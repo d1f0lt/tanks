@@ -7,12 +7,13 @@ find_package(SFML 2.5 COMPONENTS graphics audio)
 
 add_executable(
         tanks
-        source/cpp/main.cpp
-        source/cpp/tank.cpp
-        source/cpp/player.cpp
-        source/headers/tank.h
-        source/headers/player.h
-        source/headers/constants.h
+        source/main.cpp
+        source/tank.cpp
+        source/player.cpp
+        headers/tank.h
+        headers/player.h
+        headers/constants.h
+        headers/map.h
 )
 
 target_link_libraries(tanks sfml-graphics sfml-audio)
