@@ -10,10 +10,13 @@ add_executable(
         source/main.cpp
         source/tank.cpp
         source/player.cpp
+        source/bullet.cpp
+        source/movable_object.cpp
         headers/tank.h
         headers/player.h
         headers/constants.h
         headers/map.h
-)
+        headers/bullet.h
+        headers/movable_object.h)
 
 target_link_libraries(tanks sfml-graphics sfml-audio)

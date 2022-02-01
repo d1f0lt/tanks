@@ -4,31 +4,33 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <vector>
+#include "bullet.h"
 #include "constants.h"
 
 namespace Tanks {
 
-struct Tank {
+struct Tank : MovableObject {
 public:
-    explicit Tank(const std::string &filename, const sf::Vector2<float> &start_coordinates);
+    explicit Tank(const std::string &filename,
+                  const sf::Vector2<float> &start_coordinates);
 
-    virtual void update_position(Direction direction, double time) = 0;
+    [[nodiscard]] const sf::Sprite &get_tank_sprite() const;
 
-    [[nodiscard]] virtual const sf::Sprite &get_tank_sprite() const = 0;
+    void check_interaction_with_map();
 
-    [[nodiscard]] float get_tank_coordinate_x() const;
+    bool is_have_shot() const;
 
-    [[nodiscard]] float get_tank_coordinate_y() const;
+    void make_shot();
 
-    void interaction_with_map();
+    void recover_bullet();
 
 protected:
     sf::Image tank_image;
     sf::Texture tank_texture;
     sf::Sprite tank_sprite;
-    sf::Vector2<float> coordinates;
-    Tanks::Direction direction;
-    double speed = 0.3;
+
+private:
+    bool have_bullet = true;
 };
 
 }  // namespace Tanks
