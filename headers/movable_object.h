@@ -2,7 +2,6 @@
 #define TANKS_MOVABLE_OBJECT_H
 
 #include <SFML/Graphics.hpp>
-#include <string>
 #include "constants.h"
 
 namespace Tanks {

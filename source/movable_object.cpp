@@ -1,4 +1,4 @@
-#include "../headers/movable_object.h"
+#include "movable_object.h"
 
 namespace Tanks {
 

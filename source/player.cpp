@@ -1,6 +1,5 @@
-#include "../headers/player.h"
+#include "player.h"
 #include <string>
-#include <unordered_map>
 
 namespace Tanks {
 
@@ -9,20 +8,28 @@ Player::Player(const std::string &filename, sf::Vector2<float> position)
 }
 
 void Player::change_tail() {
-    static std::unordered_map<Direction, std::string>
-        translate_direction_to_string{{Direction::UP, "up"},
-                                      {Direction::DOWN, "down"},
-                                      {Direction::LEFT, "left"},
-                                      {Direction::RIGHT, "right"}};
 
-    std::string str_direction(translate_direction_to_string[get_direction()]);
+    switch (get_direction()) {
+        case Direction::LEFT:
+            tank_sprite.setTextureRect(sf::IntRect(24, 26, 24, 20));
+            tank_sprite.setScale(2, 2.4); // 24, 20 -> 48, 48
+            break;
 
-    tank_image.loadFromFile("../images/tanks/player_tank_" + str_direction +
-                            ".png");
-    tank_image.createMaskFromColor(
-        sf::Color(32, 200, 248));  // delete background
-    tank_texture.loadFromImage(tank_image);
-    tank_sprite.setTexture(tank_texture);
+        case Direction::RIGHT:
+            tank_sprite.setTextureRect(sf::IntRect(0, 26, 24, 20));
+            tank_sprite.setScale(2, 2.4);
+            break;
+
+        case Direction::UP:
+            tank_sprite.setTextureRect(sf::IntRect(0, 0, 20, 26));
+            tank_sprite.setScale(2.4, 1.846); // 20, 26 -> 48, 47.996
+            break;
+
+        case Direction::DOWN:
+            tank_sprite.setTextureRect(sf::IntRect(20, 0, 20, 26));
+            tank_sprite.setScale(2.4, 1.846);
+            break;
+    }
 
     tank_sprite.setPosition(coordinates);
 }

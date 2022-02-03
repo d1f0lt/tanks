@@ -3,6 +3,10 @@ project(tanks)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin/)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/headers/)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/)
+
+
 find_package(SFML 2.5 COMPONENTS graphics audio)
 
 add_executable(
@@ -12,11 +16,7 @@ add_executable(
         source/player.cpp
         source/bullet.cpp
         source/movable_object.cpp
-        headers/tank.h
-        headers/player.h
-        headers/constants.h
-        headers/map.h
-        headers/bullet.h
-        headers/movable_object.h)
+        source/game.cpp
+)
 
 target_link_libraries(tanks sfml-graphics sfml-audio)

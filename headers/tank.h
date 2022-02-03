@@ -2,8 +2,6 @@
 #define TANK_H_
 
 #include <SFML/Graphics.hpp>
-#include <iostream>
-#include <vector>
 #include "bullet.h"
 #include "constants.h"
 

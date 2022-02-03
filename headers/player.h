@@ -1,6 +1,7 @@
 #ifndef PLAYER_H_
 #define PLAYER_H_
 
+#include <string>
 #include "constants.h"
 #include "tank.h"
 
