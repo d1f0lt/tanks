@@ -10,11 +10,7 @@ struct Bullet final : MovableObject {
 public:
     Bullet(Direction direction, const sf::Vector2<int> &start_coordinates);
 
-    //    void change_tail() final;
-
     bool is_destroyed() const;
-
-    //    const sf::Sprite &get_bullet_sprite() const;
 
     void check_intersection_with_map();
 

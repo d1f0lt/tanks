@@ -15,7 +15,7 @@ struct MovableObject {
 
     void set_speed(double new_speed);
 
-    [[nodiscard]] const sf::Vector2<int> &get_object_coordinate() const;
+    [[nodiscard]] const sf::Vector2<int> &get_coordinates() const;
 
     [[nodiscard]] Direction get_direction() const;
 

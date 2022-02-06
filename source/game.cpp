@@ -5,8 +5,8 @@
 #include <thread>
 #include <vector>
 #include "constants.h"
-#include "player.h"
 #include "movable_object_view.h"
+#include "player.h"
 
 namespace Tanks {
 
@@ -86,7 +86,7 @@ void draw_map(sf::RenderWindow &window,
 //    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) &&
 //        player.is_have_shot()) {
 //        bullets.emplace_back(Tanks::Bullet(player.get_direction(),
-//                                           player.get_object_coordinate()));
+//                                           player.get_coordinates()));
 //        player.make_shot();
 //    }
 //
@@ -183,9 +183,9 @@ void start_game(sf::RenderWindow &window, int level) {
 
         //        player.check_interaction_with_map(); TODO
 
-        playerView.updatePosition();  // TODO make this unnesessary
-        window.draw(playerView.getObjectSprite());
+        window.draw(playerView.getSprite());
         window.display();
+
         // Hack for better performance
         std::this_thread::sleep_for(std::chrono::milliseconds(15));
     }

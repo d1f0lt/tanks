@@ -27,15 +27,13 @@ void MovableObject::update_position(Direction new_direction, double time) {
             coordinates.x += static_cast<int>(speed * time);
             break;
     }
-
-    //    change_tail();
 }
 
 void MovableObject::set_speed(double new_speed) {
     speed = new_speed;
 }
 
-[[nodiscard]] const sf::Vector2<int> &MovableObject::get_object_coordinate() const {
+[[nodiscard]] const sf::Vector2<int> &MovableObject::get_coordinates() const {
     return coordinates;
 }
 

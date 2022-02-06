@@ -10,8 +10,6 @@ struct Tank : MovableObject {
 public:
     explicit Tank(const sf::Vector2<int> &start_coordinates);
 
-//    [[nodiscard]] const sf::Sprite &get_tank_sprite() const;
-
     void check_interaction_with_map();
 
     bool is_have_shot() const;
