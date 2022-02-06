@@ -1,11 +1,12 @@
 #include "game.h"
+#include <chrono>
 #include <fstream>
 #include <iostream>
+#include <thread>
 #include <vector>
 #include "constants.h"
-#include <chrono>
-#include <thread>
 #include "player.h"
+#include "movable_object_view.h"
 
 namespace Tanks {
 
@@ -123,10 +124,16 @@ std::vector<std::vector<std::string>> parse_csv(int level) {
 }  // namespace
 
 void start_game(sf::RenderWindow &window, int level) {
+    const std::string tankImageFilename =
+        "../images/tanks/player_tanks.png";  // TODO remake initialization
+
     Tanks::Player player(
-        "../images/tanks/player_tanks.png",
-        {Tanks::MARGIN_LEFT + Tanks::TILE_SIZE,
-         Tanks::TILE_SIZE * (Tanks::MAP_HEIGHT - 2) + Tanks::MARGIN_TOP * 3});
+        //        "../images/tanks/player_tanks.png",
+        sf::Vector2<int>(Tanks::MARGIN_LEFT + Tanks::TILE_SIZE,
+                         Tanks::TILE_SIZE * (Tanks::MAP_HEIGHT - 2) +
+                             Tanks::MARGIN_TOP * 3));
+
+    Tanks::MovableView playerView(player, tankImageFilename);
 
     // map
     sf::Image map_image;
@@ -175,7 +182,9 @@ void start_game(sf::RenderWindow &window, int level) {
         //        bullets_control(player, bullets, time, window); TODO
 
         //        player.check_interaction_with_map(); TODO
-        window.draw(player.get_tank_sprite());
+
+        playerView.updatePosition();  // TODO make this unnesessary
+        window.draw(playerView.getObjectSprite());
         window.display();
         // Hack for better performance
         std::this_thread::sleep_for(std::chrono::milliseconds(15));

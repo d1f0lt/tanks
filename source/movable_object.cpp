@@ -12,30 +12,30 @@ void MovableObject::update_position(Direction new_direction, double time) {
     direction = new_direction;
     switch (direction) {
         case Direction::UP:
-            coordinates.y += static_cast<float>(speed * -1 * time);
+            coordinates.y += static_cast<int>(speed * -1 * time);
             break;
 
         case Direction::DOWN:
-            coordinates.y += static_cast<float>(speed * time);
+            coordinates.y += static_cast<int>(speed * time);
             break;
 
         case Direction::LEFT:
-            coordinates.x += static_cast<float>(speed * -1 * time);
+            coordinates.x += static_cast<int>(speed * -1 * time);
             break;
 
         case Direction::RIGHT:
-            coordinates.x += static_cast<float>(speed * time);
+            coordinates.x += static_cast<int>(speed * time);
             break;
     }
 
-    change_tail();
+    //    change_tail();
 }
 
 void MovableObject::set_speed(double new_speed) {
     speed = new_speed;
 }
 
-[[nodiscard]] sf::Vector2<int> MovableObject::get_object_coordinate() const {
+[[nodiscard]] const sf::Vector2<int> &MovableObject::get_object_coordinate() const {
     return coordinates;
 }
 

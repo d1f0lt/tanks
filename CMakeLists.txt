@@ -17,6 +17,6 @@ add_executable(
         source/bullet.cpp
         source/movable_object.cpp
         source/game.cpp
-        source/tank_view.cpp)
+        source/movable_object_view.cpp)
 
 target_link_libraries(tanks sfml-graphics sfml-audio)
