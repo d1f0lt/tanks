@@ -8,8 +8,8 @@ Bullet::Bullet(Direction direction, const sf::Vector2<float> &start_coordinates)
     bullet_image.createMaskFromColor(sf::Color(0, 0, 0));
     bullet_texture.loadFromImage(bullet_image);
     bullet_sprite.setTexture(bullet_texture);
-//    coordinates.x += 18; TODO
-//    coordinates.y += 14;
+    //    coordinates.x += 18; TODO
+    //    coordinates.y += 14;
     bullet_sprite.setPosition(coordinates);
 }
 
@@ -27,7 +27,7 @@ const sf::Sprite &Bullet::get_bullet_sprite() const {
 }
 
 // TODO
-//void Bullet::check_intersection_with_map() {
+// void Bullet::check_intersection_with_map() {
 //    if (coordinates.x < SHIFT * ONE_TILE_WIDTH + 20 ||
 //        coordinates.x > WINDOW_WIDTH - (SHIFT + 1) * ONE_TILE_WIDTH - 5 ||
 //        coordinates.y > WINDOW_HEIGHT - 45 || coordinates.y < 32) {

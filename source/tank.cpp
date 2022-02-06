@@ -20,7 +20,7 @@ Tank::Tank(const std::string &filename,
 }
 
 // TODO
-//void Tank::check_interaction_with_map() {  // The coordinates were chosen
+// void Tank::check_interaction_with_map() {  // The coordinates were chosen
 //                                           // empirically.
 //    static const int shift = ONE_TILE_WIDTH * SHIFT;
 //    coordinates.x = (coordinates.x < shift + 25 ? shift + 25 : coordinates.x);

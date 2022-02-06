@@ -1,9 +1,11 @@
 #include "game.h"
-#include "constants.h"
-#include "player.h"
-#include <vector>
 #include <fstream>
 #include <iostream>
+#include <vector>
+#include "constants.h"
+#include <chrono>
+#include <thread>
+#include "player.h"
 
 namespace Tanks {
 
@@ -25,32 +27,53 @@ void make_move(Tanks::Player &player, double time) {
     }
 }
 
-void draw_map(sf::RenderWindow &window, const std::vector<std::vector<std::string>> &map, sf::Sprite &map_sprite) {
+void draw_map(sf::RenderWindow &window,
+              const std::vector<std::vector<std::string>> &map,
+              sf::Sprite &map_sprite) {
     for (int i = 0; i < Tanks::MAP_HEIGHT; ++i) {
         for (int j = 0; j < Tanks::MAP_WIDTH; ++j) {
             std::string item = map[i][j];
             if (item == " ") {
-                map_sprite.setTextureRect(sf::IntRect(2*Tanks::TILE_SIZE, Tanks::TILE_SIZE, Tanks::TILE_SIZE, Tanks::TILE_SIZE));
+                map_sprite.setTextureRect(
+                    sf::IntRect(2 * Tanks::TILE_SIZE, Tanks::TILE_SIZE,
+                                Tanks::TILE_SIZE, Tanks::TILE_SIZE));
             } else if (item == "=") {
-                map_sprite.setTextureRect(sf::IntRect(Tanks::TILE_SIZE, 0, Tanks::TILE_SIZE, Tanks::TILE_SIZE));
+                map_sprite.setTextureRect(sf::IntRect(
+                    Tanks::TILE_SIZE, 0, Tanks::TILE_SIZE, Tanks::TILE_SIZE));
             } else if (item == "|") {
-                map_sprite.setTextureRect(sf::IntRect(0, Tanks::TILE_SIZE, Tanks::TILE_SIZE, Tanks::TILE_SIZE));
+                map_sprite.setTextureRect(sf::IntRect(
+                    0, Tanks::TILE_SIZE, Tanks::TILE_SIZE, Tanks::TILE_SIZE));
             } else if (item == "1") {
-                map_sprite.setTextureRect(sf::IntRect(Tanks::TILE_SIZE, Tanks::TILE_SIZE, Tanks::TILE_SIZE, Tanks::TILE_SIZE));
+                map_sprite.setTextureRect(
+                    sf::IntRect(Tanks::TILE_SIZE, Tanks::TILE_SIZE,
+                                Tanks::TILE_SIZE, Tanks::TILE_SIZE));
             } else if (item == "0") {
-                map_sprite.setTextureRect(sf::IntRect(Tanks::TILE_SIZE, 2*Tanks::TILE_SIZE, Tanks::TILE_SIZE, Tanks::TILE_SIZE));
+                map_sprite.setTextureRect(
+                    sf::IntRect(Tanks::TILE_SIZE, 2 * Tanks::TILE_SIZE,
+                                Tanks::TILE_SIZE, Tanks::TILE_SIZE));
             } else if (item == "~") {
-                map_sprite.setTextureRect(sf::IntRect(3*Tanks::TILE_SIZE, 0, Tanks::TILE_SIZE, Tanks::TILE_SIZE));
-            }else if (item == "[") {
-                map_sprite.setTextureRect(sf::IntRect(0, 0, Tanks::TILE_SIZE, Tanks::TILE_SIZE));
+                map_sprite.setTextureRect(sf::IntRect(3 * Tanks::TILE_SIZE, 0,
+                                                      Tanks::TILE_SIZE,
+                                                      Tanks::TILE_SIZE));
+            } else if (item == "[") {
+                map_sprite.setTextureRect(
+                    sf::IntRect(0, 0, Tanks::TILE_SIZE, Tanks::TILE_SIZE));
             } else if (item == "]") {
-                map_sprite.setTextureRect(sf::IntRect(2*Tanks::TILE_SIZE, 0, Tanks::TILE_SIZE, Tanks::TILE_SIZE));
+                map_sprite.setTextureRect(sf::IntRect(2 * Tanks::TILE_SIZE, 0,
+                                                      Tanks::TILE_SIZE,
+                                                      Tanks::TILE_SIZE));
             } else if (item == "{") {
-                map_sprite.setTextureRect(sf::IntRect(0, 2*Tanks::TILE_SIZE, Tanks::TILE_SIZE, Tanks::TILE_SIZE));
+                map_sprite.setTextureRect(sf::IntRect(0, 2 * Tanks::TILE_SIZE,
+                                                      Tanks::TILE_SIZE,
+                                                      Tanks::TILE_SIZE));
             } else if (item == "}") {
-                map_sprite.setTextureRect(sf::IntRect(2*Tanks::TILE_SIZE, 2*Tanks::TILE_SIZE, Tanks::TILE_SIZE, Tanks::TILE_SIZE));
+                map_sprite.setTextureRect(
+                    sf::IntRect(2 * Tanks::TILE_SIZE, 2 * Tanks::TILE_SIZE,
+                                Tanks::TILE_SIZE, Tanks::TILE_SIZE));
             }
-            map_sprite.setPosition(static_cast<float>(Tanks::MARGIN_LEFT + Tanks::TILE_SIZE * j),  static_cast<float>(Tanks::MARGIN_TOP + Tanks::TILE_SIZE * i));
+            map_sprite.setPosition(
+                static_cast<float>(Tanks::MARGIN_LEFT + Tanks::TILE_SIZE * j),
+                static_cast<float>(Tanks::MARGIN_TOP + Tanks::TILE_SIZE * i));
 
             window.draw(map_sprite);
         }
@@ -86,17 +109,18 @@ void draw_map(sf::RenderWindow &window, const std::vector<std::vector<std::strin
 
 std::vector<std::vector<std::string>> parse_csv(int level) {
     std::fstream file("../levels/level" + std::to_string(level) + ".csv");
-    std::vector<std::vector<std::string>> ans(Tanks::MAP_HEIGHT, std::vector<std::string>(Tanks::MAP_WIDTH));
+    std::vector<std::vector<std::string>> ans(
+        Tanks::MAP_HEIGHT, std::vector<std::string>(Tanks::MAP_WIDTH));
     std::string str;
     for (int i = 0; i < Tanks::MAP_HEIGHT; ++i) {
         std::getline(file, str);
         for (int j = 0; j < Tanks::MAP_WIDTH * 2 - 1; j += 2) {
-            ans[i][j/2] = str[j];
+            ans[i][j / 2] = str[j];
         }
     }
     return ans;
 }
-} // namespace
+}  // namespace
 
 void start_game(sf::RenderWindow &window, int level) {
     Tanks::Player player(
@@ -153,6 +177,8 @@ void start_game(sf::RenderWindow &window, int level) {
         //        player.check_interaction_with_map(); TODO
         window.draw(player.get_tank_sprite());
         window.display();
+        // Hack for better performance
+        std::this_thread::sleep_for(std::chrono::milliseconds(15));
     }
 }
 
