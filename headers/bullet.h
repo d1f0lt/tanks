@@ -8,20 +8,13 @@ namespace Tanks {
 
 struct Bullet final : MovableObject {
 public:
-    Bullet(Direction direction, const sf::Vector2<float> &start_coordinates);
+    Bullet(Direction direction, const sf::Vector2<int> &startCoordinates);
 
-    void change_tail() final;
+    bool isDestroyed() const;
 
-    bool is_destroyed() const;
-
-    const sf::Sprite &get_bullet_sprite() const;
-
-    void check_intersection_with_map();
+    void checkIntersectionWithMap();
 
 private:
-    sf::Image bullet_image;
-    sf::Texture bullet_texture;
-    sf::Sprite bullet_sprite;
     bool destroyed = false;
 };
 

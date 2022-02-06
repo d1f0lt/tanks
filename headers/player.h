@@ -9,9 +9,7 @@ namespace Tanks {
 
 struct Player final : public Tank {
 public:
-    explicit Player(const std::string &filename, sf::Vector2<float> position);
-
-    void change_tail() final;
+    explicit Player(sf::Vector2<int> position);
 
 private:
 };
