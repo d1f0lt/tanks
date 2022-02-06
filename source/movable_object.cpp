@@ -3,13 +3,13 @@
 namespace Tanks {
 
 MovableObject::MovableObject(Tanks::Direction direction,
-                             const sf::Vector2<int> &start_coordinates,
+                             const sf::Vector2<int> &startCoordinates,
                              double speed)
-    : direction(direction), coordinates(start_coordinates), speed(speed) {
+    : direction(direction), coordinates(startCoordinates), speed(speed) {
 }
 
-void MovableObject::update_position(Direction new_direction, double time) {
-    direction = new_direction;
+void MovableObject::updatePosition(Direction newDirection, double time) {
+    direction = newDirection;
     switch (direction) {
         case Direction::UP:
             coordinates.y += static_cast<int>(speed * -1 * time);
@@ -29,15 +29,15 @@ void MovableObject::update_position(Direction new_direction, double time) {
     }
 }
 
-void MovableObject::set_speed(double new_speed) {
+void MovableObject::setSpeed(double new_speed) {
     speed = new_speed;
 }
 
-[[nodiscard]] const sf::Vector2<int> &MovableObject::get_coordinates() const {
+[[nodiscard]] const sf::Vector2<int> &MovableObject::getCoordinates() const {
     return coordinates;
 }
 
-[[nodiscard]] Direction MovableObject::get_direction() const {
+[[nodiscard]] Direction MovableObject::getDirection() const {
     return direction;
 }
 

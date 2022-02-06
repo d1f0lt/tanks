@@ -12,17 +12,14 @@
 #include "movable_object.h"
 
 namespace Tanks {
-// TODO refactor it
 struct SpriteHolder {
+    [[nodiscard]] explicit SpriteHolder(
+        const std::string &imageFilename,
+        const std::vector<sf::IntRect> &rect,
+        const std::vector<sf::Vector2<float>> &scale,
+        const sf::Color &color);
+
     [[nodiscard]] sf::Sprite getSprite(Direction direction) const;
-
-    // Contructor for tank
-    explicit SpriteHolder(const std::string &filename);
-
-    explicit SpriteHolder(const std::string &imageFilename,
-                          const std::vector<sf::IntRect> &rect,
-                          const std::vector<sf::Vector2<float>> &scale,
-                          const sf::Color &color);
 
 private:
     sf::Texture texture;
@@ -37,7 +34,7 @@ public:
     [[nodiscard]] sf::Sprite getSprite() const;
 
 private:
-    const SpriteHolder holder;  // TODO make it link
+    const SpriteHolder &spriteHolder;
     const MovableObject &object;
 };
 

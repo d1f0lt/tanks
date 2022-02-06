@@ -6,6 +6,6 @@ int main() {
         sf::VideoMode(Tanks::WINDOW_WIDTH, Tanks::WINDOW_HEIGHT),
         "Just Tanks");  // create window
     // Tanks::menu(window); TODO
-    Tanks::start_game(window);
+    Tanks::startGame(window);
     return 0;
 }

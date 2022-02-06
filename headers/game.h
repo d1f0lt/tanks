@@ -5,7 +5,7 @@
 
 namespace Tanks {
 
-void start_game(sf::RenderWindow &window, int level = 1);
+void startGame(sf::RenderWindow &window, int level = 1);
 
 }
 

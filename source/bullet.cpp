@@ -2,8 +2,8 @@
 
 namespace Tanks {
 
-Bullet::Bullet(Direction direction, const sf::Vector2<int> &start_coordinates)
-    : MovableObject(direction, start_coordinates, 0.4) {
+Bullet::Bullet(Direction direction, const sf::Vector2<int> &startCoordinates)
+    : MovableObject(direction, startCoordinates, 0.4) {
     // TODO make MovableView for bullet
     //    bullet_image.loadFromFile("../images/bullet.png");
     //    bullet_image.createMaskFromColor(sf::Color(0, 0, 0));
@@ -14,12 +14,12 @@ Bullet::Bullet(Direction direction, const sf::Vector2<int> &start_coordinates)
     //    bullet_sprite.setPosition(sf::Vector2<float>(coordinates));
 }
 
-bool Bullet::is_destroyed() const {
+bool Bullet::isDestroyed() const {
     return destroyed;
 }
 
 // TODO
-// void Bullet::check_intersection_with_map() {
+// void Bullet::checkIntersectionWithMap() {
 //    if (coordinates.x < SHIFT * ONE_TILE_WIDTH + 20 ||
 //        coordinates.x > WINDOW_WIDTH - (SHIFT + 1) * ONE_TILE_WIDTH - 5 ||
 //        coordinates.y > WINDOW_HEIGHT - 45 || coordinates.y < 32) {

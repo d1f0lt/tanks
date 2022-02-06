@@ -8,16 +8,16 @@ namespace Tanks {
 
 struct MovableObject {
     explicit MovableObject(Tanks::Direction direction,
-                           const sf::Vector2<int> &start_coordinates,
+                           const sf::Vector2<int> &startCoordinates,
                            double speed = 0.3);  // test speed, by default 0.15
 
-    void update_position(Direction direction, double time);
+    void updatePosition(Direction newDirection, double time);
 
-    void set_speed(double new_speed);
+    void setSpeed(double new_speed);
 
-    [[nodiscard]] const sf::Vector2<int> &get_coordinates() const;
+    [[nodiscard]] const sf::Vector2<int> &getCoordinates() const;
 
-    [[nodiscard]] Direction get_direction() const;
+    [[nodiscard]] Direction getDirection() const;
 
 protected:
     double speed;
