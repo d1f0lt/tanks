@@ -3,7 +3,7 @@
 
 namespace Tanks {
 
-Player::Player(const std::string &filename, sf::Vector2<float> position)
+Player::Player(const std::string &filename, sf::Vector2<int> position)
     : Tank(filename, position) {
 }
 
@@ -30,7 +30,7 @@ void Player::change_tail() {
             break;
     }
 
-    tank_sprite.setPosition(coordinates);
+    tank_sprite.setPosition(sf::Vector2<float>(coordinates));
 }
 
 }  // namespace Tanks

@@ -2,7 +2,7 @@
 
 namespace Tanks {
 
-Bullet::Bullet(Direction direction, const sf::Vector2<float> &start_coordinates)
+Bullet::Bullet(Direction direction, const sf::Vector2<int> &start_coordinates)
     : MovableObject(direction, start_coordinates, 0.4) {
     bullet_image.loadFromFile("../images/bullet.png");
     bullet_image.createMaskFromColor(sf::Color(0, 0, 0));
@@ -10,12 +10,12 @@ Bullet::Bullet(Direction direction, const sf::Vector2<float> &start_coordinates)
     bullet_sprite.setTexture(bullet_texture);
     //    coordinates.x += 18; TODO
     //    coordinates.y += 14;
-    bullet_sprite.setPosition(coordinates);
+    bullet_sprite.setPosition(sf::Vector2<float>(coordinates));
 }
 
 void Bullet::change_tail() {
     bullet_sprite.setTexture(bullet_texture);
-    bullet_sprite.setPosition(coordinates);
+    bullet_sprite.setPosition(sf::Vector2<float>(coordinates));
 }
 
 bool Bullet::is_destroyed() const {

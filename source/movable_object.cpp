@@ -3,7 +3,7 @@
 namespace Tanks {
 
 MovableObject::MovableObject(Tanks::Direction direction,
-                             const sf::Vector2<float> &start_coordinates,
+                             const sf::Vector2<int> &start_coordinates,
                              double speed)
     : direction(direction), coordinates(start_coordinates), speed(speed) {
 }
@@ -35,7 +35,7 @@ void MovableObject::set_speed(double new_speed) {
     speed = new_speed;
 }
 
-[[nodiscard]] sf::Vector2<float> MovableObject::get_object_coordinate() const {
+[[nodiscard]] sf::Vector2<int> MovableObject::get_object_coordinate() const {
     return coordinates;
 }
 

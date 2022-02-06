@@ -3,7 +3,7 @@
 namespace Tanks {
 
 Tank::Tank(const std::string &filename,
-           const sf::Vector2<float> &start_coordinates)
+           const sf::Vector2<int> &start_coordinates)
     : MovableObject(Direction::UP, start_coordinates) {
     tank_image.loadFromFile(filename);
     tank_image.createMaskFromColor(
@@ -12,7 +12,6 @@ Tank::Tank(const std::string &filename,
     tank_sprite.setTexture(tank_texture);
     tank_sprite.setTextureRect(sf::IntRect(0, 0, 20, 26));
     tank_sprite.scale(2.4, 1.846);
-    tank_sprite.setPosition(coordinates);
 }
 
 [[nodiscard]] const sf::Sprite &Tank::get_tank_sprite() const {
