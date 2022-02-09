@@ -7,7 +7,7 @@
 namespace Tanks {
 
 struct MovableObject {
-    explicit MovableObject(Tanks::Direction direction,
+    explicit MovableObject(Direction direction,
                            const sf::Vector2<int> &startCoordinates,
                            double speed = 0.3);  // test speed, by default 0.15
 
