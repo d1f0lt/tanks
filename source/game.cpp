@@ -40,7 +40,7 @@ void makeMove(Player &player, double time) {
 //        if (!iterator->isDestroyed()) {
 //            iterator->updatePosition(iterator->getDirection(), time);
 //            window.draw(iterator->get_bullet_sprite());
-////            iterator->checkIntersectionWithMap();
+//            iterator->checkIntersectionWithMap();
 //            iterator++;
 //        }
 //    }
@@ -84,7 +84,7 @@ void startGame(sf::RenderWindow &window, int level) {
 
     sf::Clock clock;
 
-    //    std::list<int> blocks;
+    std::list<Block *> blocks(std::move(map.getPhysicalMapBlocks()));
     //    std::list<Bullet> bullets; TODO
 
     while (window.isOpen()) {
@@ -111,7 +111,7 @@ void startGame(sf::RenderWindow &window, int level) {
 
         //        bullets_control(player, bullets, time, window); TODO
 
-        //        player.check_interaction_with_map(); TODO
+        player.checkCollisionWithMap(blocks);
 
         window.draw(playerView.getSprite());
         window.display();

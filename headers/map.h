@@ -2,13 +2,39 @@
 #define MAP_H
 
 #include <SFML/Graphics.hpp>
+#include <list>
 #include "constants.h"
 
 namespace Tanks {
 
-enum class Blocks {LEFT_UP_CORNER, RIGHT_UP_CORNER, LEFT_DOWN_CORNER, RIGHT_DOWN_CORNER,
-                   VERTICAL_BORDER, HORIZONTAL_BORDER,
-                   FLOOR, BRICK, STEEL, WATER};
+enum class BlockType {
+    LEFT_UP_CORNER,
+    RIGHT_UP_CORNER,
+    LEFT_DOWN_CORNER,
+    RIGHT_DOWN_CORNER,
+    VERTICAL_BORDER,
+    HORIZONTAL_BORDER,
+    FLOOR,
+    BRICK,
+    STEEL,
+    WATER
+};
+
+struct Block {
+public:
+    explicit Block(const sf::Vector2<int> &coordinates_,
+                   const sf::Vector2<int> &mapPlacement_,
+                   BlockType type_);
+
+    const sf::Vector2<int> &getCoordinates() const;
+
+private:
+    const sf::Vector2<int> coordinates;
+    const sf::Vector2<int> mapPlacement;
+    BlockType type;
+
+    friend struct Map;
+};
 
 struct Map final {
 public:
@@ -18,13 +44,17 @@ public:
 
     void drawMap(sf::RenderWindow &window);
 
+    std::list<Block *> getPhysicalMapBlocks();
+
+    void destroyBlock(int row, int col);
+
 private:
-    std::vector<std::vector<Blocks>> map;
+    std::vector<std::vector<Block>> map;
     sf::Image image;
     sf::Texture texture;
     sf::Sprite sprite;
 };
 
-}
+}  // namespace Tanks
 
-#endif // MAP_H
+#endif  // MAP_H
