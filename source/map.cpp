@@ -4,10 +4,15 @@
 
 namespace Tanks {
 
-Block::Block(const sf::Vector2<int> &coordinates_,
-             const sf::Vector2<int> &mapPlacement_,
-             BlockType type_)
-    : coordinates(coordinates_), mapPlacement(mapPlacement_), type(type_) {
+Block::Block(const sf::Vector2<int> &coordinates_, BlockType type_)
+    : coordinates(coordinates_), type(type_) {
+}
+
+void Block::destroyBlock() {
+    assert(
+        type ==
+        BlockType::BRICK);  // TODO remake, if we want destroy not only bricks
+    type = BlockType::FLOOR;
 }
 
 const sf::Vector2<int> &Block::getCoordinates() const {
@@ -46,7 +51,6 @@ void Map::loadLevel(int level) {
             int realCol = col / 2;
             map[row].emplace_back(Block({MARGIN_LEFT + TILE_SIZE * realCol,
                                          MARGIN_TOP + TILE_SIZE * row},
-                                        {row, realCol},
                                         translateStringToEnum[str[col]]));
         }
     }
@@ -124,11 +128,6 @@ std::list<Block *> Map::getPhysicalMapBlocks() {
         }
     }
     return ans;
-}
-
-void Map::destroyBlock(int row, int col) {
-    assert(map[row][col].type != BlockType::FLOOR);
-    map[row][col].type = BlockType::FLOOR;
 }
 
 }  // namespace Tanks

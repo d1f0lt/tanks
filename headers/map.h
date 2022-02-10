@@ -22,15 +22,14 @@ enum class BlockType {
 
 struct Block {
 public:
-    explicit Block(const sf::Vector2<int> &coordinates_,
-                   const sf::Vector2<int> &mapPlacement_,
-                   BlockType type_);
+    explicit Block(const sf::Vector2<int> &coordinates_, BlockType type_);
 
-    const sf::Vector2<int> &getCoordinates() const;
+    [[nodiscard]] const sf::Vector2<int> &getCoordinates() const;
+
+    void destroyBlock();
 
 private:
     const sf::Vector2<int> coordinates;
-    const sf::Vector2<int> mapPlacement;
     BlockType type;
 
     friend struct Map;
@@ -45,8 +44,6 @@ public:
     void drawMap(sf::RenderWindow &window);
 
     std::list<Block *> getPhysicalMapBlocks();
-
-    void destroyBlock(int row, int col);
 
 private:
     std::vector<std::vector<Block>> map;
