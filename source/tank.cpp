@@ -32,27 +32,25 @@ void Tank::checkCollisionWithMap(Map &map, double time) {
         for (const auto &item : field[row]) {
             sf::Vector2<int> blockCoordinates = item->getCoordinates();
             if (checkIntersectionOfRectangles(coordinates, blockCoordinates) && item->canIntersectWithTank()) {
+                Direction currentDirection = direction;
                 switch (getDirection()) {
                     case Direction::LEFT:
                         updatePosition(Direction::RIGHT, time);
-                        direction = Direction::LEFT;
                         break;
 
                     case Direction::RIGHT:
                         updatePosition(Direction::LEFT, time);
-                        direction = Direction::RIGHT;
                         break;
 
                     case Direction::UP:
                         updatePosition(Direction::DOWN, time);
-                        direction = Direction::UP;
                         break;
 
                     case Direction::DOWN:
                         updatePosition(Direction::UP, time);
-                        direction = Direction::DOWN;
                         break;
                 }
+                direction = currentDirection;
             }
         }
     }

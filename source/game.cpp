@@ -86,16 +86,15 @@ void startGame(sf::RenderWindow &window, int level) {
 
         GameController::checkPause();
         GameController::makeMove(player, time);
+        player.checkCollisionWithMap(map, time);
+
+        //        bullets_control(player, bullets, time, window); TODO
 
         // redraw
         window.clear();
         window.draw(backgroundSprite);
 
         map.drawMap(window);
-
-        //        bullets_control(player, bullets, time, window); TODO
-
-        player.checkCollisionWithMap(map, time);
 
         window.draw(playerView.getSprite());
         window.display();
