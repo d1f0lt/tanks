@@ -19,6 +19,7 @@ add_executable(
         source/game.cpp
         source/movable_object_view.cpp
         source/map.cpp
+        source/controller.cpp
 )
 
 target_link_libraries(tanks sfml-graphics sfml-audio)
