@@ -4,8 +4,7 @@
 
 namespace Tanks {
 
-Block::Block(const sf::Vector2<int> &coordinates_)
-    : coordinates(coordinates_) {
+Block::Block(const sf::Vector2<int> &coordinates_) : coordinates(coordinates_) {
 }
 
 // void Block::destroyBlock() {
@@ -23,7 +22,8 @@ bool Block::canIntersectWithTank() const {
     return true;
 }
 
-FloorBlock::FloorBlock(const sf::Vector2<int> &coordinates_) : Block(coordinates_) {
+FloorBlock::FloorBlock(const sf::Vector2<int> &coordinates_)
+    : Block(coordinates_) {
 }
 
 bool FloorBlock::canIntersectWithTank() const {
@@ -34,7 +34,8 @@ BlockSpriteHolder::BlockSpriteHolder(const BlockType type,
                                      sf::Texture &texture,
                                      const sf::Vector2<int> &coordinates) {
     sprite.setTexture(texture);
-    sprite.setPosition(static_cast<float>(coordinates.x), static_cast<float>(coordinates.y));
+    sprite.setPosition(static_cast<float>(coordinates.x),
+                       static_cast<float>(coordinates.y));
 
     switch (type) {
         case BlockType::FLOOR:
@@ -150,8 +151,9 @@ void Map::drawMap(sf::RenderWindow &window) {
     }
 }
 
-std::vector<std::vector<Block*>> Map::getMap() {
-    std::vector<std::vector<Block*>> ans(MAP_HEIGHT, std::vector<Block*>(MAP_WIDTH));
+std::vector<std::vector<Block *>> Map::getMap() {
+    std::vector<std::vector<Block *>> ans(MAP_HEIGHT,
+                                          std::vector<Block *>(MAP_WIDTH));
     for (int row = 0; row < MAP_HEIGHT; ++row) {
         for (int col = 0; col < MAP_WIDTH; ++col) {
             ans[row][col] = map[row][col].block.get();
