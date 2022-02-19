@@ -3,10 +3,11 @@
 namespace Tanks {
 
 namespace {
-bool checkIntersectionOfRectangles(const sf::Vector2<int> &firstLeftUpCorner,
-                                   const sf::Vector2<int> &secondLeftUpCorner,
-                                   int firstTileSize = TANK_SIZE,
-                                   int secondTileSize = TILE_SIZE) {
+[[nodiscard]] bool checkIntersectionOfRectangles(
+    const sf::Vector2<int> &firstLeftUpCorner,
+    const sf::Vector2<int> &secondLeftUpCorner,
+    int firstTileSize = TANK_SIZE,
+    int secondTileSize = TILE_SIZE) {
     const sf::Vector2<int> firstRightDownCorner = {
         firstLeftUpCorner.x + firstTileSize,
         firstLeftUpCorner.y + firstTileSize};
@@ -25,40 +26,47 @@ Tank::Tank(const sf::Vector2<int> &start_coordinates)
     : MovableObject(Direction::UP, start_coordinates) {
 }
 
-void Tank::checkCollisionWithMap(std::list<Block *> &blocks) {
-    for (auto &item : blocks) {
-        sf::Vector2<int> blockCoordinates = item->getCoordinates();
-        if (checkIntersectionOfRectangles(coordinates, blockCoordinates)) {
-            switch (getDirection()) {
-                case Direction::LEFT:
-                    coordinates.x = blockCoordinates.x + TILE_SIZE;
-                    break;
+void Tank::checkCollisionWithMap(Map &map, double time) {
+    const std::vector<std::vector<Block *>> field = map.getMap();
+    for (int row = 0; row < MAP_HEIGHT; ++row) {
+        for (const auto &item : field[row]) {
+            sf::Vector2<int> blockCoordinates = item->getCoordinates();
+            if (checkIntersectionOfRectangles(coordinates, blockCoordinates) && item->canIntersectWithTank()) {
+                switch (getDirection()) {
+                    case Direction::LEFT:
+                        updatePosition(Direction::RIGHT, time);
+                        direction = Direction::LEFT;
+                        break;
 
-                case Direction::RIGHT:
-                    coordinates.x = blockCoordinates.x - TANK_SIZE;
-                    break;
+                    case Direction::RIGHT:
+                        updatePosition(Direction::LEFT, time);
+                        direction = Direction::RIGHT;
+                        break;
 
-                case Direction::UP:
-                    coordinates.y = blockCoordinates.y + TILE_SIZE;
-                    break;
+                    case Direction::UP:
+                        updatePosition(Direction::DOWN, time);
+                        direction = Direction::UP;
+                        break;
 
-                case Direction::DOWN:
-                    coordinates.y = blockCoordinates.y - TANK_SIZE;
-                    break;
+                    case Direction::DOWN:
+                        updatePosition(Direction::UP, time);
+                        direction = Direction::DOWN;
+                        break;
+                }
             }
         }
     }
 }
 
-bool Tank::is_have_shot() const {
+bool Tank::isHaveShot() const {
     return have_bullet;
 }
 
-void Tank::make_shot() {
+void Tank::makeShot() {
     have_bullet = false;
 }
 
-void Tank::recover_bullet() {
+void Tank::recoverBullet() {
     have_bullet = true;
 }
 

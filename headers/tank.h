@@ -1,7 +1,6 @@
 #ifndef TANK_H_
 #define TANK_H_
 
-#include <list>
 #include "bullet.h"
 #include "constants.h"
 #include "map.h"
@@ -12,13 +11,13 @@ struct Tank : MovableObject {
 public:
     explicit Tank(const sf::Vector2<int> &start_coordinates);
 
-    void checkCollisionWithMap(std::list<Block *> &blocks) final;
+    void checkCollisionWithMap(Map &map, double time) final;
 
-    bool is_have_shot() const;
+    [[nodiscard]] bool isHaveShot() const;
 
-    void make_shot();
+    void makeShot();
 
-    void recover_bullet();
+    void recoverBullet();
 
 private:
     bool have_bullet = true;

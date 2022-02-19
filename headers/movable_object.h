@@ -15,7 +15,7 @@ struct MovableObject {
 
     void updatePosition(Direction newDirection, double time);
 
-    virtual void checkCollisionWithMap(std::list<Block *> &blocks) = 0;
+    virtual void checkCollisionWithMap(Map &map, double time) = 0;
 
     void setSpeed(double new_speed);
 
@@ -26,8 +26,6 @@ struct MovableObject {
 protected:
     double speed;
     sf::Vector2<int> coordinates;
-
-private:
     Direction direction;
 };
 

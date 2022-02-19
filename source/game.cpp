@@ -1,8 +1,8 @@
 #include "game.h"
 #include <chrono>
-#include <list>
 #include <thread>
 #include "constants.h"
+#include "controller.h"
 #include "map.h"
 #include "movable_object_view.h"
 #include "player.h"
@@ -10,22 +10,6 @@
 namespace Tanks {
 
 namespace {
-
-void makeMove(Player &player, double time) {
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) ||
-        sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-        player.updatePosition(Direction::LEFT, time);
-    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) ||
-               sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-        player.updatePosition(Direction::RIGHT, time);
-    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) ||
-               sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-        player.updatePosition(Direction::DOWN, time);
-    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) ||
-               sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-        player.updatePosition(Direction::UP, time);
-    }
-}
 
 // void bullets_control(Player &player, std::list<Bullet>
 // &bullets, double time, sf::RenderWindow &window) {
@@ -84,7 +68,6 @@ void startGame(sf::RenderWindow &window, int level) {
 
     sf::Clock clock;
 
-    std::list<Block *> blocks(std::move(map.getPhysicalMapBlocks()));
     //    std::list<Bullet> bullets; TODO
 
     while (window.isOpen()) {
@@ -101,7 +84,8 @@ void startGame(sf::RenderWindow &window, int level) {
                 window.close();
         }
 
-        makeMove(player, time);
+        GameController::checkPause();
+        GameController::makeMove(player, time);
 
         // redraw
         window.clear();
@@ -111,7 +95,7 @@ void startGame(sf::RenderWindow &window, int level) {
 
         //        bullets_control(player, bullets, time, window); TODO
 
-        player.checkCollisionWithMap(blocks);
+        player.checkCollisionWithMap(map, time);
 
         window.draw(playerView.getSprite());
         window.display();
