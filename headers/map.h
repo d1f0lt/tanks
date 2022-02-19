@@ -2,8 +2,8 @@
 #define MAP_H
 
 #include <SFML/Graphics.hpp>
-#include <list>
 #include "constants.h"
+#include <memory>
 
 namespace Tanks {
 
@@ -22,18 +22,42 @@ enum class BlockType {
 
 struct Block {
 public:
-    explicit Block(const sf::Vector2<int> &coordinates_, BlockType type_);
+    explicit Block(const sf::Vector2<int> &coordinates_);
 
     [[nodiscard]] const sf::Vector2<int> &getCoordinates() const;
 
-    void destroyBlock();
+    [[nodiscard]] virtual bool canIntersectWithTank() const; // TODO rename
+
+//    void destroyBlock();
 
 private:
     const sf::Vector2<int> coordinates;
-    BlockType type;
+};
+
+struct FloorBlock final : Block { // TODO add new
+public:
+
+    explicit FloorBlock(const sf::Vector2<int> &coordinates_);
+
+    [[nodiscard]] bool canIntersectWithTank() const final;
+};
+
+
+struct BlockSpriteHolder {
+public:
+    BlockSpriteHolder(BlockType type, sf::Texture &texture, const sf::Vector2<int> &coordinates_);
+
+    const sf::Sprite &getSprite() const;
+
+private:
+    std::unique_ptr<Block> block;
+    sf::Sprite sprite;
+
+    void changeSprite(BlockType new_type);
 
     friend struct Map;
 };
+
 
 struct Map final {
 public:
@@ -43,13 +67,15 @@ public:
 
     void drawMap(sf::RenderWindow &window);
 
-    std::list<Block *> getPhysicalMapBlocks();
-
 private:
-    std::vector<std::vector<Block>> map;
+    std::vector<std::vector<BlockSpriteHolder>> map;
     sf::Image image;
     sf::Texture texture;
     sf::Sprite sprite;
+
+    std::vector<std::vector<Block*>> getMap();
+
+    friend struct Tank;
 };
 
 }  // namespace Tanks
