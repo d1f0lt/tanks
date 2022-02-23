@@ -3,6 +3,7 @@
 
 #include "bullet.h"
 #include "constants.h"
+#include "map.h"
 
 namespace Tanks {
 
@@ -10,13 +11,13 @@ struct Tank : MovableObject {
 public:
     explicit Tank(const sf::Vector2<int> &start_coordinates);
 
-    void check_interaction_with_map();
+    void checkCollisionWithMap(Map &map, double time) final;
 
-    bool is_have_shot() const;
+    [[nodiscard]] bool isHaveShot() const;
 
-    void make_shot();
+    void makeShot();
 
-    void recover_bullet();
+    void recoverBullet();
 
 private:
     bool have_bullet = true;

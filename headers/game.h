@@ -9,4 +9,4 @@ void startGame(sf::RenderWindow &window, int level = 1);
 
 }
 
-#endif // GAME_H_
+#endif  // GAME_H_

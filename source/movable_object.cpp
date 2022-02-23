@@ -2,7 +2,7 @@
 
 namespace Tanks {
 
-MovableObject::MovableObject(Tanks::Direction direction,
+MovableObject::MovableObject(Direction direction,
                              const sf::Vector2<int> &startCoordinates,
                              double speed)
     : direction(direction), coordinates(startCoordinates), speed(speed) {
