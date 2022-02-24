@@ -1,4 +1,6 @@
 #pragma once
+#ifndef TANKS_BLOCKS_H
+#define TANKS_BLOCKS_h
 
 #include <array>
 #include "entity.h"
@@ -14,3 +16,5 @@ private:
     BlockType type;
 };
 }  // namespace tanks::model
+
+#endif  // TANKS_BLOCKS_H

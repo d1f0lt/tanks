@@ -1,5 +1,4 @@
 #include "game_model.h"
-#include <cassert>
 
 namespace tanks::model {
 void IdMap::removeEntityById(int id) {

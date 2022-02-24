@@ -1,7 +1,3 @@
-//
-// Created by ilma4 on 2/18/22.
-//
-
 #pragma once
 #ifndef TANKS_GROUPED_ENTITIES_H
 #define TANKS_GROUPED_ENTITIES_H
@@ -9,7 +5,10 @@
 #include "entity.h"
 
 namespace tanks::model {
-struct DrawIterator {};
+struct DrawIterator {
+public:
+private:
+};
 
 class GroupedEntities {
 public:

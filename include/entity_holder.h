@@ -1,7 +1,3 @@
-//
-// Created by ilma4 on 2/18/22.
-//
-
 #pragma once
 #ifndef TANKS_ENTITY_HOLDER_H
 #define TANKS_ENTITY_HOLDER_H

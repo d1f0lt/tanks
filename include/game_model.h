@@ -1,4 +1,6 @@
 #pragma once
+#ifndef TANKS_GAME_MODEL_H
+#define TANKS_GAME_MODEL_H
 
 #include "entity.h"
 #include "entity_holder.h"
@@ -37,3 +39,5 @@ private:
     EntityHolder entityHolder;
 };
 }  // namespace tanks::model
+
+#endif  // TANKS_GAME_MODEL_H

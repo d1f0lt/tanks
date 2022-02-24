@@ -1,7 +1,3 @@
-//
-// Created by ilma4 on 2/18/22.
-//
-
 #include "entity_holder.h"
 
 namespace tanks::model {

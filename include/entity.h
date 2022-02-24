@@ -1,4 +1,6 @@
 #pragma once
+#ifndef TANKS_ENTITY_H
+#define TANKS_ENTITY_H
 
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/System/Vector2.hpp>
@@ -37,3 +39,5 @@ private:
 };
 
 }  // namespace tanks::model
+
+#endif  // TANKS_ENTITY_H
