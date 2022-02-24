@@ -8,7 +8,6 @@ namespace tanks::model {
 class GameMap {
 public:
     [[nodiscard]] int getWidth() const;
-
     [[nodiscard]] int getHeight() const;
 
     [[nodiscard]] Entity *getEntityByCoords(const sf::Vector2<int> &coords);
@@ -16,7 +15,6 @@ public:
     void addEntity(Entity *entity);
 
     void removeEntityByCoords(const sf::Vector2<int> &coords);
-
     void removeEntity(Entity *entity);
 
 private:

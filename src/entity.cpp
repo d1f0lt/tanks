@@ -9,6 +9,7 @@ sf::Rect<int> Entity::getRect() const {
     return rect;
 }
 
+// TODO сделать из этого нормальный класс "прямоугольник"
 int Entity::getWidth() const {
     return getRect().width;
 }

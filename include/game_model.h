@@ -10,10 +10,8 @@
 namespace tanks::model {
 class IdMap {
 public:
-    void removeEntityById(int id);
-
     void addEntity(Entity *entity);
-
+    void removeEntityById(int id);
     [[nodiscard]] Entity *getEntityById(int id);
 
 private:
@@ -23,14 +21,12 @@ private:
 class GameModel {
 public:
     [[nodiscard]] Entity *getEntityById(int id);
-
     [[nodiscard]] Entity *getEntityByCoords(const sf::Vector2<int> &coords);
 
     [[nodiscard]] DrawIterator getIterator() const;
 
 private:
     void addEntity(std::unique_ptr<Entity> entity);
-
     void removeEntityById(int id);
 
     GameMap map;
