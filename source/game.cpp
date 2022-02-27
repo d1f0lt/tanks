@@ -104,6 +104,9 @@ void startGame(sf::RenderWindow &window, int level) {
 
         if (pause.isPause()) {
             pause.drawPause(window);
+            if (PauseController::checkMouse(pause, window)) {
+                return;
+            }
         }
 
         window.display();

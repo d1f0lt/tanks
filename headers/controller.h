@@ -2,6 +2,7 @@
 #define CONTROLLER_H
 
 #include "player.h"
+#include "pause.h"
 
 namespace Tanks {
 
@@ -10,6 +11,10 @@ public:
     static bool isEscReleased(const sf::Event &event);
 
     static void makeMove(Player &player, double time);
+};
+
+struct PauseController final {
+    static bool checkMouse(Pause &pause, sf::RenderWindow &window);
 };
 
 } // namespace Tanks
