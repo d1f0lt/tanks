@@ -2,10 +2,8 @@
 
 namespace Tanks {
 
-void GameController::checkPause() {
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
-        //        pause()
-    }
+bool GameController::isEscReleased(const sf::Event &event) {
+    return (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Escape);
 }
 
 void GameController::makeMove(Player &player, const double time) {

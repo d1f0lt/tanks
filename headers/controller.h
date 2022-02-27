@@ -2,13 +2,12 @@
 #define CONTROLLER_H
 
 #include "player.h"
-//#include "pause.h"
 
 namespace Tanks {
 
 struct GameController final {
 public:
-    static void checkPause();
+    static bool isEscReleased(const sf::Event &event);
 
     static void makeMove(Player &player, double time);
 };
