@@ -2,9 +2,9 @@
 #define PAUSE_H
 
 #include <SFML/Graphics.hpp>
-#include "constants.h"
-#include <vector>
 #include <memory>
+#include <vector>
+#include "constants.h"
 
 namespace Tanks {
 
@@ -12,7 +12,6 @@ struct PauseItem;
 
 struct Pause final {
 public:
-
     Pause();
 
     void drawPause(sf::RenderWindow &window) const;
@@ -27,7 +26,8 @@ private:
     std::vector<std::unique_ptr<PauseItem>> items;
     const static int pauseWidth = 400;
 
-    [[nodiscard]] const std::vector<std::unique_ptr<PauseItem>> &getItems() const;
+    [[nodiscard]] const std::vector<std::unique_ptr<PauseItem>> &getItems()
+        const;
 
     friend struct PauseButton;
     friend struct PauseController;
@@ -35,7 +35,8 @@ private:
 
 struct PauseItem {
 public:
-    explicit PauseItem(const std::string &path, const sf::Vector2<float> &coordinates);
+    explicit PauseItem(const std::string &path,
+                       const sf::Vector2<float> &coordinates);
 
     virtual void drawSprite(sf::RenderWindow &window) const;
 
@@ -65,6 +66,6 @@ private:
     friend struct PauseController;
 };
 
-}
+}  // namespace Tanks
 
 #endif

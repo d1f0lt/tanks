@@ -5,8 +5,8 @@
 #include "controller.h"
 #include "map.h"
 #include "movable_object_view.h"
-#include "player.h"
 #include "pause.h"
+#include "player.h"
 
 namespace Tanks {
 
@@ -104,7 +104,8 @@ void startGame(sf::RenderWindow &window, int level) {
 
         if (pause.isPause()) {
             pause.drawPause(window);
-            if (PauseController::checkMouse(pause, window)) {
+            if (PauseController::checkMouse(
+                    pause, window)) {  // TODO remake, add enum class
                 return;
             }
         }

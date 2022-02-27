@@ -1,8 +1,8 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
-#include "player.h"
 #include "pause.h"
+#include "player.h"
 
 namespace Tanks {
 
@@ -17,6 +17,6 @@ struct PauseController final {
     static bool checkMouse(Pause &pause, sf::RenderWindow &window);
 };
 
-} // namespace Tanks
+}  // namespace Tanks
 
-#endif // CONTROLLER_H
+#endif  // CONTROLLER_H

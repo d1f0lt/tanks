@@ -3,7 +3,8 @@
 namespace Tanks {
 
 bool GameController::isEscReleased(const sf::Event &event) {
-    return (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Escape);
+    return (event.type == sf::Event::KeyReleased &&
+            event.key.code == sf::Keyboard::Escape);
 }
 
 void GameController::makeMove(Player &player, const double time) {
@@ -22,13 +23,18 @@ void GameController::makeMove(Player &player, const double time) {
     }
 }
 
-bool PauseController::checkMouse(Pause &pause, sf::RenderWindow &window) { // TODO rename
+bool PauseController::checkMouse(Pause &pause,
+                                 sf::RenderWindow &window) {  // TODO rename
     auto &items = pause.getItems();
     for (int i = 1; i < items.size(); ++i) {
         auto item = dynamic_cast<PauseButton *>(items[i].get());
-        auto coordinates = static_cast<sf::Vector2<int>>(item->rectangle.getPosition());
-        auto proportions = static_cast<sf::Vector2<int>>(item->rectangle.getSize());
-        if (sf::IntRect(coordinates.x, coordinates.y, proportions.x, proportions.y).contains(sf::Mouse::getPosition(window))) {
+        auto coordinates =
+            static_cast<sf::Vector2<int>>(item->rectangle.getPosition());
+        auto proportions =
+            static_cast<sf::Vector2<int>>(item->rectangle.getSize());
+        if (sf::IntRect(coordinates.x, coordinates.y, proportions.x,
+                        proportions.y)
+                .contains(sf::Mouse::getPosition(window))) {
             item->hover();
             if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
                 switch (i) {  // TODO remake
@@ -43,7 +49,8 @@ bool PauseController::checkMouse(Pause &pause, sf::RenderWindow &window) { // TO
             }
         }
     }
-    return false;;
+    return false;
+    ;
 }
 
 }  // namespace Tanks
