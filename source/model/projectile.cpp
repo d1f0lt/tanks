@@ -1,7 +1,3 @@
-//
-// Created by ilma4 on 2/18/22.
-//
+#include "projectile.h"
 
-namespace tanks::model{
-
-}
+namespace tanks::model {}

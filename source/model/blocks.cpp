@@ -5,7 +5,7 @@
 #include "blocks.h"
 
 namespace tanks::model {
-    BlockType Block::getType() const {
-        return type;
-    }
+BlockType Block::getType() const {
+    return type;
 }
+}  // namespace tanks::model

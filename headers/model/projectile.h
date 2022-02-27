@@ -4,11 +4,8 @@
 
 namespace tanks::model {
 
-
-    class Projectile : Entity, Entity {
-    public:
-
-    private:
-
-    };
-}
+class Projectile : Entity {
+public:
+private:
+};
+}  // namespace tanks::model
