@@ -8,6 +8,8 @@
 
 namespace Tanks {
 
+enum class Button { RESUME, NEW_GAME, SETTINGS, EXIT };
+
 struct PauseItem;
 
 struct Pause final {
@@ -58,7 +60,7 @@ public:
     void hover();
 
 private:
-    mutable sf::RectangleShape rectangle;
+    mutable sf::RectangleShape rectangle;  // we want drawSprite to be a const
     const static int rectangleHeight = 80;
     const static int rectangleWidth = Pause::pauseWidth;
 

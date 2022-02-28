@@ -23,11 +23,19 @@ void GameController::makeMove(Player &player, const double time) {
     }
 }
 
-bool PauseController::checkMouse(Pause &pause,
-                                 sf::RenderWindow &window) {  // TODO rename
+std::optional<Button> PauseController::control(Pause &pause,
+                                               sf::RenderWindow &window) {
     auto &items = pause.getItems();
-    for (int i = 1; i < items.size(); ++i) {
+    static std::unordered_map<int, Button> translateIntToButtonType{
+        {1, Button::RESUME},
+        {2, Button::NEW_GAME},
+        {3, Button::SETTINGS},
+        {4, Button::EXIT}};
+    for (int i = 0; i < items.size(); ++i) {
         auto item = dynamic_cast<PauseButton *>(items[i].get());
+        if (item == nullptr) {  // header
+            continue;
+        }
         auto coordinates =
             static_cast<sf::Vector2<int>>(item->rectangle.getPosition());
         auto proportions =
@@ -37,20 +45,25 @@ bool PauseController::checkMouse(Pause &pause,
                 .contains(sf::Mouse::getPosition(window))) {
             item->hover();
             if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-                switch (i) {  // TODO remake
-                    case 1:
+                Button button = translateIntToButtonType[i];
+                switch (button) {
+                    case Button::RESUME:
                         pause.pause = false;
                         break;
-                    case 4:
-                        return true;
-                    default:
+                    case Button::NEW_GAME:
+                        break;
+
+                    case Button::SETTINGS:
+                        break;
+
+                    case Button::EXIT:
                         break;
                 }
+                return button;
             }
         }
     }
-    return false;
-    ;
+    return std::nullopt;
 }
 
 }  // namespace Tanks

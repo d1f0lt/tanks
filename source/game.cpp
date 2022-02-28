@@ -104,8 +104,9 @@ void startGame(sf::RenderWindow &window, int level) {
 
         if (pause.isPause()) {
             pause.drawPause(window);
-            if (PauseController::checkMouse(
-                    pause, window)) {  // TODO remake, add enum class
+            std::optional<Button> signal =
+                PauseController::control(pause, window);
+            if (signal == Button::EXIT) {
                 return;
             }
         }
