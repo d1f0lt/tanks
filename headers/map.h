@@ -2,8 +2,8 @@
 #define MAP_H
 
 #include <SFML/Graphics.hpp>
-#include "constants.h"
 #include <memory>
+#include "constants.h"
 
 namespace Tanks {
 
@@ -26,26 +26,26 @@ public:
 
     [[nodiscard]] const sf::Vector2<int> &getCoordinates() const;
 
-    [[nodiscard]] virtual bool canIntersectWithTank() const; // TODO rename
+    [[nodiscard]] virtual bool canIntersectWithTank() const;  // TODO rename
 
-//    void destroyBlock();
+    //    void destroyBlock();
 
 private:
     const sf::Vector2<int> coordinates;
 };
 
-struct FloorBlock final : Block { // TODO add new
+struct FloorBlock final : Block {  // TODO add new
 public:
-
     explicit FloorBlock(const sf::Vector2<int> &coordinates_);
 
     [[nodiscard]] bool canIntersectWithTank() const final;
 };
 
-
 struct BlockSpriteHolder {
 public:
-    BlockSpriteHolder(BlockType type, sf::Texture &texture, const sf::Vector2<int> &coordinates_);
+    BlockSpriteHolder(BlockType type,
+                      sf::Texture &texture,
+                      const sf::Vector2<int> &coordinates_);
 
     const sf::Sprite &getSprite() const;
 
@@ -57,7 +57,6 @@ private:
 
     friend struct Map;
 };
-
 
 struct Map final {
 public:
@@ -73,7 +72,7 @@ private:
     sf::Texture texture;
     sf::Sprite sprite;
 
-    std::vector<std::vector<Block*>> getMap();
+    std::vector<std::vector<Block *>> getMap();
 
     friend struct Tank;
 };

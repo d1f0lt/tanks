@@ -5,6 +5,7 @@
 #include "controller.h"
 #include "map.h"
 #include "movable_object_view.h"
+#include "pause.h"
 #include "player.h"
 
 namespace Tanks {
@@ -68,6 +69,8 @@ void startGame(sf::RenderWindow &window, int level) {
 
     sf::Clock clock;
 
+    Pause pause;
+
     //    std::list<Bullet> bullets; TODO
 
     while (window.isOpen()) {
@@ -82,12 +85,13 @@ void startGame(sf::RenderWindow &window, int level) {
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed)
                 window.close();
+            pause.checkPause(event);
         }
 
-        GameController::checkPause();
-        GameController::makeMove(player, time);
-        player.checkCollisionWithMap(map, time);
-
+        if (!pause.isPause()) {
+            GameController::makeMove(player, time);
+            player.checkCollisionWithMap(map, time);
+        }
         //        bullets_control(player, bullets, time, window); TODO
 
         // redraw
@@ -97,6 +101,16 @@ void startGame(sf::RenderWindow &window, int level) {
         map.drawMap(window);
 
         window.draw(playerView.getSprite());
+
+        if (pause.isPause()) {
+            pause.drawPause(window);
+            std::optional<Button> signal =
+                PauseController::control(pause, window);
+            if (signal == Button::EXIT) {
+                return;
+            }
+        }
+
         window.display();
 
         // Hack for better performance
