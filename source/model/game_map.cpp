@@ -1,7 +1,10 @@
 #include "game_map.h"
 #include <cassert>
+#include <fstream>
+#include <string>
+#include "constants.h"
 
-namespace tanks::model {
+namespace Tanks::model {
 int GameMap::getWidth() const {
     assert(!map.empty());
     return static_cast<int>(map[0].size());
@@ -11,31 +14,45 @@ int GameMap::getHeight() const {
     return static_cast<int>(map.size());
 }
 
-Entity *GameMap::getEntityByCoords(const sf::Vector2<int> &coords) {
-    assert(0 < coords.y && coords.y < getHeight() && 0 < coords.x &&
-           coords.x < getWidth());
-    return map[coords.y][coords.x];
+Entity &GameMap::getEntityByCoords(int col, int row) {
+    assert(0 <= col && col < getHeight() && 0 <= row && row < getWidth());
+    assert(map[row][col] != nullptr);
+
+    return *map[row][col];
 }
 
-void GameMap::addEntity(Entity *entity) {
-    // TODO: check it
-    for (int y = entity->getBottom(); y <= entity->getTop(); y++) {
-        for (int x = entity->getLeft(); x <= entity->getRight(); x++) {
-            map[y][x] = entity;
+void GameMap::insert(Entity &entity) {
+    if (map[entity.getTop()][entity.getLeft()] == &entity) {
+        return;
+    }
+
+    for (int y = entity.getTop(); y < entity.getTop() + entity.getHeight();
+         y++) {
+        for (int x = entity.getLeft(); x < entity.getLeft() + entity.getWidth();
+             x++) {
+            map[y][x] = &entity;
         }
     }
 }
 
-void GameMap::removeEntityByCoords(const sf::Vector2<int> &coords) {
-    removeEntity(getEntityByCoords(coords));
+void GameMap::eraseByCoords(int col, int row) {
+    erase(getEntityByCoords(col, row));
 }
 
-void GameMap::removeEntity(Entity *entity) {
-    for (int y = entity->getBottom(); y <= entity->getTop(); y++) {
-        for (int x = entity->getLeft(); x <= entity->getRight(); x++) {
+void GameMap::erase(Entity &entity) {
+    for (int y = entity.getTop(); y < entity.getTop() + entity.getHeight();
+         y++) {
+        for (int x = entity.getLeft(); x < entity.getLeft() + entity.getWidth();
+             x++) {
             // TODO: default block
             map[y][x] = nullptr;
         }
     }
 }
-}  // namespace tanks::model
+
+GameMap::GameMap(int width, int height)
+    : map(height * TILE_SIZE,
+          std::vector<Entity *>(width * TILE_SIZE, nullptr)) {
+}
+
+}  // namespace Tanks::model

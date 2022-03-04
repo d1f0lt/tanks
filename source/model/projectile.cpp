@@ -1,3 +1,5 @@
 #include "projectile.h"
 
-namespace tanks::model {}
+namespace Tanks::model {
+
+}

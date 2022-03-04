@@ -1,20 +1,20 @@
-#pragma once
 #ifndef TANKS_BLOCKS_H
-#define TANKS_BLOCKS_h
+#define TANKS_BLOCKS_H
 
-#include <array>
 #include "entity.h"
 
-namespace tanks::model {
-enum class BlockType { GROUND, GRASS, RED_WALL, METAL_WALL, WATER };
+namespace Tanks::model {
 
 class Block : public Entity {
 public:
-    [[nodiscard]] BlockType getType() const;
+    explicit Block(int col, int row, EntityType entityType);
+
+    [[nodiscard]] bool isTankPassable() const;
+    [[nodiscard]] bool isBulletPassable() const;
+    [[nodiscard]] bool isDestroyable() const;
 
 private:
-    BlockType type;
 };
-}  // namespace tanks::model
+}  // namespace Tanks::model
 
 #endif  // TANKS_BLOCKS_H

@@ -1,23 +1,28 @@
-#pragma once
 #ifndef TANKS_TANK_H
 #define TANKS_TANK_H
 
-#include "entity.h"
+#include "foreground_entity.h"
 #include "game_map.h"
 
-namespace tanks::model {
-class Tank : public Entity {
+namespace Tanks::model {
+class Tank : public ForegroundEntity {
 public:
-    void move(Direction dir, const GameMap &map);
+    Tank(int left, int top, EntityType type_, GameMap &map_);
+
+    [[nodiscard]] Direction getDirection() const;
+
+protected:
+    void setDirection(Direction dir);
 
 private:
-    void updateBackground(const GameMap &map);
-
-    Direction direction;
-    static constexpr int WIDTH = 3;
-    static constexpr int HEIGHT = WIDTH;
-    std::array<std::array<Entity, WIDTH>, HEIGHT> background;
+    Direction direction = Direction::DOWN;
 };
-}  // namespace tanks::model
+
+class PlayableTank : public Tank {
+public:
+    PlayableTank(int left, int top, GameMap &map_);
+    void move(Direction dir);
+};
+}  // namespace Tanks::model
 
 #endif  // TANKS_TANK_H

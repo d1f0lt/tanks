@@ -1,15 +1,21 @@
 #include "entity.h"
 
-namespace tanks::model {
+namespace Tanks::model {
+/*
+
 int Entity::getId() const {
     return id;
+}
+*/
+
+EntityType Entity::getType() const {
+    return type;
 }
 
 sf::Rect<int> Entity::getRect() const {
     return rect;
 }
 
-// TODO сделать из этого нормальный класс "прямоугольник"
 int Entity::getWidth() const {
     return getRect().width;
 }
@@ -20,14 +26,6 @@ int Entity::getHeight() const {
 
 int Entity::getLeft() const {
     return getRect().left;
-}
-
-int Entity::getRight() const {
-    return getLeft();
-}
-
-int Entity::getBottom() const {
-    return getTop() - getHeight();
 }
 
 int Entity::getTop() const {
@@ -45,4 +43,16 @@ void Entity::setTop(int top) {
 void Entity::setLeft(int left) {
     rect.left = left;
 }
-}  // namespace tanks::model
+
+Entity::Entity(int left, int top, int width, int height, EntityType type_)
+    : type(type_), rect(left, top, width, height) {
+}
+
+/*
+void Entity::setCoords(int x, int y) {
+    rect.top = y;
+    rect.left = x;
+}
+ */
+
+}  // namespace Tanks::model

@@ -1,12 +1,25 @@
 #include "tank.h"
 #include "game_map.h"
 
-namespace tanks::model {
-void Tank::move(tanks::model::Direction dir, const GameMap &map) {
-    if (dir == Direction::UP) {
-        sf::Rect<int> a = getRect();
-    }
+namespace Tanks::model {
+void PlayableTank::move(Direction dir) {
+    setDirection(dir);
+    move_(dir);
 }
-void Tank::updateBackground(const GameMap &map) {
+
+PlayableTank::PlayableTank(int left, int top, GameMap &map_)
+    : Tank(left, top, EntityType::PLAYABLE_TANK, map_) {
 }
-}  // namespace tanks::model
+
+Direction Tank::getDirection() const {
+    return direction;
+}
+
+Tank::Tank(int left, int top, EntityType type_, GameMap &map_)
+    : ForegroundEntity(left, top, TANK_SIZE, TANK_SIZE, type_, map_) {
+}
+
+void Tank::setDirection(Direction dir) {
+    direction = dir;
+}
+}  // namespace Tanks::model

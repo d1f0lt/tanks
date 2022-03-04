@@ -1,4 +1,3 @@
-#pragma once
 #ifndef TANKS_GAME_MODEL_H
 #define TANKS_GAME_MODEL_H
 
@@ -6,34 +5,30 @@
 #include "entity_holder.h"
 #include "game_map.h"
 #include "grouped_entities.h"
+#include "tank.h"
 
-namespace tanks::model {
-class IdMap {
-public:
-    void addEntity(Entity *entity);
-    void removeEntityById(int id);
-    [[nodiscard]] Entity *getEntityById(int id);
-
-private:
-    std::map<int, Entity *> idMap;
-};
-
+namespace Tanks::model {
 class GameModel {
 public:
-    [[nodiscard]] Entity *getEntityById(int id);
-    [[nodiscard]] Entity *getEntityByCoords(const sf::Vector2<int> &coords);
+    explicit GameModel() = default;
+    explicit GameModel(const std::string &filename);
 
-    [[nodiscard]] DrawIterator getIterator() const;
+    [[nodiscard]] Entity &getEntityByCoords(int col, int row);
+
+    void nextTick();
+
+    [[nodiscard]] PlayableTank &spawnPlayableTank(int left, int top);
+
+    void loadLevel(int level);
 
 private:
-    void addEntity(std::unique_ptr<Entity> entity);
-    void removeEntityById(int id);
+    Entity &addEntity(std::unique_ptr<Entity> entity);
+    void removeEntity(Entity &entity);
 
     GameMap map;
-    IdMap idMap;
     GroupedEntities groupedEntities;
     EntityHolder entityHolder;
 };
-}  // namespace tanks::model
+}  // namespace Tanks::model
 
 #endif  // TANKS_GAME_MODEL_H

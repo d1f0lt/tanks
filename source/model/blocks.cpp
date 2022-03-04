@@ -1,11 +1,23 @@
-//
-// Created by ilma4 on 2/18/22.
-//
-
 #include "blocks.h"
+#include "constants.h"
 
-namespace tanks::model {
-BlockType Block::getType() const {
-    return type;
+namespace Tanks::model {
+Block::Block(int col, int row, EntityType entityType)
+    : Entity(col, row, TILE_SIZE, TILE_SIZE, entityType) {
 }
-}  // namespace tanks::model
+
+bool Block::isTankPassable() const {
+    // TODO
+    return false;
+}
+
+bool Block::isBulletPassable() const {
+    // TODO
+    return false;
+}
+
+bool Block::isDestroyable() const {
+    // TODO
+    return false;
+}
+}  // namespace Tanks::model

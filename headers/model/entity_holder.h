@@ -1,4 +1,3 @@
-#pragma once
 #ifndef TANKS_ENTITY_HOLDER_H
 #define TANKS_ENTITY_HOLDER_H
 
@@ -6,16 +5,15 @@
 #include "entity.h"
 #include "memory"
 
-namespace tanks::model {
+namespace Tanks::model {
 class EntityHolder {
 public:
-    void addEntity(std::unique_ptr<Entity> entity);
-
-    void removeEntity(int id);
+    Entity &insert(std::unique_ptr<Entity> entity);
+    void remove(Entity &entity);
 
 private:
-    std::map<int, std::unique_ptr<Entity>> entityHolder;
+    std::vector<std::unique_ptr<Entity>> buffer;
 };
-}  // namespace tanks::model
+}  // namespace Tanks::model
 
 #endif  // TANKS_ENTITY_HOLDER_H

@@ -1,11 +1,19 @@
 #include "entity_holder.h"
 
-namespace tanks::model {
-void EntityHolder::addEntity(std::unique_ptr<Entity> entity) {
-    entityHolder[entity->getId()] = std::move(entity);
+namespace Tanks::model {
+Entity &EntityHolder::insert(std::unique_ptr<Entity> entity) {
+    Entity &res = *entity;
+    buffer.emplace_back(std::move(entity));
+    return res;
 }
 
-void EntityHolder::removeEntity(int id) {
-    entityHolder.erase(id);
+void EntityHolder::remove(Entity &entity) {
+    for (unsigned i = 0; i < buffer.size(); i++) {
+        if (&entity == buffer[i].get()) {
+            std::swap(buffer[i], buffer.back());
+            buffer.pop_back();
+            break;
+        }
+    }
 }
-}  // namespace tanks::model
+}  // namespace Tanks::model

@@ -1,27 +1,23 @@
-#pragma once
 #ifndef TANKS_GROUPED_ENTITIES_H
 #define TANKS_GROUPED_ENTITIES_H
 
 #include "entity.h"
 
-namespace tanks::model {
-struct DrawIterator {
-public:
-private:
-};
-
+namespace Tanks::model {
 class GroupedEntities {
 public:
-    void addEntity(Entity *entity);
+    explicit GroupedEntities();
 
-    void removeEntity(Entity *entity);
+    void insert(Entity &entity);
+    void erase(Entity &entity);
 
-    [[nodiscard]] DrawIterator getIterator() const;
+    [[nodiscard]] const std::vector<std::vector<const Entity *>> &getAll()
+        const;
 
 private:
     std::vector<std::vector<const Entity *>> entities;
 };
 
-}  // namespace tanks::model
+}  // namespace Tanks::model
 
 #endif  // TANKS_GROUPED_ENTITIES_H
