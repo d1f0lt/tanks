@@ -9,15 +9,24 @@ Pause::Pause() : background(sf::Vector2<float>(WINDOW_WIDTH, WINDOW_HEIGHT)) {
     background.setFillColor(sf::Color(0, 0, 0, 180));
 
     const std::string path = "../images/pause/";
-    const int paddingBetweenButtons = 10;
+    const int marginBetweenButtons = 10;
+    const int marginFromTitle = marginBetweenButtons * 6;
     const int marginLeft = (WINDOW_WIDTH - pauseWidth) / 2;
-    const int marginTop = 250;  // some calculate
-    const int elementsCount = 5;
-    sf::Vector2<float> currentCoordinates = {marginLeft, marginTop};
+    const int buttonsCount = 4;
+
+    sf::Vector2<float> currentCoordinates = {marginLeft, 0};
 
     // Header
     items.emplace_back(
         std::make_unique<PauseItem>(path + "pause.png", currentCoordinates));
+
+    const int pauseHeight =
+        static_cast<int>(items[0]->inscriptionImage.getSize().y) +
+        marginFromTitle + buttonsCount * PauseButton::rectangleHeight +
+        (buttonsCount - 1) * marginBetweenButtons;
+    const int marginTop = (WINDOW_HEIGHT - pauseHeight) / 2;
+    currentCoordinates.y = static_cast<float>(marginTop);
+
     items[0]->inscriptionSprite.setPosition(
         {static_cast<float>(
              static_cast<int>(currentCoordinates.x) +
@@ -26,12 +35,13 @@ Pause::Pause() : background(sf::Vector2<float>(WINDOW_WIDTH, WINDOW_HEIGHT)) {
          currentCoordinates.y});  // Centralize
 
     // Buttons
-    currentCoordinates.y += paddingBetweenButtons * 12;
-    for (int i = 2; i <= elementsCount; ++i) {
+    currentCoordinates.y += static_cast<float>(
+        marginFromTitle + items[0]->inscriptionImage.getSize().y);
+    for (int i = 2; i <= buttonsCount + 1; ++i) {
         items.emplace_back(std::make_unique<PauseButton>(
             path + "item_" + std::to_string(i) + ".png", currentCoordinates));
         currentCoordinates.y +=
-            PauseButton::rectangleHeight + paddingBetweenButtons;
+            PauseButton::rectangleHeight + marginBetweenButtons;
     }
 }
 

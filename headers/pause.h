@@ -27,6 +27,7 @@ private:
     sf::RectangleShape background;
     std::vector<std::unique_ptr<PauseItem>> items;
     const static int pauseWidth = 400;
+    // pauseHeight calculate automatically
 
     [[nodiscard]] const std::vector<std::unique_ptr<PauseItem>> &getItems()
         const;
