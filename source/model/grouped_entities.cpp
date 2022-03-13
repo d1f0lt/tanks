@@ -1,4 +1,4 @@
-#include "grouped_entities.h"
+#include "model/grouped_entities.h"
 
 namespace Tanks::model {
 // TODO: make here order

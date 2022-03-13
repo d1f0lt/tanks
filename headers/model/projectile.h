@@ -8,12 +8,12 @@ namespace Tanks::model {
 class Projectile : ForegroundEntity {
 public:
     explicit Projectile(int col, int row, GameMap &map_);
-    void nextState();
+
+    // TODO: Make possible to use move() only for model
+    void move();
 
 private:
     Direction dir;
-
-    void boom();
 };
 }  // namespace Tanks::model
 

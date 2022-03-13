@@ -1,4 +1,4 @@
-#include "entity.h"
+#include "model/entity.h"
 #include <unordered_set>
 
 namespace Tanks::model {

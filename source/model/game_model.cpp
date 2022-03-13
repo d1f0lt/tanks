@@ -1,7 +1,7 @@
-#include "game_model.h"
+#include "model/game_model.h"
 #include <cassert>
 #include <fstream>
-#include "blocks.h"
+#include "model/blocks.h"
 
 namespace Tanks::model {
 Entity &GameModel::getEntityByCoords(int col, int row) {

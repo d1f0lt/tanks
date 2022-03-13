@@ -1,6 +1,6 @@
 #include <cassert>
-#include "blocks.h"
-#include "game_model.h"
+#include "model/blocks.h"
+#include "model/game_model.h"
 
 int main() {
     {

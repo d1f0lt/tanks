@@ -1,4 +1,4 @@
-#include "foreground_entity.h"
+#include "model/foreground_entity.h"
 
 namespace Tanks::model {
 ForegroundEntity::ForegroundEntity(int left,

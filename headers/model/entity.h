@@ -38,6 +38,7 @@ public:
 
     [[nodiscard]] bool intersect(const Entity &other) const;
 
+    // TODO: make it pure virtual and override in derives
     [[nodiscard]] bool isTankPassable() const;
     [[nodiscard]] bool isBulletPassable() const;
     [[nodiscard]] bool isDestroyable() const;

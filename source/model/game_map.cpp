@@ -1,4 +1,4 @@
-#include "game_map.h"
+#include "model/game_map.h"
 #include <cassert>
 #include <fstream>
 #include <string>

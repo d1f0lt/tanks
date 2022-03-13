@@ -1,6 +1,6 @@
-#include "tank.h"
+#include "model/tank.h"
 #include <cassert>
-#include "game_map.h"
+#include "model/game_map.h"
 
 namespace Tanks::model {
 void PlayableTank::move(Direction dir) {

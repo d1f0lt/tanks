@@ -1,10 +1,9 @@
-#include "entity_holder.h"
+#include "model/entity_holder.h"
 
 namespace Tanks::model {
 Entity &EntityHolder::insert(std::unique_ptr<Entity> entity) {
-    Entity &res = *entity;
     buffer.emplace_back(std::move(entity));
-    return res;
+    return *buffer.back();
 }
 
 void EntityHolder::remove(Entity &entity) {
