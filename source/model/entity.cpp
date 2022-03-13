@@ -1,12 +1,10 @@
 #include "entity.h"
+#include <unordered_set>
 
 namespace Tanks::model {
-/*
-
-int Entity::getId() const {
-    return id;
+Entity::Entity(int left, int top, int width, int height, EntityType type_)
+    : type(type_), rect(left, top, width, height) {
 }
-*/
 
 EntityType Entity::getType() const {
     return type;
@@ -44,15 +42,21 @@ void Entity::setLeft(int left) {
     rect.left = left;
 }
 
-Entity::Entity(int left, int top, int width, int height, EntityType type_)
-    : type(type_), rect(left, top, width, height) {
+bool Entity::isTankPassable() const {
+    static const std::unordered_set<EntityType> PASSABLE = {
+        EntityType::FLOOR, EntityType::GRASS, EntityType::BULLET};
+    return PASSABLE.count(getType()) == 1;
 }
 
-/*
-void Entity::setCoords(int x, int y) {
-    rect.top = y;
-    rect.left = x;
+bool Entity::isBulletPassable() const {
+    static const std::unordered_set<EntityType> PASSABLE = {
+        EntityType::GRASS, EntityType::FLOOR, EntityType::WATER};
+    return PASSABLE.count(getType()) == 1;
 }
- */
 
+bool Entity::isDestroyable() const {
+    static const std::unordered_set<EntityType> DESTROYABLE = {
+        EntityType::BRICK, EntityType::BULLET};
+    return DESTROYABLE.count(getType()) == 1;
+}
 }  // namespace Tanks::model

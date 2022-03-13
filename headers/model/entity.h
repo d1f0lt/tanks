@@ -38,6 +38,10 @@ public:
 
     [[nodiscard]] bool intersect(const Entity &other) const;
 
+    [[nodiscard]] bool isTankPassable() const;
+    [[nodiscard]] bool isBulletPassable() const;
+    [[nodiscard]] bool isDestroyable() const;
+
 protected:
     void setTop(int top);
     void setLeft(int left);

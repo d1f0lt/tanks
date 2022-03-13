@@ -20,7 +20,7 @@ protected:
 
     void move_(Direction dir);
 
-private:
+protected:
     GameMap &map;
     std::vector<std::vector<Entity *>> background;
 };

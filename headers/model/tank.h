@@ -11,6 +11,10 @@ public:
 
     [[nodiscard]] Direction getDirection() const;
 
+    [[nodiscard]] std::vector<const Entity *> whatsOn(Direction dir);
+
+    void shoot();
+
 protected:
     void setDirection(Direction dir);
 
