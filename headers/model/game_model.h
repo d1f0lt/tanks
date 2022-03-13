@@ -11,7 +11,7 @@ namespace Tanks::model {
 class GameModel {
 public:
     explicit GameModel() = default;
-    explicit GameModel(const std::string &filename);
+    //    explicit GameModel(const std::string &filename);
 
     [[nodiscard]] Entity &getEntityByCoords(int col, int row);
 

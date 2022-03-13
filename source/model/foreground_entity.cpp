@@ -9,14 +9,14 @@ ForegroundEntity::ForegroundEntity(int left,
                                    GameMap &map_)
     : Entity(left, top, width, height, type_),
       map(map_),
-      background(height, std::vector<Entity *>(width, nullptr)) {
+      background(height, std::vector<const Entity *>(width, nullptr)) {
     setBackground();
 }
 
 void ForegroundEntity::restoreBackground() {
     for (int y = 0; y < +getHeight(); y++) {
         for (int x = 0; x < +getWidth(); x++) {
-            map.insert(*background[y][x]);
+            map.insert(const_cast<Entity &>(*background[y][x]));
         }
     }
 }

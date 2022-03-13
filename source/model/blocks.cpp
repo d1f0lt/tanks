@@ -1,5 +1,4 @@
 #include "model/blocks.h"
-#include <unordered_set>
 #include "constants.h"
 
 namespace Tanks::model {

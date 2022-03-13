@@ -7,11 +7,11 @@
 namespace Tanks::model {
 class Tank : public ForegroundEntity {
 public:
-    Tank(int left, int top, EntityType type_, GameMap &map_);
+    explicit Tank(int left, int top, EntityType type_, GameMap &map_);
 
     [[nodiscard]] Direction getDirection() const;
 
-    [[nodiscard]] std::vector<const Entity *> whatsOn(Direction dir);
+    [[nodiscard]] std::vector<const Entity *> look(Direction dir);
 
     void shoot();
 
@@ -26,6 +26,7 @@ class PlayableTank : public Tank {
 public:
     PlayableTank(int left, int top, GameMap &map_);
     void move(Direction dir);
+    // TODO: ShootHandler or other solution for shooting
 };
 }  // namespace Tanks::model
 

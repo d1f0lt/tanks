@@ -1,7 +1,6 @@
 #include "model/grouped_entities.h"
 
 namespace Tanks::model {
-// TODO: make here order
 void GroupedEntities::insert(Entity &entity) {
     // 0 - usual blocks
     // 1 - bot-Tanks

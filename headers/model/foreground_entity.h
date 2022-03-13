@@ -18,11 +18,11 @@ protected:
     void restoreBackground();
     void setBackground();
 
-    void move_(Direction dir);
+    void move_(Direction direction);
 
 protected:
     GameMap &map;
-    std::vector<std::vector<Entity *>> background;
+    std::vector<std::vector<const Entity *>> background;
 };
 
 }  // namespace Tanks::model

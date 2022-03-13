@@ -22,15 +22,11 @@ Entity &GameMap::getEntityByCoords(int col, int row) {
 }
 
 void GameMap::insert(Entity &entity) {
-    if (map[entity.getTop()][entity.getLeft()] == &entity) {
-        return;
-    }
-
-    for (int y = entity.getTop(); y < entity.getTop() + entity.getHeight();
-         y++) {
-        for (int x = entity.getLeft(); x < entity.getLeft() + entity.getWidth();
-             x++) {
-            map[y][x] = &entity;
+    for (int row = entity.getTop(); row < entity.getTop() + entity.getHeight();
+         row++) {
+        for (int col = entity.getLeft();
+             col < entity.getLeft() + entity.getWidth(); col++) {
+            map[row][col] = &entity;
         }
     }
 }
@@ -40,12 +36,12 @@ void GameMap::eraseByCoords(int col, int row) {
 }
 
 void GameMap::erase(Entity &entity) {
-    for (int y = entity.getTop(); y < entity.getTop() + entity.getHeight();
-         y++) {
-        for (int x = entity.getLeft(); x < entity.getLeft() + entity.getWidth();
-             x++) {
+    for (int row = entity.getTop(); row < entity.getTop() + entity.getHeight();
+         row++) {
+        for (int col = entity.getLeft();
+             col < entity.getLeft() + entity.getWidth(); col++) {
             // TODO: default block
-            map[y][x] = nullptr;
+            map[row][col] = nullptr;
         }
     }
 }

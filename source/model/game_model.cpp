@@ -31,9 +31,10 @@ PlayableTank &GameModel::spawnPlayableTank(int left, int top) {
         addEntity(std::make_unique<PlayableTank>(left, top, map)));
 }
 
+/*
 GameModel::GameModel(const std::string &filename) {
     std::ifstream is(filename);
-}
+}*/
 
 void GameModel::loadLevel(int level) {
     const std::string currentLevel =

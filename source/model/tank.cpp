@@ -3,13 +3,13 @@
 #include "model/game_map.h"
 
 namespace Tanks::model {
+PlayableTank::PlayableTank(int left, int top, GameMap &map_)
+    : Tank(left, top, EntityType::PLAYABLE_TANK, map_) {
+}
+
 void PlayableTank::move(Direction dir) {
     setDirection(dir);
     move_(dir);
-}
-
-PlayableTank::PlayableTank(int left, int top, GameMap &map_)
-    : Tank(left, top, EntityType::PLAYABLE_TANK, map_) {
 }
 
 Direction Tank::getDirection() const {
@@ -24,7 +24,7 @@ void Tank::setDirection(Direction dir) {
     direction = dir;
 }
 
-std::vector<const Entity *> Tank::whatsOn(Direction dir) {
+std::vector<const Entity *> Tank::look(Direction dir) {
     if (dir == Direction::DOWN) {
         if (getTop() + getHeight() == map.getHeight() - 1) {
             return {};
@@ -70,5 +70,6 @@ std::vector<const Entity *> Tank::whatsOn(Direction dir) {
 }
 
 void Tank::shoot() {
+    // TODO
 }
 }  // namespace Tanks::model

@@ -31,10 +31,10 @@ int main() {
         Tanks::model::GameModel model;
         model.loadLevel(1);
         auto &realTank = model.spawnPlayableTank(0, 0);
-        auto left = realTank.whatsOn(Tanks::model::Direction::LEFT);
+        auto left = realTank.look(Tanks::model::Direction::LEFT);
         assert(left.empty());
 
-        auto right = realTank.whatsOn(Tanks::model::Direction::RIGHT);
+        auto right = realTank.look(Tanks::model::Direction::RIGHT);
         assert(right[0] == right.back());
         assert(right[0]->getType() == Tanks::model::EntityType::LEFT_UP_CORNER);
 
@@ -43,7 +43,7 @@ int main() {
         for (int i = 0; i < 9; i++) {
             realTank.move(Tanks::model::Direction::DOWN);
         }
-        right = realTank.whatsOn(Tanks::model::Direction::RIGHT);
+        right = realTank.look(Tanks::model::Direction::RIGHT);
         assert(right[0] == right[realTank.getHeight() - 2]);
         assert(right[0] != right.back());
         assert(right.back()->getType() ==
