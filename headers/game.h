@@ -2,10 +2,12 @@
 #define GAME_H_
 
 #include <SFML/Graphics.hpp>
+#include "menu.h"
 
 namespace Tanks {
 
-void startGame(sf::RenderWindow &window, int level = 1);
+std::optional<Menu::ButtonType> startGame(sf::RenderWindow &window,
+                                          int level = 1);
 
 }
 

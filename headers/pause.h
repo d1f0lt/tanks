@@ -5,12 +5,10 @@
 #include <memory>
 #include <vector>
 #include "constants.h"
+#include "controller.h"
+#include "menu.h"
 
 namespace Tanks {
-
-enum class Button { RESUME, NEW_GAME, SETTINGS, EXIT };
-
-struct PauseItem;
 
 struct Pause final {
 public:
@@ -22,51 +20,23 @@ public:
 
     void checkPause(const sf::Event &event);
 
+    const Menu::Menu &getMenu() const;
+
+    void unpause();
+
 private:
     bool pause = false;
     sf::RectangleShape background;
-    std::vector<std::unique_ptr<PauseItem>> items;
     const static int pauseWidth = 400;
     // pauseHeight calculate automatically
-
-    [[nodiscard]] const std::vector<std::unique_ptr<PauseItem>> &getItems()
-        const;
-
-    friend struct PauseButton;
-    friend struct PauseController;
-};
-
-struct PauseItem {
-public:
-    explicit PauseItem(const std::string &path,
-                       const sf::Vector2<float> &coordinates);
-
-    virtual void drawSprite(sf::RenderWindow &window) const;
-
-protected:
-    sf::Image inscriptionImage;
-    sf::Texture inscriptionTexture;
-    sf::Sprite inscriptionSprite;
-
-    friend struct Pause;
-    friend struct PauseController;
-};
-
-struct PauseButton final : PauseItem {
-public:
-    PauseButton(const std::string &path, const sf::Vector2<float> &coordinates);
-
-    void drawSprite(sf::RenderWindow &window) const final;
-
-    void hover();
-
-private:
-    mutable sf::RectangleShape rectangle;  // we want drawSprite to be a const
-    const static int rectangleHeight = 80;
-    const static int rectangleWidth = Pause::pauseWidth;
-
-    friend struct Pause;
-    friend struct PauseController;
+    const std::string path = "../images/pause/";
+    const int buttonsHeight = 80;
+    const sf::Color buttonsStandardColor = sf::Color(0, 0, 0);
+    const sf::Color buttonsHoverColor = sf::Color(115, 115, 115);
+    const std::vector<Menu::ButtonType> buttonTypes = {
+        Menu::ButtonType::RESUME, Menu::ButtonType::NEW_GAME,
+        Menu::ButtonType::SETTINGS, Menu::ButtonType::EXIT};
+    Menu::Menu menu;
 };
 
 }  // namespace Tanks

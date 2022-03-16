@@ -20,7 +20,9 @@ add_executable(
         source/movable_object_view.cpp
         source/map.cpp
         source/controller.cpp
+        source/menu.cpp
         source/pause.cpp
+        source/main_menu.cpp
 )
 
 target_link_libraries(tanks sfml-graphics sfml-audio)
