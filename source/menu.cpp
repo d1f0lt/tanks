@@ -1,9 +1,22 @@
 #include "menu.h"
 #include <cassert>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace Tanks::Menu {
+
+std::string convertButtonTypeToString(const ButtonType type) {
+    static std::unordered_map<ButtonType, std::string> dictionary{
+        {ButtonType::NEW_GAME, "new_game"},
+        {ButtonType::EXIT, "exit"},
+        {ButtonType::RESUME, "resume"},
+        {ButtonType::SETTINGS, "settings"},
+        {ButtonType::CREATE_MAP, "create_map"},
+        {ButtonType::RATING, "rating"}};
+    assert(dictionary.find(type) != dictionary.end());
+    return dictionary[type];
+}
 
 Menu::Menu(const std::string &imagesPath,
            const int menuWidth,
@@ -38,13 +51,13 @@ Menu::Menu(const std::string &imagesPath,
     // Buttons
     currentCoordinates.y += static_cast<float>(
         marginFromTitle + items[0]->inscriptionImage.getSize().y);
-    for (int i = 2; i <= buttonsCount + 1; ++i) {
+    for (int i = 0; i < buttonsCount; ++i) {
         items.emplace_back(std::make_unique<MenuButton>(
-            imagesPath + "item_" + std::to_string(i) + ".png",
+            imagesPath + convertButtonTypeToString(buttonTypes[i]) + ".png",
             currentCoordinates,
             sf::Vector2<float>(static_cast<float>(menuWidth),
                                static_cast<float>(buttonsHeight)),
-            buttonsStandardColor, buttonsHoverColor, buttonTypes[i - 2]));
+            buttonsStandardColor, buttonsHoverColor, buttonTypes[i]));
         currentCoordinates.y +=
             static_cast<float>(buttonsHeight) + marginBetweenButtons;
     }

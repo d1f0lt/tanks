@@ -24,7 +24,7 @@ sf::Sprite initBackground(const std::string &path) {
 
 Menu initMenu(const std::string &path) {
     const static std::vector<ButtonType> buttonTypes = {
-        ButtonType::NEW_GAME, ButtonType::CREATE_MAP, ButtonType::STAT,
+        ButtonType::NEW_GAME, ButtonType::CREATE_MAP, ButtonType::RATING,
         ButtonType::SETTINGS};
     const static int menuWidth = static_cast<int>(WINDOW_WIDTH / 3.4);
     const static int buttonsHeight = 100;
