@@ -2,9 +2,12 @@ cmake_minimum_required(VERSION 3.16)
 project(tanks)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin/)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/headers/)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/headers)
-find_package(SFML 2.5 COMPONENTS graphics)
+
+find_package(SFML 2.5 COMPONENTS graphics audio)
 
 add_executable(model_tests model_tests.cpp
         source/model/blocks.cpp
@@ -16,5 +19,21 @@ add_executable(model_tests model_tests.cpp
         source/model/game_map.cpp
         source/model/entity_holder.cpp
         source/model/foreground_entity.cpp)
+
+
+add_executable(
+        tanks
+        source/main.cpp
+        source/tank.cpp
+        source/player.cpp
+        source/bullet.cpp
+        source/movable_object.cpp
+        source/game.cpp
+        source/movable_object_view.cpp
+        source/map.cpp
+        source/controller.cpp
+        source/pause.cpp
+)
+
 
 target_link_libraries(model_tests sfml-graphics)
