@@ -3,25 +3,12 @@
 #include "model/game_map.h"
 
 namespace Tanks::model {
-PlayableTank::PlayableTank(int left, int top, GameMap &map_)
-    : Tank(left, top, EntityType::PLAYABLE_TANK, map_) {
+Tank::Tank(int left, int top, EntityType type_, Direction dir, GameMap &map_)
+    : MovableEntity(left, top, TANK_SIZE, TANK_SIZE, type_, dir, map_) {
 }
 
-void PlayableTank::move(Direction dir) {
-    setDirection(dir);
-    move_(dir);
-}
-
-Direction Tank::getDirection() const {
-    return direction;
-}
-
-Tank::Tank(int left, int top, EntityType type_, GameMap &map_)
-    : ForegroundEntity(left, top, TANK_SIZE, TANK_SIZE, type_, map_) {
-}
-
-void Tank::setDirection(Direction dir) {
-    direction = dir;
+PlayableTank::PlayableTank(int left, int top, Direction dir, GameMap &map_)
+    : Tank(left, top, EntityType::PLAYABLE_TANK, dir, map_) {
 }
 
 std::vector<const Entity *> Tank::look(Direction dir) {

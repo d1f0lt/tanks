@@ -1,11 +1,12 @@
 #ifndef TANKS_GAME_MODEL_H
 #define TANKS_GAME_MODEL_H
 
-#include "entity.h"
+#include <queue>
 #include "entity_holder.h"
-#include "game_map.h"
-#include "grouped_entities.h"
-#include "tank.h"
+#include "model/event.h"
+#include "model/game_map.h"
+#include "model/grouped_entities.h"
+#include "model/tank.h"
 
 namespace Tanks::model {
 class GameModel {
@@ -28,6 +29,7 @@ private:
     GameMap map;
     GroupedEntities groupedEntities;
     EntityHolder entityHolder;
+    std::queue<std::unique_ptr<Event>> que{};  // TODO threadsafe
 };
 }  // namespace Tanks::model
 

@@ -1,32 +1,30 @@
 #ifndef TANKS_TANK_H
 #define TANKS_TANK_H
 
-#include "foreground_entity.h"
 #include "game_map.h"
+#include "movable_entity.h"
 
 namespace Tanks::model {
-class Tank : public ForegroundEntity {
+class Tank : public MovableEntity {
 public:
-    explicit Tank(int left, int top, EntityType type_, GameMap &map_);
-
-    [[nodiscard]] Direction getDirection() const;
+    explicit Tank(int left,
+                  int top,
+                  EntityType type_,
+                  Direction dir,
+                  GameMap &map_);
 
     [[nodiscard]] std::vector<const Entity *> look(Direction dir);
 
-    void shoot();
-
 protected:
-    void setDirection(Direction dir);
-
-private:
-    Direction direction = Direction::DOWN;
+    void shoot();
 };
 
 class PlayableTank : public Tank {
 public:
-    PlayableTank(int left, int top, GameMap &map_);
-    void move(Direction dir);
+    PlayableTank(int left, int top, Direction dir, GameMap &map_);
     // TODO: ShootHandler or other solution for shooting
+
+    using MovableEntity::move;
 };
 }  // namespace Tanks::model
 

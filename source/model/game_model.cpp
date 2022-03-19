@@ -27,8 +27,8 @@ void GameModel::removeEntity(Entity &entity) {
 }
 
 PlayableTank &GameModel::spawnPlayableTank(int left, int top) {
-    return static_cast<PlayableTank &>(
-        addEntity(std::make_unique<PlayableTank>(left, top, map)));
+    return static_cast<PlayableTank &>(addEntity(
+        std::make_unique<PlayableTank>(left, top, Direction::UP, map)));
 }
 
 /*
