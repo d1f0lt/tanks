@@ -14,7 +14,10 @@ public:
 };
 
 struct PauseController final {
-    static bool checkMouse(Pause &pause, sf::RenderWindow &window);
+
+    [[nodiscard]] static std::optional<Button> control(
+        Pause &pause,
+        sf::RenderWindow &window);
 };
 
 }  // namespace Tanks
