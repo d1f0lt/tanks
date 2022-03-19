@@ -1,4 +1,5 @@
 #include "model/entity_holder.h"
+#include <cassert>
 
 namespace Tanks::model {
 Entity &EntityHolder::insert(std::unique_ptr<Entity> entity) {
@@ -11,8 +12,9 @@ void EntityHolder::remove(Entity &entity) {
         if (&entity == buffer[i].get()) {
             std::swap(buffer[i], buffer.back());
             buffer.pop_back();
-            break;
+            return;
         }
     }
+    assert(false && "Entity not foud!");
 }
 }  // namespace Tanks::model

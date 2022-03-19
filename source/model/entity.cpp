@@ -56,7 +56,8 @@ bool Entity::isBulletPassable() const {
 
 bool Entity::isDestroyable() const {
     static const std::unordered_set<EntityType> DESTROYABLE = {
-        EntityType::BRICK, EntityType::BULLET};
+        EntityType::BRICK, EntityType::BULLET, EntityType::PLAYABLE_TANK,
+        EntityType::BOT_TANK};
     return DESTROYABLE.count(getType()) == 1;
 }
 }  // namespace Tanks::model
