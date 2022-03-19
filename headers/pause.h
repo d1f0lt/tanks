@@ -29,13 +29,6 @@ private:
     sf::RectangleShape background;
     const static int pauseWidth = 400;
     // pauseHeight calculate automatically
-    const std::string path = "../images/pause/";
-    const int buttonsHeight = 80;
-    const sf::Color buttonsStandardColor = sf::Color(0, 0, 0);
-    const sf::Color buttonsHoverColor = sf::Color(115, 115, 115);
-    const std::vector<Menu::ButtonType> buttonTypes = {
-        Menu::ButtonType::RESUME, Menu::ButtonType::NEW_GAME,
-        Menu::ButtonType::SETTINGS, Menu::ButtonType::EXIT};
     Menu::Menu menu;
 };
 

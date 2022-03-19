@@ -20,6 +20,8 @@ struct MenuItem;
 
 struct Menu final {
 public:
+    explicit Menu() = default;
+
     explicit Menu(const std::string &imagesPath,
                   int menuWidth,
                   const std::vector<ButtonType> &buttonTypes,

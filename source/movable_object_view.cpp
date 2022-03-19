@@ -9,11 +9,9 @@ namespace Tanks {
 // rect - rectangle of texture
 SpriteHolder::SpriteHolder(const std::string &imageFilename,
                            const std::vector<sf::IntRect> &rect,
-                           const std::vector<sf::Vector2<float>> &scale,
-                           const sf::Color &color) {
+                           const std::vector<sf::Vector2<float>> &scale) {
     sf::Image image;
     image.loadFromFile(imageFilename);
-    image.createMaskFromColor(color);
     texture.loadFromImage(image);
     for (int i = 0; i < 4; i++) {
         sprites[i].setTexture(texture);
@@ -33,8 +31,7 @@ SpriteHolder::SpriteHolder(const std::string &imageFilename,
     static const std::vector<sf::Vector2<float>> scale = {
         {2, 2.4}, {2, 2.4}, {2.4, 1.846}, {2.4, 1.846}};
 
-    static const SpriteHolder spriteHolder(imageFilename, rect, scale,
-                                           sf::Color(32, 200, 248));
+    static const SpriteHolder spriteHolder(imageFilename, rect, scale);
 
     return spriteHolder;
 }

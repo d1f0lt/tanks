@@ -6,14 +6,23 @@ namespace Tanks {
 
 Pause::Pause()
     : background(sf::Vector2<float>(WINDOW_WIDTH, WINDOW_HEIGHT)),
-      menu(path,
-           pauseWidth,
-           buttonTypes,
-           buttonsHeight,
-           buttonsStandardColor,
-           buttonsHoverColor) {
+      menu() {
     background.setPosition(0, 0);
     background.setFillColor(sf::Color(0, 0, 0, 180));
+
+    const std::string path = "../images/pause/";
+    const int buttonsHeight = 80;
+    const sf::Color buttonsStandardColor = sf::Color(0, 0, 0);
+    const sf::Color buttonsHoverColor = sf::Color(115, 115, 115);
+    const std::vector<Menu::ButtonType> buttonTypes = {
+            Menu::ButtonType::RESUME, Menu::ButtonType::NEW_GAME,
+            Menu::ButtonType::SETTINGS, Menu::ButtonType::EXIT};
+    menu = Menu::Menu(path,
+                           pauseWidth,
+                           buttonTypes,
+                           buttonsHeight,
+                           buttonsStandardColor,
+                           buttonsHoverColor);
 }
 
 void Pause::drawPause(sf::RenderWindow &window) const {
