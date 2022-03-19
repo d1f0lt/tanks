@@ -37,3 +37,4 @@ add_executable(
 
 
 target_link_libraries(model_tests sfml-graphics)
+target_link_libraries(tanks sfml-graphics)
