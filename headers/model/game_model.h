@@ -6,7 +6,7 @@
 #include "model/event.h"
 #include "model/game_map.h"
 #include "model/grouped_entities.h"
-#include "model/tank.h"
+#include "model/playable-tank.h"
 
 namespace Tanks::model {
 class GameModel {

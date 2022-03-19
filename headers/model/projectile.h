@@ -9,7 +9,6 @@ class Projectile : MovableEntity {
 public:
     explicit Projectile(int col, int row, Direction dir, GameMap &map_);
 
-    // TODO: Make possible to use move() only for model
 private:
     Direction dir;
 };

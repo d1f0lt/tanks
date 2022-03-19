@@ -9,9 +9,17 @@ Entity &GameModel::getEntityByCoords(int col, int row) {
 }
 
 void GameModel::nextTick() {
-    for (const auto &bot_tank :
+    while (!que.empty()) {
+        que.front()->execute(*this);
+        que.pop();
+    }
+
+    for (auto &bot_tank :
          groupedEntities
              .getAll()[static_cast<unsigned>(EntityType::BOT_TANK)]) {
+        ((MovableEntity &)bot_tank)
+            .move(((MovableEntity &)bot_tank)
+                      .getDirection());  // TODO normal casts
     }
 }
 
@@ -28,7 +36,7 @@ void GameModel::removeEntity(Entity &entity) {
 
 PlayableTank &GameModel::spawnPlayableTank(int left, int top) {
     return static_cast<PlayableTank &>(addEntity(
-        std::make_unique<PlayableTank>(left, top, Direction::UP, map)));
+        std::make_unique<PlayableTank>(left, top, Direction::UP, map, que)));
 }
 
 /*

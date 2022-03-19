@@ -1,14 +1,23 @@
 #include "model/tank.h"
 #include <cassert>
-#include "model/game_map.h"
+#include "model/playable-tank.h"
 
 namespace Tanks::model {
 Tank::Tank(int left, int top, EntityType type_, Direction dir, GameMap &map_)
     : MovableEntity(left, top, TANK_SIZE, TANK_SIZE, type_, dir, map_) {
 }
 
-PlayableTank::PlayableTank(int left, int top, Direction dir, GameMap &map_)
-    : Tank(left, top, EntityType::PLAYABLE_TANK, dir, map_) {
+PlayableTank::PlayableTank(int left,
+                           int top,
+                           Direction dir,
+                           GameMap &map_,
+                           std::queue<std::unique_ptr<Event>> &que_)
+    : Tank(left, top, EntityType::PLAYABLE_TANK, dir, map_), que(que_) {
+}
+
+void PlayableTank::move(Direction dir) {
+    // TODO make impossible more than one move
+    que.push(std::make_unique<TankMove>(*this, dir));
 }
 
 std::vector<const Entity *> Tank::look(Direction dir) {

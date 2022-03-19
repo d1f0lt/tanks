@@ -1,22 +1,25 @@
 #ifndef TANKS_EVENT_H
 #define TANKS_EVENT_H
 
-#include "model/tank.h"
+#include "model/entity.h"
+#include "tank.h"
 
 namespace Tanks::model {
-class GameModel;  // TODO forward declaration
 
 class Event {
+public:
     virtual void execute(GameModel &model) = 0;
+    virtual ~Event() = default;
 };
 
 class TankMove : public Event {
 public:
+    explicit TankMove(Tank &tank_, Direction direction_);
     void execute(GameModel &model) final;
 
 private:
-    PlayableTank &Tank;
-    Tanks::model::Direction direction;
+    Tank &tank;
+    Direction direction;
 };
 }  // namespace Tanks::model
 

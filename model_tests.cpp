@@ -23,6 +23,7 @@ int main() {
 
         real_tank.move(Tanks::model::Direction::DOWN);
         Tanks::model::Entity &ptr2 = model.getEntityByCoords(0, 0);
+        model.nextTick();
 
         assert(brick00 == &model.getEntityByCoords(0, 0));
     }
@@ -43,6 +44,7 @@ int main() {
         for (int i = 0; i < 9; i++) {
             realTank.move(Tanks::model::Direction::DOWN);
         }
+        model.nextTick(); // TODO make impossible more than one move
         right = realTank.look(Tanks::model::Direction::RIGHT);
         assert(right[0] == right[realTank.getHeight() - 2]);
         assert(right[0] != right.back());
