@@ -45,6 +45,7 @@ std::optional<Button> PauseController::control(Pause &pause,
                 .contains(sf::Mouse::getPosition(window))) {
             item->hover();
             if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+
                 Button button = translateIntToButtonType[i];
                 switch (button) {
                     case Button::RESUME:

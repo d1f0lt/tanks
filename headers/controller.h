@@ -14,6 +14,7 @@ public:
 };
 
 struct PauseController final {
+
     [[nodiscard]] static std::optional<Button> control(
         Pause &pause,
         sf::RenderWindow &window);

@@ -20,6 +20,7 @@ Pause::Pause() : background(sf::Vector2<float>(WINDOW_WIDTH, WINDOW_HEIGHT)) {
     items.emplace_back(
         std::make_unique<PauseItem>(path + "pause.png", currentCoordinates));
 
+
     const int pauseHeight =
         static_cast<int>(items[0]->inscriptionImage.getSize().y) +
         marginFromTitle + buttonsCount * PauseButton::rectangleHeight +
@@ -35,6 +36,7 @@ Pause::Pause() : background(sf::Vector2<float>(WINDOW_WIDTH, WINDOW_HEIGHT)) {
          currentCoordinates.y});  // Centralize
 
     // Buttons
+
     currentCoordinates.y += static_cast<float>(
         marginFromTitle + items[0]->inscriptionImage.getSize().y);
     for (int i = 2; i <= buttonsCount + 1; ++i) {

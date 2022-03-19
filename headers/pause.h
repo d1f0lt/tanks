@@ -27,7 +27,6 @@ private:
     sf::RectangleShape background;
     std::vector<std::unique_ptr<PauseItem>> items;
     const static int pauseWidth = 400;
-    // pauseHeight calculate automatically
 
     [[nodiscard]] const std::vector<std::unique_ptr<PauseItem>> &getItems()
         const;
@@ -61,6 +60,7 @@ public:
     void hover();
 
 private:
+
     mutable sf::RectangleShape rectangle;  // we want drawSprite to be a const
     const static int rectangleHeight = 80;
     const static int rectangleWidth = Pause::pauseWidth;
