@@ -13,7 +13,8 @@ std::string convertButtonTypeToString(const ButtonType type) {
         {ButtonType::RESUME, "resume"},
         {ButtonType::SETTINGS, "settings"},
         {ButtonType::CREATE_MAP, "create_map"},
-        {ButtonType::RATING, "rating"}};
+        {ButtonType::RATING, "rating"},
+        {ButtonType::PAUSE, "pause"}};
     assert(dictionary.find(type) != dictionary.end());
     return dictionary[type];
 }

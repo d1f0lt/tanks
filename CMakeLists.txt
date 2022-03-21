@@ -23,6 +23,7 @@ add_executable(
         source/menu.cpp
         source/pause.cpp
         source/main_menu.cpp
+        source/game_environment.cpp
 )
 
 target_link_libraries(tanks sfml-graphics sfml-audio)

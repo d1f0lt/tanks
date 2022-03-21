@@ -14,6 +14,8 @@ struct Pause final {
 public:
     Pause();
 
+    void makePause();
+
     void drawPause(sf::RenderWindow &window) const;
 
     [[nodiscard]] bool isPause() const;
@@ -22,7 +24,7 @@ public:
 
     const Menu::Menu &getMenu() const;
 
-    void unpause();
+    void makeUnPause();
 
 private:
     bool pause = false;
