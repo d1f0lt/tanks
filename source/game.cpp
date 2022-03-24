@@ -97,14 +97,14 @@ std::optional<Menu::ButtonType> startGame(sf::RenderWindow &window, int level) {
             pause.checkPause(event);
         }
 
-        if (auto signal = MenuController::control(environment.getMenu(), window); signal != std::nullopt) {
-            assert(signal == Menu::ButtonType::PAUSE);
-            pause.makePause();
-        }
-
         if (!pause.isPause()) {
-            GameController::makeMove(player, time);
-            player.checkCollisionWithMap(map, time);
+            if (auto signal = MenuController::control(environment.getMenu(), window); signal != std::nullopt) {
+                assert(signal == Menu::ButtonType::PAUSE);
+                pause.makePause();
+            } else {
+                GameController::makeMove(player, time);
+                player.checkCollisionWithMap(map, time);
+            }
         }
         //        bullets_control(player, bullets, time, window); TODO
 

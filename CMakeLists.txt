@@ -5,9 +5,10 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin/)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/headers/)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/)
+message("CMake runtime output directory: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
 
-find_package(SFML 2.5 COMPONENTS graphics audio)
+find_package(SFML 2.5 COMPONENTS graphics audio REQUIRED)
 
 add_executable(
         tanks
