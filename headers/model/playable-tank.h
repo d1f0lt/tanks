@@ -3,7 +3,8 @@
 
 #include <memory>
 #include <queue>
-#include "model/event.h"
+#include "model/tank-action-handler.h"
+#include "model/tank-move-event.h"
 #include "model/tank.h"
 
 namespace Tanks::model {
@@ -16,11 +17,11 @@ public:
                  std::queue<std::unique_ptr<Event>> &que_);
     // TODO: ShootHandler or other solution for shooting
 
+    // hiding is feature, if upcast to MovableObject move will move
     void move(Direction dir);
 
 private:
-    std::queue<std::unique_ptr<Event>> &que;
-    // TODO MoveHandler
+    TankActionHandler actionHandler;
 };
 }  // namespace Tanks::model
 #endif  // TANKS_PLAYABLE_TANK_H

@@ -1,6 +1,8 @@
 #include "model/tank.h"
 #include <cassert>
+#include <queue>
 #include "model/playable-tank.h"
+#include "model/tank-move-event.h"
 
 namespace Tanks::model {
 Tank::Tank(int left, int top, EntityType type_, Direction dir, GameMap &map_)
@@ -12,12 +14,13 @@ PlayableTank::PlayableTank(int left,
                            Direction dir,
                            GameMap &map_,
                            std::queue<std::unique_ptr<Event>> &que_)
-    : Tank(left, top, EntityType::PLAYABLE_TANK, dir, map_), que(que_) {
+    : Tank(left, top, EntityType::PLAYABLE_TANK, dir, map_),
+      actionHandler(*this, que_) {
 }
 
+// hiding is a feature
 void PlayableTank::move(Direction dir) {
-    // TODO make impossible more than one move
-    que.push(std::make_unique<TankMove>(*this, dir));
+    actionHandler.move(dir);
 }
 
 std::vector<const Entity *> Tank::look(Direction dir) {

@@ -18,7 +18,11 @@ add_executable(model_tests model_tests.cpp
         source/model/grouped_entities.cpp
         source/model/game_map.cpp
         source/model/entity_holder.cpp
-        source/model/foreground_entity.cpp source/model/event.cpp headers/model/event.h source/model/movable_entity.cpp headers/model/movable_entity.h source/model/events_queue.cpp headers/model/events_queue.h headers/model/playable-tank.h)
+        source/model/foreground_entity.cpp
+        source/model/event.cpp
+        source/model/movable_entity.cpp
+        source/model/events_queue.cpp
+        source/model/tank-action-handler.cpp)
 
 
 add_executable(

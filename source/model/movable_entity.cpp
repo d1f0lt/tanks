@@ -12,6 +12,7 @@ void MovableEntity::move(Direction dir) {
             setLeft(getLeft() - 1);
             break;
         case Direction::DOWN:
+
             setTop(getTop() + 1);
             break;
         case Direction::RIGHT:

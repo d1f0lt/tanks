@@ -26,6 +26,8 @@ private:
     Entity &addEntity(std::unique_ptr<Entity> entity);
     void removeEntity(Entity &entity);
 
+    void moveEntity(MovableEntity &entity, Direction direction);
+
     GameMap map;
     GroupedEntities groupedEntities;
     EntityHolder entityHolder;

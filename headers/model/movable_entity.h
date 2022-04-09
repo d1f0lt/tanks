@@ -1,7 +1,6 @@
 #ifndef TANKS_MOVABLE_ENTITY_H
 #define TANKS_MOVABLE_ENTITY_H
 
-//#include "event.h"
 #include "model/foreground_entity.h"
 
 namespace Tanks::model {

@@ -81,4 +81,24 @@ void GameModel::loadLevel(int level) {
     }
 }
 
+void GameModel::moveEntity(MovableEntity &entity, Direction direction) {
+    entity.setDirection(direction);
+    entity.restoreBackground();
+    switch (direction) {
+        case Direction::UP:
+            entity.setTop(entity.getTop() - 1);
+            break;
+        case Direction::LEFT:
+            entity.setLeft(entity.getLeft() - 1);
+            break;
+        case Direction::DOWN:
+            entity.setTop(entity.getTop() + 1);
+            break;
+        case Direction::RIGHT:
+            entity.setLeft(entity.getLeft() + 1);
+            break;
+    }
+    entity.setBackground();
+}
+
 }  // namespace Tanks::model

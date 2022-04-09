@@ -1,5 +1,6 @@
 #include "model/event.h"
 #include "model/movable_entity.h"
+#include "model/tank-move-event.h"
 #include "model/tank.h"
 
 namespace Tanks::model {
