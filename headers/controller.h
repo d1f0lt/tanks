@@ -1,7 +1,7 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
-#include "pause.h"
+#include "menu.h"
 #include "player.h"
 
 namespace Tanks {
@@ -13,10 +13,10 @@ public:
     static void makeMove(Player &player, double time);
 };
 
-struct PauseController final {
-
-    [[nodiscard]] static std::optional<Button> control(
-        Pause &pause,
+struct MenuController final {
+public:
+    static std::optional<Tanks::Menu::ButtonType> control(
+        const Menu::Menu &menu,
         sf::RenderWindow &window);
 };
 
