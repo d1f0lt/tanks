@@ -15,8 +15,7 @@ namespace Tanks {
 struct SpriteHolder {
     explicit SpriteHolder(const std::string &imageFilename,
                           const std::vector<sf::IntRect> &rect,
-                          const std::vector<sf::Vector2<float>> &scale,
-                          const sf::Color &color);
+                          const std::vector<sf::Vector2<float>> &scale);
 
     [[nodiscard]] sf::Sprite getSprite(Direction direction) const;
 

@@ -1,4 +1,6 @@
 #include "controller.h"
+#include "menu.h"
+#include "player.h"
 
 namespace Tanks {
 
@@ -23,16 +25,12 @@ void GameController::makeMove(Player &player, const double time) {
     }
 }
 
-std::optional<Button> PauseController::control(Pause &pause,
-                                               sf::RenderWindow &window) {
-    auto &items = pause.getItems();
-    static std::unordered_map<int, Button> translateIntToButtonType{
-        {1, Button::RESUME},
-        {2, Button::NEW_GAME},
-        {3, Button::SETTINGS},
-        {4, Button::EXIT}};
-    for (int i = 0; i < items.size(); ++i) {
-        auto item = dynamic_cast<PauseButton *>(items[i].get());
+std::optional<Menu::ButtonType> MenuController::control(
+    const Menu::Menu &menu,
+    sf::RenderWindow &window) {
+    auto &items = menu.getItems();
+    for (auto &menuItem : items) {
+        auto item = dynamic_cast<Menu::MenuButton *>(menuItem.get());
         if (item == nullptr) {  // header
             continue;
         }
@@ -45,22 +43,7 @@ std::optional<Button> PauseController::control(Pause &pause,
                 .contains(sf::Mouse::getPosition(window))) {
             item->hover();
             if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-
-                Button button = translateIntToButtonType[i];
-                switch (button) {
-                    case Button::RESUME:
-                        pause.pause = false;
-                        break;
-                    case Button::NEW_GAME:
-                        break;
-
-                    case Button::SETTINGS:
-                        break;
-
-                    case Button::EXIT:
-                        break;
-                }
-                return button;
+                return item->getType();
             }
         }
     }

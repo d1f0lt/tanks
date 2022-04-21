@@ -7,6 +7,7 @@
 #include "movable_object_view.h"
 #include "pause.h"
 #include "player.h"
+#include "game_environment.h"
 
 namespace Tanks {
 
@@ -39,14 +40,27 @@ namespace {
 //    });
 //}
 
+sf::Sprite initBackground(const std::string &path) {
+    static const std::string imageFilename =
+        path + "environment/background.png";
+    sf::Image image;
+    image.loadFromFile(imageFilename);
+    static sf::Texture texture;  // so that the texture isn't
+                                           // destroyed after the function exits
+    texture.loadFromImage(image);
+    sf::Sprite sprite;
+    sprite.setTexture(texture);
+    sprite.setPosition(0, 0);
+    return sprite;
+}
+
 }  // namespace
 
-void startGame(sf::RenderWindow &window, int level) {
+std::optional<Menu::ButtonType> startGame(sf::RenderWindow &window, int level) {
+    static const std::string imagesPath = "../images/";
     static const std::string tankImageFilename =
-        "../images/tanks/player_tanks.png";  // TODO remake initialization
-    static const std::string mapImageFilename = "../images/map.png";
-    static const std::string backgroundImageFilename =
-        "../images/environment/background.png";
+        imagesPath + "tanks/player_tanks.png";
+    static const std::string mapImageFilename = imagesPath + "map.png";
 
     Player player(sf::Vector2<int>(
         MARGIN_LEFT + 7 * TILE_SIZE,
@@ -58,14 +72,9 @@ void startGame(sf::RenderWindow &window, int level) {
     static Map map(mapImageFilename);
     map.loadLevel(level);
 
-    // background
-    sf::Image backgroundImage;
-    backgroundImage.loadFromFile(backgroundImageFilename);
-    sf::Texture backgroundTexture;
-    backgroundTexture.loadFromImage(backgroundImage);
-    sf::Sprite backgroundSprite;
-    backgroundSprite.setTexture(backgroundTexture);
-    backgroundSprite.setPosition(0, 0);
+    static sf::Sprite backgroundSprite = initBackground(imagesPath);
+
+    Environment environment(imagesPath + "environment/");
 
     sf::Clock clock;
 
@@ -89,27 +98,41 @@ void startGame(sf::RenderWindow &window, int level) {
         }
 
         if (!pause.isPause()) {
-            GameController::makeMove(player, time);
-            player.checkCollisionWithMap(map, time);
+            if (auto signal = MenuController::control(environment.getMenu(), window); signal != std::nullopt) {
+                assert(signal == Menu::ButtonType::PAUSE);
+                pause.makePause();
+            } else {
+                GameController::makeMove(player, time);
+                player.checkCollisionWithMap(map, time);
+            }
         }
         //        bullets_control(player, bullets, time, window); TODO
 
         // redraw
         window.clear();
         window.draw(backgroundSprite);
+        environment.draw(window, pause);
 
         map.drawMap(window);
 
         window.draw(playerView.getSprite());
 
         if (pause.isPause()) {
-            pause.drawPause(window);
-
-            std::optional<Button> signal =
-                PauseController::control(pause, window);
-            if (signal == Button::EXIT) {
-                return;
+            if (auto signal = MenuController::control(pause.getMenu(), window);
+                signal != std::nullopt) {
+                switch (signal.value()) {
+                    case Menu::ButtonType::RESUME:
+                        pause.makeUnPause();
+                        break;
+                    case Menu::ButtonType::NEW_GAME:
+                        return Menu::ButtonType::NEW_GAME;
+                    case Menu::ButtonType::EXIT:
+                        return std::nullopt;
+                    default:
+                        break;
+                }
             }
+            pause.drawPause(window);
         }
 
         window.display();
@@ -117,6 +140,7 @@ void startGame(sf::RenderWindow &window, int level) {
         // Hack for better performance
         std::this_thread::sleep_for(std::chrono::milliseconds(15));
     }
+    return std::nullopt;
 }
 
 }  // namespace Tanks
