@@ -9,6 +9,18 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/)
 
 find_package(SFML 2.5 COMPONENTS graphics audio)
 
+add_executable(model_tests model_tests.cpp
+        source/model/blocks.cpp
+        source/model/entity.cpp
+        source/model/game_model.cpp
+        source/model/projectile.cpp
+        source/model/tank.cpp
+        source/model/grouped_entities.cpp
+        source/model/game_map.cpp
+        source/model/entity_holder.cpp
+        source/model/foreground_entity.cpp)
+
+
 add_executable(
         tanks
         source/main.cpp
@@ -25,4 +37,6 @@ add_executable(
         source/main_menu.cpp
 )
 
-target_link_libraries(tanks sfml-graphics sfml-audio)
+
+target_link_libraries(model_tests sfml-graphics)
+target_link_libraries(tanks sfml-graphics)
