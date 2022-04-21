@@ -9,16 +9,14 @@
 namespace Tanks::model {
 class TankActionHandler {
 public:
-    explicit TankActionHandler(Tank &tank_,
-                               std::queue<std::unique_ptr<Event>> &que_);
+    explicit TankActionHandler(Tank &tank_, GameModel &model_);
 
     void move(Direction dir);
 
 private:
     Tank &tank;
-    //    GameModel &model;
-    std::queue<std::unique_ptr<Event>> &que;
-    //    int lastActionTick = -1;
+    GameModel &model;
+    int lastShootTick = -1;
 };
 }  // namespace Tanks::model
 

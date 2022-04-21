@@ -4,7 +4,6 @@
 #include "movable_entity.h"
 
 namespace Tanks::model {
-
 class Projectile : MovableEntity {
 public:
     explicit Projectile(int col, int row, Direction dir, GameMap &map_);

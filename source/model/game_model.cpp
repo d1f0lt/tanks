@@ -2,6 +2,7 @@
 #include <cassert>
 #include <fstream>
 #include "model/blocks.h"
+#include "model/projectile.h"
 
 namespace Tanks::model {
 Entity &GameModel::getEntityByCoords(int col, int row) {
@@ -36,7 +37,7 @@ void GameModel::removeEntity(Entity &entity) {
 
 PlayableTank &GameModel::spawnPlayableTank(int left, int top) {
     return static_cast<PlayableTank &>(addEntity(
-        std::make_unique<PlayableTank>(left, top, Direction::UP, map, que)));
+        std::make_unique<PlayableTank>(left, top, Direction::UP, map, *this)));
 }
 
 /*
@@ -82,6 +83,7 @@ void GameModel::loadLevel(int level) {
 }
 
 void GameModel::moveEntity(MovableEntity &entity, Direction direction) {
+    // TODO lock model
     entity.setDirection(direction);
     entity.restoreBackground();
     switch (direction) {
@@ -99,6 +101,10 @@ void GameModel::moveEntity(MovableEntity &entity, Direction direction) {
             break;
     }
     entity.setBackground();
+}
+
+void GameModel::spawnBullet(int left, int top, Direction dir) {
+    auto a = std::make_unique<Projectile>(left, top, dir, map);
 }
 
 }  // namespace Tanks::model

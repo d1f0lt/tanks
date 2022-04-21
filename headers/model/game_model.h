@@ -10,6 +10,8 @@
 
 namespace Tanks::model {
 class GameModel {
+    friend TankActionHandler;
+
 public:
     explicit GameModel() = default;
     //    explicit GameModel(const std::string &filename);
@@ -27,6 +29,8 @@ private:
     void removeEntity(Entity &entity);
 
     void moveEntity(MovableEntity &entity, Direction direction);
+
+    void spawnBullet(int left, int top, Direction dir);
 
     GameMap map;
     GroupedEntities groupedEntities;

@@ -2,7 +2,6 @@
 #include <cassert>
 #include <queue>
 #include "model/playable-tank.h"
-#include "model/tank-move-event.h"
 
 namespace Tanks::model {
 Tank::Tank(int left, int top, EntityType type_, Direction dir, GameMap &map_)
@@ -13,9 +12,9 @@ PlayableTank::PlayableTank(int left,
                            int top,
                            Direction dir,
                            GameMap &map_,
-                           std::queue<std::unique_ptr<Event>> &que_)
+                           GameModel &model_)
     : Tank(left, top, EntityType::PLAYABLE_TANK, dir, map_),
-      actionHandler(*this, que_) {
+      actionHandler(*this, model_) {
 }
 
 // hiding is a feature
@@ -32,7 +31,7 @@ std::vector<const Entity *> Tank::look(Direction dir) {
         std::vector<const Entity *> res(getWidth());
         for (int col = getLeft(); col < getLeft() + getWidth(); col++) {
             res[col - getLeft()] =
-                &map.getEntityByCoords(col, getTop() + getHeight() + 1);
+                &map.getEntityByCoords(col, getTop() + getHeight());
         }
         return res;
     } else if (dir == Direction::UP) {
@@ -52,7 +51,7 @@ std::vector<const Entity *> Tank::look(Direction dir) {
         std::vector<const Entity *> res(getHeight());
         for (int row = getTop(); row < getTop() + getHeight(); row++) {
             res[row - getTop()] =
-                &map.getEntityByCoords(getLeft() + getWidth() + 1, row);
+                &map.getEntityByCoords(getLeft() + getWidth(), row);
         }
         return res;
     } else {

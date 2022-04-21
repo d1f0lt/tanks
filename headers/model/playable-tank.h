@@ -4,7 +4,6 @@
 #include <memory>
 #include <queue>
 #include "model/tank-action-handler.h"
-#include "model/tank-move-event.h"
 #include "model/tank.h"
 
 namespace Tanks::model {
@@ -14,7 +13,7 @@ public:
                  int top,
                  Direction dir,
                  GameMap &map_,
-                 std::queue<std::unique_ptr<Event>> &que_);
+                 GameModel &model_);
     // TODO: ShootHandler or other solution for shooting
 
     // hiding is feature, if upcast to MovableObject move will move
