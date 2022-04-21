@@ -25,6 +25,11 @@ Pause::Pause()
                            buttonsHoverColor);
 }
 
+void Pause::makePause() {
+    assert(!pause);
+    pause = true;
+}
+
 void Pause::drawPause(sf::RenderWindow &window) const {
     window.draw(background);
     menu.drawMenu(window);
@@ -42,7 +47,7 @@ const Menu::Menu &Pause::getMenu() const {
     return menu;
 }
 
-void Pause::unpause() {
+void Pause::makeUnPause() {
     assert(pause);
     pause = false;
 }

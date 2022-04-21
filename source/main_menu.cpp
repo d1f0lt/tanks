@@ -37,12 +37,12 @@ Menu initMenu(const std::string &path) {
 void addExitButton(Menu &menu, const std::string &path) {
     sf::Image exitImage;
     exitImage.loadFromFile(path + "exit.png");
-    const int margin = 10;
+    const int margin = 5;
     sf::Vector2<float> coordinates(
-        0, static_cast<float>(WINDOW_HEIGHT - exitImage.getSize().y - margin));
+        margin, static_cast<float>(WINDOW_HEIGHT - exitImage.getSize().y - 3*margin));
     sf::Vector2<float> rectangleSize(
-        static_cast<float>(exitImage.getSize().x + margin),
-        static_cast<float>(exitImage.getSize().y + margin));
+        static_cast<float>(exitImage.getSize().x + 2*margin),
+        static_cast<float>(exitImage.getSize().y + 2*margin));
     menu.addMenuItem(std::make_unique<MenuButton>(
         path + "exit.png", coordinates, rectangleSize, sf::Color(0, 0, 0, 0),
         sf::Color(128, 128, 128, 128), ButtonType::EXIT));

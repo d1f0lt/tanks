@@ -7,6 +7,7 @@
 #include "movable_object_view.h"
 #include "pause.h"
 #include "player.h"
+#include "game_environment.h"
 
 namespace Tanks {
 
@@ -40,17 +41,17 @@ namespace {
 //}
 
 sf::Sprite initBackground(const std::string &path) {
-    static const std::string backgroundImageFilename =
+    static const std::string imageFilename =
         path + "environment/background.png";
-    sf::Image backgroundImage;
-    backgroundImage.loadFromFile(backgroundImageFilename);
-    static sf::Texture backgroundTexture;  // so that the texture isn't
+    sf::Image image;
+    image.loadFromFile(imageFilename);
+    static sf::Texture texture;  // so that the texture isn't
                                            // destroyed after the function exits
-    backgroundTexture.loadFromImage(backgroundImage);
-    sf::Sprite backgroundSprite;
-    backgroundSprite.setTexture(backgroundTexture);
-    backgroundSprite.setPosition(0, 0);
-    return backgroundSprite;
+    texture.loadFromImage(image);
+    sf::Sprite sprite;
+    sprite.setTexture(texture);
+    sprite.setPosition(0, 0);
+    return sprite;
 }
 
 }  // namespace
@@ -72,6 +73,8 @@ std::optional<Menu::ButtonType> startGame(sf::RenderWindow &window, int level) {
     map.loadLevel(level);
 
     static sf::Sprite backgroundSprite = initBackground(imagesPath);
+
+    Environment environment(imagesPath + "environment/");
 
     sf::Clock clock;
 
@@ -95,14 +98,20 @@ std::optional<Menu::ButtonType> startGame(sf::RenderWindow &window, int level) {
         }
 
         if (!pause.isPause()) {
-            GameController::makeMove(player, time);
-            player.checkCollisionWithMap(map, time);
+            if (auto signal = MenuController::control(environment.getMenu(), window); signal != std::nullopt) {
+                assert(signal == Menu::ButtonType::PAUSE);
+                pause.makePause();
+            } else {
+                GameController::makeMove(player, time);
+                player.checkCollisionWithMap(map, time);
+            }
         }
         //        bullets_control(player, bullets, time, window); TODO
 
         // redraw
         window.clear();
         window.draw(backgroundSprite);
+        environment.draw(window, pause);
 
         map.drawMap(window);
 
@@ -113,7 +122,7 @@ std::optional<Menu::ButtonType> startGame(sf::RenderWindow &window, int level) {
                 signal != std::nullopt) {
                 switch (signal.value()) {
                     case Menu::ButtonType::RESUME:
-                        pause.unpause();
+                        pause.makeUnPause();
                         break;
                     case Menu::ButtonType::NEW_GAME:
                         return Menu::ButtonType::NEW_GAME;
