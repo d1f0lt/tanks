@@ -2,7 +2,7 @@
 #define CONTROLLER_H
 
 #include "menu.h"
-#include "player.h"
+#include "model/playable-tank.h"
 
 namespace Tanks {
 
@@ -10,7 +10,9 @@ struct GameController final {
 public:
     static bool isEscReleased(const sf::Event &event);
 
-    static void makeMove(Player &player, double time);
+    static void makeMove(model::PlayableTank &player);
+
+    static void makeMove(model::PlayableTank &player, model::Direction direction);
 };
 
 struct MenuController final {

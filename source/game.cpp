@@ -1,94 +1,30 @@
-#include "game.h"
 #include <chrono>
 #include <thread>
-#include "constants.h"
+#include <cassert>
 #include "controller.h"
-#include "map.h"
-#include "movable_object_view.h"
 #include "pause.h"
-#include "player.h"
-#include "game_environment.h"
+#include "model/game_model.h"
+#include "view/game_view.h"
+#include "view/tank_view.h"
 
 namespace Tanks {
 
-namespace {
-
-// void bullets_control(Player &player, std::list<Bullet>
-// &bullets, double time, sf::RenderWindow &window) {
-//    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) &&
-//        player.is_have_shot()) {
-//        bullets.emplace_back(Bullet(player.getDirection(),
-//                                           player.getCoordinates()));
-//        player.make_shot();
-//    }
-//
-//    for (auto iterator = bullets.begin(); iterator != bullets.end();) {
-//        if (!iterator->isDestroyed()) {
-//            iterator->updatePosition(iterator->getDirection(), time);
-//            window.draw(iterator->get_bullet_sprite());
-//            iterator->checkIntersectionWithMap();
-//            iterator++;
-//        }
-//    }
-//    // needs to be redone
-//    bullets.remove_if([&](Bullet &bullet) {
-//        if (bullet.isDestroyed()) {
-//            player.recover_bullet();
-//            return true;
-//        }
-//        return false;
-//    });
-//}
-
-sf::Sprite initBackground(const std::string &path) {
-    static const std::string imageFilename =
-        path + "environment/background.png";
-    sf::Image image;
-    image.loadFromFile(imageFilename);
-    static sf::Texture texture;  // so that the texture isn't
-                                           // destroyed after the function exits
-    texture.loadFromImage(image);
-    sf::Sprite sprite;
-    sprite.setTexture(texture);
-    sprite.setPosition(0, 0);
-    return sprite;
-}
-
-}  // namespace
-
 std::optional<Menu::ButtonType> startGame(sf::RenderWindow &window, int level) {
     static const std::string imagesPath = "../images/";
-    static const std::string tankImageFilename =
-        imagesPath + "tanks/player_tanks.png";
-    static const std::string mapImageFilename = imagesPath + "map.png";
 
-    Player player(sf::Vector2<int>(
-        MARGIN_LEFT + 7 * TILE_SIZE,
-        TILE_SIZE * (MAP_HEIGHT - 2) + MARGIN_TOP + TILE_SIZE - TANK_SIZE));
+    model::GameModel model;
+    model.loadLevel(level);
+    auto &player = model.spawnPlayableTank(MARGIN_LEFT + TILE_SIZE * 6, WINDOW_HEIGHT - MARGIN_TOP - TILE_SIZE * 2 + (TILE_SIZE - TANK_SIZE));
 
-    MovableView playerView(player, tankImageFilename);
-
-    // map
-    static Map map(mapImageFilename);
-    map.loadLevel(level);
-
-    static sf::Sprite backgroundSprite = initBackground(imagesPath);
+    View::TankSpriteHolder greenTank(imagesPath + "tanks/green_tank.png");
 
     Environment environment(imagesPath + "environment/");
 
-    sf::Clock clock;
+    View::Map map(imagesPath + "map.png", level);
 
     Pause pause;
 
-    //    std::list<Bullet> bullets; TODO
-
     while (window.isOpen()) {
-        // calculate time since last tick
-        double time =
-            static_cast<double>(clock.getElapsedTime().asMicroseconds());
-        clock.restart();
-        time = time / 800;
-
         // catch event
         sf::Event event{};
         while (window.pollEvent(event)) {
@@ -102,20 +38,17 @@ std::optional<Menu::ButtonType> startGame(sf::RenderWindow &window, int level) {
                 assert(signal == Menu::ButtonType::PAUSE);
                 pause.makePause();
             } else {
-                GameController::makeMove(player, time);
-                player.checkCollisionWithMap(map, time);
+                GameController::makeMove(player);
             }
         }
-        //        bullets_control(player, bullets, time, window); TODO
 
         // redraw
         window.clear();
-        window.draw(backgroundSprite);
-        environment.draw(window, pause);
+        environment.draw(window, pause.isPause());
 
-        map.drawMap(window);
+        map.draw(window, model);
 
-        window.draw(playerView.getSprite());
+        greenTank.draw(window, player);
 
         if (pause.isPause()) {
             if (auto signal = MenuController::control(pause.getMenu(), window);

@@ -1,4 +1,4 @@
-#include "tank.h"
+#include "tank_view.h"
 
 namespace Tanks {
 

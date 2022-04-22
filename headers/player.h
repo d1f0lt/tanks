@@ -3,7 +3,7 @@
 
 #include <string>
 #include "constants.h"
-#include "tank.h"
+#include "tank_view.h"
 
 namespace Tanks {
 

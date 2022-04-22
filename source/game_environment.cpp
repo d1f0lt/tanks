@@ -60,12 +60,13 @@ void Timer::nextTick() {
     }
 }
 
-Environment::Environment(const std::string &path) : timer(path + "timer.png"), menu() {
+Environment::Environment(const std::string &path) : timer(path + "timer.png"), menu(), background(initBackground(path)) {
     addPauseButton(path);
 }
 
-void Environment::draw(sf::RenderWindow &window, Pause &pause) const {
-    if (!pause.isPause()) {
+void Environment::draw(sf::RenderWindow &window, bool isPause) const {
+    window.draw(background);
+    if (!isPause) {
         timer.nextTick();
         menu.drawMenu(window);
     } else {
@@ -87,6 +88,20 @@ void Environment::addPauseButton(const std::string &path) {
     const sf::Vector2<float> rectangleSize{static_cast<float>(image.getSize().x) + margin, static_cast<float>(image.getSize().y) + margin};
     auto item = std::make_unique<Menu::MenuButton>(imageFilename, coordinates, rectangleSize, sf::Color(0, 0, 0, 0), sf::Color(128, 128, 128, 128), Menu::ButtonType::PAUSE);
     menu.addMenuItem(std::move(item));
+}
+
+sf::Sprite Environment::initBackground(const std::string &path) {
+    static const std::string backgroundImageFilename =
+        path + "background.png";
+    sf::Image backgroundImage;
+    backgroundImage.loadFromFile(backgroundImageFilename);
+    static sf::Texture backgroundTexture;  // so that the texture isn't
+                                           // destroyed after the function exits
+    backgroundTexture.loadFromImage(backgroundImage);
+    sf::Sprite backgroundSprite;
+    backgroundSprite.setTexture(backgroundTexture);
+    backgroundSprite.setPosition(0, 0);
+    return backgroundSprite;
 }
 
 }  // namespace Tanks

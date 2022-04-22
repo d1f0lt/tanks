@@ -1,51 +1,15 @@
-#include "map.h"
+#include "view/game_view.h"
 #include <cassert>
 #include <fstream>
 
-namespace Tanks {
+namespace Tanks::View {
 
-Block::Block(const sf::Vector2<int> &coordinates_) : coordinates(coordinates_) {
-}
-
-// void Block::destroyBlock() {
-//    assert(
-//        type ==
-//        model::EntityType::BRICK);  // TODO remake, if we want destroy not only bricks
-//    type = model::EntityType::FLOOR;
-//}
-
-const sf::Vector2<int> &Block::getCoordinates() const {
-    return coordinates;
-}
-
-bool Block::canIntersectWithTank() const {
-    return true;
-}
-
-FloorBlock::FloorBlock(const sf::Vector2<int> &coordinates_)
-    : Block(coordinates_) {
-}
-
-bool FloorBlock::canIntersectWithTank() const {
-    return false;
-}
-
-BlockSpriteHolder::BlockSpriteHolder(const model::EntityType type,
+BlockSpriteHolder::BlockSpriteHolder(model::EntityType type_,
                                      sf::Texture &texture,
-                                     const sf::Vector2<int> &coordinates) {
+                                     const sf::Vector2<int> &coordinates) : type(type_) {
     sprite.setTexture(texture);
     sprite.setPosition(static_cast<float>(coordinates.x),
                        static_cast<float>(coordinates.y));
-
-    switch (type) {
-        case model::EntityType::FLOOR:
-            block = std::make_unique<FloorBlock>(coordinates);
-            break;
-        default:
-            block = std::make_unique<Block>(coordinates);
-            break;
-    }
-
     changeSprite(type);
 }
 
@@ -98,17 +62,28 @@ void BlockSpriteHolder::changeSprite(model::EntityType newType) {
             sprite.setTextureRect(sf::IntRect(2 * TILE_SIZE, 2 * TILE_SIZE,
                                               TILE_SIZE, TILE_SIZE));
             break;
+        default:
+            assert(false && "unknown block type");
     }
+    type = newType;
 }
 
-const sf::Sprite &BlockSpriteHolder::getSprite() const {
-    return sprite;
+void BlockSpriteHolder::draw(sf::RenderWindow &window) const {
+    window.draw(sprite);
 }
 
-Map::Map(const std::string &filename) : map(MAP_HEIGHT) {
+model::EntityType BlockSpriteHolder::getType() const {
+    return type;
+}
+
+void BlockSpriteHolder::destroy() {
+    changeSprite(model::EntityType::FLOOR);
+}
+
+Map::Map(const std::string &filename, int level) : map(MAP_HEIGHT) {
     image.loadFromFile(filename);
     texture.loadFromImage(image);
-    sprite.setTexture(texture);
+    loadLevel(level);
 }
 
 void Map::loadLevel(int level) {
@@ -141,25 +116,19 @@ void Map::loadLevel(int level) {
                                    MARGIN_TOP + TILE_SIZE * row}));
         }
     }
+    assert(map[0].size() == MAP_WIDTH);
 }
 
-void Map::drawMap(sf::RenderWindow &window) {
-    for (int row = 0; row < MAP_HEIGHT; ++row) {
-        for (const auto &tile : map[row]) {
-            window.draw(tile.getSprite());
-        }
-    }
-}
-
-std::vector<std::vector<Block *>> Map::getMap() {
-    std::vector<std::vector<Block *>> ans(MAP_HEIGHT,
-                                          std::vector<Block *>(MAP_WIDTH));
+void Map::draw(sf::RenderWindow &window, model::GameModel &model) {
     for (int row = 0; row < MAP_HEIGHT; ++row) {
         for (int col = 0; col < MAP_WIDTH; ++col) {
-            ans[row][col] = map[row][col].block.get();
+            auto &tile = map[row][col];
+            if (tile.getType() == model::EntityType::BRICK && model.getEntityByCoords(col*TILE_SIZE, row*TILE_SIZE).getType() != model::EntityType::BRICK) {
+                tile.destroy();
+            }
+            tile.draw(window);
         }
     }
-    return ans;
 }
 
-}  // namespace Tanks
+}  // namespace Tanks::View

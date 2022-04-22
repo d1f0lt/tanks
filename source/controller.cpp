@@ -1,27 +1,43 @@
 #include "controller.h"
 #include "menu.h"
-#include "player.h"
+#include <cassert>
 
 namespace Tanks {
+
+void GameController::makeMove(model::PlayableTank &player, model::Direction direction) {
+    auto res = player.look(direction);
+    assert(res != std::vector<const model::Entity *>());
+
+    for (auto &col : player.look(direction)) {
+        if (col != nullptr && col->getType() != model::EntityType::FLOOR) {
+            return;
+        }
+    }
+    player.move(direction);
+}
 
 bool GameController::isEscReleased(const sf::Event &event) {
     return (event.type == sf::Event::KeyReleased &&
             event.key.code == sf::Keyboard::Escape);
 }
 
-void GameController::makeMove(Player &player, const double time) {
+void GameController::makeMove(model::PlayableTank &player) {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) ||
         sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-        player.updatePosition(Direction::LEFT, time);
+        auto direction = model::Direction::LEFT;
+        makeMove(player, direction);
     } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) ||
                sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-        player.updatePosition(Direction::RIGHT, time);
+        auto direction = model::Direction::RIGHT;
+        makeMove(player, direction);
     } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) ||
                sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-        player.updatePosition(Direction::DOWN, time);
-    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) ||
-               sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-        player.updatePosition(Direction::UP, time);
+        auto direction = model::Direction::DOWN;
+        makeMove(player, direction);
+    } else if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Up) ||
+               sf::Keyboard::isKeyPressed(sf::Keyboard::W))) {
+        auto direction = model::Direction::UP;
+        makeMove(player, direction);
     }
 }
 

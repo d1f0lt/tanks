@@ -7,19 +7,6 @@
 
 namespace Tanks {
 
-enum class BlockType {
-    LEFT_UP_CORNER,
-    RIGHT_UP_CORNER,
-    LEFT_DOWN_CORNER,
-    RIGHT_DOWN_CORNER,
-    VERTICAL_BORDER,
-    HORIZONTAL_BORDER,
-    FLOOR,
-    BRICK,
-    STEEL,
-    WATER
-};
-
 struct Block {
 public:
     explicit Block(const sf::Vector2<int> &coordinates_);
@@ -28,7 +15,6 @@ public:
 
     [[nodiscard]] virtual bool canIntersectWithTank() const;  // TODO rename
 
-    //    void destroyBlock();
 
 private:
     const sf::Vector2<int> coordinates;
@@ -43,17 +29,16 @@ public:
 
 struct BlockSpriteHolder {
 public:
-    BlockSpriteHolder(BlockType type,
+    BlockSpriteHolder(model::EntityType type,
                       sf::Texture &texture,
                       const sf::Vector2<int> &coordinates_);
 
     const sf::Sprite &getSprite() const;
 
 private:
-    std::unique_ptr<Block> block;
     sf::Sprite sprite;
 
-    void changeSprite(BlockType new_type);
+    void changeSprite(model::EntityType new_type);
 
     friend struct Map;
 };
