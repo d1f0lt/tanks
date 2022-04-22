@@ -5,9 +5,6 @@
 namespace Tanks {
 
 void GameController::makeMove(model::PlayableTank &player, model::Direction direction) {
-    auto res = player.look(direction);
-    assert(res != std::vector<const model::Entity *>());
-
     for (auto &col : player.look(direction)) {
         if (col != nullptr && col->getType() != model::EntityType::FLOOR) {
             return;
