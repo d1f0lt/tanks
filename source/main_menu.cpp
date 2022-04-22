@@ -22,7 +22,7 @@ sf::Sprite initBackground(const std::string &path) {
     return backgroundSprite;
 }
 
-Menu initMenu(const std::string &path) {
+Menu initMenu() {
     const static std::vector<ButtonType> buttonTypes = {
         ButtonType::NEW_GAME, ButtonType::CREATE_MAP, ButtonType::RATING,
         ButtonType::SETTINGS};
@@ -30,7 +30,7 @@ Menu initMenu(const std::string &path) {
     const static int buttonsHeight = 100;
     const static sf::Color buttonsStandardColor(0, 0, 0, 150);
     const static sf::Color buttonsHoverColor(66, 66, 66, 230);
-    return Menu(path, menuWidth, buttonTypes, buttonsHeight,
+    return Menu(menuWidth, buttonTypes, buttonsHeight,
                 buttonsStandardColor, buttonsHoverColor);
 }
 
@@ -77,7 +77,7 @@ void menu(sf::RenderWindow &window) {
     const static std::string imagesPath = "../images/menu/";
     sf::Sprite backgroundSprite(initBackground(imagesPath));
 
-    Menu menu(initMenu(imagesPath));
+    Menu menu(initMenu());
     addExitButton(menu, imagesPath);
 
     while (window.isOpen()) {
@@ -95,7 +95,7 @@ void menu(sf::RenderWindow &window) {
         // redraw
         window.clear();
         window.draw(backgroundSprite);
-        menu.drawMenu(window);
+        menu.draw(window);
         window.display();
     }
 }

@@ -34,7 +34,7 @@ Timer::Timer(const std::string &path) {
     restart();
 }
 
-void Timer::drawTimer(sf::RenderWindow &window) const {
+void Timer::draw(sf::RenderWindow &window) const {
     window.draw(sprite);
     window.draw(time);
 }
@@ -67,11 +67,11 @@ Environment::Environment(const std::string &path) : timer(path + "timer.png"), m
 void Environment::draw(sf::RenderWindow &window, Pause &pause) const {
     if (!pause.isPause()) {
         timer.nextTick();
-        menu.drawMenu(window);
+        menu.draw(window);
     } else {
         timer.restart();
     }
-    timer.drawTimer(window);
+    timer.draw(window);
 }
 
 const Menu::Menu &Environment::getMenu() const {
