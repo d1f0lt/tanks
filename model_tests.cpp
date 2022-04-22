@@ -23,6 +23,7 @@ int main() {
 
         real_tank.move(Tanks::model::Direction::DOWN);
         Tanks::model::Entity &ptr2 = model.getEntityByCoords(0, 0);
+        model.nextTick();
 
         assert(brick00 == &model.getEntityByCoords(0, 0));
     }
@@ -43,6 +44,7 @@ int main() {
         for (int i = 0; i < 9; i++) {
             realTank.move(Tanks::model::Direction::DOWN);
         }
+        model.nextTick();  // TODO make impossible more than one move
         right = realTank.look(Tanks::model::Direction::RIGHT);
         assert(right[0] == right[realTank.getHeight() - 2]);
         assert(right[0] != right.back());
@@ -67,6 +69,32 @@ int main() {
             assert(block.isDestroyable() == false);
             assert(block.isTankPassable() == true);
             assert(block.isBulletPassable() == true);
+        }
+    }
+    {
+        Tanks::model::GameModel model;
+        model.loadLevel(1);
+        auto tank = model.spawnPlayableTank(80, 80);
+        auto resl = tank.look(Tanks::model::Direction::LEFT);
+        auto resu = tank.look(Tanks::model::Direction::UP);
+        auto resr = tank.look(Tanks::model::Direction::RIGHT);
+        auto resd = tank.look(Tanks::model::Direction::DOWN);
+
+        for (auto &col : tank.look(Tanks::model::Direction::LEFT)) {
+            assert(col != nullptr);
+            assert(col->getType() == Tanks::model::EntityType::FLOOR);
+        }
+        for (auto &col : tank.look(Tanks::model::Direction::RIGHT)) {
+            assert(col != nullptr);
+            assert(col->getType() == Tanks::model::EntityType::FLOOR);
+        }
+        for (auto &col : tank.look(Tanks::model::Direction::DOWN)) {
+            assert(col != nullptr);
+            assert(col->getType() == Tanks::model::EntityType::FLOOR);
+        }
+        for (auto &col : tank.look(Tanks::model::Direction::UP)) {
+            assert(col != nullptr);
+            assert(col->getType() == Tanks::model::EntityType::FLOOR);
         }
     }
 

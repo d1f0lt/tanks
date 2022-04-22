@@ -1,27 +1,25 @@
 #include "model/tank.h"
 #include <cassert>
-#include "model/game_map.h"
+#include <queue>
+#include "model/playable-tank.h"
 
 namespace Tanks::model {
-PlayableTank::PlayableTank(int left, int top, GameMap &map_)
-    : Tank(left, top, EntityType::PLAYABLE_TANK, map_) {
+Tank::Tank(int left, int top, EntityType type_, Direction dir, GameMap &map_)
+    : MovableEntity(left, top, TANK_SIZE, TANK_SIZE, type_, dir, map_) {
 }
 
+PlayableTank::PlayableTank(int left,
+                           int top,
+                           Direction dir,
+                           GameMap &map_,
+                           GameModel &model_)
+    : Tank(left, top, EntityType::PLAYABLE_TANK, dir, map_),
+      actionHandler(*this, model_) {
+}
+
+// hiding is a feature
 void PlayableTank::move(Direction dir) {
-    setDirection(dir);
-    move_(dir);
-}
-
-Direction Tank::getDirection() const {
-    return direction;
-}
-
-Tank::Tank(int left, int top, EntityType type_, GameMap &map_)
-    : ForegroundEntity(left, top, TANK_SIZE, TANK_SIZE, type_, map_) {
-}
-
-void Tank::setDirection(Direction dir) {
-    direction = dir;
+    actionHandler.move(dir);
 }
 
 std::vector<const Entity *> Tank::look(Direction dir) {
@@ -33,7 +31,7 @@ std::vector<const Entity *> Tank::look(Direction dir) {
         std::vector<const Entity *> res(getWidth());
         for (int col = getLeft(); col < getLeft() + getWidth(); col++) {
             res[col - getLeft()] =
-                &map.getEntityByCoords(col, getTop() + getHeight() + 1);
+                &map.getEntityByCoords(col, getTop() + getHeight());
         }
         return res;
     } else if (dir == Direction::UP) {
@@ -53,7 +51,7 @@ std::vector<const Entity *> Tank::look(Direction dir) {
         std::vector<const Entity *> res(getHeight());
         for (int row = getTop(); row < getTop() + getHeight(); row++) {
             res[row - getTop()] =
-                &map.getEntityByCoords(getLeft() + getWidth() + 1, row);
+                &map.getEntityByCoords(getLeft() + getWidth(), row);
         }
         return res;
     } else {

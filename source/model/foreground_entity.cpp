@@ -32,23 +32,4 @@ void ForegroundEntity::setBackground() {
     map.insert(*this);
 }
 
-void ForegroundEntity::move_(Tanks::model::Direction dir) {
-    restoreBackground();
-    switch (dir) {
-        case Direction::UP:
-            setTop(getTop() - 1);
-            break;
-        case Direction::LEFT:
-            setLeft(getLeft() - 1);
-            break;
-        case Direction::DOWN:
-            setTop(getTop() + 1);
-            break;
-        case Direction::RIGHT:
-            setLeft(getLeft() + 1);
-            break;
-    }
-    setBackground();
-}
-
 }  // namespace Tanks::model

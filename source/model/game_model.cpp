@@ -2,6 +2,7 @@
 #include <cassert>
 #include <fstream>
 #include "model/blocks.h"
+#include "model/projectile.h"
 
 namespace Tanks::model {
 Entity &GameModel::getEntityByCoords(int col, int row) {
@@ -9,9 +10,17 @@ Entity &GameModel::getEntityByCoords(int col, int row) {
 }
 
 void GameModel::nextTick() {
-    for (const auto &bot_tank :
+    while (!que.empty()) {
+        que.front()->execute(*this);
+        que.pop();
+    }
+
+    for (auto &bot_tank :
          groupedEntities
              .getAll()[static_cast<unsigned>(EntityType::BOT_TANK)]) {
+        ((MovableEntity &)bot_tank)
+            .move(((MovableEntity &)bot_tank)
+                      .getDirection());  // TODO normal casts
     }
 }
 
@@ -27,8 +36,8 @@ void GameModel::removeEntity(Entity &entity) {
 }
 
 PlayableTank &GameModel::spawnPlayableTank(int left, int top) {
-    return static_cast<PlayableTank &>(
-        addEntity(std::make_unique<PlayableTank>(left, top, map)));
+    return static_cast<PlayableTank &>(addEntity(
+        std::make_unique<PlayableTank>(left, top, Direction::UP, map, *this)));
 }
 
 /*
@@ -71,6 +80,31 @@ void GameModel::loadLevel(int level) {
             addEntity(std::move(real_entity));
         }
     }
+}
+
+void GameModel::moveEntity(MovableEntity &entity, Direction direction) {
+    // TODO lock model
+    entity.setDirection(direction);
+    entity.restoreBackground();
+    switch (direction) {
+        case Direction::UP:
+            entity.setTop(entity.getTop() - 1);
+            break;
+        case Direction::LEFT:
+            entity.setLeft(entity.getLeft() - 1);
+            break;
+        case Direction::DOWN:
+            entity.setTop(entity.getTop() + 1);
+            break;
+        case Direction::RIGHT:
+            entity.setLeft(entity.getLeft() + 1);
+            break;
+    }
+    entity.setBackground();
+}
+
+void GameModel::spawnBullet(int left, int top, Direction dir) {
+    auto a = std::make_unique<Projectile>(left, top, dir, map);
 }
 
 }  // namespace Tanks::model

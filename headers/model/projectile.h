@@ -1,16 +1,12 @@
 #ifndef TANKS_PROJECTILE_H
 #define TANKS_PROJECTILE_H
 
-#include "foreground_entity.h"
+#include "movable_entity.h"
 
 namespace Tanks::model {
-
-class Projectile : ForegroundEntity {
+class Projectile : MovableEntity {
 public:
-    explicit Projectile(int col, int row, GameMap &map_);
-
-    // TODO: Make possible to use move() only for model
-    void move();
+    explicit Projectile(int col, int row, Direction dir, GameMap &map_);
 
 private:
     Direction dir;
