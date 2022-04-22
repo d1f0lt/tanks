@@ -21,22 +21,26 @@ add_executable(model_tests model_tests.cpp
         source/model/entity_holder.cpp
         source/model/foreground_entity.cpp)
 
-
 add_executable(
         tanks
         source/main.cpp
-        source/tank.cpp
-        source/player.cpp
-        source/bullet.cpp
-        source/movable_object.cpp
         source/game.cpp
-        source/movable_object_view.cpp
-        source/map.cpp
         source/controller.cpp
         source/menu.cpp
         source/pause.cpp
         source/main_menu.cpp
         source/game_environment.cpp
+        source/model/blocks.cpp
+        source/model/entity.cpp
+        source/model/game_model.cpp
+        source/model/projectile.cpp
+        source/model/tank.cpp
+        source/model/grouped_entities.cpp
+        source/model/game_map.cpp
+        source/model/entity_holder.cpp
+        source/model/foreground_entity.cpp
+        source/view/game_view.cpp
+        source/view/tank_view.cpp
 )
 
 
