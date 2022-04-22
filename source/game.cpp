@@ -11,7 +11,7 @@ namespace Tanks {
 
 std::optional<Menu::ButtonType> startGame(sf::RenderWindow &window, int level) {
     static const std::string imagesPath = "../images/";
-    const sf::Vector2<int> tankStartCoordinates{TILE_SIZE * 6, TILE_SIZE * (MAP_HEIGHT - 2) + (TILE_SIZE - TANK_SIZE)};
+    const sf::Vector2<int> tankStartCoordinates{TILE_SIZE * 6 + (TILE_SIZE - TANK_SIZE) / 2, TILE_SIZE * (MAP_HEIGHT - 2) + (TILE_SIZE - TANK_SIZE)};
 
     model::GameModel model;
     model.loadLevel(level);
