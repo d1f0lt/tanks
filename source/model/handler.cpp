@@ -57,8 +57,8 @@ std::vector<const Entity *> MovableHandler::look(Direction direction) {
     }
 
     std::vector<const Entity *> res;
-    for (int row = down; row > top; row--) {
-        for (int col = left; col < right; col++) {
+    for (int row = down; row > top && row >= 0; row--) {
+        for (int col = left; col < right && col < model.map.getWidth(); col++) {
             res.push_back(&model.getEntityByCoords(col, row));
         }
     }
