@@ -9,7 +9,7 @@ message("CMake runtime output directory: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
 
 SET(GCC_WARNINGS "-Wall -Wextra")
-SET(SANITIZERS "-fsanitize=address,undefined,leak,vptr")
+#SET(SANITIZERS "-fsanitize=address,undefined,leak,vptr")
 SET(GCC_OPTIMIZE "-Og -g -ftrapv") # Latest is integer overflow protection
 #SET(GCC_OPTIMIZE "-O2 -DNDEBUG") # RELEASE
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_WARNINGS} ${SANITIZERS} ${GCC_OPTIMIZE}")
