@@ -68,11 +68,6 @@ TEST_CASE("multiple moves") {
 
     model.nextTick();
     right = realTank.look(Tanks::model::Direction::RIGHT);
-    CHECK(right[0] != right[realTank.getHeight() - 2]);
-    CHECK(right[0] != right.back());
-    CHECK(right.back() == right[realTank.getHeight() - 2]);
-    CHECK(right[0] == &model.getEntityByCoords(realTank.getLeft() + TANK_SIZE,
-                                               realTank.getTop()));
     CHECK(right.back()->getType() == Tanks::model::EntityType::FLOOR);
 }
 
@@ -127,6 +122,5 @@ TEST_CASE("Tank simple shoot") {
 
     model.nextTick();
     CHECK(bullet.getTop() == Tanks::TILE_SIZE + Tanks::TANK_SIZE / 2);
-    CHECK(bullet.getLeft() ==
-          TILE_SIZE + TANK_SIZE + bullet.getSpeed());
+    CHECK(bullet.getLeft() == TILE_SIZE + TANK_SIZE + bullet.getSpeed());
 }

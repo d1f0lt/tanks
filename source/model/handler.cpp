@@ -19,54 +19,51 @@ void BasicHandler::shoot() {
 }
 
 std::vector<const Entity *> BasicHandler::look(Direction direction) {
-    if (direction == Direction::DOWN) {
-        if (entity.getTop() + entity.getHeight() == model.map.getHeight() - 1) {
-            return {};
-        }
+    assert(false);
+}
 
-        std::vector<const Entity *> res(entity.getWidth());
-        for (int col = entity.getLeft();
-             col < entity.getLeft() + entity.getWidth(); col++) {
-            res[col - entity.getLeft()] = &model.map.getEntityByCoords(
-                col, entity.getTop() + entity.getHeight());
-        }
-        return res;
-    } else if (direction == Direction::UP) {
-        if (entity.getTop() == 0) {
-            return {};
-        }
-
-        std::vector<const Entity *> res(entity.getWidth());
-        for (int col = entity.getLeft();
-             col < entity.getLeft() + entity.getWidth(); col++) {
-            res[col - entity.getLeft()] =
-                &model.map.getEntityByCoords(col, entity.getTop() - 1);
-        }
-        return res;
-    } else if (direction == Direction::RIGHT) {
-        if (entity.getLeft() + entity.getWidth() == model.map.getWidth() - 1) {
-            return {};
-        }
-        std::vector<const Entity *> res(entity.getHeight());
-        for (int row = entity.getTop();
-             row < entity.getTop() + entity.getHeight(); row++) {
-            res[row - entity.getTop()] = &model.map.getEntityByCoords(
-                entity.getLeft() + entity.getWidth(), row);
-        }
-        return res;
-    } else {
-        assert(direction == Direction::LEFT);
-        std::vector<const Entity *> res(entity.getHeight());
-        if (entity.getLeft() == 0) {
-            return {};
-        }
-        for (int row = entity.getTop();
-             row < entity.getTop() + entity.getHeight(); row++) {
-            res[row - entity.getTop()] =
-                &model.map.getEntityByCoords(entity.getLeft() - 1, row);
-        }
-        return res;
+std::vector<const Entity *> MovableHandler::look(Direction direction) {
+    auto &real_entity = static_cast<MovableEntity &>(entity);
+    // retuns square [left, right) x [down, top)
+    int left = -1;
+    int top = -1;
+    int right = -1;
+    int down = 0;
+    switch (direction) {
+        case (Direction::UP):
+            left = entity.getLeft();
+            right = left + entity.getWidth();
+            down = entity.getTop() - 1;
+            top = down - real_entity.getSpeed();
+            break;
+        case (Direction::DOWN):
+            left = entity.getLeft();
+            right = left + entity.getWidth();
+            top = entity.getTop() + entity.getHeight();
+            down = top + real_entity.getSpeed();
+            break;
+        case (Direction::LEFT):
+            right = entity.getLeft();
+            left = right - real_entity.getSpeed();
+            top = entity.getTop() - 1;
+            down = top + entity.getHeight();
+            break;
+        case (Direction::RIGHT):
+            left = entity.getLeft() + entity.getWidth();
+            right = left + real_entity.getSpeed();
+            top = entity.getTop() - 1;
+            down = top + entity.getHeight();
+            break;
     }
+
+    std::vector<const Entity *> res;
+    for (int row = down; row > top; row--) {
+        for (int col = left; col < right; col++) {
+            res.push_back(&model.getEntityByCoords(col, row));
+        }
+    }
+
+    return res;
 }
 
 void ForegroundHandler::restoreBackground() {

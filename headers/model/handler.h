@@ -20,7 +20,7 @@ public:
     virtual void setBackground() = 0;
     virtual void restoreBackground() = 0;
 
-    [[nodiscard]] std::vector<const Entity *> look(Direction direction);
+    [[nodiscard]] virtual std::vector<const Entity *> look(Direction direction);
 
     virtual void move(Direction direction);
 
@@ -42,6 +42,8 @@ public:
 class MovableHandler : public ForegroundHandler {
 public:
     explicit MovableHandler(GameModel &model_, MovableEntity &entity);
+
+    [[nodiscard]] std::vector<const Entity *> look(Direction direction) final;
 
     void move(Direction direction) final;
 };
