@@ -1,8 +1,8 @@
-#include "menu.h"
-#include "pause.h"
-
 #ifndef GAME_ENVIRONMENT
 #define GAME_ENVIRONMENT
+
+#include "menu.h"
+#include "pause.h"
 
 namespace Tanks {
 
@@ -37,8 +37,6 @@ public:
 private:
     mutable Timer timer;
     Menu::Menu menu;
-
-    void addPauseButton(const std::string &path);
 };
 
 }

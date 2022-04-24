@@ -12,6 +12,19 @@ std::string numberWithLeftZeros(int num, int numberLength) {
     assert(numStr.size() <= numberLength);
     return std::string("0", numberLength - numStr.size()) + numStr;
 }
+
+void addPauseButton(Menu::Menu &menu, const std::string &path) {
+    static const std::string imageFilename = path + "pause.png";
+    sf::Image image;
+    image.loadFromFile(imageFilename);
+    const int margin = 5;
+    const sf::Vector2<float> coordinates{2*margin, 2*margin};
+    const sf::Vector2<float> rectangleSize{static_cast<float>(image.getSize().x) + margin, static_cast<float>(image.getSize().y) + margin};
+    auto pauseSprite = std::make_unique<Menu::MenuPicture>(imageFilename, coordinates);
+    auto item = std::make_unique<Menu::MenuButton>(std::move(pauseSprite), coordinates, rectangleSize, sf::Color(0, 0, 0, 0), sf::Color(128, 128, 128, 128), Menu::ButtonType::PAUSE);
+    menu.addMenuItem(std::move(item));
+}
+
 }  // namespace
 
 Timer::Timer(const std::string &filename) {
@@ -62,7 +75,7 @@ void Timer::nextTick() {
 }
 
 Environment::Environment(const std::string &path) : timer(path + "timer.png"), menu() {
-    addPauseButton(path);
+    addPauseButton(menu, path);
 }
 
 void Environment::draw(sf::RenderWindow &window, Pause &pause) const {
@@ -77,18 +90,6 @@ void Environment::draw(sf::RenderWindow &window, Pause &pause) const {
 
 const Menu::Menu &Environment::getMenu() const {
     return menu;
-}
-
-void Environment::addPauseButton(const std::string &path) {
-    static const std::string imageFilename = path + "pause.png";
-    sf::Image image;
-    image.loadFromFile(imageFilename);
-    const int margin = 5;
-    const sf::Vector2<float> coordinates{2*margin, 2*margin};
-    const sf::Vector2<float> rectangleSize{static_cast<float>(image.getSize().x) + margin, static_cast<float>(image.getSize().y) + margin};
-    auto pauseSprite = std::make_unique<Menu::MenuPicture>(imageFilename, coordinates);
-    auto item = std::make_unique<Menu::MenuButton>(std::move(pauseSprite), coordinates, rectangleSize, sf::Color(0, 0, 0, 0), sf::Color(128, 128, 128, 128), Menu::ButtonType::PAUSE);
-    menu.addMenuItem(std::move(item));
 }
 
 }  // namespace Tanks
