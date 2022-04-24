@@ -3,6 +3,7 @@
 
 #include "menu.h"
 #include "player.h"
+#include <optional>
 
 namespace Tanks {
 

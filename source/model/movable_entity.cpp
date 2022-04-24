@@ -1,4 +1,5 @@
 #include "model/movable_entity.h"
+#include "model/handler.h"
 
 namespace Tanks::model {
 void MovableEntity::move(Direction dir) {
@@ -28,8 +29,9 @@ MovableEntity::MovableEntity(int col,
                              int height,
                              EntityType type,
                              Direction dir,
-                             GameMap &map)
-    : ForegroundEntity(col, row, width, height, type, map), direction(dir) {
+                             std::unique_ptr<BasicHandler> handler_)
+    : ForegroundEntity(col, row, width, height, type, std::move(handler_)),
+      direction(dir) {
 }
 
 Direction MovableEntity::getDirection() const {

@@ -4,12 +4,16 @@
 #include "movable_entity.h"
 
 namespace Tanks::model {
-class Projectile : MovableEntity {
+class Projectile : public MovableEntity {
+    friend GameModel;
+
 public:
-    explicit Projectile(int col, int row, Direction dir, GameMap &map_);
+    explicit Projectile(int col,
+                        int row,
+                        Direction dir,
+                        std::unique_ptr<BasicHandler> handler_);
 
 private:
-    Direction dir;
 };
 }  // namespace Tanks::model
 

@@ -6,15 +6,18 @@
 #include "model/event.h"
 #include "model/game_map.h"
 #include "model/grouped_entities.h"
+#include "model/handler.h"
 #include "model/playable-tank.h"
 
 namespace Tanks::model {
 class GameModel {
-    friend TankActionHandler;
+    friend BasicHandler;
+    friend ForegroundHandler;
+    friend MovableHandler;
+    friend TankHandler;
 
 public:
     explicit GameModel() = default;
-    //    explicit GameModel(const std::string &filename);
 
     [[nodiscard]] Entity &getEntityByCoords(int col, int row);
 
@@ -26,15 +29,13 @@ public:
 
 private:
     Entity &addEntity(std::unique_ptr<Entity> entity);
+    Entity &addEntity(std::unique_ptr<Entity> entity, BasicHandler *handler);
     void removeEntity(Entity &entity);
-
-    void moveEntity(MovableEntity &entity, Direction direction);
-
-    void spawnBullet(int left, int top, Direction dir);
 
     GameMap map;
     GroupedEntities groupedEntities;
     EntityHolder entityHolder;
+    std::unordered_map<Entity *, BasicHandler *> handlers;
     std::queue<std::unique_ptr<Event>> que{};  // TODO threadsafe
 };
 }  // namespace Tanks::model

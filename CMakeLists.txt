@@ -8,6 +8,9 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/)
 message("CMake runtime output directory: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
 
+SET(GCC_FLAGS "-Wall -Wextra -fsanitize=address,undefined")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_FLAGS}")
+
 find_package(SFML 2.5 COMPONENTS graphics audio REQUIRED)
 
 add_executable(model_tests model_tests.cpp
@@ -21,8 +24,7 @@ add_executable(model_tests model_tests.cpp
         source/model/entity_holder.cpp
         source/model/foreground_entity.cpp
         source/model/movable_entity.cpp
-        source/model/events_queue.cpp
-        source/model/tank-action-handler.cpp)
+        source/model/handler.cpp)
 
 
 add_executable(
@@ -40,7 +42,7 @@ add_executable(
         source/pause.cpp
         source/main_menu.cpp
         source/game_environment.cpp
-)
+        source/model/handler.cpp)
 
 
 target_link_libraries(model_tests sfml-graphics)

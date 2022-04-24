@@ -15,12 +15,26 @@ void GameModel::nextTick() {
         que.pop();
     }
 
-    for (auto &bot_tank :
+    for (auto entity :
          groupedEntities
-             .getAll()[static_cast<unsigned>(EntityType::BOT_TANK)]) {
-        ((MovableEntity &)bot_tank)
-            .move(((MovableEntity &)bot_tank)
-                      .getDirection());  // TODO normal casts
+             .snapshotAll()[static_cast<unsigned>(EntityType::BOT_TANK)]) {
+        auto tank = static_cast<BotTank *>(entity);
+        handlers[tank]->move(*tank, tank->getDirection());
+    }
+
+    for (auto entity :
+         groupedEntities
+             .snapshotAll()[static_cast<unsigned>(EntityType::BULLET)]) {
+        auto bullet = static_cast<Projectile *>(entity);
+        bullet->move(bullet->getDirection());
+
+        for (auto &row : bullet->snapshotBackground()) {
+            for (auto &ent : row) {
+                if (ent->isDestroyable()) {
+                    removeEntity(*const_cast<Entity *>(ent));
+                }
+            }
+        }
     }
 }
 
@@ -30,20 +44,29 @@ Entity &GameModel::addEntity(std::unique_ptr<Entity> entity) {
     return entityHolder.insert(std::move(entity));
 }
 
+Entity &GameModel::addEntity(std::unique_ptr<Entity> entity,
+                             BasicHandler *handler) {
+    auto ptr = entity.get();
+    addEntity(std::move(entity));
+    assert(handlers.count(ptr) == 0);
+    handlers[ptr] = handler;
+}
+
 void GameModel::removeEntity(Entity &entity) {
+    if (ForegroundEntity *foreground =
+            dynamic_cast<ForegroundEntity *>(&entity)) {
+        foreground->restoreBackground();
+    }
+
+    handlers.erase(&entity);
     map.erase(entity);
     groupedEntities.erase(entity);
 }
 
 PlayableTank &GameModel::spawnPlayableTank(int left, int top) {
-    return static_cast<PlayableTank &>(addEntity(
-        std::make_unique<PlayableTank>(left, top, Direction::UP, map, *this)));
+    return static_cast<PlayableTank &>(addEntity(std::make_unique<PlayableTank>(
+        left, top, Direction::UP, std::make_unique<TankHandler>(*this))));
 }
-
-/*
-GameModel::GameModel(const std::string &filename) {
-    std::ifstream is(filename);
-}*/
 
 void GameModel::loadLevel(int level) {
     const std::string currentLevel =
@@ -80,31 +103,6 @@ void GameModel::loadLevel(int level) {
             addEntity(std::move(real_entity));
         }
     }
-}
-
-void GameModel::moveEntity(MovableEntity &entity, Direction direction) {
-    // TODO lock model
-    entity.setDirection(direction);
-    entity.restoreBackground();
-    switch (direction) {
-        case Direction::UP:
-            entity.setTop(entity.getTop() - 1);
-            break;
-        case Direction::LEFT:
-            entity.setLeft(entity.getLeft() - 1);
-            break;
-        case Direction::DOWN:
-            entity.setTop(entity.getTop() + 1);
-            break;
-        case Direction::RIGHT:
-            entity.setLeft(entity.getLeft() + 1);
-            break;
-    }
-    entity.setBackground();
-}
-
-void GameModel::spawnBullet(int left, int top, Direction dir) {
-    auto a = std::make_unique<Projectile>(left, top, dir, map);
 }
 
 }  // namespace Tanks::model
