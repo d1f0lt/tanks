@@ -2,17 +2,13 @@
 #define TANKS_HANDLER_H
 
 #include "entity.h"
+#include "model/entities_fwd.h"
 
 namespace Tanks::model {
-class Entity;
-class MovableEntity;
-class ForegroundEntity;
-class Tank;
-
-class GameModel;
+class GameModel;  // TODO GameModel fwd
 class BasicHandler {
 public:
-    explicit BasicHandler(GameModel &model_);
+    explicit BasicHandler(GameModel &model_, Entity &entity);
 
     BasicHandler(const BasicHandler &) = delete;
     BasicHandler(BasicHandler &&) = delete;
@@ -21,40 +17,40 @@ public:
 
     virtual ~BasicHandler() = default;
 
-    [[nodiscard]] std::vector<const Entity *> look(const Entity &entity,
-                                                   Direction direction);
+    virtual void setBackground() = 0;
+    virtual void restoreBackground() = 0;
 
-    virtual void move(MovableEntity &entity, Direction direction);
+    [[nodiscard]] std::vector<const Entity *> look(Direction direction);
 
-    virtual void setBackground(ForegroundEntity &entity) = 0;
-    virtual void restoreBackground(ForegroundEntity &entity) = 0;
+    virtual void move(Direction direction);
 
-    virtual void shoot(Tank &entity);
+    virtual void shoot();
 
 protected:
     GameModel &model;
+    Entity &entity;
 };
 
 class ForegroundHandler : public BasicHandler {
 public:
-    explicit ForegroundHandler(GameModel &model_);
+    explicit ForegroundHandler(GameModel &model_, ForegroundEntity &entity);
 
-    void setBackground(ForegroundEntity &entity) final;
-    void restoreBackground(ForegroundEntity &entity) final;
+    void setBackground() final;
+    void restoreBackground() final;
 };
 
 class MovableHandler : public ForegroundHandler {
 public:
-    explicit MovableHandler(GameModel &model_);
+    explicit MovableHandler(GameModel &model_, MovableEntity &entity);
 
-    void move(MovableEntity &entity, Direction direction) final;
+    void move(Direction direction) final;
 };
 
 class TankHandler : public MovableHandler {
 public:
-    explicit TankHandler(GameModel &model_);
+    explicit TankHandler(GameModel &model_, Tank &entity);
 
-    void shoot(Tank &entity) final;
+    void shoot() final;
 };
 
 }  // namespace Tanks::model

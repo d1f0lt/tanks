@@ -8,8 +8,11 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/)
 message("CMake runtime output directory: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
 
-SET(GCC_FLAGS "-Wall -Wextra -fsanitize=address,undefined")
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_FLAGS}")
+SET(GCC_WARNINGS "-Wall -Wextra")
+SET(SANITIZERS "-fsanitize=address,undefined,leak,vptr")
+SET(GCC_OPTIMIZE "-Og -g -ftrapv") # Latest is integer overflow protection
+#SET(GCC_OPTIMIZE "-O2 -DNDEBUG") # RELEASE
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_WARNINGS} ${SANITIZERS} ${GCC_OPTIMIZE}")
 
 find_package(SFML 2.5 COMPONENTS graphics audio REQUIRED)
 

@@ -1,24 +1,25 @@
 #include "model/handler.h"
 #include <model/game_model.h>
 #include <cassert>
-//#include "model/tank.h"
 #include "model/projectile.h"
 
 namespace Tanks::model {
-BasicHandler::BasicHandler(GameModel &model_) : model(model_) {
+BasicHandler::BasicHandler(GameModel &model_, Entity &entity_)
+    : model(model_), entity(entity_) {
+    assert(model.handlers.count(&entity) == 0);
+    model.handlers[&entity] = this;
 }
 
-void BasicHandler::move(MovableEntity &entity,
-                        Tanks::model::Direction direction) {
+void BasicHandler::move([[maybe_unused]] Direction direction) {
     assert(false);
 }
 
-void BasicHandler::shoot(Tank &entity) {
+void BasicHandler::shoot() {
     assert(false);
 }
-std::vector<const Entity *> BasicHandler::look(const Entity &entity,
-                                               Tanks::model::Direction dir) {
-    if (dir == Direction::DOWN) {
+
+std::vector<const Entity *> BasicHandler::look(Direction direction) {
+    if (direction == Direction::DOWN) {
         if (entity.getTop() + entity.getHeight() == model.map.getHeight() - 1) {
             return {};
         }
@@ -30,7 +31,7 @@ std::vector<const Entity *> BasicHandler::look(const Entity &entity,
                 col, entity.getTop() + entity.getHeight());
         }
         return res;
-    } else if (dir == Direction::UP) {
+    } else if (direction == Direction::UP) {
         if (entity.getTop() == 0) {
             return {};
         }
@@ -42,7 +43,7 @@ std::vector<const Entity *> BasicHandler::look(const Entity &entity,
                 &model.map.getEntityByCoords(col, entity.getTop() - 1);
         }
         return res;
-    } else if (dir == Direction::RIGHT) {
+    } else if (direction == Direction::RIGHT) {
         if (entity.getLeft() + entity.getWidth() == model.map.getWidth() - 1) {
             return {};
         }
@@ -54,7 +55,7 @@ std::vector<const Entity *> BasicHandler::look(const Entity &entity,
         }
         return res;
     } else {
-        assert(dir == Direction::LEFT);
+        assert(direction == Direction::LEFT);
         std::vector<const Entity *> res(entity.getHeight());
         if (entity.getLeft() == 0) {
             return {};
@@ -68,60 +69,71 @@ std::vector<const Entity *> BasicHandler::look(const Entity &entity,
     }
 }
 
-void ForegroundHandler::restoreBackground(ForegroundEntity &entity) {
+void ForegroundHandler::restoreBackground() {
+    auto &real_entity = static_cast<ForegroundEntity &>(entity);
+
     for (int y = 0; y < entity.getHeight(); y++) {
         for (int x = 0; x < entity.getWidth(); x++) {
-            model.map.insert(const_cast<Entity &>(*entity.background[y][x]));
-            entity.background[y][x] = nullptr;
+            model.map.insert(
+                const_cast<Entity &>(*real_entity.background[y][x]));
+            real_entity.background[y][x] = nullptr;
         }
     }
 }
 
-void ForegroundHandler::setBackground(ForegroundEntity &entity) {
+void ForegroundHandler::setBackground() {
+    auto &real_entity = static_cast<ForegroundEntity &>(entity);
+
     int y0 = entity.getTop();
     int x0 = entity.getLeft();
     for (int y = entity.getTop(); y < entity.getTop() + entity.getHeight();
          y++) {
         for (int x = entity.getLeft(); x < entity.getLeft() + entity.getWidth();
              x++) {
-            entity.background[y - y0][x - x0] = &model.getEntityByCoords(x, y);
+            real_entity.background[y - y0][x - x0] =
+                &model.getEntityByCoords(x, y);
         }
     }
     model.map.insert(entity);
 }
 
-ForegroundHandler::ForegroundHandler(GameModel &model_) : BasicHandler(model_) {
+ForegroundHandler::ForegroundHandler(GameModel &model_,
+                                     ForegroundEntity &entity)
+    : BasicHandler(model_, entity) {
 }
 
-MovableHandler::MovableHandler(GameModel &model_) : ForegroundHandler(model_) {
+MovableHandler::MovableHandler(GameModel &model_, MovableEntity &entity)
+    : ForegroundHandler(model_, entity) {
 }
 
-void MovableHandler::move(MovableEntity &entity,
-                          Tanks::model::Direction direction) {
+void MovableHandler::move(Direction direction) {
     // TODO lock model
-    entity.setDirection(direction);
-    entity.restoreBackground();
-    switch (direction) {
-        case Direction::UP:
-            entity.setTop(entity.getTop() - 1);
-            break;
-        case Direction::LEFT:
-            entity.setLeft(entity.getLeft() - 1);
-            break;
-        case Direction::DOWN:
-            entity.setTop(entity.getTop() + 1);
-            break;
-        case Direction::RIGHT:
-            entity.setLeft(entity.getLeft() + 1);
-            break;
+    auto &real_entity = static_cast<MovableEntity &>(entity);
+
+    real_entity.setDirection(direction);
+    real_entity.restoreBackground();
+    for (int i = 0; i < real_entity.getSpeed(); i++) {
+        switch (direction) {
+            case Direction::UP:
+                real_entity.setTop(entity.getTop() - 1);
+                break;
+            case Direction::LEFT:
+                real_entity.setLeft(entity.getLeft() - 1);
+                break;
+            case Direction::DOWN:
+                real_entity.setTop(entity.getTop() + 1);
+                break;
+            case Direction::RIGHT:
+                real_entity.setLeft(entity.getLeft() + 1);
+                break;
+        }
     }
-    entity.setBackground();
+    real_entity.setBackground();
 }
 
-TankHandler::TankHandler(GameModel &model_) : MovableHandler(model_) {
-}
+void TankHandler::shoot() {
+    auto &real_entity = static_cast<Tank &>(entity);
 
-void TankHandler::shoot(Tank &entity) {
     const std::unordered_map<Direction, int> DCOL = {
         {Tanks::model::Direction::UP, entity.getWidth() / 2},
         {Tanks::model::Direction::DOWN, entity.getWidth() / 2},
@@ -135,8 +147,12 @@ void TankHandler::shoot(Tank &entity) {
         {Tanks::model::Direction::LEFT, entity.getHeight() / 2}};
 
     model.addEntity(std::make_unique<Projectile>(
-        entity.getLeft() + DCOL.at(entity.getDirection()),
-        entity.getTop() + DROW.at(entity.getDirection()), entity.getDirection(),
-        std::make_unique<MovableHandler>(model)));
+        entity.getLeft() + DCOL.at(real_entity.getDirection()),
+        entity.getTop() + DROW.at(real_entity.getDirection()),
+        real_entity.getDirection(), model));
+}
+
+TankHandler::TankHandler(GameModel &model_, Tank &entity)
+    : MovableHandler(model_, entity) {
 }
 }  // namespace Tanks::model

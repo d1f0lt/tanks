@@ -5,15 +5,16 @@
 
 namespace Tanks::model {
 class Projectile : public MovableEntity {
-    friend GameModel;
-
 public:
-    explicit Projectile(int col,
-                        int row,
-                        Direction dir,
+    explicit Projectile(int left_,
+                        int top_,
+                        Direction direction_,
                         std::unique_ptr<BasicHandler> handler_);
 
-private:
+    explicit Projectile(int left_,
+                        int top_,
+                        Direction direction_,
+                        GameModel &model_);
 };
 }  // namespace Tanks::model
 

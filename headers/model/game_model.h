@@ -3,7 +3,6 @@
 
 #include <queue>
 #include "entity_holder.h"
-#include "model/event.h"
 #include "model/game_map.h"
 #include "model/grouped_entities.h"
 #include "model/handler.h"
@@ -29,14 +28,12 @@ public:
 
 private:
     Entity &addEntity(std::unique_ptr<Entity> entity);
-    Entity &addEntity(std::unique_ptr<Entity> entity, BasicHandler *handler);
     void removeEntity(Entity &entity);
 
     GameMap map;
     GroupedEntities groupedEntities;
     EntityHolder entityHolder;
     std::unordered_map<Entity *, BasicHandler *> handlers;
-    std::queue<std::unique_ptr<Event>> que{};  // TODO threadsafe
 };
 }  // namespace Tanks::model
 

@@ -4,21 +4,22 @@
 #include "model/foreground_entity.h"
 
 namespace Tanks::model {
-// class GameModel;  // TODO forward declaration
 
 class MovableEntity : public ForegroundEntity {
 public:
     friend MovableHandler;
 
-    explicit MovableEntity(int col,
-                           int row,
+    explicit MovableEntity(int left,
+                           int right,
                            int width,
                            int height,
                            EntityType type,
                            Direction direction,
+                           int speed,
                            std::unique_ptr<BasicHandler> handler_);
 
     [[nodiscard]] Direction getDirection() const;
+    [[nodiscard]] int getSpeed() const;
 
 protected:
     void setDirection(Direction dir);
@@ -27,6 +28,7 @@ protected:
 
 private:
     Direction direction;
+    int speed = 0;
 };
 }  // namespace Tanks::model
 

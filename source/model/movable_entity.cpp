@@ -3,35 +3,20 @@
 
 namespace Tanks::model {
 void MovableEntity::move(Direction dir) {
-    setDirection(dir);
-    restoreBackground();
-    switch (dir) {
-        case Direction::UP:
-            setTop(getTop() - 1);
-            break;
-        case Direction::LEFT:
-            setLeft(getLeft() - 1);
-            break;
-        case Direction::DOWN:
-
-            setTop(getTop() + 1);
-            break;
-        case Direction::RIGHT:
-            setLeft(getLeft() + 1);
-            break;
-    }
-    setBackground();
+    handler->move(dir);
 }
 
-MovableEntity::MovableEntity(int col,
-                             int row,
+MovableEntity::MovableEntity(int left,
+                             int right,
                              int width,
                              int height,
                              EntityType type,
-                             Direction dir,
+                             Direction direction,
+                             int speed,
                              std::unique_ptr<BasicHandler> handler_)
-    : ForegroundEntity(col, row, width, height, type, std::move(handler_)),
-      direction(dir) {
+    : ForegroundEntity(left, right, width, height, type, std::move(handler_)),
+      direction(direction),
+      speed(speed) {
 }
 
 Direction MovableEntity::getDirection() const {
@@ -40,5 +25,9 @@ Direction MovableEntity::getDirection() const {
 
 void MovableEntity::setDirection(Direction dir) {
     direction = dir;
+}
+
+int MovableEntity::getSpeed() const {
+    return speed;
 }
 }  // namespace Tanks::model

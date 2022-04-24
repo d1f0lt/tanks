@@ -2,8 +2,8 @@
 #include <unordered_set>
 
 namespace Tanks::model {
-Entity::Entity(int left, int top, int width, int height, EntityType type_)
-    : type(type_), rect(left, top, width, height) {
+Entity::Entity(int left_, int top_, int height_, int width_, EntityType type_)
+    : type(type_), rect(left_, top_, height_, width_) {
 }
 
 EntityType Entity::getType() const {

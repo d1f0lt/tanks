@@ -8,7 +8,6 @@
 namespace Tanks::model {
 class ForegroundEntity : public Entity {
     friend ForegroundHandler;
-    friend GameModel;
 
 public:
     ForegroundEntity(int left,
@@ -16,7 +15,7 @@ public:
                      int width,
                      int height,
                      EntityType type,
-                     std::unique_ptr<BasicHandler> model_);
+                     std::unique_ptr<BasicHandler> handler_);
 
     [[nodiscard]] std::vector<const Entity *> look(Direction direction) const;
 

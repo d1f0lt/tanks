@@ -7,23 +7,27 @@
 namespace Tanks::model {
 class Tank : public MovableEntity {
 public:
-    explicit Tank(int left,
-                  int top,
+    explicit Tank(int left_,
+                  int top_,
                   EntityType type_,
-                  Direction dir,
+                  Direction direction_,
                   std::unique_ptr<BasicHandler> handler_);
+
+    explicit Tank(int left_,
+                  int top_,
+                  EntityType type_,
+                  Direction direction_,
+                  GameModel &model_);
 
 protected:
     void shoot();
 };
 
 class BotTank : public Tank {
-    friend GameModel;
-
 public:
-    explicit BotTank(int left,
-                     int top,
-                     Direction dir,
+    explicit BotTank(int left_,
+                     int top_,
+                     Direction direction_,
                      std::unique_ptr<BasicHandler> handler_);
 };
 

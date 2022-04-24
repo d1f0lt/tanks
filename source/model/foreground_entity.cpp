@@ -14,15 +14,15 @@ ForegroundEntity::ForegroundEntity(int left,
 }
 
 std::vector<const Entity *> ForegroundEntity::look(Direction direction) const {
-    return handler->look(*this, direction);
+    return handler->look(direction);
 }
 
 void ForegroundEntity::restoreBackground() {
-    handler->restoreBackground(*this);
+    handler->restoreBackground();
 }
 
 void ForegroundEntity::setBackground() {
-    handler->setBackground(*this);
+    handler->setBackground();
 }
 
 std::vector<std::vector<const Entity *>> ForegroundEntity::snapshotBackground()

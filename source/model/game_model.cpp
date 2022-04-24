@@ -10,26 +10,21 @@ Entity &GameModel::getEntityByCoords(int col, int row) {
 }
 
 void GameModel::nextTick() {
-    while (!que.empty()) {
-        que.front()->execute(*this);
-        que.pop();
-    }
-
-    for (auto entity :
+    for (auto *entity :
          groupedEntities
              .snapshotAll()[static_cast<unsigned>(EntityType::BOT_TANK)]) {
         auto tank = static_cast<BotTank *>(entity);
-        handlers[tank]->move(*tank, tank->getDirection());
+        handlers[tank]->move(tank->getDirection());
     }
 
-    for (auto entity :
+    for (auto *entity :
          groupedEntities
              .snapshotAll()[static_cast<unsigned>(EntityType::BULLET)]) {
         auto bullet = static_cast<Projectile *>(entity);
-        bullet->move(bullet->getDirection());
+        handlers[bullet]->move(bullet->getDirection());
 
         for (auto &row : bullet->snapshotBackground()) {
-            for (auto &ent : row) {
+            for (auto *ent : row) {
                 if (ent->isDestroyable()) {
                     removeEntity(*const_cast<Entity *>(ent));
                 }
@@ -44,18 +39,9 @@ Entity &GameModel::addEntity(std::unique_ptr<Entity> entity) {
     return entityHolder.insert(std::move(entity));
 }
 
-Entity &GameModel::addEntity(std::unique_ptr<Entity> entity,
-                             BasicHandler *handler) {
-    auto ptr = entity.get();
-    addEntity(std::move(entity));
-    assert(handlers.count(ptr) == 0);
-    handlers[ptr] = handler;
-}
-
 void GameModel::removeEntity(Entity &entity) {
-    if (ForegroundEntity *foreground =
-            dynamic_cast<ForegroundEntity *>(&entity)) {
-        foreground->restoreBackground();
+    if (auto *foreground = dynamic_cast<ForegroundEntity *>(&entity)) {
+        handlers[foreground]->restoreBackground();
     }
 
     handlers.erase(&entity);
@@ -63,16 +49,25 @@ void GameModel::removeEntity(Entity &entity) {
     groupedEntities.erase(entity);
 }
 
-PlayableTank &GameModel::spawnPlayableTank(int left, int top) {
-    return static_cast<PlayableTank &>(addEntity(std::make_unique<PlayableTank>(
-        left, top, Direction::UP, std::make_unique<TankHandler>(*this))));
+PlayableTank &GameModel::spawnPlayableTank(const int left, const int top) {
+    assert(left + TANK_SIZE < map.getWidth());
+    assert(top + TANK_SIZE < map.getHeight());
+
+    for (int row = top; row < top + TANK_SIZE; row++) {
+        for (int col = left; col < left + TANK_SIZE; col++) {
+            assert(getEntityByCoords(col, row).isTankPassable());
+        }
+    }
+
+    return static_cast<PlayableTank &>(addEntity(
+        std::make_unique<PlayableTank>(left, top, Direction::UP, *this)));
 }
 
 void GameModel::loadLevel(int level) {
     const std::string currentLevel =
         "../levels/level" + std::to_string(level) + ".csv";
 
-    static std::unordered_map<char, EntityType> charToEnum = {
+    const static std::unordered_map<char, EntityType> CHAR_TO_TYPE = {
         {'=', EntityType::HORIZONTAL_BORDER},
         {'|', EntityType::VERTICAL_BORDER},
         {'1', EntityType::BRICK},
@@ -97,10 +92,9 @@ void GameModel::loadLevel(int level) {
         for (int col = 0, realCol = 0; col < MAP_WIDTH * 2 - 1;
              col += 2, realCol++) {  // skipping delimiter
 
-            auto real_entity = std::make_unique<Block>(
-                realCol * TILE_SIZE, row * TILE_SIZE, charToEnum[str[col]]);
-
-            addEntity(std::move(real_entity));
+            addEntity(std::make_unique<Block>(realCol * TILE_SIZE,
+                                              row * TILE_SIZE,
+                                              CHAR_TO_TYPE.at(str[col])));
         }
     }
 }

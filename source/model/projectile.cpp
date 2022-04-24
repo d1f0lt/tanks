@@ -1,18 +1,32 @@
 #include "model/projectile.h"
+#include "constants.h"
 
 namespace Tanks::model {
-Projectile::Projectile(int col,
-                       int row,
-                       Direction dir,
+Projectile::Projectile(int left_,
+                       int top_,
+                       Direction direction_,
                        std::unique_ptr<BasicHandler> handler_)
-    : MovableEntity(col,
-                    row,
-                    5,
-                    5,
+    : MovableEntity(left_,
+                    top_,
+                    BULLET_SIZE,
+                    BULLET_SIZE,
                     EntityType::BULLET,
-                    dir,
+                    direction_,
+                    BULLET_SPEED,
                     std::move(handler_)) {
-    // TODO : width and height consts
 }
 
+Projectile::Projectile(int left_,
+                       int top_,
+                       Direction direction_,
+                       GameModel &model_)
+    : MovableEntity(left_,
+                    top_,
+                    BULLET_SIZE,
+                    BULLET_SIZE,
+                    EntityType::BULLET,
+                    direction_,
+                    BULLET_SPEED,
+                    std::make_unique<MovableHandler>(model_, *this)) {
+}
 }  // namespace Tanks::model
