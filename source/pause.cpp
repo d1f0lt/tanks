@@ -19,7 +19,8 @@ Menu::Menu initMenu() {
     // inscriptions
     const static std::string inscriptionsText;
     const static int inscriptionsCharacterSize = 36;
-    Menu::InscriptionInfo inscriptions{inscriptionsText, inscriptionsCharacterSize, textColor};
+    Menu::InscriptionInfo inscriptions{inscriptionsText,
+                                       inscriptionsCharacterSize, textColor};
 
     // buttons
     const std::vector<Menu::ButtonType> buttonTypes = {
@@ -31,16 +32,18 @@ Menu::Menu initMenu() {
     std::vector<Menu::ButtonInfo> buttons;
     buttons.reserve(buttonTypes.size());
     for (auto type : buttonTypes) {
-        buttons.emplace_back(Menu::ButtonInfo{type, buttonsHeight, btnStandardColor, btnHoverColor});
+        buttons.emplace_back(Menu::ButtonInfo{type, buttonsHeight,
+                                              btnStandardColor, btnHoverColor});
     }
 
     return Menu::Menu(pauseWidth, title, inscriptions, buttons);
 }
 
-}
+}  // namespace
 
 Pause::Pause()
-    : background(sf::Vector2<float>(WINDOW_WIDTH, WINDOW_HEIGHT)), menu(initMenu()) {
+    : background(sf::Vector2<float>(WINDOW_WIDTH, WINDOW_HEIGHT)),
+      menu(initMenu()) {
     background.setPosition(0, 0);
     background.setFillColor(sf::Color(0, 0, 0, 180));
 }

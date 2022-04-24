@@ -34,17 +34,21 @@ Menu initMenu() {
     // inscriptions
     const static std::string inscriptionsText;
     const static int inscriptionsCharacterSize = 50;
-    InscriptionInfo inscriptions{inscriptionsText, inscriptionsCharacterSize, textColor};
+    InscriptionInfo inscriptions{inscriptionsText, inscriptionsCharacterSize,
+                                 textColor};
 
     // buttons
-    const static std::vector<ButtonType> buttonTypes = {ButtonType::NEW_GAME, ButtonType::UPGRADE, ButtonType::CREATE_MAP, ButtonType::RATING};
+    const static std::vector<ButtonType> buttonTypes = {
+        ButtonType::NEW_GAME, ButtonType::UPGRADE, ButtonType::CREATE_MAP,
+        ButtonType::RATING};
     const static int buttonsHeight = 100;
     const static sf::Color btnStandardColor(0, 0, 0, 150);
     const static sf::Color btnHoverColor(66, 66, 66, 230);
     std::vector<ButtonInfo> buttons;
     buttons.reserve(buttonTypes.size());
     for (auto type : buttonTypes) {
-        buttons.emplace_back(ButtonInfo{type, buttonsHeight, btnStandardColor, btnHoverColor});
+        buttons.emplace_back(
+            ButtonInfo{type, buttonsHeight, btnStandardColor, btnHoverColor});
     }
 
     return Menu(menuWidth, title, inscriptions, buttons);
@@ -55,11 +59,13 @@ void addExitButton(Menu &menu, const std::string &path) {
     exitImage.loadFromFile(path + "exit.png");
     const int margin = 5;
     sf::Vector2<float> coordinates(
-        margin, static_cast<float>(WINDOW_HEIGHT - exitImage.getSize().y - 3*margin));
+        margin,
+        static_cast<float>(WINDOW_HEIGHT - exitImage.getSize().y - 3 * margin));
     sf::Vector2<float> rectangleSize(
-        static_cast<float>(exitImage.getSize().x + 2*margin),
-        static_cast<float>(exitImage.getSize().y + 2*margin));
-    auto picture = std::make_unique<MenuPicture>(path + "exit.png", coordinates);
+        static_cast<float>(exitImage.getSize().x + 2 * margin),
+        static_cast<float>(exitImage.getSize().y + 2 * margin));
+    auto picture =
+        std::make_unique<MenuPicture>(path + "exit.png", coordinates);
     menu.addMenuItem(std::make_unique<MenuButton>(
         std::move(picture), coordinates, rectangleSize, sf::Color(0, 0, 0, 0),
         sf::Color(128, 128, 128, 128), ButtonType::EXIT));
@@ -70,10 +76,16 @@ void addSettingsButton(Menu &menu, const std::string &path) {
     sf::Image image;
     image.loadFromFile(imageFilename);
     const int margin = 5;
-    const sf::Vector2<float> coordinates{2*margin, 2*margin};
-    const sf::Vector2<float> rectangleSize{static_cast<float>(image.getSize().x) + margin, static_cast<float>(image.getSize().y) + margin};
-    auto pauseSprite = std::make_unique<MenuPicture>(imageFilename, coordinates);
-    auto item = std::make_unique<MenuButton>(std::move(pauseSprite), coordinates, rectangleSize, sf::Color(0, 0, 0, 0), sf::Color(128, 128, 128, 128), ButtonType::SETTINGS);
+    const sf::Vector2<float> coordinates{2 * margin, 2 * margin};
+    const sf::Vector2<float> rectangleSize{
+        static_cast<float>(image.getSize().x) + margin,
+        static_cast<float>(image.getSize().y) + margin};
+    auto pauseSprite =
+        std::make_unique<MenuPicture>(imageFilename, coordinates);
+    auto item = std::make_unique<MenuButton>(
+        std::move(pauseSprite), coordinates, rectangleSize,
+        sf::Color(0, 0, 0, 0), sf::Color(128, 128, 128, 128),
+        ButtonType::SETTINGS);
     menu.addMenuItem(std::move(item));
 }
 

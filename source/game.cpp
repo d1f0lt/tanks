@@ -3,11 +3,11 @@
 #include <thread>
 #include "constants.h"
 #include "controller.h"
+#include "game_environment.h"
 #include "map.h"
 #include "movable_object_view.h"
 #include "pause.h"
 #include "player.h"
-#include "game_environment.h"
 
 namespace Tanks {
 
@@ -46,7 +46,7 @@ sf::Sprite initBackground(const std::string &path) {
     sf::Image image;
     image.loadFromFile(imageFilename);
     static sf::Texture texture;  // so that the texture isn't
-                                           // destroyed after the function exits
+                                 // destroyed after the function exits
     texture.loadFromImage(image);
     sf::Sprite sprite;
     sprite.setTexture(texture);
@@ -98,7 +98,9 @@ std::optional<Menu::ButtonType> startGame(sf::RenderWindow &window, int level) {
         }
 
         if (!pause.isPause()) {
-            if (auto signal = MenuController::control(environment.getMenu(), window); signal != std::nullopt) {
+            if (auto signal =
+                    MenuController::control(environment.getMenu(), window);
+                signal != std::nullopt) {
                 assert(signal == Menu::ButtonType::PAUSE);
                 pause.makePause();
             } else {

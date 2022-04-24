@@ -12,7 +12,16 @@ struct MenuController;
 
 namespace Menu {
 
-enum class ButtonType { NEW_GAME, RESUME, SETTINGS, CREATE_MAP, RATING, EXIT, PAUSE, UPGRADE };
+enum class ButtonType {
+    NEW_GAME,
+    RESUME,
+    SETTINGS,
+    CREATE_MAP,
+    RATING,
+    EXIT,
+    PAUSE,
+    UPGRADE
+};
 
 std::string convertButtonTypeToString(ButtonType type);
 
@@ -22,7 +31,7 @@ struct InscriptionInfo final {
     sf::Color textColor;
 };
 
-struct ButtonInfo final { // NOLINT
+struct ButtonInfo final {  // NOLINT
     ButtonType type;
     int height;
     sf::Color standardColor;
@@ -87,7 +96,7 @@ protected:
 struct MenuPicture : MenuItem {
 public:
     explicit MenuPicture(const std::string &path,
-                      const sf::Vector2<float> &coordinates);
+                         const sf::Vector2<float> &coordinates);
 
     sf::Vector2<float> getSize() const final;
 

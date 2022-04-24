@@ -23,7 +23,7 @@ private:
     sf::Text time;
     sf::Image image;
     sf::Texture texture;
-    sf::Sprite sprite; // TODO make menuItem for this
+    sf::Sprite sprite;  // TODO make menuItem for this
 };
 
 struct Environment final {
@@ -39,6 +39,6 @@ private:
     Menu::Menu menu;
 };
 
-}
+}  // namespace Tanks
 
 #endif
