@@ -122,7 +122,7 @@ std::optional<Menu::ButtonType> startGame(sf::RenderWindow &window, int level) {
                 signal != std::nullopt) {
                 switch (signal.value()) {
                     case Menu::ButtonType::RESUME:
-                        pause.makeUnPause();
+                        pause.unpause();
                         break;
                     case Menu::ButtonType::NEW_GAME:
                         return Menu::ButtonType::NEW_GAME;

@@ -14,23 +14,24 @@ std::string numberWithLeftZeros(int num, int numberLength) {
 }
 }  // namespace
 
-Timer::Timer(const std::string &path) {
-    image.loadFromFile(path);
+Timer::Timer(const std::string &filename) {
+    image.loadFromFile(filename);
     texture.loadFromImage(image);
     sprite.setTexture(texture);
-    const int marginRight = MARGIN_LEFT / 4;
-    const int marginTop = MARGIN_TOP + TILE_SIZE;
+    const static int marginRight = MARGIN_LEFT / 4;
+    const static int marginTop = MARGIN_TOP + TILE_SIZE;
+    const static int marginFromSprite = 100;
     sprite.setPosition(
         static_cast<float>(MARGIN_LEFT - image.getSize().x - marginRight),
         marginTop);
 
     // text
-    font.loadFromFile("../fonts/base.ttf");
+    font.loadFromFile("../fonts/base_bold.ttf");
 
     time.setFont(font);
     time.setString("00:00");
     time.setCharacterSize(28);
-    time.setPosition(sprite.getPosition().x + (static_cast<float>(image.getSize().x) - time.getGlobalBounds().width) / 2, sprite.getPosition().y + static_cast<float>(image.getSize().y));
+    time.setPosition(sprite.getPosition().x + (static_cast<float>(image.getSize().x) - time.getLocalBounds().width) / 2, sprite.getPosition().y + static_cast<float>(image.getSize().y) + marginFromSprite);
     restart();
 }
 
@@ -85,7 +86,8 @@ void Environment::addPauseButton(const std::string &path) {
     const int margin = 5;
     const sf::Vector2<float> coordinates{2*margin, 2*margin};
     const sf::Vector2<float> rectangleSize{static_cast<float>(image.getSize().x) + margin, static_cast<float>(image.getSize().y) + margin};
-    auto item = std::make_unique<Menu::MenuButton>(imageFilename, coordinates, rectangleSize, sf::Color(0, 0, 0, 0), sf::Color(128, 128, 128, 128), Menu::ButtonType::PAUSE);
+    auto pauseSprite = std::make_unique<Menu::MenuPicture>(imageFilename, coordinates);
+    auto item = std::make_unique<Menu::MenuButton>(std::move(pauseSprite), coordinates, rectangleSize, sf::Color(0, 0, 0, 0), sf::Color(128, 128, 128, 128), Menu::ButtonType::PAUSE);
     menu.addMenuItem(std::move(item));
 }
 

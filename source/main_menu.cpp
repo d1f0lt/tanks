@@ -23,15 +23,31 @@ sf::Sprite initBackground(const std::string &path) {
 }
 
 Menu initMenu() {
-    const static std::vector<ButtonType> buttonTypes = {
-        ButtonType::NEW_GAME, ButtonType::CREATE_MAP, ButtonType::RATING,
-        ButtonType::SETTINGS};
+    const static sf::Color textColor{0, 0, 255};
     const static int menuWidth = static_cast<int>(WINDOW_WIDTH / 3.4);
+
+    // title
+    const static std::string titleText = "JUST TANKS";
+    const static int titleCharacterSize = 80;
+    InscriptionInfo title{titleText, titleCharacterSize, textColor};
+
+    // inscriptions
+    const static std::string inscriptionsText;
+    const static int inscriptionsCharacterSize = 50;
+    InscriptionInfo inscriptions{inscriptionsText, inscriptionsCharacterSize, textColor};
+
+    // buttons
+    const static std::vector<ButtonType> buttonTypes = {ButtonType::NEW_GAME, ButtonType::UPGRADE, ButtonType::CREATE_MAP, ButtonType::RATING};
     const static int buttonsHeight = 100;
-    const static sf::Color buttonsStandardColor(0, 0, 0, 150);
-    const static sf::Color buttonsHoverColor(66, 66, 66, 230);
-    return Menu(menuWidth, buttonTypes, buttonsHeight,
-                buttonsStandardColor, buttonsHoverColor);
+    const static sf::Color btnStandardColor(0, 0, 0, 150);
+    const static sf::Color btnHoverColor(66, 66, 66, 230);
+    std::vector<ButtonInfo> buttons;
+    buttons.reserve(buttonTypes.size());
+    for (auto type : buttonTypes) {
+        buttons.emplace_back(ButtonInfo{type, buttonsHeight, btnStandardColor, btnHoverColor});
+    }
+
+    return Menu(menuWidth, title, inscriptions, buttons);
 }
 
 void addExitButton(Menu &menu, const std::string &path) {
@@ -43,8 +59,9 @@ void addExitButton(Menu &menu, const std::string &path) {
     sf::Vector2<float> rectangleSize(
         static_cast<float>(exitImage.getSize().x + 2*margin),
         static_cast<float>(exitImage.getSize().y + 2*margin));
+    auto picture = std::make_unique<MenuPicture>(path + "exit.png", coordinates);
     menu.addMenuItem(std::make_unique<MenuButton>(
-        path + "exit.png", coordinates, rectangleSize, sf::Color(0, 0, 0, 0),
+        std::move(picture), coordinates, rectangleSize, sf::Color(0, 0, 0, 0),
         sf::Color(128, 128, 128, 128), ButtonType::EXIT));
 }
 

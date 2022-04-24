@@ -8,7 +8,7 @@ namespace Tanks {
 
 struct Timer final {
 public:
-    explicit Timer(const std::string &path);
+    explicit Timer(const std::string &filename);
 
     void draw(sf::RenderWindow &window) const;
 

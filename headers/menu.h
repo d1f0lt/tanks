@@ -16,6 +16,19 @@ enum class ButtonType { NEW_GAME, RESUME, SETTINGS, CREATE_MAP, RATING, EXIT, PA
 
 std::string convertButtonTypeToString(ButtonType type);
 
+struct InscriptionInfo final {
+    std::string inscription;
+    int characterSize;
+    sf::Color textColor;
+};
+
+struct ButtonInfo final { // NOLINT
+    ButtonType type;
+    int height;
+    sf::Color standardColor;
+    sf::Color hoverColor;
+};
+
 struct MenuItem;
 
 struct Menu final {
@@ -23,11 +36,9 @@ public:
     explicit Menu() = default;
 
     explicit Menu(int menuWidth,
-                  const std::vector<ButtonType> &buttonTypes,
-                  int buttonsHeight,
-                  const sf::Color &buttonsStandardColor,
-                  const sf::Color &buttonsHoverColor);  // TODO make struct for
-                                                        // buttons parameters
+                  const InscriptionInfo &titleInfo,
+                  const InscriptionInfo &inscriptionsInfo,
+                  const std::vector<ButtonInfo> &buttonsInfo);
 
     void draw(sf::RenderWindow &window) const;
 
@@ -45,24 +56,24 @@ private:
 struct MenuItem {
     virtual void draw(sf::RenderWindow &window) const = 0;
 
-    [[nodiscard]] virtual sf::Vector2<int> getSize() const = 0;
+    [[nodiscard]] virtual sf::Vector2<float> getSize() const = 0;
 
-    [[nodiscard]] virtual sf::Vector2<int> getPosition() const = 0;
+    [[nodiscard]] virtual sf::Vector2<float> getPosition() const = 0;
 
-    virtual void setPosition(sf::Vector2<int> newPosition) = 0;
+    virtual void setPosition(sf::Vector2<float> newPosition) = 0;
 
     virtual ~MenuItem() = default;
 };
 
 struct MenuInscription : MenuItem {
-    explicit MenuInscription(const std::string &inscription,
-                         const sf::Vector2<float> &coordinates);
+    explicit MenuInscription(const InscriptionInfo &info,
+                             const sf::Vector2<float> &coordinates);
 
-    sf::Vector2<int> getSize() const final;
+    sf::Vector2<float> getSize() const final;
 
-    sf::Vector2<int> getPosition() const final;
+    sf::Vector2<float> getPosition() const final;
 
-    void setPosition(sf::Vector2<int> newPosition) final;
+    void setPosition(sf::Vector2<float> newPosition) final;
 
     void draw(sf::RenderWindow &window) const final;
 
@@ -78,11 +89,11 @@ public:
     explicit MenuPicture(const std::string &path,
                       const sf::Vector2<float> &coordinates);
 
-    sf::Vector2<int> getSize() const final;
+    sf::Vector2<float> getSize() const final;
 
-    sf::Vector2<int> getPosition() const final;
+    sf::Vector2<float> getPosition() const final;
 
-    void setPosition(sf::Vector2<int> newPosition) final;
+    void setPosition(sf::Vector2<float> newPosition) final;
 
     void draw(sf::RenderWindow &window) const final;
 
@@ -109,11 +120,11 @@ public:
 
     void hover();
 
-    sf::Vector2<int> getSize() const final;
+    sf::Vector2<float> getSize() const final;
 
-    sf::Vector2<int> getPosition() const final;
+    sf::Vector2<float> getPosition() const final;
 
-    void setPosition(sf::Vector2<int> newPosition) final;
+    void setPosition(sf::Vector2<float> newPosition) final;
 
 private:
     std::unique_ptr<MenuItem> content;

@@ -3,6 +3,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <iostream>
 
 namespace Tanks::Menu {
 
@@ -14,17 +15,17 @@ std::string convertButtonTypeToString(const ButtonType type) {
         {ButtonType::SETTINGS, "SETTINGS"},
         {ButtonType::CREATE_MAP, "CREATE MAP"},
         {ButtonType::RATING, "RATING"},
-        {ButtonType::PAUSE, "PAUSE"}};
+        {ButtonType::PAUSE, "PAUSE"},
+        {ButtonType::UPGRADE, "UPGRADE"}};
     assert(dictionary.find(type) != dictionary.end());
     return dictionary[type];
 }
 
-Menu::Menu(const int menuWidth,
-           const std::vector<ButtonType> &buttonTypes,
-           const int buttonsHeight,
-           const sf::Color &buttonsStandardColor,
-           const sf::Color &buttonsHoverColor) {
-    const size_t buttonsCount = buttonTypes.size();
+Menu::Menu(int menuWidth,
+           const InscriptionInfo &titleInfo,
+           const InscriptionInfo &inscriptionsInfo,
+           const std::vector<ButtonInfo> &buttonsInfo) {
+    const size_t buttonsCount = buttonsInfo.size();
     const int marginBetweenButtons = 10;
     const int marginFromTitle = marginBetweenButtons * 8;
     const int marginLeft = (WINDOW_WIDTH - menuWidth) / 2;
@@ -32,34 +33,35 @@ Menu::Menu(const int menuWidth,
     sf::Vector2<float> currentCoordinates = {static_cast<float>(marginLeft), 0};
 
     // Title
-    auto title = std::make_unique<MenuInscription>(convertButtonTypeToString(buttonTypes[0]),
+    auto title = std::make_unique<MenuInscription>(titleInfo,
                                                  currentCoordinates);
 
     const size_t menuHeight = static_cast<size_t>(title->getSize().y) +
-                              marginFromTitle + buttonsCount * buttonsHeight +
+                              marginFromTitle + buttonsCount * buttonsInfo[0].height +
                               (buttonsCount - 1) * marginBetweenButtons;
     const size_t marginTop = (WINDOW_HEIGHT - menuHeight) / 2;
     currentCoordinates.y = static_cast<float>(marginTop);
-
     title->text.setPosition(
-        {static_cast<float>(
-             currentCoordinates.x +
-                 static_cast<float>(menuWidth - title->getPosition().x) / 2),
+        {currentCoordinates.x + (static_cast<float>(menuWidth) - title->getSize().x) / 2,
          currentCoordinates.y});  // Centralize
 
     currentCoordinates.y += static_cast<float>(
-        marginFromTitle + title->getPosition().y);
+        marginFromTitle + title->getSize().y);
 
     items.emplace_back(std::move(title));
+
+    // buttons
     for (int i = 0; i < buttonsCount; ++i) {
-        auto content = std::make_unique<MenuInscription>(convertButtonTypeToString(buttonTypes[i]), currentCoordinates);
+        auto btnInfo = buttonsInfo[i];
+        InscriptionInfo info{convertButtonTypeToString(btnInfo.type), inscriptionsInfo.characterSize, inscriptionsInfo.textColor};
+        auto content = std::make_unique<MenuInscription>(info, currentCoordinates);
         items.emplace_back(std::make_unique<MenuButton>(std::move(content),
             currentCoordinates,
             sf::Vector2<float>(static_cast<float>(menuWidth),
-                               static_cast<float>(buttonsHeight)),
-            buttonsStandardColor, buttonsHoverColor, buttonTypes[i]));
+                               static_cast<float>(btnInfo.height)),
+            btnInfo.standardColor, btnInfo.hoverColor, btnInfo.type));
         currentCoordinates.y +=
-            static_cast<float>(items[i]->getSize().y) + marginBetweenButtons;
+            static_cast<float>(items[i+1]->getSize().y) + marginBetweenButtons;
     }
 }
 
@@ -77,26 +79,31 @@ const std::vector<std::unique_ptr<MenuItem>> &Menu::getItems() const {
     return items;
 }
 
-MenuInscription::MenuInscription(const std::string &inscription, const sf::Vector2<float> &coordinates) {
-    text.setString(inscription);
+MenuInscription::MenuInscription(const InscriptionInfo &parameters, const sf::Vector2<float> &coordinates) {
+    font.loadFromFile("../fonts/base_bold.ttf");
+    text.setFillColor(parameters.textColor);
+    text.setFont(font);
+    text.setCharacterSize(parameters.characterSize);
+    text.setString(parameters.inscription);
     text.setPosition(coordinates);
+    text.setOrigin(text.getLocalBounds().left, text.getLocalBounds().top);
 }
 
 void MenuInscription::draw(sf::RenderWindow &window) const {
     window.draw(text);
 }
 
-sf::Vector2<int> MenuInscription::getSize() const {
+sf::Vector2<float> MenuInscription::getSize() const {
     auto res = text.getGlobalBounds();
-    return sf::Vector2<int>{static_cast<int>(res.width), static_cast<int>(res.height)};
+    return sf::Vector2<float>{res.width, res.height};
 }
 
-sf::Vector2<int> MenuInscription::getPosition() const {
-    return static_cast<sf::Vector2<int>>(text.getPosition());
+sf::Vector2<float> MenuInscription::getPosition() const {
+    return text.getPosition();
 }
 
-void MenuInscription::setPosition(sf::Vector2<int> newPosition) {
-    text.setPosition(static_cast<sf::Vector2<float>>(newPosition));
+void MenuInscription::setPosition(sf::Vector2<float> newPosition) {
+    text.setPosition(newPosition.x, newPosition.y); // fix bugs
 }
 
 MenuPicture::MenuPicture(const std::string &path, const sf::Vector2<float> &coordinates) {
@@ -106,16 +113,16 @@ MenuPicture::MenuPicture(const std::string &path, const sf::Vector2<float> &coor
     sprite.setPosition(coordinates);
 }
 
-sf::Vector2<int> MenuPicture::getPosition() const {
-    return static_cast<sf::Vector2<int>>(sprite.getPosition());
+sf::Vector2<float> MenuPicture::getPosition() const {
+    return sprite.getPosition();
 }
 
-sf::Vector2<int> MenuPicture::getSize() const {
-    return static_cast<sf::Vector2<int>>(image.getSize());
+sf::Vector2<float> MenuPicture::getSize() const {
+    return static_cast<sf::Vector2<float>>(image.getSize());
 }
 
-void MenuPicture::setPosition(sf::Vector2<int> newPosition) {
-    sprite.setPosition(static_cast<sf::Vector2<float>>(newPosition));
+void MenuPicture::setPosition(sf::Vector2<float> newPosition) {
+    sprite.setPosition(newPosition);
 }
 
 void MenuPicture::draw(sf::RenderWindow &window) const {
@@ -135,17 +142,8 @@ MenuButton::MenuButton(std::unique_ptr<MenuItem> &&content_,
       type(type_) {
     rectangle.setFillColor(rectangleStandardColor);
     rectangle.setPosition(coordinates);
-    content->setPosition({
-            static_cast<int>(coordinates.x) +
-            static_cast<int>(
-                (rectangleSize.x -
-                 static_cast<float>(content->getPosition().x)) /
-                2),
-            static_cast<int>(coordinates.y) +
-            static_cast<int>(
-                (rectangleSize.y -
-                 static_cast<float>(content->getPosition().y)) /
-                2)});  // Centralize
+    content->setPosition({static_cast<float>(static_cast<int>(coordinates.x) + static_cast<int>((rectangleSize.x - content->getSize().x) / 2)),
+                          static_cast<float>(static_cast<int>(coordinates.y) + static_cast<int>((rectangleSize.y - content->getSize().y) / 2))});
 }
 
 void MenuButton::draw(sf::RenderWindow &window) const {
@@ -163,16 +161,16 @@ void MenuButton::hover() {
     rectangle.setFillColor(rectangleHoverColor);
 }
 
-sf::Vector2<int> MenuButton::getPosition() const {
-    return static_cast<sf::Vector2<int>>(rectangle.getPosition());
+sf::Vector2<float> MenuButton::getPosition() const {
+    return rectangle.getPosition();
 }
 
-sf::Vector2<int> MenuButton::getSize() const {
-    return static_cast<sf::Vector2<int>>(rectangle.getSize());
+sf::Vector2<float> MenuButton::getSize() const {
+    return rectangle.getSize();
 }
 
-void MenuButton::setPosition(sf::Vector2<int> newPosition) {
-    rectangle.setPosition(static_cast<sf::Vector2<float>>(newPosition));
+void MenuButton::setPosition(sf::Vector2<float> newPosition) {
+    rectangle.setPosition(newPosition);
 }
 
 }  // namespace Tanks::Menu
