@@ -1,9 +1,9 @@
 #include "new_game_menu.h"
-#include "controller.h"
 #include <cassert>
-#include "game.h"
 #include <chrono>
 #include <thread>
+#include "controller.h"
+#include "game.h"
 
 namespace Tanks::Menu {
 
@@ -25,7 +25,8 @@ Menu initMenu() {
                                  textColor};
 
     // buttons
-    const static std::vector<ButtonType> buttonTypes = {ButtonType::SINGLE_PLAYER, ButtonType::MULTIPLAYER};
+    const static std::vector<ButtonType> buttonTypes = {
+        ButtonType::SINGLE_PLAYER, ButtonType::MULTIPLAYER};
     const static int buttonsHeight = 100;
     const static sf::Color btnStandardColor(0, 0, 0, 150);
     const static sf::Color btnHoverColor(66, 66, 66, 230);
@@ -40,8 +41,8 @@ Menu initMenu() {
 }
 }  // namespace
 
-
-void new_game_menu(sf::RenderWindow &window, const sf::Sprite &backgroundSprite) {
+void new_game_menu(sf::RenderWindow &window,
+                   const sf::Sprite &backgroundSprite) {
     const static std::string imagesPath = "../images/menu/";
     static Menu menu(initMenu());
     menu.addIconToLeftUpCorner(imagesPath + "return.png", ButtonType::RETURN);
@@ -63,14 +64,15 @@ void new_game_menu(sf::RenderWindow &window, const sf::Sprite &backgroundSprite)
                         return;
                     }
                     assert(ans.value() == ButtonType::NEW_GAME);
-                    std::this_thread::sleep_for(std::chrono::milliseconds(173)); // fix bug with new game
+                    std::this_thread::sleep_for(std::chrono::milliseconds(
+                        173));  // fix bug with new game
                     break;
                 }
                 case ButtonType::MULTIPLAYER:
 
                 case ButtonType::RETURN:
                     return;
-                    
+
                 default:
                     assert(false);
             }
@@ -84,4 +86,4 @@ void new_game_menu(sf::RenderWindow &window, const sf::Sprite &backgroundSprite)
     }
 }
 
-}
+}  // namespace Tanks::Menu

@@ -85,16 +85,15 @@ void Menu::addIconToLeftUpCorner(const std::string &filename, ButtonType type) {
     const sf::Vector2<float> rectangleSize{
         static_cast<float>(image.getSize().x) + margin,
         static_cast<float>(image.getSize().y) + margin};
-    auto pauseSprite =
-        std::make_unique<MenuPicture>(filename, coordinates);
+    auto pauseSprite = std::make_unique<MenuPicture>(filename, coordinates);
     auto item = std::make_unique<MenuButton>(
         std::move(pauseSprite), coordinates, rectangleSize,
-        sf::Color(0, 0, 0, 0), sf::Color(128, 128, 128, 128),
-        type);
+        sf::Color(0, 0, 0, 0), sf::Color(128, 128, 128, 128), type);
     addMenuItem(std::move(item));
 }
 
-void Menu::addIconToLeftLowerCorner(const std::string &filename, ButtonType type) {
+void Menu::addIconToLeftLowerCorner(const std::string &filename,
+                                    ButtonType type) {
     sf::Image exitImage;
     exitImage.loadFromFile(filename);
     const int margin = 5;
@@ -104,8 +103,7 @@ void Menu::addIconToLeftLowerCorner(const std::string &filename, ButtonType type
     sf::Vector2<float> rectangleSize(
         static_cast<float>(exitImage.getSize().x + 2 * margin),
         static_cast<float>(exitImage.getSize().y + 2 * margin));
-    auto picture =
-        std::make_unique<MenuPicture>(filename, coordinates);
+    auto picture = std::make_unique<MenuPicture>(filename, coordinates);
     auto item = std::make_unique<MenuButton>(
         std::move(picture), coordinates, rectangleSize, sf::Color(0, 0, 0, 0),
         sf::Color(128, 128, 128, 128), type);

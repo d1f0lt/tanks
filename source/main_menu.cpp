@@ -54,7 +54,9 @@ Menu initMenu() {
     return Menu(menuWidth, title, inscriptions, buttons);
 }
 
-void activity(ButtonType type, sf::RenderWindow &window, const sf::Sprite& background) {  // TODO rename
+void activity(ButtonType type,
+              sf::RenderWindow &window,
+              const sf::Sprite &background) {  // TODO rename
     switch (type) {
         case ButtonType::NEW_GAME: {
             new_game_menu(window, background);
