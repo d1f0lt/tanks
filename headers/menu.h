@@ -18,9 +18,12 @@ enum class ButtonType {
     SETTINGS,
     CREATE_MAP,
     RATING,
+    RETURN,
     EXIT,
     PAUSE,
-    UPGRADE
+    UPGRADE,
+    SINGLE_PLAYER,
+    MULTIPLAYER,
 };
 
 std::string convertButtonTypeToString(ButtonType type);
@@ -50,6 +53,10 @@ public:
                   const std::vector<ButtonInfo> &buttonsInfo);
 
     void draw(sf::RenderWindow &window) const;
+
+    void addIconToLeftUpCorner(const std::string &filename, ButtonType type);
+
+    void addIconToLeftLowerCorner(const std::string &filename, ButtonType type);
 
     void addMenuItem(std::unique_ptr<MenuItem> &&item);
 

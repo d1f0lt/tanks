@@ -15,7 +15,9 @@ std::string convertButtonTypeToString(const ButtonType type) {
         {ButtonType::CREATE_MAP, "CREATE MAP"},
         {ButtonType::RATING, "RATING"},
         {ButtonType::PAUSE, "PAUSE"},
-        {ButtonType::UPGRADE, "UPGRADE"}};
+        {ButtonType::UPGRADE, "UPGRADE"},
+        {ButtonType::SINGLE_PLAYER, "SINGLE PLAYER"},
+        {ButtonType::MULTIPLAYER, "MULTIPLAYER"}};
     assert(dictionary.find(type) != dictionary.end());
     return dictionary[type];
 }
@@ -73,6 +75,41 @@ void Menu::draw(sf::RenderWindow &window) const {
     for (const auto &item : items) {
         item->draw(window);
     }
+}
+
+void Menu::addIconToLeftUpCorner(const std::string &filename, ButtonType type) {
+    sf::Image image;
+    image.loadFromFile(filename);
+    const int margin = 5;
+    const sf::Vector2<float> coordinates{2 * margin, 2 * margin};
+    const sf::Vector2<float> rectangleSize{
+        static_cast<float>(image.getSize().x) + margin,
+        static_cast<float>(image.getSize().y) + margin};
+    auto pauseSprite =
+        std::make_unique<MenuPicture>(filename, coordinates);
+    auto item = std::make_unique<MenuButton>(
+        std::move(pauseSprite), coordinates, rectangleSize,
+        sf::Color(0, 0, 0, 0), sf::Color(128, 128, 128, 128),
+        type);
+    addMenuItem(std::move(item));
+}
+
+void Menu::addIconToLeftLowerCorner(const std::string &filename, ButtonType type) {
+    sf::Image exitImage;
+    exitImage.loadFromFile(filename);
+    const int margin = 5;
+    sf::Vector2<float> coordinates(
+        margin,
+        static_cast<float>(WINDOW_HEIGHT - exitImage.getSize().y - 3 * margin));
+    sf::Vector2<float> rectangleSize(
+        static_cast<float>(exitImage.getSize().x + 2 * margin),
+        static_cast<float>(exitImage.getSize().y + 2 * margin));
+    auto picture =
+        std::make_unique<MenuPicture>(filename, coordinates);
+    auto item = std::make_unique<MenuButton>(
+        std::move(picture), coordinates, rectangleSize, sf::Color(0, 0, 0, 0),
+        sf::Color(128, 128, 128, 128), type);
+    addMenuItem(std::move(item));
 }
 
 void Menu::addMenuItem(std::unique_ptr<MenuItem> &&item) {

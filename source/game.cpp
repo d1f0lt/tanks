@@ -129,7 +129,7 @@ std::optional<Menu::ButtonType> startGame(sf::RenderWindow &window, int level) {
                     case Menu::ButtonType::NEW_GAME:
                         return Menu::ButtonType::NEW_GAME;
                     case Menu::ButtonType::EXIT:
-                        return std::nullopt;
+                        return signal.value();
                     default:
                         break;
                 }

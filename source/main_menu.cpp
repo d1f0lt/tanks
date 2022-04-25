@@ -3,8 +3,8 @@
 #include <string>
 #include "constants.h"
 #include "controller.h"
-#include "game.h"
 #include "menu.h"
+#include "new_game_menu.h"
 
 namespace Tanks::Menu {
 
@@ -23,7 +23,7 @@ sf::Sprite initBackground(const std::string &path) {
 }
 
 Menu initMenu() {
-    const static sf::Color textColor{0, 0, 255};
+    const static sf::Color textColor{63, 87, 210};
     const static int menuWidth = static_cast<int>(WINDOW_WIDTH / 3.4);
 
     // title
@@ -54,58 +54,12 @@ Menu initMenu() {
     return Menu(menuWidth, title, inscriptions, buttons);
 }
 
-void addExitButton(Menu &menu, const std::string &path) {
-    sf::Image exitImage;
-    exitImage.loadFromFile(path + "exit.png");
-    const int margin = 5;
-    sf::Vector2<float> coordinates(
-        margin,
-        static_cast<float>(WINDOW_HEIGHT - exitImage.getSize().y - 3 * margin));
-    sf::Vector2<float> rectangleSize(
-        static_cast<float>(exitImage.getSize().x + 2 * margin),
-        static_cast<float>(exitImage.getSize().y + 2 * margin));
-    auto picture =
-        std::make_unique<MenuPicture>(path + "exit.png", coordinates);
-    menu.addMenuItem(std::make_unique<MenuButton>(
-        std::move(picture), coordinates, rectangleSize, sf::Color(0, 0, 0, 0),
-        sf::Color(128, 128, 128, 128), ButtonType::EXIT));
-}
-
-void addSettingsButton(Menu &menu, const std::string &path) {
-    static const std::string imageFilename = path + "gear.png";
-    sf::Image image;
-    image.loadFromFile(imageFilename);
-    const int margin = 5;
-    const sf::Vector2<float> coordinates{2 * margin, 2 * margin};
-    const sf::Vector2<float> rectangleSize{
-        static_cast<float>(image.getSize().x) + margin,
-        static_cast<float>(image.getSize().y) + margin};
-    auto pauseSprite =
-        std::make_unique<MenuPicture>(imageFilename, coordinates);
-    auto item = std::make_unique<MenuButton>(
-        std::move(pauseSprite), coordinates, rectangleSize,
-        sf::Color(0, 0, 0, 0), sf::Color(128, 128, 128, 128),
-        ButtonType::SETTINGS);
-    menu.addMenuItem(std::move(item));
-}
-
-void activity(ButtonType type, sf::RenderWindow &window) {  // TODO rename
+void activity(ButtonType type, sf::RenderWindow &window, const sf::Sprite& background) {  // TODO rename
     switch (type) {
         case ButtonType::NEW_GAME: {
-            auto res = startGame(window);
-            while (res != std::nullopt) {
-                res = startGame(window);  // TODO make others
-            }
+            new_game_menu(window, background);
             break;
         }
-            /*
-        case ButtonType::CREATE_MAP:
-            break;
-        case ButtonType::SETTINGS:
-            break;
-        case ButtonType::STAT:
-            break;
-             */
         case ButtonType::EXIT:
             window.close();
         default:
@@ -114,13 +68,13 @@ void activity(ButtonType type, sf::RenderWindow &window) {  // TODO rename
 }
 }  // namespace
 
-void menu(sf::RenderWindow &window) {
+void main_menu(sf::RenderWindow &window) {
     const static std::string imagesPath = "../images/menu/";
     sf::Sprite backgroundSprite(initBackground(imagesPath));
 
     Menu menu(initMenu());
-    addExitButton(menu, imagesPath);
-    addSettingsButton(menu, imagesPath);
+    menu.addIconToLeftLowerCorner(imagesPath + "exit.png", ButtonType::EXIT);
+    menu.addIconToLeftUpCorner(imagesPath + "gear.png", ButtonType::SETTINGS);
 
     while (window.isOpen()) {
         // catch event
@@ -131,7 +85,7 @@ void menu(sf::RenderWindow &window) {
         }
         if (const auto res = Tanks::MenuController::control(menu, window);
             res != std::nullopt) {
-            activity(res.value(), window);
+            activity(res.value(), window, backgroundSprite);
         }
 
         // redraw
