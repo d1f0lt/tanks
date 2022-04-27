@@ -94,12 +94,12 @@ std::optional<Menu::ButtonType> startGame(sf::RenderWindow &window, int level) {
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed)
                 window.close();
-            pause.checkPause(event);
         }
+        pause.checkPause(event);
 
         if (!pause.isPause()) {
             if (auto signal =
-                    MenuController::control(environment.getMenu(), window);
+                    MenuController::control(environment.getMenu(), window, event);
                 signal != std::nullopt) {
                 assert(signal == Menu::ButtonType::PAUSE);
                 pause.makePause();
@@ -120,7 +120,7 @@ std::optional<Menu::ButtonType> startGame(sf::RenderWindow &window, int level) {
         window.draw(playerView.getSprite());
 
         if (pause.isPause()) {
-            if (auto signal = MenuController::control(pause.getMenu(), window);
+            if (auto signal = MenuController::control(pause.getMenu(), window, event);
                 signal != std::nullopt) {
                 switch (signal.value()) {
                     case Menu::ButtonType::RESUME:

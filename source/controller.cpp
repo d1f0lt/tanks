@@ -27,7 +27,8 @@ void GameController::makeMove(Player &player, const double time) {
 
 std::optional<Menu::ButtonType> MenuController::control(
     const Menu::Menu &menu,
-    sf::RenderWindow &window) {
+    sf::RenderWindow &window,
+    const sf::Event &event) {
     auto &items = menu.getItems();
     for (auto &menuItem : items) {
         auto item = dynamic_cast<Menu::MenuButton *>(menuItem.get());
@@ -42,7 +43,7 @@ std::optional<Menu::ButtonType> MenuController::control(
                         proportions.y)
                 .contains(sf::Mouse::getPosition(window))) {
             item->hover();
-            if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+            if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left) {
                 return item->getType();
             }
         }

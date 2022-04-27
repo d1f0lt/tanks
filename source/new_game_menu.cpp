@@ -1,6 +1,5 @@
 #include "new_game_menu.h"
 #include <cassert>
-#include <chrono>
 #include <thread>
 #include "controller.h"
 #include "game.h"
@@ -54,7 +53,7 @@ void new_game_menu(sf::RenderWindow &window,
             if (event.type == sf::Event::Closed)
                 window.close();
         }
-        if (const auto res = Tanks::MenuController::control(menu, window);
+        if (const auto res = Tanks::MenuController::control(menu, window, event);
             res != std::nullopt) {
             switch (res.value()) {
                 case ButtonType::SINGLE_PLAYER: {
@@ -64,8 +63,6 @@ void new_game_menu(sf::RenderWindow &window,
                         return;
                     }
                     assert(ans.value() == ButtonType::NEW_GAME);
-                    std::this_thread::sleep_for(std::chrono::milliseconds(
-                        173));  // fix bug with new game
                     break;
                 }
                 case ButtonType::MULTIPLAYER:
