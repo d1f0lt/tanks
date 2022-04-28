@@ -43,7 +43,8 @@ std::optional<Menu::ButtonType> MenuController::control(
                         proportions.y)
                 .contains(sf::Mouse::getPosition(window))) {
             item->hover();
-            if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left) {
+            if (event.type == sf::Event::MouseButtonReleased &&
+                event.mouseButton.button == sf::Mouse::Left) {
                 return item->getType();
             }
         }

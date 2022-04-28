@@ -100,9 +100,37 @@ protected:
     friend struct Menu;
 };
 
+struct MenuButton final : MenuItem {
+public:
+    MenuButton(std::unique_ptr<MenuItem> &&content,
+               const sf::Vector2<float> &coordinates,
+               const sf::Vector2<float> &rectangleSize,
+               ButtonInfo info);
+
+    void draw(sf::RenderWindow &window) const final;
+
+    ButtonType getType() const;
+
+    void hover();
+
+    sf::Vector2<float> getSize() const final;
+
+    sf::Vector2<float> getPosition() const final;
+
+    void setPosition(sf::Vector2<float> newPosition) final;
+
+private:
+    std::unique_ptr<MenuItem> content;
+    mutable sf::RectangleShape rectangle;  // we want draw to be a const
+    ButtonInfo info;
+
+    friend struct Menu;
+    friend struct Tanks::MenuController;
+};
+
 struct MenuPicture : MenuItem {
 public:
-    explicit MenuPicture(const std::string &path,
+    explicit MenuPicture(const std::string &filename,
                          const sf::Vector2<float> &coordinates);
 
     sf::Vector2<float> getSize() const final;
@@ -120,39 +148,6 @@ private:
 
     friend struct Menu;
 };
-
-struct MenuButton final : MenuItem {
-public:
-    MenuButton(std::unique_ptr<MenuItem> &&content,
-               const sf::Vector2<float> &coordinates,
-               const sf::Vector2<float> &rectangleSize,
-               const sf::Color &rectangleColor_,
-               const sf::Color &rectangleHoverColor_,
-               ButtonType type_);
-
-    void draw(sf::RenderWindow &window) const final;
-
-    ButtonType getType() const;
-
-    void hover();
-
-    sf::Vector2<float> getSize() const final;
-
-    sf::Vector2<float> getPosition() const final;
-
-    void setPosition(sf::Vector2<float> newPosition) final;
-
-private:
-    std::unique_ptr<MenuItem> content;
-    mutable sf::RectangleShape rectangle;  // we want draw to be a const
-    sf::Color rectangleStandardColor;
-    sf::Color rectangleHoverColor;
-    ButtonType type;
-
-    friend struct Menu;
-    friend struct Tanks::MenuController;
-};
-
 }  // namespace Menu
 
 }  // namespace Tanks

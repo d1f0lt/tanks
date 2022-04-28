@@ -65,7 +65,7 @@ Menu::Menu(int menuWidth,
             std::move(content), currentCoordinates,
             sf::Vector2<float>(static_cast<float>(menuWidth),
                                static_cast<float>(btnInfo.height)),
-            btnInfo.standardColor, btnInfo.hoverColor, btnInfo.type));
+            btnInfo));
         currentCoordinates.y += static_cast<float>(items[i + 1]->getSize().y) +
                                 marginBetweenButtons;
     }
@@ -86,9 +86,10 @@ void Menu::addIconToLeftUpCorner(const std::string &filename, ButtonType type) {
         static_cast<float>(image.getSize().x) + margin,
         static_cast<float>(image.getSize().y) + margin};
     auto pauseSprite = std::make_unique<MenuPicture>(filename, coordinates);
+    ButtonInfo btnInfo{type, static_cast<int>(rectangleSize.y),
+                       sf::Color(0, 0, 0, 0), sf::Color(128, 128, 128, 128)};
     auto item = std::make_unique<MenuButton>(
-        std::move(pauseSprite), coordinates, rectangleSize,
-        sf::Color(0, 0, 0, 0), sf::Color(128, 128, 128, 128), type);
+        std::move(pauseSprite), coordinates, rectangleSize, btnInfo);
     addMenuItem(std::move(item));
 }
 
@@ -104,9 +105,10 @@ void Menu::addIconToLeftLowerCorner(const std::string &filename,
         static_cast<float>(exitImage.getSize().x + 2 * margin),
         static_cast<float>(exitImage.getSize().y + 2 * margin));
     auto picture = std::make_unique<MenuPicture>(filename, coordinates);
-    auto item = std::make_unique<MenuButton>(
-        std::move(picture), coordinates, rectangleSize, sf::Color(0, 0, 0, 0),
-        sf::Color(128, 128, 128, 128), type);
+    ButtonInfo btnInfo{type, static_cast<int>(rectangleSize.y),
+                       sf::Color(0, 0, 0, 0), sf::Color(128, 128, 128, 128)};
+    auto item = std::make_unique<MenuButton>(std::move(picture), coordinates,
+                                             rectangleSize, btnInfo);
     addMenuItem(std::move(item));
 }
 
@@ -146,9 +148,54 @@ void MenuInscription::setPosition(sf::Vector2<float> newPosition) {
     text.setPosition(newPosition.x, newPosition.y);  // fix bugs
 }
 
-MenuPicture::MenuPicture(const std::string &path,
+MenuButton::MenuButton(std::unique_ptr<MenuItem> &&content_,
+                       const sf::Vector2<float> &coordinates,
+                       const sf::Vector2<float> &rectangleSize,
+                       ButtonInfo info_)
+    : content(std::move(content_)), rectangle(rectangleSize), info(info_) {
+    rectangle.setFillColor(info.standardColor);
+    setPosition(coordinates);
+}
+
+void MenuButton::draw(sf::RenderWindow &window) const {
+    window.draw(rectangle);
+    content->draw(window);
+    rectangle.setFillColor(
+        info.standardColor);  // recover after possible hover;
+}
+
+ButtonType MenuButton::getType() const {
+    return info.type;
+}
+
+void MenuButton::hover() {
+    rectangle.setFillColor(info.hoverColor);
+}
+
+sf::Vector2<float> MenuButton::getPosition() const {
+    return rectangle.getPosition();
+}
+
+sf::Vector2<float> MenuButton::getSize() const {
+    return rectangle.getSize();
+}
+
+void MenuButton::setPosition(sf::Vector2<float> newPosition) {
+    rectangle.setPosition(newPosition);
+    content->setPosition(
+        {static_cast<float>(
+             static_cast<int>(newPosition.x) +
+             static_cast<int>((rectangle.getSize().x - content->getSize().x) /
+                              2)),
+         static_cast<float>(
+             static_cast<int>(newPosition.y) +
+             static_cast<int>((rectangle.getSize().y - content->getSize().y) /
+                              2))});
+}
+
+MenuPicture::MenuPicture(const std::string &filename,
                          const sf::Vector2<float> &coordinates) {
-    image.loadFromFile(path);
+    image.loadFromFile(filename);
     texture.loadFromImage(image);
     sprite.setTexture(texture);
     sprite.setPosition(coordinates);
@@ -168,55 +215,6 @@ void MenuPicture::setPosition(sf::Vector2<float> newPosition) {
 
 void MenuPicture::draw(sf::RenderWindow &window) const {
     window.draw(sprite);
-}
-
-MenuButton::MenuButton(std::unique_ptr<MenuItem> &&content_,
-                       const sf::Vector2<float> &coordinates,
-                       const sf::Vector2<float> &rectangleSize,
-                       const sf::Color &rectangleStandardColor_,
-                       const sf::Color &rectangleHoverColor_,
-                       ButtonType type_)
-    : content(std::move(content_)),
-      rectangle(rectangleSize),
-      rectangleStandardColor(rectangleStandardColor_),
-      rectangleHoverColor(rectangleHoverColor_),
-      type(type_) {
-    rectangle.setFillColor(rectangleStandardColor);
-    rectangle.setPosition(coordinates);
-    content->setPosition(
-        {static_cast<float>(
-             static_cast<int>(coordinates.x) +
-             static_cast<int>((rectangleSize.x - content->getSize().x) / 2)),
-         static_cast<float>(
-             static_cast<int>(coordinates.y) +
-             static_cast<int>((rectangleSize.y - content->getSize().y) / 2))});
-}
-
-void MenuButton::draw(sf::RenderWindow &window) const {
-    window.draw(rectangle);
-    content->draw(window);
-    rectangle.setFillColor(
-        rectangleStandardColor);  // recover after possible hover;
-}
-
-ButtonType MenuButton::getType() const {
-    return type;
-}
-
-void MenuButton::hover() {
-    rectangle.setFillColor(rectangleHoverColor);
-}
-
-sf::Vector2<float> MenuButton::getPosition() const {
-    return rectangle.getPosition();
-}
-
-sf::Vector2<float> MenuButton::getSize() const {
-    return rectangle.getSize();
-}
-
-void MenuButton::setPosition(sf::Vector2<float> newPosition) {
-    rectangle.setPosition(newPosition);
 }
 
 }  // namespace Tanks::Menu

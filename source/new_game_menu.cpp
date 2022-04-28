@@ -53,7 +53,8 @@ void new_game_menu(sf::RenderWindow &window,
             if (event.type == sf::Event::Closed)
                 window.close();
         }
-        if (const auto res = Tanks::MenuController::control(menu, window, event);
+        if (const auto res =
+                Tanks::MenuController::control(menu, window, event);
             res != std::nullopt) {
             switch (res.value()) {
                 case ButtonType::SINGLE_PLAYER: {
