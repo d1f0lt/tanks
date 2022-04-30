@@ -26,6 +26,7 @@ add_executable(
         source/main_menu.cpp
         source/game_environment.cpp
         source/new_game_menu.cpp
+        source/levels_menu.cpp
 )
 
 target_link_libraries(tanks sfml-graphics sfml-audio)

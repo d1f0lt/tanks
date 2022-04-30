@@ -24,33 +24,66 @@ enum class ButtonType {
     UPGRADE,
     SINGLE_PLAYER,
     MULTIPLAYER,
+    LEVEL
 };
 
 std::string convertButtonTypeToString(ButtonType type);
 
 struct InscriptionInfo final {
-    std::string inscription;
-    int characterSize;
-    sf::Color textColor;
+    const std::string inscription;
+    const size_t characterSize;
+    const sf::Color textColor;
 };
 
-struct ButtonInfo final {  // NOLINT
-    ButtonType type;
-    int height;
-    sf::Color standardColor;
-    sf::Color hoverColor;
+struct Button {
+public:
+    Button(const sf::Vector2<float> &size_, const sf::Color &standardColor_, const sf::Color &hoverColor_);
+
+    [[nodiscard]] const sf::Color &getStandardColor() const;
+
+    [[nodiscard]] const sf::Color &getHoverColor() const;
+
+    [[nodiscard]] const sf::Vector2<float> &getSize() const;
+
+    void setSize(const sf::Vector2<float> &newSize);
+
+protected:
+    const sf::Color standardColor;
+    const sf::Color hoverColor;
+    sf::Vector2<float> size;
 };
+
+struct ButtonWithType final : Button {
+public:
+    ButtonWithType(ButtonType type_, const sf::Vector2<float> &size_, const sf::Color &standardColor_, const sf::Color &hoverColor_);
+
+    ButtonWithType(Button btn, ButtonType type_);
+
+    [[nodiscard]] ButtonType getType() const;
+
+private:
+    ButtonType type;
+};
+
 
 struct MenuItem;
+struct MenuButton;
 
 struct Menu final {
 public:
     explicit Menu() = default;
 
-    explicit Menu(int menuWidth,
+    explicit Menu(size_t menuWidth,
                   const InscriptionInfo &titleInfo,
                   const InscriptionInfo &inscriptionsInfo,
-                  const std::vector<ButtonInfo> &buttonsInfo);
+                  const std::vector<ButtonWithType> &buttonsInfo);  // for most
+
+    explicit Menu(size_t menuWidth,
+                  const InscriptionInfo &titleInfo,
+                  const std::vector<InscriptionInfo> &inscriptions,
+                  const std::string &path,
+                  size_t quantityPerLine,
+                  Button btnInfo);  // for levels
 
     void draw(sf::RenderWindow &window) const;
 
@@ -70,6 +103,7 @@ private:
 };
 
 struct MenuItem {
+public:
     virtual void draw(sf::RenderWindow &window) const = 0;
 
     [[nodiscard]] virtual sf::Vector2<float> getSize() const = 0;
@@ -78,64 +112,70 @@ struct MenuItem {
 
     virtual void setPosition(sf::Vector2<float> newPosition) = 0;
 
+    void centralizeByWidth(
+        const std::pair<float, float> &rectangleCoordinatesX);
+
+    void centralizeByHeight(
+        const std::pair<float, float> &rectangleCoordinatesY);
+
     virtual ~MenuItem() = default;
 };
 
-struct MenuInscription : MenuItem {
+struct MenuInscription final : MenuItem {
+public:
     explicit MenuInscription(const InscriptionInfo &info,
                              const sf::Vector2<float> &coordinates);
 
-    sf::Vector2<float> getSize() const final;
+    [[nodiscard]] sf::Vector2<float> getSize() const final;
 
-    sf::Vector2<float> getPosition() const final;
+    [[nodiscard]] sf::Vector2<float> getPosition() const final;
 
     void setPosition(sf::Vector2<float> newPosition) final;
 
+    [[nodiscard]] std::string getContent() const;
+
     void draw(sf::RenderWindow &window) const final;
 
-protected:
+private:
     sf::Font font;
     sf::Text text;
-
-    friend struct Menu;
 };
 
-struct MenuButton final : MenuItem {
+struct MenuButton : MenuItem {
 public:
     MenuButton(std::unique_ptr<MenuItem> &&content,
                const sf::Vector2<float> &coordinates,
-               const sf::Vector2<float> &rectangleSize,
-               ButtonInfo info);
-
-    void draw(sf::RenderWindow &window) const final;
+               ButtonWithType info);
 
     ButtonType getType() const;
 
     void hover();
 
-    sf::Vector2<float> getSize() const final;
+    [[nodiscard]] sf::Vector2<float> getSize() const override;
 
-    sf::Vector2<float> getPosition() const final;
+    [[nodiscard]] sf::Vector2<float> getPosition() const override;
 
-    void setPosition(sf::Vector2<float> newPosition) final;
+    void setPosition(sf::Vector2<float> newPosition) override;
 
-private:
+    void draw(sf::RenderWindow &window) const override;
+
+protected:
     std::unique_ptr<MenuItem> content;
     mutable sf::RectangleShape rectangle;  // we want draw to be a const
-    ButtonInfo info;
-
-    friend struct Menu;
-    friend struct Tanks::MenuController;
+    ButtonWithType info;
 };
 
-struct MenuPicture : MenuItem {
+struct MenuPicture final : MenuItem {
 public:
     explicit MenuPicture(const std::string &filename,
                          const sf::Vector2<float> &coordinates);
 
-    sf::Vector2<float> getSize() const final;
+    explicit MenuPicture(const sf::Image &image_,
+                         const sf::Vector2<float> &coordinates);
 
-    sf::Vector2<float> getPosition() const final;
+    [[nodiscard]] sf::Vector2<float> getSize() const final;
+
+    [[nodiscard]] sf::Vector2<float> getPosition() const final;
 
     void setPosition(sf::Vector2<float> newPosition) final;
 
@@ -146,8 +186,31 @@ private:
     sf::Texture texture;
     sf::Sprite sprite;
 
-    friend struct Menu;
+    void initWithImage(const sf::Vector2<float> &coordinates);
 };
+
+struct MenuPictureWithDescription final : MenuButton {
+public:
+    explicit MenuPictureWithDescription(
+        std::unique_ptr<MenuPicture> &&picture,
+        std::unique_ptr<MenuInscription> &&description,
+        const sf::Vector2<float> &coordinates,
+        Button btnInfo);
+
+    void draw(sf::RenderWindow &window) const final;
+
+    [[nodiscard]] sf::Vector2<float> getSize() const final;
+
+    [[nodiscard]] sf::Vector2<float> getPosition() const final;
+
+    void setPosition(sf::Vector2<float> newPosition) final;
+
+    [[nodiscard]] std::string getDescription() const;
+
+private:
+    std::unique_ptr<MenuInscription> description;
+};
+
 }  // namespace Menu
 
 }  // namespace Tanks

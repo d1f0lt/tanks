@@ -15,7 +15,7 @@ public:
 
 struct MenuController final {
 public:
-    static std::optional<Tanks::Menu::ButtonType> control(
+    static std::optional<Menu::MenuButton *> control(
         const Menu::Menu &menu,
         sf::RenderWindow &window,
         const sf::Event &event);

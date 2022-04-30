@@ -25,7 +25,7 @@ void GameController::makeMove(Player &player, const double time) {
     }
 }
 
-std::optional<Menu::ButtonType> MenuController::control(
+std::optional<Menu::MenuButton *> MenuController::control(
     const Menu::Menu &menu,
     sf::RenderWindow &window,
     const sf::Event &event) {
@@ -35,17 +35,15 @@ std::optional<Menu::ButtonType> MenuController::control(
         if (item == nullptr) {  // header
             continue;
         }
-        auto coordinates =
-            static_cast<sf::Vector2<int>>(item->rectangle.getPosition());
-        auto proportions =
-            static_cast<sf::Vector2<int>>(item->rectangle.getSize());
+        auto coordinates = static_cast<sf::Vector2<int>>(item->getPosition());
+        auto proportions = static_cast<sf::Vector2<int>>(item->getSize());
         if (sf::IntRect(coordinates.x, coordinates.y, proportions.x,
                         proportions.y)
                 .contains(sf::Mouse::getPosition(window))) {
             item->hover();
             if (event.type == sf::Event::MouseButtonReleased &&
                 event.mouseButton.button == sf::Mouse::Left) {
-                return item->getType();
+                return item;
             }
         }
     }

@@ -29,10 +29,10 @@ Menu::Menu initMenu() {
     const int buttonsHeight = 80;
     const sf::Color btnStandardColor = sf::Color(0, 0, 0);
     const sf::Color btnHoverColor = sf::Color(115, 115, 115);
-    std::vector<Menu::ButtonInfo> buttons;
+    std::vector<Menu::ButtonWithType> buttons;
     buttons.reserve(buttonTypes.size());
     for (auto type : buttonTypes) {
-        buttons.emplace_back(Menu::ButtonInfo{type, buttonsHeight,
+        buttons.emplace_back(Menu::ButtonWithType{type, sf::Vector2<float>(pauseWidth, buttonsHeight),
                                               btnStandardColor, btnHoverColor});
     }
 

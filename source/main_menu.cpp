@@ -44,11 +44,11 @@ Menu initMenu() {
     const static int buttonsHeight = 100;
     const static sf::Color btnStandardColor(0, 0, 0, 150);
     const static sf::Color btnHoverColor(66, 66, 66, 230);
-    std::vector<ButtonInfo> buttons;
+    std::vector<ButtonWithType> buttons;
     buttons.reserve(buttonTypes.size());
     for (auto type : buttonTypes) {
         buttons.emplace_back(
-            ButtonInfo{type, buttonsHeight, btnStandardColor, btnHoverColor});
+            ButtonWithType(type, sf::Vector2<float>(menuWidth, buttonsHeight), btnStandardColor, btnHoverColor));
     }
 
     return Menu(menuWidth, title, inscriptions, buttons);
@@ -88,7 +88,7 @@ void main_menu(sf::RenderWindow &window) {
         if (const auto res =
                 Tanks::MenuController::control(menu, window, event);
             res != std::nullopt) {
-            activity(res.value(), window, backgroundSprite);
+            activity(res.value()->getType(), window, backgroundSprite);
         }
 
         // redraw

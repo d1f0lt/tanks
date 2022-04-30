@@ -3,6 +3,7 @@
 #include <thread>
 #include "controller.h"
 #include "game.h"
+#include "levels_menu.h"
 
 namespace Tanks::Menu {
 
@@ -14,7 +15,7 @@ Menu initMenu() {
 
     // title
     const static std::string titleText = "SELECT MODE";
-    const static int titleCharacterSize = 80;
+    const static int titleCharacterSize = 76;
     InscriptionInfo title{titleText, titleCharacterSize, textColor};
 
     // inscriptions
@@ -29,11 +30,11 @@ Menu initMenu() {
     const static int buttonsHeight = 100;
     const static sf::Color btnStandardColor(0, 0, 0, 150);
     const static sf::Color btnHoverColor(66, 66, 66, 230);
-    std::vector<ButtonInfo> buttons;
+    std::vector<ButtonWithType> buttons;
     buttons.reserve(buttonTypes.size());
     for (auto type : buttonTypes) {
         buttons.emplace_back(
-            ButtonInfo{type, buttonsHeight, btnStandardColor, btnHoverColor});
+            ButtonWithType{type, sf::Vector2<float>(menuWidth, buttonsHeight), btnStandardColor, btnHoverColor});
     }
 
     return Menu(menuWidth, title, inscriptions, buttons);
@@ -56,15 +57,17 @@ void new_game_menu(sf::RenderWindow &window,
         if (const auto res =
                 Tanks::MenuController::control(menu, window, event);
             res != std::nullopt) {
-            switch (res.value()) {
+            switch (res.value()->getType()) {
                 case ButtonType::SINGLE_PLAYER: {
-                    auto ans = startGame(window);
-                    assert(ans != std::nullopt);
-                    if (ans.value() == ButtonType::EXIT) {
-                        return;
+                    auto ans = levels_menu(window, backgroundSprite);
+                    switch (ans) {
+                        case ButtonType::RETURN:
+                            continue;
+                        case ButtonType::EXIT:
+                            return;
+                        default:
+                            assert(false);
                     }
-                    assert(ans.value() == ButtonType::NEW_GAME);
-                    break;
                 }
                 case ButtonType::MULTIPLAYER:
 

@@ -101,7 +101,7 @@ std::optional<Menu::ButtonType> startGame(sf::RenderWindow &window, int level) {
             if (auto signal = MenuController::control(environment.getMenu(),
                                                       window, event);
                 signal != std::nullopt) {
-                assert(signal == Menu::ButtonType::PAUSE);
+                assert(signal.value()->getType() == Menu::ButtonType::PAUSE);
                 pause.makePause();
             } else {
                 GameController::makeMove(player, time);
@@ -123,14 +123,14 @@ std::optional<Menu::ButtonType> startGame(sf::RenderWindow &window, int level) {
             if (auto signal =
                     MenuController::control(pause.getMenu(), window, event);
                 signal != std::nullopt) {
-                switch (signal.value()) {
+                switch (signal.value()->getType()) {
                     case Menu::ButtonType::RESUME:
                         pause.unpause();
                         break;
                     case Menu::ButtonType::NEW_GAME:
                         return Menu::ButtonType::NEW_GAME;
                     case Menu::ButtonType::EXIT:
-                        return signal.value();
+                        return signal.value()->getType();
                     default:
                         break;
                 }

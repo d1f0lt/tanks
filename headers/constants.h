@@ -12,6 +12,7 @@ const int MARGIN_LEFT = 288;  // = MARGIN_RIGHT     for centralize
 const int MAP_HEIGHT = 19;    // number of vertical tiles
 const int MAP_WIDTH = 24;     // number of horizontal tiles
 const int TANK_SIZE = 48;     // TANK_WIDTH = TANK_HEIGHT = 48
+const int LEVELS_COUNT = 1;
 
 }  // namespace Tanks
 
