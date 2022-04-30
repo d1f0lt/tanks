@@ -11,23 +11,23 @@ namespace {
 
 Menu initMenu() {
     const static sf::Color textColor{63, 87, 210};
-    const static int menuWidth = static_cast<int>(WINDOW_WIDTH / 3.4);
+    const static auto menuWidth = static_cast<size_t>(WINDOW_WIDTH / 3.4);
 
     // title
     const static std::string titleText = "SELECT MODE";
-    const static int titleCharacterSize = 76;
+    const static size_t titleCharacterSize = 76;
     InscriptionInfo title{titleText, titleCharacterSize, textColor};
 
     // inscriptions
     const static std::string inscriptionsText;
-    const static int inscriptionsCharacterSize = 50;
+    const static size_t inscriptionsCharacterSize = 50;
     InscriptionInfo inscriptions{inscriptionsText, inscriptionsCharacterSize,
                                  textColor};
 
     // buttons
     const static std::vector<ButtonType> buttonTypes = {
         ButtonType::SINGLE_PLAYER, ButtonType::MULTIPLAYER};
-    const static int buttonsHeight = 100;
+    const static size_t buttonsHeight = 100;
     const static sf::Color btnStandardColor(0, 0, 0, 150);
     const static sf::Color btnHoverColor(66, 66, 66, 230);
     std::vector<ButtonWithType> buttons;

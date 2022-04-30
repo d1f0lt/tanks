@@ -7,18 +7,18 @@ namespace Tanks {
 namespace {
 
 Menu::Menu initMenu() {
-    const static int pauseWidth = 400;
+    const static size_t pauseWidth = 400;
 
     const static sf::Color textColor{255, 255, 255};
 
     // title
     const static std::string titleText = "PAUSED";
-    const static int titleCharacterSize = 70;
+    const static size_t titleCharacterSize = 70;
     Menu::InscriptionInfo title{titleText, titleCharacterSize, textColor};
 
     // inscriptions
     const static std::string inscriptionsText;
-    const static int inscriptionsCharacterSize = 36;
+    const static size_t inscriptionsCharacterSize = 36;
     Menu::InscriptionInfo inscriptions{inscriptionsText,
                                        inscriptionsCharacterSize, textColor};
 
@@ -26,7 +26,7 @@ Menu::Menu initMenu() {
     const std::vector<Menu::ButtonType> buttonTypes = {
         Menu::ButtonType::RESUME, Menu::ButtonType::NEW_GAME,
         Menu::ButtonType::SETTINGS, Menu::ButtonType::EXIT};
-    const int buttonsHeight = 80;
+    const size_t buttonsHeight = 80;
     const sf::Color btnStandardColor = sf::Color(0, 0, 0);
     const sf::Color btnHoverColor = sf::Color(115, 115, 115);
     std::vector<Menu::ButtonWithType> buttons;

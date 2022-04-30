@@ -24,16 +24,16 @@ sf::Sprite initBackground(const std::string &path) {
 
 Menu initMenu() {
     const static sf::Color textColor{63, 87, 210};
-    const static int menuWidth = static_cast<int>(WINDOW_WIDTH / 3.4);
+    const static auto menuWidth = static_cast<size_t>(WINDOW_WIDTH / 3.4);
 
     // title
     const static std::string titleText = "JUST TANKS";
-    const static int titleCharacterSize = 80;
+    const static size_t titleCharacterSize = 80;
     InscriptionInfo title{titleText, titleCharacterSize, textColor};
 
     // inscriptions
     const static std::string inscriptionsText;
-    const static int inscriptionsCharacterSize = 50;
+    const static size_t inscriptionsCharacterSize = 50;
     InscriptionInfo inscriptions{inscriptionsText, inscriptionsCharacterSize,
                                  textColor};
 
@@ -41,7 +41,7 @@ Menu initMenu() {
     const static std::vector<ButtonType> buttonTypes = {
         ButtonType::NEW_GAME, ButtonType::UPGRADE, ButtonType::CREATE_MAP,
         ButtonType::RATING};
-    const static int buttonsHeight = 100;
+    const static size_t buttonsHeight = 100;
     const static sf::Color btnStandardColor(0, 0, 0, 150);
     const static sf::Color btnHoverColor(66, 66, 66, 230);
     std::vector<ButtonWithType> buttons;

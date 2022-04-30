@@ -4,15 +4,15 @@
 namespace Tanks {
 enum class Direction { LEFT, RIGHT, DOWN, UP };
 
-const int WINDOW_WIDTH = 1920;
-const int WINDOW_HEIGHT = 1080;
-const int TILE_SIZE = 56;     // ONE_TILE_WIDTH = ONE_TILE_HEIGHT = 56
-const int MARGIN_TOP = 8;     // = MARGIN_DOWN
-const int MARGIN_LEFT = 288;  // = MARGIN_RIGHT     for centralize
-const int MAP_HEIGHT = 19;    // number of vertical tiles
-const int MAP_WIDTH = 24;     // number of horizontal tiles
-const int TANK_SIZE = 48;     // TANK_WIDTH = TANK_HEIGHT = 48
-const int LEVELS_COUNT = 1;
+constexpr int WINDOW_WIDTH = 1920;
+constexpr int WINDOW_HEIGHT = 1080;
+constexpr int TILE_SIZE = 56;     // ONE_TILE_WIDTH = ONE_TILE_HEIGHT = 56
+constexpr int MARGIN_TOP = 8;     // = MARGIN_DOWN
+constexpr int MARGIN_LEFT = 288;  // = MARGIN_RIGHT     for centralize
+constexpr int MAP_HEIGHT = 19;    // number of vertical tiles
+constexpr int MAP_WIDTH = 24;     // number of horizontal tiles
+constexpr int TANK_SIZE = 48;     // TANK_WIDTH = TANK_HEIGHT = 48
+constexpr int LEVELS_COUNT = 1;
 
 }  // namespace Tanks
 
