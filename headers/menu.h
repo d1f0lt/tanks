@@ -37,7 +37,9 @@ struct InscriptionInfo final {
 
 struct Button {
 public:
-    Button(const sf::Vector2<float> &size_, const sf::Color &standardColor_, const sf::Color &hoverColor_);
+    Button(const sf::Vector2<float> &size_,
+           const sf::Color &standardColor_,
+           const sf::Color &hoverColor_);
 
     [[nodiscard]] const sf::Color &getStandardColor() const;
 
@@ -55,7 +57,10 @@ protected:
 
 struct ButtonWithType final : Button {
 public:
-    ButtonWithType(ButtonType type_, const sf::Vector2<float> &size_, const sf::Color &standardColor_, const sf::Color &hoverColor_);
+    ButtonWithType(ButtonType type_,
+                   const sf::Vector2<float> &size_,
+                   const sf::Color &standardColor_,
+                   const sf::Color &hoverColor_);
 
     ButtonWithType(Button btn, ButtonType type_);
 
@@ -64,7 +69,6 @@ public:
 private:
     ButtonType type;
 };
-
 
 struct MenuItem;
 struct MenuButton;

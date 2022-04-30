@@ -34,7 +34,8 @@ Menu initMenu() {
     buttons.reserve(buttonTypes.size());
     for (auto type : buttonTypes) {
         buttons.emplace_back(
-            ButtonWithType{type, sf::Vector2<float>(menuWidth, buttonsHeight), btnStandardColor, btnHoverColor});
+            ButtonWithType{type, sf::Vector2<float>(menuWidth, buttonsHeight),
+                           btnStandardColor, btnHoverColor});
     }
 
     return Menu(menuWidth, title, inscriptions, buttons);

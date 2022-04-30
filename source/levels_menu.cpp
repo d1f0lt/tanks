@@ -1,8 +1,8 @@
 #include "levels_menu.h"
-#include "controller.h"
-#include "constants.h"
-#include "game.h"
 #include <cassert>
+#include "constants.h"
+#include "controller.h"
+#include "game.h"
 
 namespace Tanks::Menu {
 
@@ -18,25 +18,29 @@ Menu initMenu(const std::string &imagesPath) {
     // title
     const static std::string titleText = "SELECT LEVEL";
     const static size_t titleCharacterSize = 76;
-    const static InscriptionInfo title{titleText, titleCharacterSize, textColor};
+    const static InscriptionInfo title{titleText, titleCharacterSize,
+                                       textColor};
 
     // inscriptions
     std::vector<InscriptionInfo> inscriptions;
     inscriptions.reserve(quantityElement);
     const static int characterSize = 32;
     for (int i = 1; i <= quantityElement; ++i) {
-        inscriptions.emplace_back(InscriptionInfo{std::to_string(i), characterSize, textColor});
+        inscriptions.emplace_back(
+            InscriptionInfo{std::to_string(i), characterSize, textColor});
     }
 
     const static sf::Color btnStandardColor(0, 0, 0, 150);
     const static sf::Color btnHoverColor(66, 66, 66, 230);
     Button btnInfo{sf::Vector2<float>(0, 0), btnStandardColor, btnHoverColor};
-    return Menu(menuWidth, title, inscriptions, imagesPath, quantityPerLine, btnInfo);
+    return Menu(menuWidth, title, inscriptions, imagesPath, quantityPerLine,
+                btnInfo);
 }
 
-}
+}  // namespace
 
-ButtonType levels_menu(sf::RenderWindow &window, const sf::Sprite &backgroundSprite) {
+ButtonType levels_menu(sf::RenderWindow &window,
+                       const sf::Sprite &backgroundSprite) {
     const static std::string imagesPath = "../images/menu/";
     static Menu menu(initMenu(imagesPath + "levels/"));
     menu.addIconToLeftUpCorner(imagesPath + "return.png", ButtonType::RETURN);
@@ -87,4 +91,4 @@ ButtonType levels_menu(sf::RenderWindow &window, const sf::Sprite &backgroundSpr
     return ButtonType::EXIT;
 }
 
-}
+}  // namespace Tanks::Menu

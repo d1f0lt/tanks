@@ -1,9 +1,9 @@
 #include "menu.h"
 #include <cassert>
+#include <cmath>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <cmath>
 
 namespace Tanks::Menu {
 
@@ -25,7 +25,10 @@ std::string convertButtonTypeToString(const ButtonType type) {
     return dictionary[type];
 }
 
-Button::Button(const sf::Vector2<float> &size_, const sf::Color &standardColor_, const sf::Color &hoverColor_) : standardColor(standardColor_), hoverColor(hoverColor_), size(size_) {
+Button::Button(const sf::Vector2<float> &size_,
+               const sf::Color &standardColor_,
+               const sf::Color &hoverColor_)
+    : standardColor(standardColor_), hoverColor(hoverColor_), size(size_) {
 }
 
 const sf::Vector2<float> &Button::getSize() const {
@@ -44,10 +47,15 @@ void Button::setSize(const sf::Vector2<float> &newSize) {
     size = newSize;
 }
 
-ButtonWithType::ButtonWithType(ButtonType type_, const sf::Vector2<float> &size_, const sf::Color &standardColor_, const sf::Color &hoverColor_) : Button(size_, standardColor_, hoverColor_), type(type_) {
+ButtonWithType::ButtonWithType(ButtonType type_,
+                               const sf::Vector2<float> &size_,
+                               const sf::Color &standardColor_,
+                               const sf::Color &hoverColor_)
+    : Button(size_, standardColor_, hoverColor_), type(type_) {
 }
 
-ButtonWithType::ButtonWithType(Button btn, ButtonType type_) : Button(btn), type(type_) {
+ButtonWithType::ButtonWithType(Button btn, ButtonType type_)
+    : Button(btn), type(type_) {
 }
 
 ButtonType ButtonWithType::getType() const {
@@ -69,30 +77,31 @@ Menu::Menu(size_t menuWidth,
     auto title =
         std::make_unique<MenuInscription>(titleInfo, currentCoordinates);
 
-    const size_t menuHeight = static_cast<size_t>(title->getSize().y) +
-                              marginFromTitle +
-                               buttonsCount * static_cast<size_t>(buttonsInfo[0].getSize().y) +
-                              (buttonsCount - 1) * marginBetweenButtons;
+    const size_t menuHeight =
+        static_cast<size_t>(title->getSize().y) + marginFromTitle +
+        buttonsCount * static_cast<size_t>(buttonsInfo[0].getSize().y) +
+        (buttonsCount - 1) * marginBetweenButtons;
     const size_t marginTop = (WINDOW_HEIGHT - menuHeight) / 2;
 
     title->setPosition(sf::Vector2<float>{0, static_cast<float>(marginTop)});
     title->centralizeByWidth({marginLeft, marginLeft + menuWidth});
 
-    currentCoordinates.y =
-        static_cast<float>(marginTop) + static_cast<float>(marginFromTitle) + title->getSize().y;
+    currentCoordinates.y = static_cast<float>(marginTop) +
+                           static_cast<float>(marginFromTitle) +
+                           title->getSize().y;
 
     items.emplace_back(std::move(title));
 
     // buttons
     for (int i = 0; i < buttonsCount; ++i) {
         auto btnInfo = buttonsInfo[i];
-        InscriptionInfo inscriptionInfo{convertButtonTypeToString(btnInfo.getType()),
-                                        inscriptionsInfo.characterSize,
-                                        inscriptionsInfo.textColor};
+        InscriptionInfo inscriptionInfo{
+            convertButtonTypeToString(btnInfo.getType()),
+            inscriptionsInfo.characterSize, inscriptionsInfo.textColor};
         auto content = std::make_unique<MenuInscription>(inscriptionInfo,
                                                          currentCoordinates);
         items.emplace_back(std::make_unique<MenuButton>(
-            std::move(content), currentCoordinates,btnInfo));
+            std::move(content), currentCoordinates, btnInfo));
         currentCoordinates.y += static_cast<float>(items[i + 1]->getSize().y) +
                                 marginBetweenButtons;
     }
@@ -108,7 +117,10 @@ Menu::Menu(size_t menuWidth,
     if (btnInfo.getSize() == sf::Vector2<float>{0, 0}) {
         sf::Image image;
         image.loadFromFile(path + "item1.png");
-        sizeOfOne = sf::Vector2<float>{static_cast<float>(image.getSize().x), static_cast<float>(image.getSize().y + 2 * textMargin) + MenuInscription{inscriptions[0], {0, 0}}.getSize().y};
+        sizeOfOne = sf::Vector2<float>{
+            static_cast<float>(image.getSize().x),
+            static_cast<float>(image.getSize().y + 2 * textMargin) +
+                MenuInscription{inscriptions[0], {0, 0}}.getSize().y};
         btnInfo.setSize(sizeOfOne);
     } else {
         sizeOfOne = btnInfo.getSize();
@@ -116,22 +128,29 @@ Menu::Menu(size_t menuWidth,
 
     const size_t itemsCount = inscriptions.size();
     const size_t marginLeft = (WINDOW_WIDTH - menuWidth) / 2;
-    const size_t marginBetweenButtons = menuWidth - static_cast<int>(sizeOfOne.x) * quantityPerLine;
+    const size_t marginBetweenButtons =
+        menuWidth - static_cast<int>(sizeOfOne.x) * quantityPerLine;
     const static size_t marginFromTitle = 80;
 
     sf::Vector2<float> currentCoordinates{static_cast<float>(marginLeft), 0};
 
-    auto title = std::make_unique<MenuInscription>(titleInfo, currentCoordinates);
+    auto title =
+        std::make_unique<MenuInscription>(titleInfo, currentCoordinates);
 
-    const size_t linesQuantity = ceil(static_cast<double>(itemsCount) / static_cast<double>(quantityPerLine));
-    const size_t itemsQuantityInLastLine = itemsCount - ((linesQuantity - 1) * quantityPerLine);
-    const size_t menuHeight = static_cast<int>(title->getSize().y) + marginFromTitle + linesQuantity * static_cast<int>(sizeOfOne.y);
+    const size_t linesQuantity = ceil(static_cast<double>(itemsCount) /
+                                      static_cast<double>(quantityPerLine));
+    const size_t itemsQuantityInLastLine =
+        itemsCount - ((linesQuantity - 1) * quantityPerLine);
+    const size_t menuHeight = static_cast<int>(title->getSize().y) +
+                              marginFromTitle +
+                              linesQuantity * static_cast<int>(sizeOfOne.y);
     const size_t marginTop = (WINDOW_HEIGHT - menuHeight) / 2;
 
     title->setPosition(sf::Vector2<float>(0, static_cast<float>(marginTop)));
     title->centralizeByWidth({marginLeft, marginLeft + menuWidth});
 
-    currentCoordinates.y = static_cast<float>(marginTop) + title->getSize().y + static_cast<float>(marginFromTitle);
+    currentCoordinates.y = static_cast<float>(marginTop) + title->getSize().y +
+                           static_cast<float>(marginFromTitle);
 
     items.emplace_back(std::move(title));
 
@@ -139,16 +158,25 @@ Menu::Menu(size_t menuWidth,
     const static sf::Color textColor(0, 0, 0);
     for (int i = 0; i < linesQuantity; ++i) {
         currentCoordinates.x = static_cast<float>(marginLeft);
-        for (int j = 1; j <= (i + 1 != linesQuantity ? quantityPerLine : itemsQuantityInLastLine); ++j) {
-            const std::string currentItem = std::to_string(i * quantityPerLine + j);
-            auto picture = std::make_unique<MenuPicture>(filename + currentItem + ".png", currentCoordinates);
-            auto description = std::make_unique<MenuInscription>(inscriptions[i*quantityPerLine + j-1], currentCoordinates);
-            auto item = std::make_unique<MenuPictureWithDescription>(std::move(picture), std::move(description), currentCoordinates, btnInfo);
+        for (int j = 1; j <= (i + 1 != linesQuantity ? quantityPerLine
+                                                     : itemsQuantityInLastLine);
+             ++j) {
+            const std::string currentItem =
+                std::to_string(i * quantityPerLine + j);
+            auto picture = std::make_unique<MenuPicture>(
+                filename + currentItem + ".png", currentCoordinates);
+            auto description = std::make_unique<MenuInscription>(
+                inscriptions[i * quantityPerLine + j - 1], currentCoordinates);
+            auto item = std::make_unique<MenuPictureWithDescription>(
+                std::move(picture), std::move(description), currentCoordinates,
+                btnInfo);
             items.emplace_back(std::move(item));
-            currentCoordinates.x += sizeOfOne.x + static_cast<float>(marginBetweenButtons);
-            assert(items[i*quantityPerLine + j]->getSize() == sizeOfOne);
+            currentCoordinates.x +=
+                sizeOfOne.x + static_cast<float>(marginBetweenButtons);
+            assert(items[i * quantityPerLine + j]->getSize() == sizeOfOne);
         }
-        currentCoordinates.y += sizeOfOne.y + static_cast<float>(marginBetweenButtons);
+        currentCoordinates.y +=
+            sizeOfOne.y + static_cast<float>(marginBetweenButtons);
     }
 }
 
@@ -168,9 +196,11 @@ std::unique_ptr<MenuButton> initIcon(const sf::Image &image,
         static_cast<float>(image.getSize().x + padding),
         static_cast<float>(image.getSize().y + padding)};
     auto icon = std::make_unique<MenuPicture>(image, coordinates);
-    ButtonWithType btnInfo(type, sf::Vector2<float>(rectangleSize.x, rectangleSize.y),
-                       sf::Color(0, 0, 0, 0), sf::Color(128, 128, 128, 128));
-    auto item = std::make_unique<MenuButton>(std::move(icon), coordinates,btnInfo);
+    ButtonWithType btnInfo(
+        type, sf::Vector2<float>(rectangleSize.x, rectangleSize.y),
+        sf::Color(0, 0, 0, 0), sf::Color(128, 128, 128, 128));
+    auto item =
+        std::make_unique<MenuButton>(std::move(icon), coordinates, btnInfo);
     return item;
 }
 
@@ -268,13 +298,14 @@ MenuButton::MenuButton(std::unique_ptr<MenuItem> &&content_,
                        ButtonWithType info_)
     : content(std::move(content_)), info(info_), rectangle(info_.getSize()) {
     rectangle.setFillColor(info.getStandardColor());
-    setPosition(coordinates); // NOLINT
+    setPosition(coordinates);  // NOLINT
 }
 
 void MenuButton::draw(sf::RenderWindow &window) const {
     window.draw(rectangle);
     content->draw(window);
-    rectangle.setFillColor(info.getStandardColor());  // recover after possible hover;
+    rectangle.setFillColor(
+        info.getStandardColor());  // recover after possible hover;
 }
 
 ButtonType MenuButton::getType() const {
@@ -342,7 +373,10 @@ MenuPictureWithDescription::MenuPictureWithDescription(
     std::unique_ptr<MenuInscription> &&description_,
     const sf::Vector2<float> &coordinates,
     Button btnInfo)
-    : MenuButton(std::move(picture_), coordinates, ButtonWithType(btnInfo, ButtonType::LEVEL)), description(std::move(description_)) {
+    : MenuButton(std::move(picture_),
+                 coordinates,
+                 ButtonWithType(btnInfo, ButtonType::LEVEL)),
+      description(std::move(description_)) {
     assert(picture->getSize().x >= description->getSize().x);
     rectangle.setSize(sf::Vector2<float>(
         picture->getSize().x,
@@ -354,7 +388,8 @@ void MenuPictureWithDescription::draw(sf::RenderWindow &window) const {
     window.draw(rectangle);
     picture->draw(window);
     description->draw(window);
-    rectangle.setFillColor(info.getStandardColor());  // recover after possible hover;
+    rectangle.setFillColor(
+        info.getStandardColor());  // recover after possible hover;
 }
 
 sf::Vector2<float> MenuPictureWithDescription::getSize() const {

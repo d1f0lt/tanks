@@ -32,8 +32,9 @@ Menu::Menu initMenu() {
     std::vector<Menu::ButtonWithType> buttons;
     buttons.reserve(buttonTypes.size());
     for (auto type : buttonTypes) {
-        buttons.emplace_back(Menu::ButtonWithType{type, sf::Vector2<float>(pauseWidth, buttonsHeight),
-                                              btnStandardColor, btnHoverColor});
+        buttons.emplace_back(Menu::ButtonWithType{
+            type, sf::Vector2<float>(pauseWidth, buttonsHeight),
+            btnStandardColor, btnHoverColor});
     }
 
     return Menu::Menu(pauseWidth, title, inscriptions, buttons);
