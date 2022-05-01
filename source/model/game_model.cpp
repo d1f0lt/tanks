@@ -1,6 +1,7 @@
 #include "model/game_model.h"
 #include <cassert>
 #include <fstream>
+#include <thread>
 #include "model/blocks.h"
 #include "model/projectile.h"
 
@@ -84,6 +85,7 @@ void GameModel::loadLevel(int level) {
     std::fstream file(currentLevel);
     while (!file.is_open()) {
         file.open(currentLevel);
+        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 
     assert(file.is_open() && "Unable to open map texture file");
