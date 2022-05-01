@@ -26,6 +26,9 @@ public:
 
     void loadLevel(int level);
 
+    [[nodiscard]] int getHeight() const;
+    [[nodiscard]] int getWidth() const;
+
 private:
     Entity &addEntity(std::unique_ptr<Entity> entity);
     void removeEntity(Entity &entity);

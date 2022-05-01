@@ -1,4 +1,5 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+
 #include <cassert>
 #include <iostream>
 #include "doctest.h"
@@ -8,6 +9,7 @@
 
 using namespace Tanks;
 using namespace Tanks::model;
+
 const std::array<Tanks::model::Direction, 4> DIRECTIONS = {
     Tanks::model::Direction::UP, Tanks::model::Direction::DOWN,
     Tanks::model::Direction::LEFT, Tanks::model::Direction::RIGHT};
@@ -20,7 +22,7 @@ TEST_CASE("Game creation") {
     CHECK(brick00.getType() == EntityType::FLOOR);
 }
 
-TEST_CASE("Single move") {
+TEST_CASE("Single move and checking background") {
     Tanks::model::GameModel model;
     model.loadLevel(1);
     Tanks::model::Entity *brick00 =
@@ -54,8 +56,16 @@ TEST_CASE("multiple moves") {
     CHECK(left[0] == &model.getEntityByCoords(0, TILE_SIZE));
 
     auto right = realTank.look(Tanks::model::Direction::RIGHT);
-    CHECK(right[0] == right.back());
-    CHECK(right[0]->getType() == Tanks::model::EntityType::FLOOR);
+    for (int row = realTank.getTop();
+         row < realTank.getTop() + realTank.getHeight(); row++) {
+        for (int col = realTank.getLeft() + realTank.getWidth();
+             col <
+             realTank.getLeft() + realTank.getWidth() + realTank.getSpeed();
+             col++) {
+            CHECK(std::find(right.begin(), right.end(),
+                            &model.getEntityByCoords(col, row)) != right.end());
+        }
+    }
 
     // [0,48) : Tank
     // [0,56) : Block
@@ -74,18 +84,32 @@ TEST_CASE("multiple moves") {
 TEST_CASE("Block check") {
     Tanks::model::GameModel model;
     model.loadLevel(1);
-    {
-        auto &block = model.getEntityByCoords(0, 0);
-        CHECK(block.isBulletPassable() == false);
-        CHECK(block.isTankPassable() == false);
-        CHECK(block.isDestroyable() == false);
-    }
-    {
-        auto &block = model.getEntityByCoords(100, 100);
-        CHECK(block.getType() == Tanks::model::EntityType::FLOOR);
-        CHECK(block.isDestroyable() == false);
-        CHECK(block.isTankPassable() == true);
-        CHECK(block.isBulletPassable() == true);
+    for (int row = 0; row < model.getHeight(); row++) {
+        for (int col = 0; col < model.getWidth(); col++) {
+            auto &entity = model.getEntityByCoords(col, row);
+            switch (entity.getType()) {
+                case EntityType::FLOOR:
+                    CHECK(entity.isTankPassable());
+                    CHECK(entity.isBulletPassable());
+                    CHECK_FALSE(entity.isDestroyable());
+                    break;
+                case EntityType::BRICK:
+                    CHECK_FALSE(entity.isTankPassable());
+                    CHECK(entity.isDestroyable());
+                    CHECK_FALSE(entity.isBulletPassable());
+                    break;
+                case EntityType::STEEL:
+                    CHECK_FALSE(entity.isTankPassable());
+                    CHECK_FALSE(entity.isDestroyable());
+                    CHECK_FALSE(entity.isBulletPassable());
+                    break;
+                case EntityType::WATER:
+                    CHECK_FALSE(entity.isTankPassable());
+                    CHECK(entity.isBulletPassable());
+                    CHECK_FALSE(entity.isDestroyable());
+                    break;
+            }
+        }
     }
 }
 

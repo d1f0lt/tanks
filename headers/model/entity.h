@@ -42,6 +42,7 @@ public:
 
     [[nodiscard]] int getLeft() const;
     [[nodiscard]] int getTop() const;
+
     [[nodiscard]] int getWidth() const;
     [[nodiscard]] int getHeight() const;
 

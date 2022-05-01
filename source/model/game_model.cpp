@@ -13,14 +13,16 @@ void GameModel::nextTick() {
     for (auto *entity :
          groupedEntities
              .snapshotAll()[static_cast<unsigned>(EntityType::BOT_TANK)]) {
-        auto tank = static_cast<BotTank *>(entity);
+        auto *tank = dynamic_cast<BotTank *>(entity);
+        assert(tank != nullptr);
         handlers[tank]->move(tank->getDirection());
     }
 
     for (auto *entity :
          groupedEntities
              .snapshotAll()[static_cast<unsigned>(EntityType::BULLET)]) {
-        auto bullet = static_cast<Projectile *>(entity);
+        auto *bullet = dynamic_cast<Projectile *>(entity);
+        assert(bullet != nullptr);
         handlers[bullet]->move(bullet->getDirection());
 
         for (auto &row : bullet->snapshotBackground()) {
@@ -97,6 +99,14 @@ void GameModel::loadLevel(int level) {
                                               CHAR_TO_TYPE.at(str[col])));
         }
     }
+}
+
+int GameModel::getWidth() const {
+    return map.getWidth();
+}
+
+int GameModel::getHeight() const {
+    return map.getHeight();
 }
 
 }  // namespace Tanks::model

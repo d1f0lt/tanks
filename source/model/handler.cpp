@@ -10,7 +10,7 @@ BasicHandler::BasicHandler(GameModel &model_, Entity &entity_)
     model.handlers[&entity] = this;
 }
 
-void BasicHandler::move([[maybe_unused]] Direction direction) {
+void BasicHandler::move(Direction) {
     assert(false);
 }
 
@@ -18,7 +18,7 @@ void BasicHandler::shoot() {
     assert(false);
 }
 
-std::vector<const Entity *> BasicHandler::look(Direction direction) {
+std::vector<const Entity *> BasicHandler::look(Direction) {
     assert(false);
 }
 
