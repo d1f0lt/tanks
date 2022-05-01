@@ -53,12 +53,12 @@ jobs:
               flags: -fsanitize=address -fno-sanitize-recover=all -fsanitize=undefined
               cmake-flags: -DCMAKE_BUILD_TYPE=Debug
           - compiler:
+          
               command: clang++
               version-flags: --version
               flags:
               cmake-flags: -DCMAKE_BUILD_TYPE=Release
 
-    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - run: sudo apt-get update && sudo apt-get install clang++-12 gcc-10 g++-10 cmake make
