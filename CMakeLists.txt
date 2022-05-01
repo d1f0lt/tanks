@@ -45,7 +45,7 @@ add_executable(
         source/pause.cpp
         source/main_menu.cpp
         source/game_environment.cpp
-        source/model/handler.cpp)
+)
 
 
 target_link_libraries(model_tests sfml-graphics)
