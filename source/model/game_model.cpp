@@ -82,6 +82,10 @@ void GameModel::loadLevel(int level) {
         {'}', EntityType::RIGHT_DOWN_CORNER}};
 
     std::fstream file(currentLevel);
+    while (!file.is_open()) {
+        file.open(currentLevel);
+    }
+
     assert(file.is_open() && "Unable to open map texture file");
     std::string str;
 
