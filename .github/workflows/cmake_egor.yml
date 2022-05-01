@@ -3,7 +3,7 @@ on: [ push ]
 jobs:
   compile-run:
     runs-on: ${{ matrix.compiler.runs-on }}
-    timeout-minutes: 3
+    timeout-minutes: 30
     strategy:
       matrix:
         compiler:
