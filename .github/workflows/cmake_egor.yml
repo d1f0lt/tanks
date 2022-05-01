@@ -11,10 +11,10 @@ jobs:
             version-flags: --version
             flags:
             runs-on: ubuntu-latest
-          - command: clang++-12
-            version-flags: --version
-            flags: -stdlib=libstdc++
-            runs-on: ubuntu-latest
+        #          - command: clang++-12
+        #            version-flags: --version
+        #            flags: -stdlib=libstdc++
+        #            runs-on: ubuntu-latest
         #          - command: clang++-12
         #            version-flags: --version
         #            flags: -stdlib=libc++
