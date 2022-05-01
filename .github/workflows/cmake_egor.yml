@@ -34,6 +34,7 @@ jobs:
       - run: sudo apt-get update && sudo apt-get install clang-12 gcc-10 g++-10 cmake make libsfml-dev libc++-12-dev libc++abi-12-dev valgrind
       - run: echo "Setup success"
       - run: ls
+      - run: pwd
       - run: cmake --version
       - run: ${{matrix.compiler.command}} ${{matrix.compiler.version-flags}}
       - run: cmake . -DCMAKE_CXX_COMPILER="${{matrix.compiler.command}}" -DEXTRA_CXX_FLAGS="-Og -g ${{matrix.compiler.flags}} ${{matrix.sanitize.flags}}" ${{matrix.compiler.cmake-flags}} ${{matrix.sanitize.cmake-flags}}
