@@ -2,6 +2,7 @@
 #include <cassert>
 #include <fstream>
 #include <thread>
+#include <unordered_map>
 #include "model/blocks.h"
 #include "model/projectile.h"
 
