@@ -38,5 +38,6 @@ jobs:
       - run: cmake . -DCMAKE_CXX_COMPILER="${{matrix.compiler.command}}" -DEXTRA_CXX_FLAGS="-Og -g ${{matrix.compiler.flags}} ${{matrix.sanitize.flags}}" ${{matrix.compiler.cmake-flags}} ${{matrix.sanitize.cmake-flags}}
       - run: cmake --build . --verbose ${{matrix.compiler.cmake-build-flags}} ${{matrix.sanitize.cmake-build-flags}}
       - run: cd bin
+      - run: ls
       - run: ${{matrix.sanitize.run-prefix}} ./model_tests
  
