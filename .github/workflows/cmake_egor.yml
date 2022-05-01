@@ -2,7 +2,7 @@ name: egor_top
 on: [push]
 jobs:
   compile-run:
-    runs-on: ${{ matrix.compiler.runs-on }}
+    runs-on: ${{ matrix.compiler }}
     timeout-minutes: 3
     strategy:
       matrix:
