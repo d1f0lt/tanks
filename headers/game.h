@@ -1,6 +1,7 @@
 #ifndef GAME_H_
 #define GAME_H_
 
+#include <optional>
 #include <SFML/Graphics.hpp>
 #include "menu.h"
 
