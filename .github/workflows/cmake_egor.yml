@@ -1,5 +1,5 @@
 name: egor_top
-on: [push]
+on: [ push ]
 jobs:
   compile-run:
     runs-on: ${{ matrix.compiler.runs-on }}
@@ -15,15 +15,15 @@ jobs:
             version-flags: --version
             flags: -stdlib=libstdc++
             runs-on: ubuntu-latest
-          - command: clang++-12
-            version-flags: --version
-            flags: -stdlib=libc++
-            runs-on: ubuntu-latest
+        #          - command: clang++-12
+        #            version-flags: --version
+        #            flags: -stdlib=libc++
+        #            runs-on: ubuntu-latest
         sanitize:
-          - flags: -fsanitize=undefined -fno-sanitize-recover=all 
+          - flags: -fsanitize=undefined -fno-sanitize-recover=all
             run-prefix: valgrind --quiet --leak-check=full --error-exitcode=123
             cmake-flags: -DCMAKE_BUILD_TYPE=Debug
-          - flags: -fsanitize=undefined -fno-sanitize-recover=all -fsanitize=address 
+          - flags: -fsanitize=undefined -fno-sanitize-recover=all -fsanitize=address
             run-prefix:
             cmake-flags: -DCMAKE_BUILD_TYPE=Debug
           - flags:
@@ -31,11 +31,11 @@ jobs:
             cmake-flags: -DCMAKE_BUILD_TYPE=Release
     steps:
       - uses: actions/checkout@v3
-      - run: sudo apt-get update && sudo apt-get install clang-12 gcc-10 g++-10 cmake make libsfml-dev libc++-12-dev libc++abi-12-dev 
+      - run: sudo apt-get update && sudo apt-get install clang-12 gcc-10 g++-10 cmake make libsfml-dev libc++-12-dev libc++abi-12-dev
       - run: echo "Setup success"
       - run: cmake --version
       - run: ${{matrix.compiler.command}} ${{matrix.compiler.version-flags}}
-      - run: cmake . -DCMAKE_CXX_COMPILER="${{matrix.compiler.command}}" -DEXTRA_CXX_FLAGS="${{matrix.compiler.flags}} ${{matrix.sanitize.flags}}" ${{matrix.compiler.cmake-flags}} ${{matrix.sanitize.cmake-flags}} 
+      - run: cmake . -DCMAKE_CXX_COMPILER="${{matrix.compiler.command}}" -DEXTRA_CXX_FLAGS="${{matrix.compiler.flags}} ${{matrix.sanitize.flags}}" ${{matrix.compiler.cmake-flags}} ${{matrix.sanitize.cmake-flags}}
       - run: cmake --build . --verbose ${{matrix.compiler.cmake-build-flags}} ${{matrix.sanitize.cmake-build-flags}}
       - run: ${{matrix.sanitize.run-prefix}} ./bin/model_tests
  
