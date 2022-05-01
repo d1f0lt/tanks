@@ -2,7 +2,7 @@ name: egor_top
 on: [push]
 jobs:
   compile-run:
-    runs-on: ${{ matrix.compiler }}
+    runs-on: ${{ matrix.compiler.runs-on }}
     timeout-minutes: 3
     strategy:
       matrix:
@@ -10,12 +10,15 @@ jobs:
           - command: g++-10
             version-flags: --version
             flags:
+            runs-on: ubuntu-latest
           - command: clang++-12
             version-flags: --version
             flags: -stdlib=libstdc++
+            runs-on: ubuntu-latest
           - command: clang++-12
             version-flags: --version
             flags: -stdlib=libc++
+            runs-on: ubuntu-latest
         sanitize:
           - flags: -fsanitize=undefined -fno-sanitize-recover=all 
             run-prefix: valgrind --quiet --leak-check=full --error-exitcode=123
@@ -26,45 +29,13 @@ jobs:
           - flags:
             run-prefix:
             cmake-flags: -DCMAKE_BUILD_TYPE=Release
-        include:
-          - compiler:
-              command: cl
-              version-flags:
-              flags:
-              cmake-build-flags: --config Debug
-          - compiler:
-              command: cl
-              version-flags:
-              cmake-build-flags: --config Release
-          - compiler:
-              command: icc
-              version-flags: --version
-              flags: -diag-disable=2196
-                  # 2196: see https://github.com/doctest/doctest/pull/555#discussion_r773959095
-              cmake-flags: -DCMAKE_BUILD_TYPE=Debug
-          - compiler:
-              command: icc
-              version-flags: --version
-              flags: -diag-disable=2196
-              cmake-flags: -DCMAKE_BUILD_TYPE=Release
-          - compiler:
-              command: clang++
-              version-flags: --version
-              flags: -fsanitize=address -fno-sanitize-recover=all -fsanitize=undefined
-              cmake-flags: -DCMAKE_BUILD_TYPE=Debug
-          - compiler:
-          
-              command: clang++
-              version-flags: --version
-              flags:
-              cmake-flags: -DCMAKE_BUILD_TYPE=Release
-
     steps:
       - uses: actions/checkout@v3
-      - run: sudo apt-get update && sudo apt-get install clang++-12 gcc-10 g++-10 cmake make
+      - run: sudo apt-get update && sudo apt-get install clang-12 gcc-10 g++-10 cmake make libsfml-dev libc++-12-dev libc++abi-12-dev 
+      - run: echo "Setup success"
       - run: cmake --version
       - run: ${{matrix.compiler.command}} ${{matrix.compiler.version-flags}}
       - run: cmake . -DCMAKE_CXX_COMPILER="${{matrix.compiler.command}}" -DEXTRA_CXX_FLAGS="${{matrix.compiler.flags}} ${{matrix.sanitize.flags}}" ${{matrix.compiler.cmake-flags}} ${{matrix.sanitize.cmake-flags}} -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG=. -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE=.
       - run: cmake --build . --verbose ${{matrix.compiler.cmake-build-flags}} ${{matrix.sanitize.cmake-build-flags}}
-      - run: ${{matrix.sanitize.run-prefix}} ./bank-test
-      - run: ./run-test-server.py ${{matrix.sanitize.run-prefix}} ./bank-server
+      # - run: ${{matrix.sanitize.run-prefix}} ./bank-test
+ 
