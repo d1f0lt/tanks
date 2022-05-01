@@ -14,7 +14,7 @@ jobs:
           - command: clang++-12
             version-flags: --version
             flags: -stdlib=libstdc++
-            uns-on: ubuntu-latest
+            runs-on: ubuntu-latest
         #          - command: clang++-12
         #            version-flags: --version
         #            flags: -stdlib=libc++
