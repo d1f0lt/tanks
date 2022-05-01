@@ -85,17 +85,6 @@ void GameModel::loadLevel(int level) {
         {'}', EntityType::RIGHT_DOWN_CORNER}};
 
     std::ifstream file(currentLevel);
-    if (!file) {
-        for (int i = 0; i < 10; i++) {
-            file.open(currentLevel);
-            if (file) break;
-            std::this_thread::sleep_for(std::chrono::seconds(2));
-        }
-        if (!file) {
-            std::cerr << currentLevel << '\n';
-            std::cerr << "Can't open" << std::endl;
-        }
-    }
 
     assert(file.is_open() && "Unable to open map texture file");
     std::string str;
