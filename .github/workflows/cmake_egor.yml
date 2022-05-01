@@ -35,7 +35,7 @@ jobs:
       - run: echo "Setup success"
       - run: cmake --version
       - run: ${{matrix.compiler.command}} ${{matrix.compiler.version-flags}}
-      - run: cmake . -DCMAKE_CXX_COMPILER="${{matrix.compiler.command}} -O2" -DEXTRA_CXX_FLAGS="${{matrix.compiler.flags}} ${{matrix.sanitize.flags}}" ${{matrix.compiler.cmake-flags}} ${{matrix.sanitize.cmake-flags}}
+      - run: cmake . -DCMAKE_CXX_COMPILER="${{matrix.compiler.command}}" -DEXTRA_CXX_FLAGS="-O2 ${{matrix.compiler.flags}} ${{matrix.sanitize.flags}}" ${{matrix.compiler.cmake-flags}} ${{matrix.sanitize.cmake-flags}}
       - run: cmake --build . --verbose ${{matrix.compiler.cmake-build-flags}} ${{matrix.sanitize.cmake-build-flags}}
       - run: ${{matrix.sanitize.run-prefix}} ./bin/model_tests
  
