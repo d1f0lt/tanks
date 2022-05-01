@@ -98,15 +98,20 @@ public:
     void addMenuItem(std::unique_ptr<MenuItem> &&item);
 
     // animations
-    void flyOutFromLeft(sf::RenderWindow &window, const sf::Sprite &backgroundSprite);
+    void flyOutFromLeft(sf::RenderWindow &window,
+                        const sf::Sprite &backgroundSprite);
 
-    void flyAwayToLeft(sf::RenderWindow &window, const sf::Sprite &backgroundSprite);
+    void flyAwayToLeft(sf::RenderWindow &window,
+                       const sf::Sprite &backgroundSprite);
 
-    void flyOutFromRight(sf::RenderWindow &window, const sf::Sprite &backgroundSprite);
+    void flyOutFromRight(sf::RenderWindow &window,
+                         const sf::Sprite &backgroundSprite);
 
-    void flyAwayToRight(sf::RenderWindow &window, const sf::Sprite &backgroundSprite);
+    void flyAwayToRight(sf::RenderWindow &window,
+                        const sf::Sprite &backgroundSprite);
 
-    void flyAwayToRight(); // without animation, to set the initial position for first animation
+    void flyAwayToRight();  // without animation, to set the initial position
+                            // for first animation
 
 private:
     std::vector<std::unique_ptr<MenuItem>> items;
@@ -114,7 +119,10 @@ private:
     [[nodiscard]] const std::vector<std::unique_ptr<MenuItem>> &getItems()
         const;
 
-    void animation(sf::RenderWindow &window, const sf::Sprite &backgroundSprite, int stepsAmount, float speed_);
+    void animation(sf::RenderWindow &window,
+                   const sf::Sprite &backgroundSprite,
+                   int stepsAmount,
+                   float speed_);
 
     void moveItems(float speed_);
 
@@ -131,7 +139,7 @@ public:
 
     [[nodiscard]] virtual sf::Vector2<float> getPosition() const = 0;
 
-    [[nodiscard]] const sf::Vector2<float>& getStandardPosition() const;
+    [[nodiscard]] const sf::Vector2<float> &getStandardPosition() const;
 
     void setStandardPosition(const sf::Vector2<float> &newPosition);
 
@@ -146,8 +154,12 @@ public:
         const std::pair<float, float> &rectangleCoordinatesY);
 
     virtual ~MenuItem() = default;
+
 private:
-    sf::Vector2<float> standardCoordinates; // for animation, if the MenuItem is contained within another MenuItem, then the values may most likely be incorrect
+    sf::Vector2<float>
+        standardCoordinates;  // for animation, if the MenuItem is contained
+                              // within another MenuItem, then the values may
+                              // most likely be incorrect
 };
 
 struct MenuInscription final : MenuItem {

@@ -243,7 +243,10 @@ void Menu::moveItems(float distance) {
     }
 }
 
-void Menu::animation(sf::RenderWindow &window, const sf::Sprite &backgroundSprite, int stepsAmount, float speed_) {
+void Menu::animation(sf::RenderWindow &window,
+                     const sf::Sprite &backgroundSprite,
+                     int stepsAmount,
+                     float speed_) {
     for (int i = 0; i < stepsAmount; ++i) {
         moveItems(speed_);
         window.clear();
@@ -255,9 +258,11 @@ void Menu::animation(sf::RenderWindow &window, const sf::Sprite &backgroundSprit
 
 static constexpr int speed = 4;
 
-void Menu::flyOutFromLeft(sf::RenderWindow &window, const sf::Sprite &backgroundSprite) {
+void Menu::flyOutFromLeft(sf::RenderWindow &window,
+                          const sf::Sprite &backgroundSprite) {
     assert(!items.empty());
-    const auto stepsAmount = (items[0]->getStandardPosition().x - items[0]->getPosition().x) / speed;
+    const auto stepsAmount =
+        (items[0]->getStandardPosition().x - items[0]->getPosition().x) / speed;
     assert(stepsAmount == static_cast<int>(stepsAmount));
     assert(stepsAmount > 0);
     animation(window, backgroundSprite, static_cast<int>(stepsAmount), speed);
@@ -268,7 +273,8 @@ void Menu::flyOutFromLeft(sf::RenderWindow &window, const sf::Sprite &background
 #endif
 }
 
-void Menu::flyAwayToLeft(sf::RenderWindow &window, const sf::Sprite &backgroundSprite) {
+void Menu::flyAwayToLeft(sf::RenderWindow &window,
+                         const sf::Sprite &backgroundSprite) {
     assert(!items.empty());
     float maxPositionX = 0;
     for (const auto &item : items) {
@@ -280,9 +286,11 @@ void Menu::flyAwayToLeft(sf::RenderWindow &window, const sf::Sprite &backgroundS
     animation(window, backgroundSprite, stepsAmount, -speed);
 }
 
-void Menu::flyOutFromRight(sf::RenderWindow &window, const sf::Sprite &backgroundSprite) {
+void Menu::flyOutFromRight(sf::RenderWindow &window,
+                           const sf::Sprite &backgroundSprite) {
     assert(!items.empty());
-    const auto stepsAmount = (items[0]->getPosition().x - items[0]->getStandardPosition().x)/speed;
+    const auto stepsAmount =
+        (items[0]->getPosition().x - items[0]->getStandardPosition().x) / speed;
     assert(stepsAmount == static_cast<int>(stepsAmount));
     assert(stepsAmount > 0);
     animation(window, backgroundSprite, static_cast<int>(stepsAmount), -speed);
@@ -293,7 +301,8 @@ void Menu::flyOutFromRight(sf::RenderWindow &window, const sf::Sprite &backgroun
 #endif
 }
 
-void Menu::flyAwayToRight(sf::RenderWindow &window, const sf::Sprite &backgroundSprite) {
+void Menu::flyAwayToRight(sf::RenderWindow &window,
+                          const sf::Sprite &backgroundSprite) {
     assert(!items.empty());
     float minPositionX = WINDOW_WIDTH;
     for (const auto &item : items) {
@@ -301,7 +310,8 @@ void Menu::flyAwayToRight(sf::RenderWindow &window, const sf::Sprite &background
         minPositionX = (pos < minPositionX ? pos : minPositionX);
     }
     assert(minPositionX < WINDOW_WIDTH && minPositionX >= 0);
-    const int stepsAmount = static_cast<int>(std::ceil((WINDOW_WIDTH - minPositionX) / speed));
+    const int stepsAmount =
+        static_cast<int>(std::ceil((WINDOW_WIDTH - minPositionX) / speed));
     animation(window, backgroundSprite, stepsAmount, speed);
 }
 
@@ -313,11 +323,13 @@ void Menu::flyAwayToRight() {
         minPositionX = (pos < minPositionX ? pos : minPositionX);
     }
     assert(minPositionX < WINDOW_WIDTH && minPositionX >= 0);
-    const int stepsAmount = static_cast<int>(std::ceil((WINDOW_WIDTH - minPositionX) / speed));
+    const int stepsAmount =
+        static_cast<int>(std::ceil((WINDOW_WIDTH - minPositionX) / speed));
     moveItems(static_cast<float>(stepsAmount * speed));
 }
 
-MenuItem::MenuItem(const sf::Vector2<float> &coordinates) : standardCoordinates(coordinates) {
+MenuItem::MenuItem(const sf::Vector2<float> &coordinates)
+    : standardCoordinates(coordinates) {
 }
 
 const sf::Vector2<float> &MenuItem::getStandardPosition() const {
@@ -329,7 +341,8 @@ void MenuItem::setStandardPosition(const sf::Vector2<float> &newPosition) {
 }
 
 void MenuItem::move(const sf::Vector2<float> &distance) {
-    setPosition(sf::Vector2<float>(getPosition().x + distance.x, getPosition().y + distance.y));
+    setPosition(sf::Vector2<float>(getPosition().x + distance.x,
+                                   getPosition().y + distance.y));
 }
 
 void MenuItem::centralizeByHeight(
@@ -361,7 +374,8 @@ void MenuItem::centralizeByWidth(
 }
 
 MenuInscription::MenuInscription(const InscriptionInfo &parameters,
-                                 const sf::Vector2<float> &coordinates) : MenuItem(coordinates) {
+                                 const sf::Vector2<float> &coordinates)
+    : MenuItem(coordinates) {
     font.loadFromFile("../fonts/base_bold.ttf");
     text.setFillColor(parameters.textColor);
     text.setFont(font);
@@ -395,7 +409,10 @@ std::string MenuInscription::getContent() const {
 MenuButton::MenuButton(std::unique_ptr<MenuItem> &&content_,
                        const sf::Vector2<float> &coordinates,
                        ButtonWithType info_)
-    : MenuItem(coordinates), content(std::move(content_)), info(info_), rectangle(info_.getSize()) {
+    : MenuItem(coordinates),
+      content(std::move(content_)),
+      info(info_),
+      rectangle(info_.getSize()) {
     rectangle.setFillColor(info.getStandardColor());
     setPosition(coordinates);  // NOLINT
 }
@@ -432,7 +449,8 @@ void MenuButton::setPosition(sf::Vector2<float> newPosition) {
 }
 
 MenuPicture::MenuPicture(const std::string &filename,
-                         const sf::Vector2<float> &coordinates) : MenuItem(coordinates) {
+                         const sf::Vector2<float> &coordinates)
+    : MenuItem(coordinates) {
     image.loadFromFile(filename);
     initWithImage(coordinates);
 }
