@@ -45,8 +45,11 @@ Menu initMenu() {
 void new_game_menu(sf::RenderWindow &window,
                    const sf::Sprite &backgroundSprite) {
     const static std::string imagesPath = "../images/menu/";
-    static Menu menu(initMenu());
+    Menu menu(initMenu());
     menu.addIconToLeftUpCorner(imagesPath + "return.png", ButtonType::RETURN);
+
+    menu.flyAwayToRight();
+    menu.flyOutFromRight(window, backgroundSprite);
 
     while (window.isOpen()) {
         // catch event
@@ -60,9 +63,11 @@ void new_game_menu(sf::RenderWindow &window,
             res != std::nullopt) {
             switch (res.value()->getType()) {
                 case ButtonType::SINGLE_PLAYER: {
+                    menu.flyAwayToLeft(window, backgroundSprite);
                     auto ans = levels_menu(window, backgroundSprite);
                     switch (ans) {
                         case ButtonType::RETURN:
+                            menu.flyOutFromLeft(window, backgroundSprite);
                             continue;
                         case ButtonType::EXIT:
                             return;
@@ -73,6 +78,7 @@ void new_game_menu(sf::RenderWindow &window,
                 case ButtonType::MULTIPLAYER:
 
                 case ButtonType::RETURN:
+                    menu.flyAwayToRight(window, backgroundSprite);
                     return;
 
                 default:

@@ -54,21 +54,6 @@ Menu initMenu() {
 
     return Menu(menuWidth, title, inscriptions, buttons);
 }
-
-void activity(ButtonType type,
-              sf::RenderWindow &window,
-              const sf::Sprite &background) {  // TODO rename
-    switch (type) {
-        case ButtonType::NEW_GAME: {
-            new_game_menu(window, background);
-            break;
-        }
-        case ButtonType::EXIT:
-            window.close();
-        default:
-            break;
-    }
-}
 }  // namespace
 
 void main_menu(sf::RenderWindow &window) {
@@ -89,7 +74,18 @@ void main_menu(sf::RenderWindow &window) {
         if (const auto res =
                 Tanks::MenuController::control(menu, window, event);
             res != std::nullopt) {
-            activity(res.value()->getType(), window, backgroundSprite);
+            switch (res.value()->getType()) {
+                case ButtonType::NEW_GAME: {
+                    menu.flyAwayToLeft(window, backgroundSprite);
+                    new_game_menu(window, backgroundSprite);
+                    menu.flyOutFromLeft(window, backgroundSprite);
+                    break;
+                }
+                case ButtonType::EXIT:
+                    window.close();
+                default:
+                    break;
+            }
         }
 
         // redraw

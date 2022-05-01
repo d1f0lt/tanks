@@ -97,24 +97,47 @@ public:
 
     void addMenuItem(std::unique_ptr<MenuItem> &&item);
 
+    // animations
+    void flyOutFromLeft(sf::RenderWindow &window, const sf::Sprite &backgroundSprite);
+
+    void flyAwayToLeft(sf::RenderWindow &window, const sf::Sprite &backgroundSprite);
+
+    void flyOutFromRight(sf::RenderWindow &window, const sf::Sprite &backgroundSprite);
+
+    void flyAwayToRight(sf::RenderWindow &window, const sf::Sprite &backgroundSprite);
+
+    void flyAwayToRight(); // without animation, to set the initial position for first animation
+
 private:
     std::vector<std::unique_ptr<MenuItem>> items;
 
     [[nodiscard]] const std::vector<std::unique_ptr<MenuItem>> &getItems()
         const;
 
+    void animation(sf::RenderWindow &window, const sf::Sprite &backgroundSprite, int stepsAmount, float speed_);
+
+    void moveItems(float speed_);
+
     friend struct Tanks::MenuController;
 };
 
 struct MenuItem {
 public:
+    explicit MenuItem(const sf::Vector2<float> &coordinates);
+
     virtual void draw(sf::RenderWindow &window) const = 0;
 
     [[nodiscard]] virtual sf::Vector2<float> getSize() const = 0;
 
     [[nodiscard]] virtual sf::Vector2<float> getPosition() const = 0;
 
+    [[nodiscard]] const sf::Vector2<float>& getStandardPosition() const;
+
+    void setStandardPosition(const sf::Vector2<float> &newPosition);
+
     virtual void setPosition(sf::Vector2<float> newPosition) = 0;
+
+    void move(const sf::Vector2<float> &distance);
 
     void centralizeByWidth(
         const std::pair<float, float> &rectangleCoordinatesX);
@@ -123,6 +146,8 @@ public:
         const std::pair<float, float> &rectangleCoordinatesY);
 
     virtual ~MenuItem() = default;
+private:
+    sf::Vector2<float> standardCoordinates; // for animation, if the MenuItem is contained within another MenuItem, then the values may most likely be incorrect
 };
 
 struct MenuInscription final : MenuItem {

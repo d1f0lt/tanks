@@ -5,6 +5,8 @@
 #include <unordered_map>
 #include <vector>
 
+//#define TEST
+
 namespace Tanks::Menu {
 
 const static int textMargin = 10;
@@ -85,6 +87,7 @@ Menu::Menu(size_t menuWidth,
 
     title->setPosition(sf::Vector2<float>{0, static_cast<float>(marginTop)});
     title->centralizeByWidth({marginLeft, marginLeft + menuWidth});
+    title->setStandardPosition(title->getPosition());
 
     currentCoordinates.y = static_cast<float>(marginTop) +
                            static_cast<float>(marginFromTitle) +
@@ -148,6 +151,7 @@ Menu::Menu(size_t menuWidth,
 
     title->setPosition(sf::Vector2<float>(0, static_cast<float>(marginTop)));
     title->centralizeByWidth({marginLeft, marginLeft + menuWidth});
+    title->setStandardPosition(title->getPosition());
 
     currentCoordinates.y = static_cast<float>(marginTop) + title->getSize().y +
                            static_cast<float>(marginFromTitle);
@@ -233,6 +237,101 @@ const std::vector<std::unique_ptr<MenuItem>> &Menu::getItems() const {
     return items;
 }
 
+void Menu::moveItems(float distance) {
+    for (auto &item : items) {
+        item->move(sf::Vector2<float>(distance, 0));
+    }
+}
+
+void Menu::animation(sf::RenderWindow &window, const sf::Sprite &backgroundSprite, int stepsAmount, float speed_) {
+    for (int i = 0; i < stepsAmount; ++i) {
+        moveItems(speed_);
+        window.clear();
+        window.draw(backgroundSprite);
+        this->draw(window);
+        window.display();
+    }
+}
+
+static constexpr int speed = 4;
+
+void Menu::flyOutFromLeft(sf::RenderWindow &window, const sf::Sprite &backgroundSprite) {
+    assert(!items.empty());
+    const auto stepsAmount = (items[0]->getStandardPosition().x - items[0]->getPosition().x) / speed;
+    assert(stepsAmount == static_cast<int>(stepsAmount));
+    assert(stepsAmount > 0);
+    animation(window, backgroundSprite, static_cast<int>(stepsAmount), speed);
+#ifdef TEST
+    for (const auto &item : items) {
+        assert(item->getPosition() == item->getStandardPosition());
+    }
+#endif
+}
+
+void Menu::flyAwayToLeft(sf::RenderWindow &window, const sf::Sprite &backgroundSprite) {
+    assert(!items.empty());
+    float maxPositionX = 0;
+    for (const auto &item : items) {
+        auto pos = item->getPosition().x + item->getSize().x;
+        maxPositionX = (pos > maxPositionX ? pos : maxPositionX);
+    }
+    assert(maxPositionX > 0 && maxPositionX < WINDOW_WIDTH);
+    const int stepsAmount = static_cast<int>(std::ceil(maxPositionX / speed));
+    animation(window, backgroundSprite, stepsAmount, -speed);
+}
+
+void Menu::flyOutFromRight(sf::RenderWindow &window, const sf::Sprite &backgroundSprite) {
+    assert(!items.empty());
+    const auto stepsAmount = (items[0]->getPosition().x - items[0]->getStandardPosition().x)/speed;
+    assert(stepsAmount == static_cast<int>(stepsAmount));
+    assert(stepsAmount > 0);
+    animation(window, backgroundSprite, static_cast<int>(stepsAmount), -speed);
+#ifdef TEST
+    for (const auto &item : items) {
+        assert(item->getPosition() == item->getStandardPosition());
+    }
+#endif
+}
+
+void Menu::flyAwayToRight(sf::RenderWindow &window, const sf::Sprite &backgroundSprite) {
+    assert(!items.empty());
+    float minPositionX = WINDOW_WIDTH;
+    for (const auto &item : items) {
+        auto pos = item->getPosition().x;
+        minPositionX = (pos < minPositionX ? pos : minPositionX);
+    }
+    assert(minPositionX < WINDOW_WIDTH && minPositionX >= 0);
+    const int stepsAmount = static_cast<int>(std::ceil((WINDOW_WIDTH - minPositionX) / speed));
+    animation(window, backgroundSprite, stepsAmount, speed);
+}
+
+void Menu::flyAwayToRight() {
+    assert(!items.empty());
+    float minPositionX = WINDOW_WIDTH;
+    for (const auto &item : items) {
+        auto pos = item->getPosition().x;
+        minPositionX = (pos < minPositionX ? pos : minPositionX);
+    }
+    assert(minPositionX < WINDOW_WIDTH && minPositionX >= 0);
+    const int stepsAmount = static_cast<int>(std::ceil((WINDOW_WIDTH - minPositionX) / speed));
+    moveItems(static_cast<float>(stepsAmount * speed));
+}
+
+MenuItem::MenuItem(const sf::Vector2<float> &coordinates) : standardCoordinates(coordinates) {
+}
+
+const sf::Vector2<float> &MenuItem::getStandardPosition() const {
+    return standardCoordinates;
+}
+
+void MenuItem::setStandardPosition(const sf::Vector2<float> &newPosition) {
+    standardCoordinates = newPosition;
+}
+
+void MenuItem::move(const sf::Vector2<float> &distance) {
+    setPosition(sf::Vector2<float>(getPosition().x + distance.x, getPosition().y + distance.y));
+}
+
 void MenuItem::centralizeByHeight(
     const std::pair<float, float> &rectangleCoordinatesY) {
     assert(rectangleCoordinatesY.first < rectangleCoordinatesY.second);
@@ -262,7 +361,7 @@ void MenuItem::centralizeByWidth(
 }
 
 MenuInscription::MenuInscription(const InscriptionInfo &parameters,
-                                 const sf::Vector2<float> &coordinates) {
+                                 const sf::Vector2<float> &coordinates) : MenuItem(coordinates) {
     font.loadFromFile("../fonts/base_bold.ttf");
     text.setFillColor(parameters.textColor);
     text.setFont(font);
@@ -296,7 +395,7 @@ std::string MenuInscription::getContent() const {
 MenuButton::MenuButton(std::unique_ptr<MenuItem> &&content_,
                        const sf::Vector2<float> &coordinates,
                        ButtonWithType info_)
-    : content(std::move(content_)), info(info_), rectangle(info_.getSize()) {
+    : MenuItem(coordinates), content(std::move(content_)), info(info_), rectangle(info_.getSize()) {
     rectangle.setFillColor(info.getStandardColor());
     setPosition(coordinates);  // NOLINT
 }
@@ -333,14 +432,14 @@ void MenuButton::setPosition(sf::Vector2<float> newPosition) {
 }
 
 MenuPicture::MenuPicture(const std::string &filename,
-                         const sf::Vector2<float> &coordinates) {
+                         const sf::Vector2<float> &coordinates) : MenuItem(coordinates) {
     image.loadFromFile(filename);
     initWithImage(coordinates);
 }
 
 MenuPicture::MenuPicture(const sf::Image &image_,
                          const sf::Vector2<float> &coordinates)
-    : image(image_) {
+    : MenuItem(coordinates), image(image_) {
     initWithImage(coordinates);
 }
 

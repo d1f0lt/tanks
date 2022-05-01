@@ -42,8 +42,11 @@ Menu initMenu(const std::string &imagesPath) {
 ButtonType levels_menu(sf::RenderWindow &window,
                        const sf::Sprite &backgroundSprite) {
     const static std::string imagesPath = "../images/menu/";
-    static Menu menu(initMenu(imagesPath + "levels/"));
+    Menu menu(initMenu(imagesPath + "levels/"));
     menu.addIconToLeftUpCorner(imagesPath + "return.png", ButtonType::RETURN);
+
+    menu.flyAwayToRight();
+    menu.flyOutFromRight(window, backgroundSprite);
 
     while (window.isOpen()) {
         // catch event
@@ -76,6 +79,7 @@ ButtonType levels_menu(sf::RenderWindow &window,
                     }
                 }
                 case ButtonType::RETURN:
+                    menu.flyAwayToRight(window, backgroundSprite);
                     return ButtonType::RETURN;
                 default:
                     assert(false);
