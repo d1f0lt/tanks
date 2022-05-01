@@ -85,7 +85,7 @@ void GameModel::loadLevel(int level) {
 
     std::ifstream file(currentLevel);
 
-    assert(file.is_open() == true);
+    assert(file.is_open() && "Unable to open map texture file");
     std::string str;
 
     map = GameMap();
