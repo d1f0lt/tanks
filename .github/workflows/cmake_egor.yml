@@ -20,9 +20,9 @@ jobs:
         #            flags: -stdlib=libc++
         #            runs-on: ubuntu-latest
         sanitize:
-          - flags: -fsanitize=undefined -fno-sanitize-recover=all
-            run-prefix: valgrind --quiet --leak-check=full --error-exitcode=123
-            cmake-flags: -DCMAKE_BUILD_TYPE=Debug
+          #          - flags: -fsanitize=undefined -fno-sanitize-recover=all
+          #            run-prefix: valgrind --quiet --leak-check=full --error-exitcode=123
+          #            cmake-flags: -DCMAKE_BUILD_TYPE=Debug
           - flags: -fsanitize=undefined -fno-sanitize-recover=all -fsanitize=address
             run-prefix:
             cmake-flags: -DCMAKE_BUILD_TYPE=Debug
