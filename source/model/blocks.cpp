@@ -2,8 +2,8 @@
 #include "constants.h"
 
 namespace Tanks::model {
-Block::Block(int col, int row, EntityType entityType)
-    : Entity(col, row, TILE_SIZE, TILE_SIZE, entityType) {
+Block::Block(int left, int right, EntityType entityType)
+    : Entity(left, right, TILE_SIZE, TILE_SIZE, entityType) {
 }
 
 }  // namespace Tanks::model

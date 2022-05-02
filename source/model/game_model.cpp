@@ -10,17 +10,28 @@ Entity &GameModel::getEntityByCoords(int col, int row) {
 }
 
 void GameModel::nextTick() {
-    while (!que.empty()) {
-        que.front()->execute(*this);
-        que.pop();
+    for (auto *entity :
+         groupedEntities
+             .snapshotAll()[static_cast<unsigned>(EntityType::BOT_TANK)]) {
+        auto *tank = dynamic_cast<BotTank *>(entity);
+        assert(tank != nullptr);
+        handlers[tank]->move(tank->getDirection());
     }
 
-    for (auto &bot_tank :
+    for (auto *entity :
          groupedEntities
-             .getAll()[static_cast<unsigned>(EntityType::BOT_TANK)]) {
-        ((MovableEntity &)bot_tank)
-            .move(((MovableEntity &)bot_tank)
-                      .getDirection());  // TODO normal casts
+             .snapshotAll()[static_cast<unsigned>(EntityType::BULLET)]) {
+        auto *bullet = dynamic_cast<Projectile *>(entity);
+        assert(bullet != nullptr);
+        handlers[bullet]->move(bullet->getDirection());
+
+        for (auto &row : bullet->snapshotBackground()) {
+            for (auto *ent : row) {
+                if (ent->isDestroyable()) {
+                    removeEntity(*const_cast<Entity *>(ent));
+                }
+            }
+        }
     }
 }
 
@@ -31,25 +42,34 @@ Entity &GameModel::addEntity(std::unique_ptr<Entity> entity) {
 }
 
 void GameModel::removeEntity(Entity &entity) {
+    if (auto *foreground = dynamic_cast<ForegroundEntity *>(&entity)) {
+        handlers[foreground]->restoreBackground();
+    }
+
+    handlers.erase(&entity);
     map.erase(entity);
     groupedEntities.erase(entity);
 }
 
-PlayableTank &GameModel::spawnPlayableTank(int left, int top) {
-    return static_cast<PlayableTank &>(addEntity(
-        std::make_unique<PlayableTank>(left, top, Direction::UP, map, *this)));
-}
+PlayableTank &GameModel::spawnPlayableTank(const int left, const int top) {
+    assert(left + TANK_SIZE < map.getWidth());
+    assert(top + TANK_SIZE < map.getHeight());
 
-/*
-GameModel::GameModel(const std::string &filename) {
-    std::ifstream is(filename);
-}*/
+    for (int row = top; row < top + TANK_SIZE; row++) {
+        for (int col = left; col < left + TANK_SIZE; col++) {
+            assert(getEntityByCoords(col, row).isTankPassable());
+        }
+    }
+
+    return static_cast<PlayableTank &>(addEntity(
+        std::make_unique<PlayableTank>(left, top, Direction::UP, *this)));
+}
 
 void GameModel::loadLevel(int level) {
     const std::string currentLevel =
         "../levels/level" + std::to_string(level) + ".csv";
 
-    static std::unordered_map<char, EntityType> charToEnum = {
+    const static std::unordered_map<char, EntityType> CHAR_TO_TYPE = {
         {'=', EntityType::HORIZONTAL_BORDER},
         {'|', EntityType::VERTICAL_BORDER},
         {'1', EntityType::BRICK},
@@ -74,37 +94,19 @@ void GameModel::loadLevel(int level) {
         for (int col = 0, realCol = 0; col < MAP_WIDTH * 2 - 1;
              col += 2, realCol++) {  // skipping delimiter
 
-            auto real_entity = std::make_unique<Block>(
-                realCol * TILE_SIZE, row * TILE_SIZE, charToEnum[str[col]]);
-
-            addEntity(std::move(real_entity));
+            addEntity(std::make_unique<Block>(realCol * TILE_SIZE,
+                                              row * TILE_SIZE,
+                                              CHAR_TO_TYPE.at(str[col])));
         }
     }
 }
 
-void GameModel::moveEntity(MovableEntity &entity, Direction direction) {
-    // TODO lock model
-    entity.setDirection(direction);
-    entity.restoreBackground();
-    switch (direction) {
-        case Direction::UP:
-            entity.setTop(entity.getTop() - 1);
-            break;
-        case Direction::LEFT:
-            entity.setLeft(entity.getLeft() - 1);
-            break;
-        case Direction::DOWN:
-            entity.setTop(entity.getTop() + 1);
-            break;
-        case Direction::RIGHT:
-            entity.setLeft(entity.getLeft() + 1);
-            break;
-    }
-    entity.setBackground();
+int GameModel::getWidth() const {
+    return map.getWidth();
 }
 
-void GameModel::spawnBullet(int left, int top, Direction dir) {
-    auto a = std::make_unique<Projectile>(left, top, dir, map);
+int GameModel::getHeight() const {
+    return map.getHeight();
 }
 
 }  // namespace Tanks::model

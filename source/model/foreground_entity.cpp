@@ -6,30 +6,28 @@ ForegroundEntity::ForegroundEntity(int left,
                                    int width,
                                    int height,
                                    EntityType type_,
-                                   GameMap &map_)
+                                   std::unique_ptr<BasicHandler> handler_)
     : Entity(left, top, width, height, type_),
-      map(map_),
+      handler(std::move(handler_)),
       background(height, std::vector<const Entity *>(width, nullptr)) {
     setBackground();
 }
 
+std::vector<const Entity *> ForegroundEntity::look(Direction direction) const {
+    return handler->look(direction);
+}
+
 void ForegroundEntity::restoreBackground() {
-    for (int y = 0; y < +getHeight(); y++) {
-        for (int x = 0; x < +getWidth(); x++) {
-            map.insert(const_cast<Entity &>(*background[y][x]));
-        }
-    }
+    handler->restoreBackground();
 }
 
 void ForegroundEntity::setBackground() {
-    int y0 = getTop();
-    int x0 = getLeft();
-    for (int y = getTop(); y < getTop() + getHeight(); y++) {
-        for (int x = getLeft(); x < getLeft() + getWidth(); x++) {
-            background[y - y0][x - x0] = &map.getEntityByCoords(x, y);
-        }
-    }
-    map.insert(*this);
+    handler->setBackground();
+}
+
+std::vector<std::vector<const Entity *>> ForegroundEntity::snapshotBackground()
+    const {
+    return background;
 }
 
 }  // namespace Tanks::model

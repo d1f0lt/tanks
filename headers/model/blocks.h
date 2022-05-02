@@ -7,7 +7,7 @@ namespace Tanks::model {
 
 class Block : public Entity {
 public:
-    explicit Block(int col, int row, EntityType entityType);
+    explicit Block(int left, int right, EntityType entityType);
 
 private:
 };

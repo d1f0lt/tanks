@@ -9,7 +9,7 @@ namespace {
 
 std::string numberWithLeftZeros(int num, int numberLength) {
     std::string numStr(std::to_string(num));
-    assert(numStr.size() <= numberLength);
+    assert(numStr.size() <= static_cast<size_t>(numberLength));
     return std::string("0", numberLength - numStr.size()) + numStr;
 }
 }  // namespace

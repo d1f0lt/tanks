@@ -3,18 +3,20 @@
 
 #include <queue>
 #include "entity_holder.h"
-#include "model/event.h"
 #include "model/game_map.h"
 #include "model/grouped_entities.h"
+#include "model/handler.h"
 #include "model/playable-tank.h"
 
 namespace Tanks::model {
 class GameModel {
-    friend TankActionHandler;
+    friend BasicHandler;
+    friend ForegroundHandler;
+    friend MovableHandler;
+    friend TankHandler;
 
 public:
     explicit GameModel() = default;
-    //    explicit GameModel(const std::string &filename);
 
     [[nodiscard]] Entity &getEntityByCoords(int col, int row);
 
@@ -24,18 +26,17 @@ public:
 
     void loadLevel(int level);
 
+    [[nodiscard]] int getHeight() const;
+    [[nodiscard]] int getWidth() const;
+
 private:
     Entity &addEntity(std::unique_ptr<Entity> entity);
     void removeEntity(Entity &entity);
 
-    void moveEntity(MovableEntity &entity, Direction direction);
-
-    void spawnBullet(int left, int top, Direction dir);
-
     GameMap map;
     GroupedEntities groupedEntities;
     EntityHolder entityHolder;
-    std::queue<std::unique_ptr<Event>> que{};  // TODO threadsafe
+    std::unordered_map<Entity *, BasicHandler *> handlers;
 };
 }  // namespace Tanks::model
 

@@ -3,6 +3,7 @@
 
 #include "menu.h"
 #include "model/playable-tank.h"
+#include <optional>
 
 namespace Tanks {
 

@@ -52,7 +52,7 @@ Menu::Menu(const std::string &imagesPath,
     // Buttons
     currentCoordinates.y += static_cast<float>(
         marginFromTitle + items[0]->inscriptionImage.getSize().y);
-    for (int i = 0; i < buttonsCount; ++i) {
+    for (size_t i = 0; i < buttonsCount; ++i) {
         items.emplace_back(std::make_unique<MenuButton>(
             imagesPath + convertButtonTypeToString(buttonTypes[i]) + ".png",
             currentCoordinates,

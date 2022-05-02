@@ -11,11 +11,10 @@ public:
     void insert(Entity &entity);
     void erase(Entity &entity);
 
-    [[nodiscard]] const std::vector<std::vector<const Entity *>> &getAll()
-        const;
+    [[nodiscard]] const std::vector<std::vector<Entity *>> &snapshotAll() const;
 
 private:
-    std::vector<std::vector<const Entity *>> entities;
+    std::vector<std::vector<Entity *>> entities;
 };
 
 }  // namespace Tanks::model
