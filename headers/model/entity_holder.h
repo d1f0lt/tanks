@@ -2,9 +2,9 @@
 #define TANKS_ENTITY_HOLDER_H
 
 #include <map>
+#include <memory>
 #include <vector>
 #include "entity.h"
-#include "memory"
 
 namespace Tanks::model {
 class EntityHolder {
