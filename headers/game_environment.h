@@ -41,6 +41,6 @@ private:
     void addPauseButton(const std::string &path);
 };
 
-}
+}  // namespace Tanks
 
 #endif

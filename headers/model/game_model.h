@@ -2,6 +2,7 @@
 #define TANKS_GAME_MODEL_H
 
 #include <queue>
+#include <unordered_map>
 #include "entity_holder.h"
 #include "model/game_map.h"
 #include "model/grouped_entities.h"

@@ -2,6 +2,7 @@
 #define TANKS_ENTITY_HOLDER_H
 
 #include <map>
+#include <vector>
 #include "entity.h"
 #include "memory"
 
