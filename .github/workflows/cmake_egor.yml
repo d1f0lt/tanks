@@ -12,30 +12,34 @@ jobs:
             flags:
             runs-on: ubuntu-latest
             packages: g++-10 gcc-10
+            target:
           - command: clang++-12
             version-flags: --version
             flags: -stdlib=libstdc++
             packages: clang-12
             runs-on: ubuntu-latest
-          # - command: clang++-12
-            # version-flags: --version
-            # flags: -stdlib=libc++
-            # runs-on: ubuntu-latest
-            # packages: 
+            target:
+          - command: clang++-12
+            version-flags: --version
+            flags: -stdlib=libc++
+            runs-on: ubuntu-latest
+            packages: clang-12 libc++-12-dev libc++abi-12-dev 
+            target: --target model_tests
         sanitize:
           - flags: -fsanitize=undefined -fno-sanitize-recover=all -fno-sanitize-recover=all
             run-prefix: valgrind --quiet --leak-check=full --error-exitcode=123
             cmake-flags: -DCMAKE_BUILD_TYPE=Debug
-            packages:
+            packages: valgrind
           - flags: -fsanitize=undefined -fsanitize=address
             run-prefix:
             cmake-flags: -DCMAKE_BUILD_TYPE=Debug
-            packages: valgrind
+            packages: 
           - flags:
             run-prefix:
             cmake-flags: -DCMAKE_BUILD_TYPE=Release
+            packages:
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: sudo apt-get update && sudo apt-get install cmake make libsfml-dev ninja-build ${{matrix.compiler.packages}} ${{matrix.sanitize.packages}}
       - run: cmake --version
       - run: ${{matrix.compiler.command}} ${{matrix.compiler.version-flags}}
