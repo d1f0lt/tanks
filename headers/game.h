@@ -3,6 +3,7 @@
 
 #include <optional>
 #include <SFML/Graphics.hpp>
+#include <optional>
 #include "menu.h"
 
 namespace Tanks {

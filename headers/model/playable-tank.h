@@ -3,24 +3,21 @@
 
 #include <memory>
 #include <queue>
-#include "model/tank-action-handler.h"
 #include "model/tank.h"
 
 namespace Tanks::model {
 class PlayableTank : public Tank {
 public:
-    PlayableTank(int left,
-                 int top,
-                 Direction dir,
-                 GameMap &map_,
-                 GameModel &model_);
-    // TODO: ShootHandler or other solution for shooting
+    explicit PlayableTank(int left_,
+                          int top_,
+                          Direction direction_,
+                          std::unique_ptr<BasicHandler> handler_);
 
-    // hiding is feature, if upcast to MovableObject move will move
-    void move(Direction dir);
+    explicit PlayableTank(int left, int top, Direction dir, GameModel &model);
 
-private:
-    TankActionHandler actionHandler;
+    using MovableEntity::move;
+    using MovableEntity::setDirection;
+    using Tank::shoot;
 };
 }  // namespace Tanks::model
 #endif  // TANKS_PLAYABLE_TANK_H

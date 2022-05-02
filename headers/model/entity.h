@@ -25,7 +25,16 @@ enum class EntityType {
 
 class Entity {
 public:
-    explicit Entity(int left, int top, int height, int width, EntityType type_);
+    explicit Entity(int left_,
+                    int top_,
+                    int height_,
+                    int width_,
+                    EntityType type_);
+
+    Entity(const Entity &) = delete;
+    Entity(Entity &&) = delete;
+    Entity &operator=(const Entity &) = delete;
+    Entity &operator=(Entity &&) = delete;
 
     virtual ~Entity() = default;
 
@@ -33,6 +42,7 @@ public:
 
     [[nodiscard]] int getLeft() const;
     [[nodiscard]] int getTop() const;
+
     [[nodiscard]] int getWidth() const;
     [[nodiscard]] int getHeight() const;
 
@@ -51,7 +61,7 @@ private:
     [[nodiscard]] sf::Rect<int> getRect() const;
 
     EntityType type;
-    sf::Rect<int> rect = {-1, -1, 0, 0};
+    sf::Rect<int> rect = {-1, -1, -1, -1};
 };
 }  // namespace Tanks::model
 

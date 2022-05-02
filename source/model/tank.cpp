@@ -1,73 +1,63 @@
 #include "model/tank.h"
 #include <cassert>
 #include <queue>
+#include "constants.h"
 #include "model/playable-tank.h"
 
 namespace Tanks::model {
-Tank::Tank(int left, int top, EntityType type_, Direction dir, GameMap &map_)
-    : MovableEntity(left, top, TANK_SIZE, TANK_SIZE, type_, dir, map_) {
+Tank::Tank(int left_,
+           int top_,
+           EntityType type_,
+           Direction direction_,
+           std::unique_ptr<BasicHandler> handler_)
+    : MovableEntity(left_,
+                    top_,
+                    TANK_SIZE,
+                    TANK_SIZE,
+                    type_,
+                    direction_,
+                    TANK_SPEED,
+                    std::move(handler_)) {
 }
 
-PlayableTank::PlayableTank(int left,
-                           int top,
-                           Direction dir,
-                           GameMap &map_,
-                           GameModel &model_)
-    : Tank(left, top, EntityType::PLAYABLE_TANK, dir, map_),
-      actionHandler(*this, model_) {
-}
-
-// hiding is a feature
-void PlayableTank::move(Direction dir) {
-    actionHandler.move(dir);
-}
-
-std::vector<const Entity *> Tank::look(Direction dir) {
-    if (dir == Direction::DOWN) {
-        if (getTop() + getHeight() == map.getHeight() - 1) {
-            return {};
-        }
-
-        std::vector<const Entity *> res(getWidth());
-        for (int col = getLeft(); col < getLeft() + getWidth(); col++) {
-            res[col - getLeft()] =
-                &map.getEntityByCoords(col, getTop() + getHeight());
-        }
-        return res;
-    } else if (dir == Direction::UP) {
-        if (getTop() == 0) {
-            return {};
-        }
-
-        std::vector<const Entity *> res(getWidth());
-        for (int col = getLeft(); col < getLeft() + getWidth(); col++) {
-            res[col - getLeft()] = &map.getEntityByCoords(col, getTop() - 1);
-        }
-        return res;
-    } else if (dir == Direction::RIGHT) {
-        if (getLeft() + getWidth() == map.getWidth() - 1) {
-            return {};
-        }
-        std::vector<const Entity *> res(getHeight());
-        for (int row = getTop(); row < getTop() + getHeight(); row++) {
-            res[row - getTop()] =
-                &map.getEntityByCoords(getLeft() + getWidth(), row);
-        }
-        return res;
-    } else {
-        assert(dir == Direction::LEFT);
-        std::vector<const Entity *> res(getHeight());
-        if (getLeft() == 0) {
-            return {};
-        }
-        for (int row = getTop(); row < getTop() + getHeight(); row++) {
-            res[row - getTop()] = &map.getEntityByCoords(getLeft() - 1, row);
-        }
-        return res;
-    }
+Tank::Tank(int left_,
+           int top_,
+           EntityType type_,
+           Direction direction_,
+           GameModel &model_)
+    : MovableEntity(left_,
+                    top_,
+                    TANK_SIZE,
+                    TANK_SIZE,
+                    type_,
+                    direction_,
+                    TANK_SPEED,
+                    std::make_unique<TankHandler>(model_, *this)) {
 }
 
 void Tank::shoot() {
-    // TODO
+    handler->shoot();
+}
+
+PlayableTank::PlayableTank(int left_,
+                           int top_,
+                           Direction direction_,
+                           std::unique_ptr<BasicHandler> handler_)
+    : Tank(left_,
+           top_,
+           EntityType::PLAYABLE_TANK,
+           direction_,
+           std::move(handler_)) {
+}
+
+PlayableTank::PlayableTank(int left, int top, Direction dir, GameModel &model)
+    : Tank(left, top, EntityType::PLAYABLE_TANK, dir, model) {
+}
+
+BotTank::BotTank(int left_,
+                 int top_,
+                 Direction direction_,
+                 std::unique_ptr<BasicHandler> handler_)
+    : Tank(left_, top_, EntityType::BOT_TANK, direction_, std::move(handler_)) {
 }
 }  // namespace Tanks::model

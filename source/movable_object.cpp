@@ -5,7 +5,7 @@ namespace Tanks {
 MovableObject::MovableObject(Direction direction,
                              const sf::Vector2<int> &startCoordinates,
                              double speed)
-    : direction(direction), coordinates(startCoordinates), speed(speed) {
+    : speed(speed), coordinates(startCoordinates), direction(direction) {
 }
 
 void MovableObject::updatePosition(Direction newDirection, double time) {

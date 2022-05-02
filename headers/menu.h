@@ -12,7 +12,15 @@ struct MenuController;
 
 namespace Menu {
 
-enum class ButtonType { NEW_GAME, RESUME, SETTINGS, CREATE_MAP, RATING, EXIT, PAUSE };
+enum class ButtonType {
+    NEW_GAME,
+    RESUME,
+    SETTINGS,
+    CREATE_MAP,
+    RATING,
+    EXIT,
+    PAUSE
+};
 
 std::string convertButtonTypeToString(ButtonType type);
 
