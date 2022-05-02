@@ -42,7 +42,7 @@ std::optional<Menu::ButtonType> startGame(sf::RenderWindow &window, int level) {
                 GameController::makeMove(player);
             }
         }
-
+        model.nextTick();
         // redraw
         window.clear();
         environment.draw(window, pause.isPause());
