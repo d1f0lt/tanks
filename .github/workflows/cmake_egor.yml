@@ -26,8 +26,8 @@ jobs:
             packages: clang-12 libc++-12-dev libc++abi-12-dev 
             target: --target model_tests
         sanitize:
-          - flags: -fsanitize=undefined  -fno-sanitize-recover=all -O2
-            run-prefix: valgrind --quiet --leak-check=full --error-exitcode=123
+          - flags: -fsanitize=undefined  -O2
+            run-prefix: valgrind --quiet --error-exitcode=123
             cmake-flags: -DCMAKE_BUILD_TYPE=Debug
             packages: valgrind
           - flags: -fsanitize=undefined -fno-sanitize-recover=all -fsanitize=address
