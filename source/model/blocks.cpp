@@ -14,15 +14,19 @@ int Block::getWidth() const {
     return TILE_SIZE;
 }
 
-EntityType Wall::getType() const {
+bool Block::canPass(const Entity &) const {
+    return false;
+}
+
+EntityType Brick::getType() const {
     return EntityType::BRICK;
 }
 
-int Wall::getStrength() const {
-    return 1;  // TODO constant
+int Brick::getStrength() const {
+    return static_cast<int>(Strength::BRICK);
 }
 
-Wall::Wall(int left, int top) : Block(left, top) {
+Brick::Brick(int left, int top) : Block(left, top) {
 }
 
 EntityType Steel::getType() const {
@@ -30,7 +34,7 @@ EntityType Steel::getType() const {
 }
 
 int Steel::getStrength() const {
-    return 4;  // TODO own constant
+    return static_cast<int>(Strength::STEEL);
 }
 
 Steel::Steel(int left, int right) : Block(left, right) {
@@ -45,7 +49,7 @@ EntityType LevelBorder::getType() const {
 }
 
 int LevelBorder::getStrength() const {
-    return INT_MAX;  // TODO own constant
+    return static_cast<int>(Strength::LEVEL_BORDER);
 }
 
 EntityType Floor::getType() const {
@@ -53,7 +57,7 @@ EntityType Floor::getType() const {
 }
 
 int Floor::getStrength() const {
-    return 0;
+    return static_cast<int>(Strength::FLOOR);
 }
 
 Floor::Floor(int left, int right) : Block(left, right) {
@@ -79,6 +83,6 @@ bool Water::isBulletPassable() const {
 }
 
 int Water::getStrength() const {
-    return 0;
+    return static_cast<int>(Strength::WATER);
 }
 }  // namespace Tanks::model

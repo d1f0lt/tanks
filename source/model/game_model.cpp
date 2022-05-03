@@ -103,8 +103,8 @@ void GameModel::loadLevel(int level) {
 
             switch (CHAR_TO_TYPE.at(str[col])) {
                 case (EntityType::BRICK):
-                    addEntity(std::make_unique<Wall>(realCol * TILE_SIZE,
-                                                     row * TILE_SIZE));
+                    addEntity(std::make_unique<Brick>(realCol * TILE_SIZE,
+                                                      row * TILE_SIZE));
                     break;
                 case (EntityType::FLOOR):
                     addEntity(std::make_unique<Floor>(realCol * TILE_SIZE,

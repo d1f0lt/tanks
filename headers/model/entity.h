@@ -42,12 +42,11 @@ public:
     [[nodiscard]] virtual int getStrength() const = 0;
 
     [[nodiscard]] bool intersect(const Entity &other) const;
+    [[nodiscard]] int dist(const Entity &other) const;
 
-    // TODO: make it pure virtual and override in derives
     [[nodiscard]] virtual bool isTankPassable() const;
     [[nodiscard]] virtual bool isBulletPassable() const;
-
-    [[nodiscard]] int dist(const Entity &other) const;
+    [[nodiscard]] virtual bool canPass(const Entity &other) const = 0;
 
 protected:
     void setTop(int top);

@@ -17,9 +17,10 @@ public:
                         GameModel &model_);
 
     [[nodiscard]] EntityType getType() const override;
-    [[nodiscard]] int getStrength() const override;
     [[nodiscard]] int getWidth() const override;
     [[nodiscard]] int getHeight() const override;
+    [[nodiscard]] int getStrength() const override;
+
     [[nodiscard]] bool canPass(const Entity &other) const override;
 };
 }  // namespace Tanks::model

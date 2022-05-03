@@ -1,9 +1,17 @@
 #ifndef TANKS_BLOCKS_H
 #define TANKS_BLOCKS_H
 
+#include <climits>
 #include "entity.h"
 
 namespace Tanks::model {
+enum class Strength {
+    BRICK = 1,
+    FLOOR = 0,
+    LEVEL_BORDER = INT_MAX,
+    WATER = 0,
+    STEEL = 10
+};
 
 class Block : public Entity {
 public:
@@ -11,6 +19,8 @@ public:
 
     [[nodiscard]] int getHeight() const final;
     [[nodiscard]] int getWidth() const final;
+
+    [[nodiscard]] bool canPass(const Entity &other) const override;
 };
 
 class Floor final : public Block {
@@ -31,9 +41,9 @@ public:
     [[nodiscard]] int getStrength() const override;
 };
 
-class Wall final : public Block {
+class Brick final : public Block {
 public:
-    explicit Wall(int left, int top);
+    explicit Brick(int left, int top);
 
     [[nodiscard]] EntityType getType() const final;
     [[nodiscard]] int getStrength() const final;
