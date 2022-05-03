@@ -1,0 +1,13 @@
+name: github_arch
+on: [ push ]
+jobs:
+  arch_compile:
+    container:
+      image: archlinux:latest
+
+  - uses: actions/checkout@v3
+  - run: sudo apt-get update && sudo apt-get install cmake make libsfml-dev ninja-build ${{matrix.compiler.packages}} ${{matrix.sanitize.packages}}
+  - run: cmake --version
+  - run: cmake . 
+  - run: cmake --build . --verbose 
+ 
