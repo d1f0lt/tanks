@@ -18,7 +18,6 @@ public:
     [[nodiscard]] Direction getDirection() const;
     [[nodiscard]] int getSpeed() const;
 
-
 protected:
     void setDirection(Direction dir);
 

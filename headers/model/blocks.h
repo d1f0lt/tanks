@@ -20,7 +20,7 @@ public:
     [[nodiscard]] int getHeight() const final;
     [[nodiscard]] int getWidth() const final;
 
-    [[nodiscard]] bool canPass(const Entity &other) const override;
+    [[nodiscard]] bool canPass(const Entity &other) const final;
 };
 
 class Floor final : public Block {
