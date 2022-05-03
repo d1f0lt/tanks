@@ -14,7 +14,7 @@ int GameMap::getHeight() const {
     return static_cast<int>(map.size());
 }
 
-Entity &GameMap::getEntityByCoords(int col, int row) {
+Entity &GameMap::getEntityByCoords(int col, int row) const {
     assert(0 <= col && col < getWidth() && 0 <= row && row < getHeight());
     assert(map[row][col] != nullptr);
 

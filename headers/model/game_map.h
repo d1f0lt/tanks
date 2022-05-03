@@ -14,7 +14,7 @@ public:
     [[nodiscard]] int getWidth() const;
     [[nodiscard]] int getHeight() const;
 
-    [[nodiscard]] Entity &getEntityByCoords(int col, int row);
+    [[nodiscard]] Entity &getEntityByCoords(int col, int row) const;
 
     void insert(Entity &entity);
     void erase(Entity &entity);

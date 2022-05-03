@@ -28,10 +28,11 @@ void GameModel::nextTick() {
         assert(bullet != nullptr);
         handlers[bullet]->move(bullet->getDirection());
 
-        for (auto &row : bullet->snapshotBackground()) {
-            for (auto *ent : row) {
-                if (ent->getStrength()) {
-                    removeEntity(*const_cast<Entity *>(ent));
+        for (const auto &row : bullet->snapshotBackground()) {
+            for (const auto *ent : row) {
+                if (ent->getStrength() != 0) {
+                    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
+                    removeEntity(const_cast<Entity &>(*ent));
                 }
             }
         }
