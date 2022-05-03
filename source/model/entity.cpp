@@ -2,7 +2,8 @@
 #include <unordered_set>
 
 namespace Tanks::model {
-Entity::Entity(int left_, int top_) : left(left_), top(top_) {
+// TODO better random
+Entity::Entity(int left_, int top_) : left(left_), top(top_), id(rand()) {
 }
 
 int Entity::getLeft() const {
@@ -53,5 +54,8 @@ int Entity::dist(const Entity &other) const {
     int delta_y = segdist(getTop(), getTop() + getHeight() - 1,
                           other.getHeight(), other.getHeight() - 1);
     return delta_x + delta_y;
+}
+
+Entity::Entity(int left, int top, int id) : left(left), top(top), id(id) {
 }
 }  // namespace Tanks::model

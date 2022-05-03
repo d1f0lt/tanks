@@ -63,7 +63,7 @@ std::vector<const Entity *> MovableHandler::look(Direction direction) {
 
     for (int row = down; row > top && row >= 0; row--) {
         for (int col = left; col < right && col < model.map.getWidth(); col++) {
-            res.push_back(&model.getEntityByCoords(col, row));
+            res.push_back(&model.getByCoords(col, row));
         }
     }
 
@@ -101,8 +101,7 @@ void ForegroundHandler::setBackground() {
          y++) {
         for (int x = entity.getLeft(); x < entity.getLeft() + entity.getWidth();
              x++) {
-            real_entity.background[y - y0][x - x0] =
-                &model.getEntityByCoords(x, y);
+            real_entity.background[y - y0][x - x0] = &model.getByCoords(x, y);
         }
     }
     model.map.insert(entity);

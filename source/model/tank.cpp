@@ -11,21 +11,13 @@ Tank::Tank(int left_,
            std::unique_ptr<BasicHandler> handler_)
     : MovableEntity(left_,
                     top_,
+                    std::move(handler_),
                     direction_,
-                    DEFAULT_TANK_SPEED,
-                    std::move(handler_)) {
+                    DEFAULT_TANK_SPEED) {
 }
 
 bool Tank::canPass(const Entity &other) const {
     return other.isTankPassable();
-}
-
-Tank::Tank(int left_, int top_, Direction direction_, GameModel &model_)
-    : MovableEntity(left_,
-                    top_,
-                    direction_,
-                    DEFAULT_TANK_SPEED,
-                    std::make_unique<TankHandler>(model_, *this)) {
 }
 
 void Tank::shoot() {
@@ -44,6 +36,15 @@ int Tank::getStrength() const {
     return 0;
 }
 
+Tank::Tank(int left,
+           int top,
+           int id,
+           std::unique_ptr<BasicHandler> handler,
+           Direction direction,
+           int speed)
+    : MovableEntity(left, top, id, std::move(handler), direction, speed) {
+}
+
 PlayableTank::PlayableTank(int left_,
                            int top_,
                            Direction direction_,
@@ -52,11 +53,20 @@ PlayableTank::PlayableTank(int left_,
 }
 
 PlayableTank::PlayableTank(int left, int top, Direction dir, GameModel &model)
-    : Tank(left, top, dir, model) {
+    : Tank(left, top, dir, std::make_unique<TankHandler>(model, *this)) {
 }
 
 EntityType PlayableTank::getType() const {
     return EntityType::PLAYABLE_TANK;
+}
+
+PlayableTank::PlayableTank(int left,
+                           int top,
+                           int id,
+                           std::unique_ptr<BasicHandler> handler,
+                           Direction direction,
+                           int speed)
+    : Tank(left, top, id, std::move(handler), direction, speed) {
 }
 
 BotTank::BotTank(int left_,

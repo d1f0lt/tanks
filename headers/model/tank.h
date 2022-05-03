@@ -12,7 +12,12 @@ public:
                   Direction direction_,
                   std::unique_ptr<BasicHandler> handler_);
 
-    explicit Tank(int left_, int top_, Direction direction_, GameModel &model_);
+    explicit Tank(int left,
+                  int top,
+                  int id,
+                  std::unique_ptr<BasicHandler> handler,
+                  Direction direction,
+                  int speed);
 
     [[nodiscard]] int getWidth() const override;
     [[nodiscard]] int getHeight() const override;

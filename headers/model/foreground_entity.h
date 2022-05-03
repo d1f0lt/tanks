@@ -15,6 +15,11 @@ public:
                               int top,
                               std::unique_ptr<BasicHandler> handler_);
 
+    explicit ForegroundEntity(int left,
+                              int top,
+                              int id,
+                              std::unique_ptr<BasicHandler> handler);
+
     [[nodiscard]] std::vector<const Entity *> look(Direction direction) const;
 
     [[nodiscard]] std::vector<std::vector<const Entity *>> snapshotBackground()

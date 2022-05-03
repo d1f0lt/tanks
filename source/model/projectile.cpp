@@ -8,9 +8,9 @@ Projectile::Projectile(int left_,
                        std::unique_ptr<BasicHandler> handler_)
     : MovableEntity(left_,
                     top_,
+                    std::move(handler_),
                     direction_,
-                    BULLET_SPEED,
-                    std::move(handler_)) {
+                    BULLET_SPEED) {
 }
 
 bool Projectile::canPass(const Entity &other) const {
@@ -23,9 +23,9 @@ Projectile::Projectile(int left_,
                        GameModel &model_)
     : MovableEntity(left_,
                     top_,
+                    std::make_unique<MovableHandler>(model_, *this),
                     direction_,
-                    BULLET_SPEED,
-                    std::make_unique<MovableHandler>(model_, *this)) {
+                    BULLET_SPEED) {
 }
 
 EntityType Projectile::getType() const {

@@ -18,7 +18,7 @@ const std::array<Tanks::model::Direction, 4> DIRECTIONS = {
 TEST_CASE("Game creation") {
     Tanks::model::GameModel model;
     model.loadLevel(1);
-    auto &brick00 = model.getEntityByCoords(TILE_SIZE, TILE_SIZE);
+    auto &brick00 = model.getByCoords(TILE_SIZE, TILE_SIZE);
 
     CHECK(brick00.getType() == EntityType::FLOOR);
 }
@@ -26,8 +26,7 @@ TEST_CASE("Game creation") {
 TEST_CASE("Single move and checking background") {
     Tanks::model::GameModel model;
     model.loadLevel(1);
-    Tanks::model::Entity *brick00 =
-        &model.getEntityByCoords(TILE_SIZE, TILE_SIZE);
+    Tanks::model::Entity *brick00 = &model.getByCoords(TILE_SIZE, TILE_SIZE);
 
     auto &real_tank = model.spawnPlayableTank(TILE_SIZE, TILE_SIZE);
     CHECK(real_tank.getLeft() == TILE_SIZE);
@@ -42,10 +41,10 @@ TEST_CASE("Single move and checking background") {
     }
 
     real_tank.move(Tanks::model::Direction::DOWN);
-    Tanks::model::Entity &ptr2 = model.getEntityByCoords(TILE_SIZE, TILE_SIZE);
+    Tanks::model::Entity &ptr2 = model.getByCoords(TILE_SIZE, TILE_SIZE);
     model.nextTick();
 
-    CHECK(brick00 == &model.getEntityByCoords(TILE_SIZE, TILE_SIZE));
+    CHECK(brick00 == &model.getByCoords(TILE_SIZE, TILE_SIZE));
 }
 
 TEST_CASE("multiple moves") {
@@ -54,7 +53,7 @@ TEST_CASE("multiple moves") {
     auto &realTank = model.spawnPlayableTank(TILE_SIZE, TILE_SIZE);
     auto left = realTank.look(Tanks::model::Direction::LEFT);
     CHECK(left[0] == left.back());
-    CHECK(left[0] == &model.getEntityByCoords(0, TILE_SIZE));
+    CHECK(left[0] == &model.getByCoords(0, TILE_SIZE));
 
     auto right = realTank.look(Tanks::model::Direction::RIGHT);
     for (int row = realTank.getTop();
@@ -64,7 +63,7 @@ TEST_CASE("multiple moves") {
              realTank.getLeft() + realTank.getWidth() + realTank.getSpeed();
              col++) {
             CHECK(std::find(right.begin(), right.end(),
-                            &model.getEntityByCoords(col, row)) != right.end());
+                            &model.getByCoords(col, row)) != right.end());
         }
     }
 
@@ -87,7 +86,7 @@ TEST_CASE("Block check") {
     model.loadLevel(1);
     for (int row = 0; row < model.getHeight(); row++) {
         for (int col = 0; col < model.getWidth(); col++) {
-            auto &entity = model.getEntityByCoords(col, row);
+            auto &entity = model.getByCoords(col, row);
             switch (entity.getType()) {
                 case EntityType::FLOOR:
                     CHECK(entity.isTankPassable());
@@ -133,8 +132,8 @@ TEST_CASE("Tank simple shoot") {
     tank.setDirection(Tanks::model::Direction::RIGHT);
     tank.shoot();
     auto &bullet = dynamic_cast<Projectile &>(
-        model.getEntityByCoords(Tanks::TILE_SIZE + Tanks::TANK_SIZE,
-                                Tanks::TILE_SIZE + Tanks::TANK_SIZE / 2));
+        model.getByCoords(Tanks::TILE_SIZE + Tanks::TANK_SIZE,
+                          Tanks::TILE_SIZE + Tanks::TANK_SIZE / 2));
 
     CHECK(bullet.getType() == Tanks::model::EntityType::BULLET);
     CHECK(bullet.getTop() == Tanks::TILE_SIZE + Tanks::TANK_SIZE / 2);

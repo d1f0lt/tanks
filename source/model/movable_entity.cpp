@@ -8,9 +8,9 @@ void MovableEntity::move(Direction dir) {
 
 MovableEntity::MovableEntity(int left,
                              int right,
+                             std::unique_ptr<BasicHandler> handler_,
                              Direction direction,
-                             int speed,
-                             std::unique_ptr<BasicHandler> handler_)
+                             int speed)
     : ForegroundEntity(left, right, std::move(handler_)),
       direction(direction),
       speed(speed) {
@@ -26,5 +26,15 @@ void MovableEntity::setDirection(Direction dir) {
 
 int MovableEntity::getSpeed() const {
     return speed;
+}
+MovableEntity::MovableEntity(int left,
+                             int top,
+                             int id,
+                             std::unique_ptr<BasicHandler> handler,
+                             Direction direction,
+                             int speed)
+    : ForegroundEntity(left, top, id, std::move(handler)),
+      direction(direction),
+      speed(speed) {
 }
 }  // namespace Tanks::model

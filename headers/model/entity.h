@@ -26,6 +26,7 @@ enum class EntityType {
 class Entity {
 public:
     explicit Entity(int left_, int top_);
+    explicit Entity(int left, int top, int id);
 
     Entity(const Entity &) = delete;
     Entity(Entity &&) = delete;
@@ -55,7 +56,8 @@ protected:
 private:
     [[nodiscard]] sf::IntRect getRect() const;
 
-    int left, top;
+    int left = -1, top = -1;
+    const int id = -1;
 };
 }  // namespace Tanks::model
 

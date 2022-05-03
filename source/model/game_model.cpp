@@ -8,7 +8,7 @@
 #include "model/projectile.h"
 
 namespace Tanks::model {
-Entity &GameModel::getEntityByCoords(int col, int row) {
+Entity &GameModel::getByCoords(int col, int row) {
     return map.getEntityByCoords(col, row);
 }
 
@@ -65,7 +65,7 @@ PlayableTank &GameModel::spawnPlayableTank(const int left, const int top) {
 
     for (int row = top; row < top + TANK_SIZE; row++) {
         for (int col = left; col < left + TANK_SIZE; col++) {
-            assert(getEntityByCoords(col, row).isTankPassable());
+            assert(getByCoords(col, row).isTankPassable());
         }
     }
 
@@ -138,6 +138,11 @@ int GameModel::getWidth() const {
 
 int GameModel::getHeight() const {
     return map.getHeight();
+}
+
+Entity &GameModel::getById(int id) {
+    assert(byid.count(id) != 0);
+    return *byid[id];
 }
 
 }  // namespace Tanks::model

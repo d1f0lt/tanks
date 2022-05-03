@@ -8,6 +8,13 @@ ForegroundEntity::ForegroundEntity(int left,
     : Entity(left, top), handler(std::move(handler_)) {
 }
 
+ForegroundEntity::ForegroundEntity(int left,
+                                   int top,
+                                   int id,
+                                   std::unique_ptr<BasicHandler> handler)
+    : Entity(left, top, id), handler(std::move(handler)) {
+}
+
 std::vector<const Entity *> ForegroundEntity::look(Direction direction) const {
     return handler->look(direction);
 }
@@ -24,4 +31,5 @@ std::vector<std::vector<const Entity *>> ForegroundEntity::snapshotBackground()
     const {
     return background;
 }
+
 }  // namespace Tanks::model
