@@ -12,7 +12,7 @@ const int MARGIN_LEFT = 288;  // = MARGIN_RIGHT     for centralize
 const int MAP_HEIGHT = 19;    // number of vertical tiles
 const int MAP_WIDTH = 24;     // number of horizontal tiles
 const int TANK_SIZE = 48;     // TANK_WIDTH = TANK_HEIGHT = 48
-constexpr int TANK_SPEED = 5;
+constexpr int DEFAULT_TANK_SPEED = 5;
 constexpr int BULLET_SPEED = 10;
 constexpr int BULLET_SIZE = 2;
 

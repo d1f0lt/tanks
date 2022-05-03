@@ -14,6 +14,7 @@ public:
                           std::unique_ptr<BasicHandler> handler_);
 
     explicit PlayableTank(int left, int top, Direction dir, GameModel &model);
+    [[nodiscard]] EntityType getType() const override;
 
     using MovableEntity::move;
     using MovableEntity::setDirection;

@@ -11,12 +11,9 @@ class ForegroundEntity : public Entity {
     friend ForegroundHandler;
 
 public:
-    ForegroundEntity(int left,
-                     int top,
-                     int width,
-                     int height,
-                     EntityType type,
-                     std::unique_ptr<BasicHandler> handler_);
+    explicit ForegroundEntity(int left,
+                              int top,
+                              std::unique_ptr<BasicHandler> handler_);
 
     [[nodiscard]] std::vector<const Entity *> look(Direction direction) const;
 

@@ -15,6 +15,11 @@ public:
                         int top_,
                         Direction direction_,
                         GameModel &model_);
+
+    [[nodiscard]] EntityType getType() const override;
+    [[nodiscard]] int getStrength() const override;
+    [[nodiscard]] int getWidth() const override;
+    [[nodiscard]] int getHeight() const override;
 };
 }  // namespace Tanks::model
 

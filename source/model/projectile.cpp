@@ -8,9 +8,6 @@ Projectile::Projectile(int left_,
                        std::unique_ptr<BasicHandler> handler_)
     : MovableEntity(left_,
                     top_,
-                    BULLET_SIZE,
-                    BULLET_SIZE,
-                    EntityType::BULLET,
                     direction_,
                     BULLET_SPEED,
                     std::move(handler_)) {
@@ -22,11 +19,24 @@ Projectile::Projectile(int left_,
                        GameModel &model_)
     : MovableEntity(left_,
                     top_,
-                    BULLET_SIZE,
-                    BULLET_SIZE,
-                    EntityType::BULLET,
                     direction_,
                     BULLET_SPEED,
                     std::make_unique<MovableHandler>(model_, *this)) {
+}
+
+EntityType Projectile::getType() const {
+    return EntityType::BULLET;
+}
+
+int Projectile::getStrength() const {
+    return 1;  // TODO make constant
+}
+
+int Projectile::getWidth() const {
+    return BULLET_SIZE;
+}
+
+int Projectile::getHeight() const {
+    return BULLET_SIZE;
 }
 }  // namespace Tanks::model

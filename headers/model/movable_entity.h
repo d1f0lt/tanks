@@ -11,9 +11,6 @@ public:
 
     explicit MovableEntity(int left,
                            int right,
-                           int width,
-                           int height,
-                           EntityType type,
                            Direction direction,
                            int speed,
                            std::unique_ptr<BasicHandler> handler_);

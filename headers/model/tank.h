@@ -9,15 +9,15 @@ class Tank : public MovableEntity {
 public:
     explicit Tank(int left_,
                   int top_,
-                  EntityType type_,
                   Direction direction_,
                   std::unique_ptr<BasicHandler> handler_);
 
-    explicit Tank(int left_,
-                  int top_,
-                  EntityType type_,
-                  Direction direction_,
-                  GameModel &model_);
+    explicit Tank(int left_, int top_, Direction direction_, GameModel &model_);
+
+    [[nodiscard]] int getWidth() const override;
+    [[nodiscard]] int getHeight() const override;
+
+    [[nodiscard]] int getStrength() const override;
 
 protected:
     void shoot();

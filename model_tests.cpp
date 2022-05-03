@@ -92,22 +92,18 @@ TEST_CASE("Block check") {
                 case EntityType::FLOOR:
                     CHECK(entity.isTankPassable());
                     CHECK(entity.isBulletPassable());
-                    CHECK_FALSE(entity.isDestroyable());
                     break;
                 case EntityType::BRICK:
                     CHECK_FALSE(entity.isTankPassable());
-                    CHECK(entity.isDestroyable());
                     CHECK_FALSE(entity.isBulletPassable());
                     break;
                 case EntityType::STEEL:
                     CHECK_FALSE(entity.isTankPassable());
-                    CHECK_FALSE(entity.isDestroyable());
                     CHECK_FALSE(entity.isBulletPassable());
                     break;
                 case EntityType::WATER:
                     CHECK_FALSE(entity.isTankPassable());
                     CHECK(entity.isBulletPassable());
-                    CHECK_FALSE(entity.isDestroyable());
                     break;
             }
         }
@@ -136,7 +132,7 @@ TEST_CASE("Tank simple shoot") {
     auto &tank = model.spawnPlayableTank(Tanks::TILE_SIZE, Tanks::TILE_SIZE);
     tank.setDirection(Tanks::model::Direction::RIGHT);
     tank.shoot();
-    auto &bullet = static_cast<Projectile &>(
+    auto &bullet = dynamic_cast<Projectile &>(
         model.getEntityByCoords(Tanks::TILE_SIZE + Tanks::TANK_SIZE,
                                 Tanks::TILE_SIZE + Tanks::TANK_SIZE / 2));
 

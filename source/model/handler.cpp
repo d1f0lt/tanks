@@ -80,6 +80,9 @@ void ForegroundHandler::restoreBackground() {
 
 void ForegroundHandler::setBackground() {
     auto &real_entity = static_cast<ForegroundEntity &>(entity);
+    real_entity.background.resize(
+        entity.getHeight(),
+        std::vector<const Entity *>(entity.getWidth(), nullptr));
 
     int y0 = entity.getTop();
     int x0 = entity.getLeft();
