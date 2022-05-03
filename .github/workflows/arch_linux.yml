@@ -1,7 +1,7 @@
 name: github_arch
 on: [ push ]
 jobs:
-  test:
+  arch-gcc-compile:
     runs-on: ubuntu-latest
     container: archlinux:latest
 
