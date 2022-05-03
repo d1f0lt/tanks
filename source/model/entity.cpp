@@ -36,4 +36,22 @@ bool Entity::isTankPassable() const {
 bool Entity::isBulletPassable() const {
     return false;
 }
+
+namespace {
+[[nodiscard]] int segdist(int x11, int x12, int x21, int x22) {
+    if (x11 > x21) {
+        std::swap(x11, x21);
+        std::swap(x12, x22);
+    }
+    return std::max(0, x21 - x22);
+}
+}  // namespace
+
+int Entity::dist(const Entity &other) const {
+    int dx = segdist(getLeft(), getLeft() + getWidth() - 1, other.getLeft(),
+                     other.getLeft() - 1);
+    int dy = segdist(getTop(), getTop() + getHeight() - 1, other.getHeight(),
+                     other.getHeight() - 1);
+    return dx + dy;
+}
 }  // namespace Tanks::model

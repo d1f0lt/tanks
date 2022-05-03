@@ -39,13 +39,15 @@ public:
     [[nodiscard]] int getTop() const;
     [[nodiscard]] virtual int getWidth() const = 0;
     [[nodiscard]] virtual int getHeight() const = 0;
+    [[nodiscard]] virtual int getStrength() const = 0;
 
     [[nodiscard]] bool intersect(const Entity &other) const;
 
     // TODO: make it pure virtual and override in derives
     [[nodiscard]] virtual bool isTankPassable() const;
     [[nodiscard]] virtual bool isBulletPassable() const;
-    [[nodiscard]] virtual int getStrength() const = 0;
+
+    [[nodiscard]] int dist(const Entity &other) const;
 
 protected:
     void setTop(int top);

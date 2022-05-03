@@ -15,6 +15,6 @@ void EntityHolder::remove(Entity &entity) {
             return;
         }
     }
-    assert(false && "Entity not foud!");
+    assert(false && "Entity not found!");
 }
 }  // namespace Tanks::model

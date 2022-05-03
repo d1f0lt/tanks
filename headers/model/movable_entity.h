@@ -18,6 +18,8 @@ public:
     [[nodiscard]] Direction getDirection() const;
     [[nodiscard]] int getSpeed() const;
 
+    [[nodiscard]] virtual bool canPass(const Entity &other) const = 0;
+
 protected:
     void setDirection(Direction dir);
 

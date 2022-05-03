@@ -13,6 +13,10 @@ Projectile::Projectile(int left_,
                     std::move(handler_)) {
 }
 
+bool Projectile::canPass(const Entity &other) const {
+    return other.isBulletPassable();
+}
+
 Projectile::Projectile(int left_,
                        int top_,
                        Direction direction_,

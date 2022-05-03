@@ -18,6 +18,7 @@ public:
     [[nodiscard]] int getHeight() const override;
 
     [[nodiscard]] int getStrength() const override;
+    [[nodiscard]] bool canPass(const Entity &other) const override;
 
 protected:
     void shoot();

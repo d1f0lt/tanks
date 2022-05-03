@@ -16,6 +16,10 @@ Tank::Tank(int left_,
                     std::move(handler_)) {
 }
 
+bool Tank::canPass(const Entity &other) const {
+    return other.isTankPassable();
+}
+
 Tank::Tank(int left_, int top_, Direction direction_, GameModel &model_)
     : MovableEntity(left_,
                     top_,
@@ -35,6 +39,7 @@ int Tank::getWidth() const {
 int Tank::getHeight() const {
     return TANK_SIZE;
 }
+
 int Tank::getStrength() const {
     return 0;
 }

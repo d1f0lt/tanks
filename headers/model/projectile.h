@@ -20,6 +20,7 @@ public:
     [[nodiscard]] int getStrength() const override;
     [[nodiscard]] int getWidth() const override;
     [[nodiscard]] int getHeight() const override;
+    [[nodiscard]] bool canPass(const Entity &other) const override;
 };
 }  // namespace Tanks::model
 
