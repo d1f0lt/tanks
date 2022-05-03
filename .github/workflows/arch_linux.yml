@@ -1,0 +1,17 @@
+name: github_arch
+on: [ push ]
+jobs:
+  arch-gcc-compile:
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - run: pacman -Syyu --noconfirm --noprogressbar
+      - run: pacman -S cmake make ninja gcc sfml --noconfirm --noprogressbar
+      - run: cmake .
+      - run: cmake --build .
+      
+
+
+ 
