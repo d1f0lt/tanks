@@ -125,7 +125,7 @@ void MovableHandler::move(Direction direction) {
     real_entity.restoreBackground();
 
     int dist = real_entity.speed;
-    for (auto *object : real_entity.look(direction)) {
+    for (const auto *object : real_entity.look(direction)) {
         if (!real_entity.canPass(*object)) {
             dist = std::min(dist, real_entity.dist(*object));
         }

@@ -1,7 +1,5 @@
 #include "model/game_map.h"
 #include <cassert>
-#include <fstream>
-#include <string>
 #include "constants.h"
 
 namespace Tanks::model {
@@ -40,15 +38,13 @@ void GameMap::erase(Entity &entity) {
          row++) {
         for (int col = entity.getLeft();
              col < entity.getLeft() + entity.getWidth(); col++) {
-            // TODO: default block
             map[row][col] = nullptr;
         }
     }
 }
 
-GameMap::GameMap(int width, int height)
-    : map(height * TILE_SIZE,
-          std::vector<Entity *>(width * TILE_SIZE, nullptr)) {
+GameMap::GameMap(size_t width, size_t height)
+    : map(height * TILE_SIZE, std::vector<Entity *>(width * TILE_SIZE)) {
 }
 
 }  // namespace Tanks::model

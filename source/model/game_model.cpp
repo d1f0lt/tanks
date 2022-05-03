@@ -40,9 +40,10 @@ void GameModel::nextTick() {
 }
 
 Entity &GameModel::addEntity(std::unique_ptr<Entity> entity) {
-    if (auto *a = dynamic_cast<ForegroundEntity *>(entity.get())) {
-        handlers[a]->setBackground();
+    if (auto *in_foreground = dynamic_cast<ForegroundEntity *>(entity.get())) {
+        handlers[in_foreground]->setBackground();
     }
+
     map.insert(*entity);
     groupedEntities.insert(*entity);
     return entityHolder.insert(std::move(entity));

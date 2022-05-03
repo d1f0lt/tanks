@@ -23,9 +23,9 @@ public:
 protected:
     void restoreBackground();
     void setBackground();
-
-protected:
     std::unique_ptr<BasicHandler> handler;
+
+private:
     std::vector<std::vector<const Entity *>> background;
 };
 

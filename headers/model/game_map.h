@@ -9,7 +9,7 @@ namespace Tanks::model {
 
 class GameMap {
 public:
-    explicit GameMap(int width = MAP_WIDTH, int height = MAP_HEIGHT);
+    explicit GameMap(size_t width = MAP_WIDTH, size_t height = MAP_HEIGHT);
 
     [[nodiscard]] int getWidth() const;
     [[nodiscard]] int getHeight() const;
