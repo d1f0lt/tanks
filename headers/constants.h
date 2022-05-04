@@ -15,6 +15,9 @@ constexpr int MARGIN_LEFT = 288;  // = MARGIN_RIGHT     for centralize
 constexpr int MAP_HEIGHT = 19;    // number of vertical tiles
 constexpr int MAP_WIDTH = 24;     // number of horizontal tiles
 constexpr int TANK_SIZE = 48;     // TANK_WIDTH = TANK_HEIGHT = 48
+constexpr int TANK_SPEED = 5;
+constexpr int BULLET_SPEED = 10;
+constexpr int BULLET_SIZE = 2;
 
 // menu
 constexpr int LEVELS_COUNT = 1;

@@ -1,7 +1,9 @@
 #ifndef GAME_H_
 #define GAME_H_
 
+#include <optional>
 #include <SFML/Graphics.hpp>
+#include <optional>
 #include "menu.h"
 
 namespace Tanks {

@@ -87,5 +87,4 @@ void Environment::draw(sf::RenderWindow &window, Pause &pause) const {
 const Menu::Menu &Environment::getMenu() const {
     return menu;
 }
-
 }  // namespace Tanks

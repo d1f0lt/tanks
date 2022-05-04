@@ -61,7 +61,7 @@ MovableView::MovableView(const MovableObject &object_,
         case Direction::DOWN:
             return sprites[3];
     }
-    assert("Incorrect direction? 0_o" == "");
+    assert(false && "Incorrect direction? 0_o");
 }
 
 }  // namespace Tanks
