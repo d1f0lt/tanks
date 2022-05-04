@@ -42,9 +42,12 @@ add_executable(
         source/map.cpp
         source/controller.cpp
         source/menu.cpp
+        source/menu_items.cpp
         source/pause.cpp
         source/main_menu.cpp
         source/game_environment.cpp
+        source/new_game_menu.cpp
+        source/levels_menu.cpp
 )
 
 
