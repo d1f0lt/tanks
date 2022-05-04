@@ -42,9 +42,7 @@ public:
            const sf::Color &hoverColor_);
 
     [[nodiscard]] const sf::Color &getStandardColor() const;
-
     [[nodiscard]] const sf::Color &getHoverColor() const;
-
     [[nodiscard]] const sf::Vector2<float> &getSize() const;
 
     void setSize(const sf::Vector2<float> &newSize);
@@ -92,7 +90,6 @@ public:
     void draw(sf::RenderWindow &window) const;
 
     void addIconToLeftUpCorner(const std::string &filename, ButtonType type);
-
     void addIconToLeftLowerCorner(const std::string &filename, ButtonType type);
 
     void addMenuItem(std::unique_ptr<MenuItem> &&item);
@@ -100,16 +97,12 @@ public:
     // animations
     void flyOutFromLeft(sf::RenderWindow &window,
                         const sf::Sprite &backgroundSprite);
-
     void flyAwayToLeft(sf::RenderWindow &window,
                        const sf::Sprite &backgroundSprite);
-
     void flyOutFromRight(sf::RenderWindow &window,
                          const sf::Sprite &backgroundSprite);
-
     void flyAwayToRight(sf::RenderWindow &window,
                         const sf::Sprite &backgroundSprite);
-
     void flyAwayToRight();  // without animation, to set the initial position
                             // for first animation
 
@@ -136,20 +129,15 @@ public:
     virtual void draw(sf::RenderWindow &window) const = 0;
 
     [[nodiscard]] virtual sf::Vector2<float> getSize() const = 0;
-
     [[nodiscard]] virtual sf::Vector2<float> getPosition() const = 0;
-
     [[nodiscard]] const sf::Vector2<float> &getStandardPosition() const;
 
     void setStandardPosition(const sf::Vector2<float> &newPosition);
-
     virtual void setPosition(sf::Vector2<float> newPosition) = 0;
-
     void move(const sf::Vector2<float> &distance);
 
     void centralizeByWidth(
         const std::pair<float, float> &rectangleCoordinatesX);
-
     void centralizeByHeight(
         const std::pair<float, float> &rectangleCoordinatesY);
 
@@ -168,12 +156,10 @@ public:
                              const sf::Vector2<float> &coordinates);
 
     [[nodiscard]] sf::Vector2<float> getSize() const final;
-
     [[nodiscard]] sf::Vector2<float> getPosition() const final;
+    [[nodiscard]] std::string getContent() const;
 
     void setPosition(sf::Vector2<float> newPosition) final;
-
-    [[nodiscard]] std::string getContent() const;
 
     void draw(sf::RenderWindow &window) const final;
 
@@ -193,7 +179,6 @@ public:
     void hover();
 
     [[nodiscard]] sf::Vector2<float> getSize() const override;
-
     [[nodiscard]] sf::Vector2<float> getPosition() const override;
 
     void setPosition(sf::Vector2<float> newPosition) override;
@@ -215,7 +200,6 @@ public:
                          const sf::Vector2<float> &coordinates);
 
     [[nodiscard]] sf::Vector2<float> getSize() const final;
-
     [[nodiscard]] sf::Vector2<float> getPosition() const final;
 
     void setPosition(sf::Vector2<float> newPosition) final;
@@ -241,12 +225,10 @@ public:
     void draw(sf::RenderWindow &window) const final;
 
     [[nodiscard]] sf::Vector2<float> getSize() const final;
-
     [[nodiscard]] sf::Vector2<float> getPosition() const final;
+    [[nodiscard]] std::string getDescription() const;
 
     void setPosition(sf::Vector2<float> newPosition) final;
-
-    [[nodiscard]] std::string getDescription() const;
 
 private:
     std::unique_ptr<MenuInscription> description;
