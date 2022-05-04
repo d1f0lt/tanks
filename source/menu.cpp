@@ -275,7 +275,7 @@ void Menu::flyAwayToLeft(sf::RenderWindow &window,
     float maxPositionX = 0;
     for (const auto &item : items) {
         auto pos = item->getPosition().x + item->getSize().x;
-        maxPositionX = (pos > maxPositionX ? pos : maxPositionX);
+        maxPositionX = std::max(pos, maxPositionX);
     }
     assert(maxPositionX > 0 && maxPositionX < WINDOW_WIDTH);
     const int stepsAmount = static_cast<int>(std::ceil(maxPositionX / speed));
@@ -298,7 +298,7 @@ void Menu::flyAwayToRight(sf::RenderWindow &window,
     float minPositionX = WINDOW_WIDTH;
     for (const auto &item : items) {
         auto pos = item->getPosition().x;
-        minPositionX = (pos < minPositionX ? pos : minPositionX);
+        minPositionX = std::min(pos, minPositionX);
     }
     assert(minPositionX < WINDOW_WIDTH && minPositionX >= 0);
     const int stepsAmount =
@@ -311,7 +311,7 @@ void Menu::flyAwayToRight() {
     float minPositionX = WINDOW_WIDTH;
     for (const auto &item : items) {
         auto pos = item->getPosition().x;
-        minPositionX = (pos < minPositionX ? pos : minPositionX);
+        minPositionX = std::min(pos, minPositionX);
     }
     assert(minPositionX < WINDOW_WIDTH && minPositionX >= 0);
     const int stepsAmount =
