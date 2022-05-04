@@ -42,8 +42,8 @@ Menu initMenu() {
 }
 }  // namespace
 
-void new_game_menu(sf::RenderWindow &window,
-                   const sf::Sprite &backgroundSprite) {
+void showNewGameMenu(sf::RenderWindow &window,
+                     const sf::Sprite &backgroundSprite) {
     const static std::string imagesPath = "../images/menu/";
     Menu menu(initMenu());
     menu.addIconToLeftUpCorner(imagesPath + "return.png", ButtonType::RETURN);
@@ -64,7 +64,7 @@ void new_game_menu(sf::RenderWindow &window,
             switch (res.value()->getType()) {
                 case ButtonType::SINGLE_PLAYER: {
                     menu.flyAwayToLeft(window, backgroundSprite);
-                    auto ans = levels_menu(window, backgroundSprite);
+                    auto ans = showLevelsMenu(window, backgroundSprite);
                     switch (ans) {
                         case ButtonType::RETURN:
                             menu.flyOutFromLeft(window, backgroundSprite);

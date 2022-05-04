@@ -5,7 +5,8 @@
 
 namespace Tanks::Menu {
 
-ButtonType levels_menu(sf::RenderWindow &window, const sf::Sprite &background);
+ButtonType showLevelsMenu(sf::RenderWindow &window,
+                          const sf::Sprite &background);
 
 }
 

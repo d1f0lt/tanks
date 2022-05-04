@@ -39,8 +39,8 @@ Menu initMenu(const std::string &imagesPath) {
 
 }  // namespace
 
-ButtonType levels_menu(sf::RenderWindow &window,
-                       const sf::Sprite &backgroundSprite) {
+ButtonType showLevelsMenu(sf::RenderWindow &window,
+                          const sf::Sprite &backgroundSprite) {
     const static std::string imagesPath = "../images/menu/";
     Menu menu(initMenu(imagesPath + "levels/"));
     menu.addIconToLeftUpCorner(imagesPath + "return.png", ButtonType::RETURN);

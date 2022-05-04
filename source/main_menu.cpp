@@ -56,7 +56,7 @@ Menu initMenu() {
 }
 }  // namespace
 
-void main_menu(sf::RenderWindow &window) {
+void showMainMenu(sf::RenderWindow &window) {
     const static std::string imagesPath = "../images/menu/";
     sf::Sprite backgroundSprite(initBackground(imagesPath));
 
@@ -77,7 +77,7 @@ void main_menu(sf::RenderWindow &window) {
             switch (res.value()->getType()) {
                 case ButtonType::NEW_GAME: {
                     menu.flyAwayToLeft(window, backgroundSprite);
-                    new_game_menu(window, backgroundSprite);
+                    showNewGameMenu(window, backgroundSprite);
                     menu.flyOutFromLeft(window, backgroundSprite);
                     break;
                 }
