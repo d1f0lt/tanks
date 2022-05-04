@@ -1,10 +1,10 @@
 #include "main_menu.h"
-#include <memory>
-#include <string>
 #include "constants.h"
 #include "controller.h"
 #include "menu.h"
 #include "new_game_menu.h"
+#include <memory>
+#include <string>
 
 namespace Tanks::Menu {
 
@@ -65,34 +65,19 @@ void showMainMenu(sf::RenderWindow &window) {
     menu.addIconToLeftUpCorner(imagesPath + "gear.png", ButtonType::SETTINGS);
 
     while (window.isOpen()) {
-        // catch event
-        sf::Event event{};
-        while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed)
-                window.close();
-        }
-        if (const auto res =
-                Tanks::MenuController::control(menu, window, event);
-            res != std::nullopt) {
-            switch (res.value()->getType()) {
-                case ButtonType::NEW_GAME: {
-                    menu.flyAwayToLeft(window, backgroundSprite);
-                    showNewGameMenu(window, backgroundSprite);
-                    menu.flyOutFromLeft(window, backgroundSprite);
-                    break;
-                }
-                case ButtonType::EXIT:
-                    window.close();
-                default:
-                    break;
+        const auto res = menu.showMenu(window, backgroundSprite);
+        switch (res->getType()) {
+            case ButtonType::NEW_GAME: {
+                menu.flyAwayToLeft(window, backgroundSprite);
+                showNewGameMenu(window, backgroundSprite);
+                menu.flyOutFromLeft(window, backgroundSprite);
+                break;
             }
+            case ButtonType::EXIT:
+                window.close();
+            default:
+                break;
         }
-
-        // redraw
-        window.clear();
-        window.draw(backgroundSprite);
-        menu.draw(window);
-        window.display();
     }
 }
 

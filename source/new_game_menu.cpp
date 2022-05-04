@@ -52,45 +52,30 @@ void showNewGameMenu(sf::RenderWindow &window,
     menu.flyOutFromRight(window, backgroundSprite);
 
     while (window.isOpen()) {
-        // catch event
-        sf::Event event{};
-        while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed)
-                window.close();
-        }
-        if (const auto res =
-                Tanks::MenuController::control(menu, window, event);
-            res != std::nullopt) {
-            switch (res.value()->getType()) {
-                case ButtonType::SINGLE_PLAYER: {
-                    menu.flyAwayToLeft(window, backgroundSprite);
-                    auto ans = showLevelsMenu(window, backgroundSprite);
-                    switch (ans) {
-                        case ButtonType::RETURN:
-                            menu.flyOutFromLeft(window, backgroundSprite);
-                            continue;
-                        case ButtonType::EXIT:
-                            return;
-                        default:
-                            assert(false);
-                    }
+        const auto res = menu.showMenu(window, backgroundSprite);
+        switch (res->getType()) {
+            case ButtonType::SINGLE_PLAYER: {
+                menu.flyAwayToLeft(window, backgroundSprite);
+                auto ans = showLevelsMenu(window, backgroundSprite);
+                switch (ans) {
+                    case ButtonType::RETURN:
+                        menu.flyOutFromLeft(window, backgroundSprite);
+                        continue;
+                    case ButtonType::EXIT:
+                        return;
+                    default:
+                        assert(false);
                 }
-                case ButtonType::MULTIPLAYER:
-
-                case ButtonType::RETURN:
-                    menu.flyAwayToRight(window, backgroundSprite);
-                    return;
-
-                default:
-                    assert(false);
             }
-        }
+            case ButtonType::MULTIPLAYER:
 
-        // redraw
-        window.clear();
-        window.draw(backgroundSprite);
-        menu.draw(window);
-        window.display();
+            case ButtonType::RETURN:
+                menu.flyAwayToRight(window, backgroundSprite);
+                return;
+
+            default:
+                assert(false);
+        }
     }
 }
 

@@ -106,6 +106,8 @@ public:
     void flyAwayToRight();  // without animation, to set the initial position
                             // for first animation
 
+    const MenuButton *showMenu(sf::RenderWindow &window, const sf::Sprite &background);
+
 private:
     std::vector<std::unique_ptr<MenuItem>> items;
 

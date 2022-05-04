@@ -26,10 +26,9 @@ void GameController::makeMove(Player &player, const double time) {
 }
 
 std::optional<Menu::MenuButton *> MenuController::control(
-    const Menu::Menu &menu,
+    const std::vector<std::unique_ptr<Menu::MenuItem>> &items,
     sf::RenderWindow &window,
     const sf::Event &event) {
-    auto &items = menu.getItems();
     for (auto &menuItem : items) {
         auto item = dynamic_cast<Menu::MenuButton *>(menuItem.get());
         if (item == nullptr) {  // header
@@ -48,6 +47,11 @@ std::optional<Menu::MenuButton *> MenuController::control(
         }
     }
     return std::nullopt;
+}
+
+std::optional<Menu::MenuButton *> MenuController::control(const Menu::Menu &menu, sf::RenderWindow &window, const sf::Event &event) {
+    const auto &items = menu.getItems();
+    return control(items, window, event);
 }
 
 }  // namespace Tanks

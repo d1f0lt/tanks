@@ -1,15 +1,14 @@
 #include "menu.h"
+#include "controller.h"
 #include <cassert>
 #include <cmath>
 #include <string>
 #include <unordered_map>
 #include <vector>
-
-//#define TEST
+#include <chrono>
+#include <thread>
 
 namespace Tanks::Menu {
-
-const static int textMargin = 10;
 
 std::string convertButtonTypeToString(const ButtonType type) {
     static std::unordered_map<ButtonType, std::string> dictionary{
@@ -109,6 +108,8 @@ Menu::Menu(size_t menuWidth,
                                 marginBetweenButtons;
     }
 }
+
+const static int textMargin = 10;
 
 Menu::Menu(size_t menuWidth,
            const InscriptionInfo &titleInfo,
@@ -256,7 +257,7 @@ void Menu::animation(sf::RenderWindow &window,
     }
 }
 
-static constexpr int speed = 4;
+static constexpr int speed = 3;
 
 void Menu::flyOutFromLeft(sf::RenderWindow &window,
                           const sf::Sprite &backgroundSprite) {
@@ -266,11 +267,6 @@ void Menu::flyOutFromLeft(sf::RenderWindow &window,
     assert(stepsAmount == static_cast<int>(stepsAmount));
     assert(stepsAmount > 0);
     animation(window, backgroundSprite, static_cast<int>(stepsAmount), speed);
-#ifdef TEST
-    for (const auto &item : items) {
-        assert(item->getPosition() == item->getStandardPosition());
-    }
-#endif
 }
 
 void Menu::flyAwayToLeft(sf::RenderWindow &window,
@@ -294,11 +290,6 @@ void Menu::flyOutFromRight(sf::RenderWindow &window,
     assert(stepsAmount == static_cast<int>(stepsAmount));
     assert(stepsAmount > 0);
     animation(window, backgroundSprite, static_cast<int>(stepsAmount), -speed);
-#ifdef TEST
-    for (const auto &item : items) {
-        assert(item->getPosition() == item->getStandardPosition());
-    }
-#endif
 }
 
 void Menu::flyAwayToRight(sf::RenderWindow &window,
@@ -326,6 +317,31 @@ void Menu::flyAwayToRight() {
     const int stepsAmount =
         static_cast<int>(std::ceil((WINDOW_WIDTH - minPositionX) / speed));
     moveItems(static_cast<float>(stepsAmount * speed));
+}
+
+const MenuButton *Menu::showMenu(sf::RenderWindow &window, const sf::Sprite &backgroundSprite) {
+    while (window.isOpen()) {
+        // catch event
+        sf::Event event{};
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed)
+                window.close();
+        }
+        if (const auto res =
+                Tanks::MenuController::control(getItems(), window, event);
+            res != std::nullopt) {
+            return res.value();
+        }
+
+        // redraw
+        window.clear();
+        window.draw(backgroundSprite);
+        this->draw(window);
+        window.display();
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(15));
+    }
+    return nullptr;
 }
 
 MenuItem::MenuItem(const sf::Vector2<float> &coordinates)

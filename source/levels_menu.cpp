@@ -49,48 +49,32 @@ ButtonType showLevelsMenu(sf::RenderWindow &window,
     menu.flyOutFromRight(window, backgroundSprite);
 
     while (window.isOpen()) {
-        // catch event
-        sf::Event event{};
-        while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed)
-                window.close();
-        }
-        if (const auto res =
-                Tanks::MenuController::control(menu, window, event);
-            res != std::nullopt) {
-            switch (res.value()->getType()) {
-                case ButtonType::LEVEL: {
-                    auto item =
-                        dynamic_cast<MenuPictureWithDescription *>(res.value());
-                    int level = std::stoi(item->getDescription());
-                    if (level > LEVELS_COUNT) {
-                        continue;
-                    }
-                    auto ans =
-                        startGame(window, std::stoi(item->getDescription()));
-                    assert(ans != std::nullopt);
-                    switch (ans.value()) {
-                        case ButtonType::EXIT:
-                            return ans.value();
-                        case ButtonType::NEW_GAME:
-                            continue;
-                        default:
-                            assert(false);
-                    }
+        const auto res = menu.showMenu(window, backgroundSprite);
+        switch (res->getType()) {
+            case ButtonType::LEVEL: {
+                auto item =
+                    dynamic_cast<const MenuPictureWithDescription *>(res);
+                int level = std::stoi(item->getDescription());
+                if (level > LEVELS_COUNT) {
+                    continue;
                 }
-                case ButtonType::RETURN:
-                    menu.flyAwayToRight(window, backgroundSprite);
-                    return ButtonType::RETURN;
-                default:
-                    assert(false);
+                auto ans = startGame(window, std::stoi(item->getDescription()));
+                assert(ans != std::nullopt);
+                switch (ans.value()) {
+                    case ButtonType::EXIT:
+                        return ans.value();
+                    case ButtonType::NEW_GAME:
+                        continue;
+                    default:
+                        assert(false);
+                }
             }
+            case ButtonType::RETURN:
+                menu.flyAwayToRight(window, backgroundSprite);
+                return ButtonType::RETURN;
+            default:
+                assert(false);
         }
-
-        // redraw
-        window.clear();
-        window.draw(backgroundSprite);
-        menu.draw(window);
-        window.display();
     }
     return ButtonType::EXIT;
 }
