@@ -20,6 +20,8 @@ enum class ButtonType {
     LEVEL
 };
 
+std::string convertButtonTypeToString(ButtonType type);
+
 struct MenuItem {
 public:
     explicit MenuItem(const sf::Vector2<float> &coordinates);

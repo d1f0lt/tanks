@@ -13,8 +13,6 @@ struct MenuController;
 
 namespace Menu {
 
-std::string convertButtonTypeToString(ButtonType type);
-
 struct Menu final {
 public:
     explicit Menu() = default;
