@@ -2,7 +2,7 @@
 #include <memory>
 #include <string>
 #include "constants.h"
-#include "controller.h"
+#include "menu_controller.h"
 #include "menu.h"
 #include "new_game_menu.h"
 

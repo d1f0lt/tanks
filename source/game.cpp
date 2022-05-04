@@ -2,7 +2,8 @@
 #include <chrono>
 #include <thread>
 #include "constants.h"
-#include "controller.h"
+#include "game_controller.h"
+#include "menu_controller.h"
 #include "game_environment.h"
 #include "map.h"
 #include "movable_object_view.h"

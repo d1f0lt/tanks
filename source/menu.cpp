@@ -5,7 +5,7 @@
 #include <string>
 #include <thread>
 #include <vector>
-#include "controller.h"
+#include "menu_controller.h"
 
 namespace Tanks::Menu {
 
@@ -41,7 +41,7 @@ Menu::Menu(size_t menuWidth,
     items.emplace_back(std::move(title));
 
     // buttons
-    for (int i = 0; i < buttonsCount; ++i) {
+    for (size_t i = 0; i < buttonsCount; ++i) {
         auto btnInfo = buttonsInfo[i];
         InscriptionInfo inscriptionInfo{
             convertButtonTypeToString(btnInfo.getType()),
@@ -105,9 +105,9 @@ Menu::Menu(size_t menuWidth,
 
     const std::string filename = path + "item";
     const static sf::Color textColor(0, 0, 0);
-    for (int i = 0; i < linesQuantity; ++i) {
+    for (size_t i = 0; i < linesQuantity; ++i) {
         currentCoordinates.x = static_cast<float>(marginLeft);
-        for (int j = 1; j <= (i + 1 != linesQuantity ? quantityPerLine
+        for (size_t j = 1; j <= (i + 1 != linesQuantity ? quantityPerLine
                                                      : itemsQuantityInLastLine);
              ++j) {
             const std::string currentItem =
@@ -190,7 +190,7 @@ void Menu::addIconToLeftUpCorner(const std::string &filename, ButtonType type) {
     image.loadFromFile(filename);
     const static int margin = 5;
     const static sf::Vector2<float> coordinates{2 * margin, 2 * margin};
-    addMenuItem(std::move(initIcon(image, type, coordinates, margin)));
+    addMenuItem(initIcon(image, type, coordinates, margin));
 }
 
 void Menu::addIconToLeftLowerCorner(const std::string &filename,
@@ -201,7 +201,7 @@ void Menu::addIconToLeftLowerCorner(const std::string &filename,
     sf::Vector2<float> coordinates(
         margin,
         static_cast<float>(WINDOW_HEIGHT - image.getSize().y - 3 * margin));
-    addMenuItem(std::move(initIcon(image, type, coordinates, 2 * margin)));
+    addMenuItem(initIcon(image, type, coordinates, 2 * margin));
 }
 
 const std::vector<std::unique_ptr<MenuItem>> &Menu::getItems() const {

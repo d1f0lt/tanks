@@ -1,7 +1,7 @@
 #include "levels_menu.h"
 #include <cassert>
 #include "constants.h"
-#include "controller.h"
+#include "menu_controller.h"
 #include "game.h"
 
 namespace Tanks::Menu {
