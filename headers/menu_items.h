@@ -48,13 +48,11 @@ private:
                               // most likely be incorrect
 };
 
-
 struct InscriptionInfo final {
     const std::string inscription;
     const size_t characterSize;
     const sf::Color textColor;
 };
-
 
 struct MenuInscription final : MenuItem {
 public:
@@ -172,7 +170,6 @@ public:
 private:
     std::unique_ptr<MenuInscription> description;
 };
-}
-
+}  // namespace Tanks::Menu
 
 #endif

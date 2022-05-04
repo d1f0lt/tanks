@@ -32,11 +32,12 @@ public:
                   Button btnInfo);  // for levels
 
     void draw(sf::RenderWindow &window) const;
-
-    void addIconToLeftUpCorner(const std::string &filename, ButtonType type);
-    void addIconToLeftLowerCorner(const std::string &filename, ButtonType type);
+    const MenuButton *showMenu(sf::RenderWindow &window,
+                               const sf::Sprite &background);
 
     void addMenuItem(std::unique_ptr<MenuItem> &&item);
+    void addIconToLeftUpCorner(const std::string &filename, ButtonType type);
+    void addIconToLeftLowerCorner(const std::string &filename, ButtonType type);
 
     // animations
     void flyOutFromLeft(sf::RenderWindow &window,
@@ -49,8 +50,6 @@ public:
                         const sf::Sprite &backgroundSprite);
     void flyAwayToRight();  // without animation, to set the initial position
                             // for first animation
-
-    const MenuButton *showMenu(sf::RenderWindow &window, const sf::Sprite &background);
 
 private:
     std::vector<std::unique_ptr<MenuItem>> items;

@@ -1,12 +1,11 @@
 #include "menu.h"
-#include "controller.h"
 #include <cassert>
+#include <chrono>
 #include <cmath>
 #include <string>
-#include <unordered_map>
-#include <vector>
-#include <chrono>
 #include <thread>
+#include <vector>
+#include "controller.h"
 
 namespace Tanks::Menu {
 
@@ -136,6 +135,36 @@ void Menu::draw(sf::RenderWindow &window) const {
     }
 }
 
+const MenuButton *Menu::showMenu(sf::RenderWindow &window,
+                                 const sf::Sprite &backgroundSprite) {
+    while (window.isOpen()) {
+        // catch event
+        sf::Event event{};
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed)
+                window.close();
+        }
+        if (const auto res =
+                Tanks::MenuController::control(getItems(), window, event);
+            res != std::nullopt) {
+            return res.value();
+        }
+
+        // redraw
+        window.clear();
+        window.draw(backgroundSprite);
+        this->draw(window);
+        window.display();
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(15));
+    }
+    return nullptr;
+}
+
+void Menu::addMenuItem(std::unique_ptr<MenuItem> &&item) {
+    items.emplace_back(std::move(item));
+}
+
 namespace {
 
 std::unique_ptr<MenuButton> initIcon(const sf::Image &image,
@@ -173,10 +202,6 @@ void Menu::addIconToLeftLowerCorner(const std::string &filename,
         margin,
         static_cast<float>(WINDOW_HEIGHT - image.getSize().y - 3 * margin));
     addMenuItem(std::move(initIcon(image, type, coordinates, 2 * margin)));
-}
-
-void Menu::addMenuItem(std::unique_ptr<MenuItem> &&item) {
-    items.emplace_back(std::move(item));
 }
 
 const std::vector<std::unique_ptr<MenuItem>> &Menu::getItems() const {
@@ -263,31 +288,5 @@ void Menu::flyAwayToRight() {
         static_cast<int>(std::ceil((WINDOW_WIDTH - minPositionX) / speed));
     moveItems(static_cast<float>(stepsAmount * speed));
 }
-
-const MenuButton *Menu::showMenu(sf::RenderWindow &window, const sf::Sprite &backgroundSprite) {
-    while (window.isOpen()) {
-        // catch event
-        sf::Event event{};
-        while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed)
-                window.close();
-        }
-        if (const auto res =
-                Tanks::MenuController::control(getItems(), window, event);
-            res != std::nullopt) {
-            return res.value();
-        }
-
-        // redraw
-        window.clear();
-        window.draw(backgroundSprite);
-        this->draw(window);
-        window.display();
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(15));
-    }
-    return nullptr;
-}
-
 
 }  // namespace Tanks::Menu

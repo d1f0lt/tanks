@@ -1,6 +1,6 @@
 #include "menu_items.h"
-#include "constants.h"
 #include <cassert>
+#include "constants.h"
 
 namespace Tanks::Menu {
 
@@ -260,4 +260,4 @@ std::string MenuPictureWithDescription::getDescription() const {
     return description->getContent();
 }
 
-}
+}  // namespace Tanks::Menu

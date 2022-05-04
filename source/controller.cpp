@@ -49,7 +49,10 @@ std::optional<Menu::MenuButton *> MenuController::control(
     return std::nullopt;
 }
 
-std::optional<Menu::MenuButton *> MenuController::control(const Menu::Menu &menu, sf::RenderWindow &window, const sf::Event &event) {
+std::optional<Menu::MenuButton *> MenuController::control(
+    const Menu::Menu &menu,
+    sf::RenderWindow &window,
+    const sf::Event &event) {
     const auto &items = menu.getItems();
     return control(items, window, event);
 }
