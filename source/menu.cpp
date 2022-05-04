@@ -217,26 +217,26 @@ void Menu::moveItems(float distance) {
 void Menu::animation(sf::RenderWindow &window,
                      const sf::Sprite &backgroundSprite,
                      int stepsAmount,
-                     float speed_) {
+                     float speed) {
     for (int i = 0; i < stepsAmount; ++i) {
-        moveItems(speed_);
+        moveItems(speed);
+#ifndef MENU_TEST
         window.clear();
         window.draw(backgroundSprite);
         this->draw(window);
         window.display();
+#endif
     }
 }
-
-static constexpr int speed = 3;
 
 void Menu::flyOutFromLeft(sf::RenderWindow &window,
                           const sf::Sprite &backgroundSprite) {
     assert(!items.empty());
     const auto stepsAmount =
-        (items[0]->getStandardPosition().x - items[0]->getPosition().x) / speed;
+        (items[0]->getStandardPosition().x - items[0]->getPosition().x) / animationSpeed;
     assert(stepsAmount == static_cast<int>(stepsAmount));
     assert(stepsAmount > 0);
-    animation(window, backgroundSprite, static_cast<int>(stepsAmount), speed);
+    animation(window, backgroundSprite, static_cast<int>(stepsAmount), animationSpeed);
 }
 
 void Menu::flyAwayToLeft(sf::RenderWindow &window,
@@ -248,18 +248,18 @@ void Menu::flyAwayToLeft(sf::RenderWindow &window,
         maxPositionX = std::max(pos, maxPositionX);
     }
     assert(maxPositionX > 0 && maxPositionX < WINDOW_WIDTH);
-    const int stepsAmount = static_cast<int>(std::ceil(maxPositionX / speed));
-    animation(window, backgroundSprite, stepsAmount, -speed);
+    const int stepsAmount = static_cast<int>(std::ceil(maxPositionX / animationSpeed));
+    animation(window, backgroundSprite, stepsAmount, -animationSpeed);
 }
 
 void Menu::flyOutFromRight(sf::RenderWindow &window,
                            const sf::Sprite &backgroundSprite) {
     assert(!items.empty());
     const auto stepsAmount =
-        (items[0]->getPosition().x - items[0]->getStandardPosition().x) / speed;
+        (items[0]->getPosition().x - items[0]->getStandardPosition().x) / animationSpeed;
     assert(stepsAmount == static_cast<int>(stepsAmount));
     assert(stepsAmount > 0);
-    animation(window, backgroundSprite, static_cast<int>(stepsAmount), -speed);
+    animation(window, backgroundSprite, static_cast<int>(stepsAmount), -animationSpeed);
 }
 
 void Menu::flyAwayToRight(sf::RenderWindow &window,
@@ -272,8 +272,8 @@ void Menu::flyAwayToRight(sf::RenderWindow &window,
     }
     assert(minPositionX < WINDOW_WIDTH && minPositionX >= 0);
     const int stepsAmount =
-        static_cast<int>(std::ceil((WINDOW_WIDTH - minPositionX) / speed));
-    animation(window, backgroundSprite, stepsAmount, speed);
+        static_cast<int>(std::ceil((WINDOW_WIDTH - minPositionX) / animationSpeed));
+    animation(window, backgroundSprite, stepsAmount, animationSpeed);
 }
 
 void Menu::flyAwayToRight() {
@@ -285,8 +285,8 @@ void Menu::flyAwayToRight() {
     }
     assert(minPositionX < WINDOW_WIDTH && minPositionX >= 0);
     const int stepsAmount =
-        static_cast<int>(std::ceil((WINDOW_WIDTH - minPositionX) / speed));
-    moveItems(static_cast<float>(stepsAmount * speed));
+        static_cast<int>(std::ceil((WINDOW_WIDTH - minPositionX) / animationSpeed));
+    moveItems(static_cast<float>(stepsAmount * animationSpeed));
 }
 
 }  // namespace Tanks::Menu
