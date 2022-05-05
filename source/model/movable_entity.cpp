@@ -3,7 +3,7 @@
 
 namespace Tanks::model {
 void MovableEntity::move(Direction dir, int speed_) {
-    handler->move(dir, speed_);
+    dynamic_cast<MovableHandler &>(*handler.get()).move(dir, speed_);
 }
 
 MovableEntity::MovableEntity(int left,

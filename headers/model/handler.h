@@ -17,15 +17,6 @@ public:
 
     virtual ~BasicHandler() = default;
 
-    virtual void setBackground() = 0;
-    virtual void restoreBackground() = 0;
-
-    [[nodiscard]] virtual std::vector<const Entity *> look(Direction direction);
-
-    virtual void move(Direction direction, int speed);
-
-    virtual void shoot();
-
 protected:
     GameModel &model;
     Entity &entity;
@@ -35,23 +26,30 @@ class ForegroundHandler : public BasicHandler {
 public:
     explicit ForegroundHandler(GameModel &model_, ForegroundEntity &entity);
 
-    void setBackground() final;
-    void restoreBackground() final;
+    void setBackground();
+    void restoreBackground();
 };
 
 class MovableHandler : public ForegroundHandler {
 public:
     explicit MovableHandler(GameModel &model_, MovableEntity &entity);
 
-    [[nodiscard]] std::vector<const Entity *> look(Direction direction) final;
-    void move(Direction direction, int speed) final;
+    [[nodiscard]] std::vector<const Entity *> look(Direction direction);
+    void move(Direction direction, int speed);
 };
 
 class TankHandler : public MovableHandler {
 public:
     explicit TankHandler(GameModel &model_, Tank &entity);
 
-    void shoot() final;
+    void shoot();
+};
+
+class ProjectileHandler : public MovableHandler {
+public:
+    explicit ProjectileHandler(GameModel &model, MovableEntity &entity);
+
+    [[nodiscard]] bool destroy();
 };
 
 }  // namespace Tanks::model

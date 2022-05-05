@@ -9,7 +9,7 @@ public:
     explicit Projectile(int left_,
                         int top_,
                         Direction direction_,
-                        std::unique_ptr<BasicHandler> handler_);
+                        std::unique_ptr<ProjectileHandler> handler_);
 
     explicit Projectile(int left_,
                         int top_,

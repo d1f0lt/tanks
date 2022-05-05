@@ -18,7 +18,8 @@ void GameModel::nextTick() {
              .snapshotAll()[static_cast<unsigned>(EntityType::BOT_TANK)]) {
         auto *tank = dynamic_cast<BotTank *>(entity);
         assert(tank != nullptr);
-        handlers[tank]->move(tank->getDirection(), 1);
+        dynamic_cast<MovableHandler &>(*handlers[tank])
+            .move(tank->getDirection(), 1);
     }
 
     for (auto *entity :
@@ -26,22 +27,19 @@ void GameModel::nextTick() {
              .snapshotAll()[static_cast<unsigned>(EntityType::BULLET)]) {
         auto *bullet = dynamic_cast<Projectile *>(entity);
         assert(bullet != nullptr);
-        handlers[bullet]->move(bullet->getDirection(), bullet->getSpeed());
 
-        for (const auto &row : bullet->snapshotBackground()) {
-            for (const auto *ent : row) {
-                if (ent->getStrength() != 0) {
-                    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
-                    removeEntity(const_cast<Entity &>(*ent));
-                }
-            }
+        if (dynamic_cast<ProjectileHandler &>(*handlers[bullet]).destroy()) {
+            continue;
         }
+        dynamic_cast<MovableHandler &>(*handlers[bullet])
+            .move(bullet->getDirection(), bullet->getSpeed());
     }
 }
 
 Entity &GameModel::addEntity(std::unique_ptr<Entity> entity) {
     if (auto *in_foreground = dynamic_cast<ForegroundEntity *>(entity.get())) {
-        handlers[in_foreground]->setBackground();
+        dynamic_cast<ForegroundHandler &>(*handlers[in_foreground])
+            .setBackground();
     }
 
     map.insert(*entity);
@@ -51,11 +49,12 @@ Entity &GameModel::addEntity(std::unique_ptr<Entity> entity) {
 
 void GameModel::removeEntity(Entity &entity) {
     if (auto *foreground = dynamic_cast<ForegroundEntity *>(&entity)) {
-        handlers[foreground]->restoreBackground();
+        dynamic_cast<ForegroundHandler &>(*handlers[foreground])
+            .restoreBackground();
     }
 
     handlers.erase(&entity);
-    map.erase(entity);
+    //    map.erase(entity);
     groupedEntities.erase(entity);
 }
 

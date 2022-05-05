@@ -21,7 +21,7 @@ bool Tank::canPass(const Entity &other) const {
 }
 
 void Tank::shoot() {
-    handler->shoot();
+    dynamic_cast<TankHandler &>(*handler.get()).shoot();
 }
 
 int Tank::getWidth() const {

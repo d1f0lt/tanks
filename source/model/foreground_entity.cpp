@@ -16,15 +16,15 @@ ForegroundEntity::ForegroundEntity(int left,
 }
 
 std::vector<const Entity *> ForegroundEntity::look(Direction direction) const {
-    return handler->look(direction);
+    return dynamic_cast<MovableHandler &>(*handler).look(direction);
 }
 
 void ForegroundEntity::restoreBackground() {
-    handler->restoreBackground();
+    dynamic_cast<ForegroundHandler &>(*handler).restoreBackground();
 }
 
 void ForegroundEntity::setBackground() {
-    handler->setBackground();
+    dynamic_cast<ForegroundHandler &>(*handler).setBackground();
 }
 
 std::vector<std::vector<const Entity *>> ForegroundEntity::snapshotBackground()

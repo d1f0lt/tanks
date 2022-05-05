@@ -144,3 +144,62 @@ TEST_CASE("Tank simple shoot") {
     CHECK(bullet.getTop() == Tanks::TILE_SIZE + Tanks::TANK_SIZE / 2);
     CHECK(bullet.getLeft() == TILE_SIZE + TANK_SIZE + bullet.getSpeed());
 }
+
+TEST_CASE("Shoot, bullet should die") {
+    using namespace Tanks::model;
+    using namespace Tanks;
+
+    GameModel model;
+    model.loadLevel(1);
+    auto &tank = model.spawnPlayableTank(Tanks::TILE_SIZE, Tanks::TILE_SIZE);
+    tank.setDirection(Tanks::model::Direction::RIGHT);
+    tank.shoot();
+    auto &bullet = dynamic_cast<Projectile &>(
+        model.getByCoords(Tanks::TILE_SIZE + Tanks::TANK_SIZE,
+                          Tanks::TILE_SIZE + Tanks::TANK_SIZE / 2));
+
+    CHECK(bullet.getType() == Tanks::model::EntityType::BULLET);
+    CHECK(bullet.getTop() == Tanks::TILE_SIZE + Tanks::TANK_SIZE / 2);
+    CHECK(bullet.getLeft() == Tanks::TILE_SIZE + Tanks::TANK_SIZE);
+    CHECK(bullet.getDirection() == tank.getDirection());
+
+    model.nextTick();
+    CHECK(bullet.getTop() == Tanks::TILE_SIZE + Tanks::TANK_SIZE / 2);
+    CHECK(bullet.getLeft() == TILE_SIZE + TANK_SIZE + bullet.getSpeed());
+    for (int i = 0; i < 20000; i++) {
+        model.nextTick();
+    }
+}
+
+TEST_CASE("3 Bullets destroy 3 bricks") {
+    using namespace Tanks::model;
+    using namespace Tanks;
+
+    GameModel model;
+    model.loadLevel(1);
+    auto &tank =
+        model.spawnPlayableTank(Tanks::TILE_SIZE, Tanks::TILE_SIZE * 2);
+
+    tank.setDirection(Tanks::model::Direction::RIGHT);
+    constexpr std::array<std::pair<int, int>, 3> COORDS = {
+        std::pair{TILE_SIZE * 3, TILE_SIZE * 2},
+        {TILE_SIZE * 7, TILE_SIZE * 2},
+        {TILE_SIZE * 13, TILE_SIZE * 2}};
+    for (auto [x, y] : COORDS) {
+        tank.shoot();
+        auto &bullet = dynamic_cast<Projectile &>(
+            model.getByCoords(tank.getLeft() + tank.getWidth(),
+                              tank.getTop() + tank.getHeight() / 2));
+
+        auto &brick = model.getByCoords(x, y);
+        int t = bullet.dist(brick) / BULLET_SPEED +
+                (bullet.dist(brick) % BULLET_SPEED != 0);
+        for (int i = 0; i < t; i++) {
+            auto &brickNow = model.getByCoords(x, y);
+            CHECK(&brick == &brickNow);
+            model.nextTick();
+        }
+        auto &floor = model.getByCoords(x, y);
+        CHECK(floor.getType() == Tanks::model::EntityType::FLOOR);
+    }
+}

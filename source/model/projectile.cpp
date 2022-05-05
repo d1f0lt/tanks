@@ -5,7 +5,7 @@ namespace Tanks::model {
 Projectile::Projectile(int left_,
                        int top_,
                        Direction direction_,
-                       std::unique_ptr<BasicHandler> handler_)
+                       std::unique_ptr<ProjectileHandler> handler_)
     : MovableEntity(left_,
                     top_,
                     std::move(handler_),
@@ -23,7 +23,7 @@ Projectile::Projectile(int left_,
                        GameModel &model_)
     : MovableEntity(left_,
                     top_,
-                    std::make_unique<MovableHandler>(model_, *this),
+                    std::make_unique<ProjectileHandler>(model_, *this),
                     direction_,
                     BULLET_SPEED) {
 }

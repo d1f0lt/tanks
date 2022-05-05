@@ -15,6 +15,7 @@ class GameModel {
     friend ForegroundHandler;
     friend MovableHandler;
     friend TankHandler;
+    friend ProjectileHandler;
 
 public:
     explicit GameModel() = default;

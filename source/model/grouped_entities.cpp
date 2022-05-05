@@ -1,4 +1,5 @@
 #include "model/grouped_entities.h"
+#include <cassert>
 
 namespace Tanks::model {
 void GroupedEntities::insert(Entity &entity) {
@@ -12,8 +13,12 @@ void GroupedEntities::insert(Entity &entity) {
 }
 
 void GroupedEntities::erase(Entity &entity) {
-    entities[0].erase(
-        std::find(entities[0].begin(), entities[0].end(), &entity));
+    auto i = static_cast<unsigned>(entity.getType());
+    assert(std::find(entities[i].begin(), entities[i].end(), &entity) !=
+           entities[i].end());
+
+    entities[i].erase(
+        std::find(entities[i].begin(), entities[i].end(), &entity));
 }
 
 const std::vector<std::vector<Entity *>> &GroupedEntities::snapshotAll() const {
