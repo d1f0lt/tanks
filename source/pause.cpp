@@ -1,7 +1,7 @@
 #include "pause.h"
 #include <cassert>
-#include "game_controller.h"
 #include "constants.h"
+#include "game_controller.h"
 
 namespace Tanks {
 

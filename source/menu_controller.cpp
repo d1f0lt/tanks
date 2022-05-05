@@ -34,4 +34,4 @@ std::optional<Menu::MenuButton *> MenuController::control(
     return control(items, window, event);
 }
 
-}
+}  // namespace Tanks

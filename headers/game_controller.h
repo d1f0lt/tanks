@@ -12,6 +12,6 @@ public:
     static void makeMove(Player &player, double time);
 };
 
-}
+}  // namespace Tanks
 
 #endif
