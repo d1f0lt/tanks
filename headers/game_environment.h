@@ -8,9 +8,9 @@ namespace Tanks {
 
 struct Timer final {
 public:
-    explicit Timer(const std::string &path);
+    explicit Timer(const std::string &filename);
 
-    void drawTimer(sf::RenderWindow &window) const;
+    void draw(sf::RenderWindow &window) const;
 
     void restart();
 
@@ -23,7 +23,7 @@ private:
     sf::Text time;
     sf::Image image;
     sf::Texture texture;
-    sf::Sprite sprite;
+    sf::Sprite sprite;  // TODO make menuItem for this
 };
 
 struct Environment final {
@@ -37,13 +37,9 @@ public:
 private:
     mutable Timer timer;
     Menu::Menu menu;
-    sf::Sprite background;
-
-    static sf::Sprite initBackground(const std::string &path);
-
-    void addPauseButton(const std::string &path);
+    sf::Sprite backgroundSprite;
 };
 
-}
+}  // namespace Tanks
 
 #endif

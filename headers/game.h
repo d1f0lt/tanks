@@ -2,8 +2,8 @@
 #define GAME_H_
 
 #include <SFML/Graphics.hpp>
-#include "menu.h"
 #include <optional>
+#include "menu.h"
 
 namespace Tanks {
 

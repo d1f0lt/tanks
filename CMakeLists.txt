@@ -10,7 +10,7 @@ message("CMake runtime output directory: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
 SET(GCC_WARNINGS "-Wall -Wextra")
 #SET(SANITIZERS "-fsanitize=address,undefined,leak,vptr")
-SET(GCC_OPTIMIZE "-Og -g -ftrapv") # Latest is integer overflow protection
+#SET(GCC_OPTIMIZE "-Og -g -ftrapv") # Latest is integer overflow protection
 #SET(GCC_OPTIMIZE "-O2 -DNDEBUG") # RELEASE
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_WARNINGS} ${SANITIZERS} ${GCC_OPTIMIZE}")
 
@@ -30,11 +30,24 @@ add_executable(model_tests model_tests.cpp
         source/model/handler.cpp)
 
 add_executable(
+        menu_tests
+        menu_tests.cpp
+        source/menu.cpp
+        source/menu_items.cpp
+        source/menu_controller.cpp
+)
+
+SET(COMPILER_FLAGS_FOR_MENU_TEST "-D MENU_TEST")
+target_compile_options(menu_tests PRIVATE ${COMPILER_FLAGS_FOR_MENU_TEST})
+
+add_executable(
         tanks
         source/main.cpp
         source/game.cpp
-        source/controller.cpp
+        source/menu_controller.cpp
+        source/game_controller.cpp
         source/menu.cpp
+        source/menu_items.cpp
         source/pause.cpp
         source/main_menu.cpp
         source/game_environment.cpp
@@ -51,8 +64,11 @@ add_executable(
         source/model/foreground_entity.cpp
         source/model/movable_entity.cpp
         source/model/handler.cpp
+        source/new_game_menu.cpp
+        source/levels_menu.cpp
 )
 
 
 target_link_libraries(model_tests sfml-graphics)
+target_link_libraries(menu_tests sfml-graphics)
 target_link_libraries(tanks sfml-graphics)

@@ -2,6 +2,7 @@
 #define TANKS_FOREGROUND_ENTITY_H
 
 #include <memory>
+#include <vector>
 #include "entity.h"
 #include "model/handler.h"
 

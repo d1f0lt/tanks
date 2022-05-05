@@ -4,8 +4,6 @@
 #include <SFML/Graphics.hpp>
 #include <memory>
 #include <vector>
-#include "constants.h"
-#include "controller.h"
 #include "menu.h"
 
 namespace Tanks {
@@ -24,13 +22,11 @@ public:
 
     const Menu::Menu &getMenu() const;
 
-    void makeUnPause();
+    void unpause();
 
 private:
     bool pause = false;
     sf::RectangleShape background;
-    const static int pauseWidth = 400;
-    // pauseHeight calculate automatically
     Menu::Menu menu;
 };
 

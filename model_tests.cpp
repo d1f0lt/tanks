@@ -1,5 +1,6 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
+#include <array>
 #include <cassert>
 #include <iostream>
 #include "doctest.h"

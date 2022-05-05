@@ -1,6 +1,4 @@
-#include "controller.h"
-#include "menu.h"
-#include <cassert>
+#include "game_controller.h"
 
 namespace Tanks {
 
@@ -36,31 +34,6 @@ void GameController::makeMove(model::PlayableTank &player) {
         auto direction = model::Direction::UP;
         makeMove(player, direction);
     }
-}
-
-std::optional<Menu::ButtonType> MenuController::control(
-    const Menu::Menu &menu,
-    sf::RenderWindow &window) {
-    auto &items = menu.getItems();
-    for (auto &menuItem : items) {
-        auto item = dynamic_cast<Menu::MenuButton *>(menuItem.get());
-        if (item == nullptr) {  // header
-            continue;
-        }
-        auto coordinates =
-            static_cast<sf::Vector2<int>>(item->rectangle.getPosition());
-        auto proportions =
-            static_cast<sf::Vector2<int>>(item->rectangle.getSize());
-        if (sf::IntRect(coordinates.x, coordinates.y, proportions.x,
-                        proportions.y)
-                .contains(sf::Mouse::getPosition(window))) {
-            item->hover();
-            if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-                return item->getType();
-            }
-        }
-    }
-    return std::nullopt;
 }
 
 }  // namespace Tanks

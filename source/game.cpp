@@ -1,7 +1,9 @@
 #include <chrono>
 #include <thread>
 #include <cassert>
-#include "controller.h"
+#include "game_controller.h"
+#include "game_environment.h"
+#include "menu_controller.h"
 #include "pause.h"
 #include "model/game_model.h"
 #include "view/game_view.h"
@@ -31,12 +33,14 @@ std::optional<Menu::ButtonType> startGame(sf::RenderWindow &window, int level) {
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed)
                 window.close();
-            pause.checkPause(event);
         }
+        pause.checkPause(event);
 
         if (!pause.isPause()) {
-            if (auto signal = MenuController::control(environment.getMenu(), window); signal != std::nullopt) {
-                assert(signal == Menu::ButtonType::PAUSE);
+            if (auto signal = MenuController::control(environment.getMenu(),
+                                                      window, event);
+                signal != std::nullopt) {
+                assert(signal.value()->getType() == Menu::ButtonType::PAUSE);
                 pause.makePause();
             } else {
                 GameController::makeMove(player);
@@ -52,16 +56,17 @@ std::optional<Menu::ButtonType> startGame(sf::RenderWindow &window, int level) {
         greenTank.draw(window, player);
 
         if (pause.isPause()) {
-            if (auto signal = MenuController::control(pause.getMenu(), window);
+            if (auto signal =
+                    MenuController::control(pause.getMenu(), window, event);
                 signal != std::nullopt) {
-                switch (signal.value()) {
+                switch (signal.value()->getType()) {
                     case Menu::ButtonType::RESUME:
-                        pause.makeUnPause();
+                        pause.unpause();
                         break;
                     case Menu::ButtonType::NEW_GAME:
                         return Menu::ButtonType::NEW_GAME;
                     case Menu::ButtonType::EXIT:
-                        return std::nullopt;
+                        return signal.value()->getType();
                     default:
                         break;
                 }

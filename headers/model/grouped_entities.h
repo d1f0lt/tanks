@@ -1,6 +1,7 @@
 #ifndef TANKS_GROUPED_ENTITIES_H
 #define TANKS_GROUPED_ENTITIES_H
 
+#include <vector>
 #include "entity.h"
 
 namespace Tanks::model {

@@ -1,6 +1,9 @@
 #include "model/game_model.h"
 #include <cassert>
 #include <fstream>
+#include <iostream>
+#include <thread>
+#include <unordered_map>
 #include "model/blocks.h"
 #include "model/projectile.h"
 
@@ -81,7 +84,8 @@ void GameModel::loadLevel(int level) {
         {'{', EntityType::LEFT_DOWN_CORNER},
         {'}', EntityType::RIGHT_DOWN_CORNER}};
 
-    std::fstream file(currentLevel);
+    std::ifstream file(currentLevel);
+
     assert(file.is_open() && "Unable to open map texture file");
     std::string str;
 
