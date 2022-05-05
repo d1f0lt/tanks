@@ -8,7 +8,6 @@ constexpr int WINDOW_WIDTH = 1920;
 constexpr int WINDOW_HEIGHT = 1080;
 
 // game
-enum class Direction { LEFT, RIGHT, DOWN, UP };
 constexpr int TILE_SIZE = 56;     // ONE_TILE_WIDTH = ONE_TILE_HEIGHT = 56
 constexpr int MARGIN_TOP = 8;     // = MARGIN_DOWN
 constexpr int MARGIN_LEFT = 288;  // = MARGIN_RIGHT     for centralize

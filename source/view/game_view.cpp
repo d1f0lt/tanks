@@ -125,8 +125,8 @@ void Map::draw(sf::RenderWindow &window, model::GameModel &model) {
         for (int col = 0; col < MAP_WIDTH; ++col) {
             auto &tile = map[row][col];
             if (tile.getType() == model::EntityType::BRICK &&
-                model.getEntityByCoords(col * TILE_SIZE, row * TILE_SIZE)
-                        .getType() != model::EntityType::BRICK) {
+                model.getByCoords(col * TILE_SIZE, row * TILE_SIZE).getType() !=
+                    model::EntityType::BRICK) {
                 tile.destroy();
             }
             tile.draw(window);

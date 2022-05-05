@@ -83,7 +83,9 @@ void Timer::nextTick() {
 }
 
 Environment::Environment(const std::string &path)
-    : timer(path + "timer.png"), menu{}, backgroundSprite(initBackground(path)) {
+    : timer(path + "timer.png"),
+      menu{},
+      backgroundSprite(initBackground(path)) {
     menu.addIconToLeftUpCorner(path + "pause.png", Menu::ButtonType::PAUSE);
 }
 
