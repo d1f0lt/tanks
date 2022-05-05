@@ -50,10 +50,11 @@ namespace {
 }  // namespace
 
 int Entity::dist(const Entity &other) const {
-    int delta_x = segdist(getLeft(), getLeft() + getWidth() - 1,
-                          other.getLeft(), other.getLeft() - 1);
-    int delta_y = segdist(getTop(), getTop() + getHeight() - 1,
-                          other.getHeight(), other.getHeight() - 1);
+    int delta_x =
+        segdist(getLeft(), getLeft() + getWidth() - 1, other.getLeft(),
+                other.getLeft() + other.getWidth() - 1);
+    int delta_y = segdist(getTop(), getTop() + getHeight() - 1, other.getTop(),
+                          other.getTop() + other.getHeight() - 1);
     return delta_x + delta_y;
 }
 
