@@ -25,44 +25,43 @@ std::vector<const Entity *> BasicHandler::look(Direction) {
 }
 
 std::vector<const Entity *> MovableHandler::look(Direction direction) {
-    auto &real_entity = dynamic_cast<MovableEntity &>(entity);
+    auto &real_entity = static_cast<MovableEntity &>(entity);
     // retuns square [left, right) x [down, top)
     int left = -1;
     int top = -1;
     int right = -1;
-    int down = 0;
+    int down = -1;
     switch (direction) {
         case (Direction::UP):
             left = entity.getLeft();
             right = left + entity.getWidth();
             down = entity.getTop() - 1;
-            top = down - real_entity.getSpeed();
+            top = std::max(-1, down - real_entity.getSpeed());
             break;
         case (Direction::DOWN):
             left = entity.getLeft();
             right = left + entity.getWidth();
-            top = entity.getTop() + entity.getHeight();
-            down = top + real_entity.getSpeed();
+            top = entity.getTop() + entity.getHeight() - 1;
+            down =
+                std::min(model.getHeight() - 1, top + real_entity.getSpeed());
             break;
         case (Direction::LEFT):
             right = entity.getLeft();
-            left = right - real_entity.getSpeed();
+            left = std::max(0, right - real_entity.getSpeed());
             top = entity.getTop() - 1;
             down = top + entity.getHeight();
             break;
         case (Direction::RIGHT):
             left = entity.getLeft() + entity.getWidth();
-            right = left + real_entity.getSpeed();
+            right = std::min(model.getWidth(), left + real_entity.getSpeed());
             top = entity.getTop() - 1;
             down = top + entity.getHeight();
             break;
     }
 
     std::vector<const Entity *> res;
-    res.reserve(real_entity.getSpeed());
-
-    for (int row = down; row > top && row >= 0; row--) {
-        for (int col = left; col < right && col < model.map.getWidth(); col++) {
+    for (int row = down; row > top; row--) {
+        for (int col = left; col < right; col++) {
             res.push_back(&model.getByCoords(col, row));
         }
     }
