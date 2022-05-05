@@ -10,7 +10,7 @@
 namespace Tanks::Menu {
 
 Menu::Menu(size_t menuWidth,
-           const InscriptionInfo &titleInfo, // NOLINT
+           const InscriptionInfo &titleInfo,  // NOLINT
            const InscriptionInfo &inscriptionsInfo,
            const std::vector<ButtonWithType> &buttonsInfo) {
     const size_t buttonsCount = buttonsInfo.size();
@@ -218,7 +218,7 @@ void Menu::moveItems(float distance) {
 
 void Menu::animation(sf::RenderWindow &window,
                      const sf::Sprite &backgroundSprite,
-                     size_t stepsAmount, // NOLINT
+                     size_t stepsAmount,  // NOLINT
                      float speed) {
     for (size_t i = 0; i < stepsAmount; ++i) {
         moveItems(speed);

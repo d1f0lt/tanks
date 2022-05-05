@@ -44,8 +44,8 @@ public:
     MenuItem() = default;
     MenuItem(const MenuItem &) = default;
     MenuItem(MenuItem &&) = default;
-    MenuItem& operator=(const MenuItem &) = default;
-    MenuItem& operator=(MenuItem &&) = default;
+    MenuItem &operator=(const MenuItem &) = default;
+    MenuItem &operator=(MenuItem &&) = default;
     virtual ~MenuItem() = default;
 
 private:

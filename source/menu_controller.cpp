@@ -18,7 +18,7 @@ std::optional<Menu::MenuButton *> MenuController::control(
                 .contains(sf::Mouse::getPosition(window))) {
             item->hover();
             if (event.type == sf::Event::MouseButtonReleased &&
-                event.mouseButton.button == sf::Mouse::Left) { // NOLINT
+                event.mouseButton.button == sf::Mouse::Left) {  // NOLINT
                 return item;
             }
         }

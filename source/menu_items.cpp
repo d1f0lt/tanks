@@ -21,7 +21,7 @@ std::string convertButtonTypeToString(const ButtonType type) {
 }
 
 Button::Button(const sf::Vector2<float> &size_,
-               const sf::Color &standardColor_, // NOLINT
+               const sf::Color &standardColor_,  // NOLINT
                const sf::Color &hoverColor_)
     : standardColor(standardColor_), hoverColor(hoverColor_), size(size_) {
 }
@@ -245,7 +245,8 @@ void MenuPictureWithDescription::draw(sf::RenderWindow &window) const {
     window.draw(getRectangle());
     getContent()->draw(window);
     description->draw(window);
-    getRectangle().setFillColor(getButtonInfo().getStandardColor());  // recover after possible hover;
+    getRectangle().setFillColor(
+        getButtonInfo().getStandardColor());  // recover after possible hover;
 }
 
 sf::Vector2<float> MenuPictureWithDescription::getSize() const {
