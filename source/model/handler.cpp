@@ -11,7 +11,7 @@ BasicHandler::BasicHandler(GameModel &model_, Entity &entity_)
     model.handlers[&entity] = this;
 }
 
-void BasicHandler::move(Direction) {
+void BasicHandler::move(Direction direction, int speed) {
     assert(false);
 }
 
@@ -116,14 +116,14 @@ MovableHandler::MovableHandler(GameModel &model_, MovableEntity &entity)
     : ForegroundHandler(model_, entity) {
 }
 
-void MovableHandler::move(Direction direction) {
+void MovableHandler::move(Direction direction, int speed) {
     // TODO lock model
     auto &real_entity = dynamic_cast<MovableEntity &>(entity);
 
     real_entity.setDirection(direction);
     real_entity.restoreBackground();
 
-    int dist = real_entity.speed;
+    int dist = speed;
     for (const auto *object : real_entity.look(direction)) {
         if (!real_entity.canPass(*object)) {
             dist = std::min(dist, real_entity.dist(*object));

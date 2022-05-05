@@ -23,12 +23,13 @@ public:
                            int speed);
 
     [[nodiscard]] Direction getDirection() const;
+
     [[nodiscard]] int getSpeed() const;
 
 protected:
     void setDirection(Direction dir);
 
-    void move(Direction dir);
+    void move(Direction dir, int speed_);
 
 private:
     Direction direction;

@@ -44,6 +44,9 @@ Tank::Tank(int left,
            int speed)
     : MovableEntity(left, top, id, std::move(handler), direction, speed) {
 }
+EntityType Tank::getType() const {
+    return EntityType::LEFT_DOWN_CORNER;
+}
 
 PlayableTank::PlayableTank(int left_,
                            int top_,
@@ -67,6 +70,9 @@ PlayableTank::PlayableTank(int left,
                            Direction direction,
                            int speed)
     : Tank(left, top, id, std::move(handler), direction, speed) {
+}
+void PlayableTank::move(Direction direction) {
+    move(direction, getSpeed());
 }
 
 BotTank::BotTank(int left_,

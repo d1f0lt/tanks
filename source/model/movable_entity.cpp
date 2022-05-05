@@ -2,8 +2,8 @@
 #include "model/handler.h"
 
 namespace Tanks::model {
-void MovableEntity::move(Direction dir) {
-    handler->move(dir);
+void MovableEntity::move(Direction dir, int speed_) {
+    handler->move(dir, speed_);
 }
 
 MovableEntity::MovableEntity(int left,
@@ -24,9 +24,6 @@ void MovableEntity::setDirection(Direction dir) {
     direction = dir;
 }
 
-int MovableEntity::getSpeed() const {
-    return speed;
-}
 MovableEntity::MovableEntity(int left,
                              int top,
                              int id,
@@ -36,5 +33,8 @@ MovableEntity::MovableEntity(int left,
     : ForegroundEntity(left, top, id, std::move(handler)),
       direction(direction),
       speed(speed) {
+}
+int MovableEntity::getSpeed() const {
+    return speed;
 }
 }  // namespace Tanks::model

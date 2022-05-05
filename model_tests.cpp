@@ -40,7 +40,7 @@ TEST_CASE("Single move and checking background") {
         }
     }
 
-    real_tank.move(Tanks::model::Direction::DOWN);
+    real_tank.move(Tanks::model::Direction::DOWN, real_tank.getSpeed());
     Tanks::model::Entity &ptr2 = model.getByCoords(TILE_SIZE, TILE_SIZE);
     model.nextTick();
 

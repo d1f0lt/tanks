@@ -22,7 +22,7 @@ public:
 
     [[nodiscard]] virtual std::vector<const Entity *> look(Direction direction);
 
-    virtual void move(Direction direction);
+    virtual void move(Direction direction, int speed);
 
     virtual void shoot();
 
@@ -44,8 +44,7 @@ public:
     explicit MovableHandler(GameModel &model_, MovableEntity &entity);
 
     [[nodiscard]] std::vector<const Entity *> look(Direction direction) final;
-
-    void move(Direction direction) final;
+    void move(Direction direction, int speed) final;
 };
 
 class TankHandler : public MovableHandler {

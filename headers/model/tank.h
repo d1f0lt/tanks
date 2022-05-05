@@ -24,6 +24,7 @@ public:
 
     [[nodiscard]] int getStrength() const override;
     [[nodiscard]] bool canPass(const Entity &other) const override;
+    EntityType getType() const override;
 
 protected:
     void shoot();

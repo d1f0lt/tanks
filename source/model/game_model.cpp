@@ -18,7 +18,7 @@ void GameModel::nextTick() {
              .snapshotAll()[static_cast<unsigned>(EntityType::BOT_TANK)]) {
         auto *tank = dynamic_cast<BotTank *>(entity);
         assert(tank != nullptr);
-        handlers[tank]->move(tank->getDirection());
+        handlers[tank]->move(tank->getDirection(), 1);
     }
 
     for (auto *entity :
@@ -26,7 +26,7 @@ void GameModel::nextTick() {
              .snapshotAll()[static_cast<unsigned>(EntityType::BULLET)]) {
         auto *bullet = dynamic_cast<Projectile *>(entity);
         assert(bullet != nullptr);
-        handlers[bullet]->move(bullet->getDirection());
+        handlers[bullet]->move(bullet->getDirection(), bullet->getSpeed());
 
         for (const auto &row : bullet->snapshotBackground()) {
             for (const auto *ent : row) {

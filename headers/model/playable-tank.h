@@ -26,6 +26,8 @@ public:
     using MovableEntity::move;
     using MovableEntity::setDirection;
     using Tank::shoot;
+
+    void move(Direction direction);
 };
 }  // namespace Tanks::model
 #endif  // TANKS_PLAYABLE_TANK_H
