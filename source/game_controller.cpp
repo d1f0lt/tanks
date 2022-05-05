@@ -5,7 +5,9 @@ namespace Tanks {
 
 namespace {
 
-int getDistanceFromTank(model::PlayableTank &player, const model::Entity* const second, model::Direction dir) {
+int getDistanceFromTank(model::PlayableTank &player,
+                        const model::Entity *const second,
+                        model::Direction dir) {
     int distance{};
     switch (dir) {
         case model::Direction::UP:
@@ -15,7 +17,8 @@ int getDistanceFromTank(model::PlayableTank &player, const model::Entity* const 
             distance = second->getTop() - player.getTop() - player.getHeight();
             break;
         case model::Direction::LEFT:
-            distance = player.getLeft() - second->getLeft() - second->getWidth();
+            distance =
+                player.getLeft() - second->getLeft() - second->getWidth();
             break;
         case model::Direction::RIGHT:
             distance = second->getLeft() - player.getLeft() - player.getWidth();
@@ -25,7 +28,7 @@ int getDistanceFromTank(model::PlayableTank &player, const model::Entity* const 
     return distance;
 }
 
-}
+}  // namespace
 
 void GameController::makeMove(model::PlayableTank &player,
                               model::Direction direction) {
@@ -34,7 +37,8 @@ void GameController::makeMove(model::PlayableTank &player,
     auto items = player.look(direction);
     for (const auto *const item : items) {
         if (item->getType() != model::EntityType::FLOOR) {
-            minDistance = std::min(minDistance, getDistanceFromTank(player, item, direction));
+            minDistance = std::min(
+                minDistance, getDistanceFromTank(player, item, direction));
         }
     }
     player.move(direction, minDistance);
