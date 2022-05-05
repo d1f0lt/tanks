@@ -11,7 +11,7 @@ BasicHandler::BasicHandler(GameModel &model_, Entity &entity_)
     model.handlers[&entity] = this;
 }
 
-void BasicHandler::move(Direction direction, int speed) {
+void BasicHandler::move(Direction, int) {
     assert(false);
 }
 
