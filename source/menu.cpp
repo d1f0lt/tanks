@@ -10,7 +10,7 @@
 namespace Tanks::Menu {
 
 Menu::Menu(size_t menuWidth,
-           const InscriptionInfo &titleInfo,
+           const InscriptionInfo &titleInfo, // NOLINT
            const InscriptionInfo &inscriptionsInfo,
            const std::vector<ButtonWithType> &buttonsInfo) {
     const size_t buttonsCount = buttonsInfo.size();
@@ -142,8 +142,9 @@ const MenuButton *Menu::showMenu(sf::RenderWindow &window,
         // catch event
         sf::Event event{};
         while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed)
+            if (event.type == sf::Event::Closed) {
                 window.close();
+            }
         }
         if (const auto res =
                 Tanks::MenuController::control(getItems(), window, event);
@@ -217,9 +218,9 @@ void Menu::moveItems(float distance) {
 
 void Menu::animation(sf::RenderWindow &window,
                      const sf::Sprite &backgroundSprite,
-                     int stepsAmount,
+                     size_t stepsAmount, // NOLINT
                      float speed) {
-    for (int i = 0; i < stepsAmount; ++i) {
+    for (size_t i = 0; i < stepsAmount; ++i) {
         moveItems(speed);
 #ifndef MENU_TEST
         window.clear();

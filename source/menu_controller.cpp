@@ -6,8 +6,8 @@ std::optional<Menu::MenuButton *> MenuController::control(
     const std::vector<std::unique_ptr<Menu::MenuItem>> &items,
     sf::RenderWindow &window,
     const sf::Event &event) {
-    for (auto &menuItem : items) {
-        auto item = dynamic_cast<Menu::MenuButton *>(menuItem.get());
+    for (const auto &menuItem : items) {
+        auto *item = dynamic_cast<Menu::MenuButton *>(menuItem.get());
         if (item == nullptr) {  // header
             continue;
         }
@@ -18,7 +18,7 @@ std::optional<Menu::MenuButton *> MenuController::control(
                 .contains(sf::Mouse::getPosition(window))) {
             item->hover();
             if (event.type == sf::Event::MouseButtonReleased &&
-                event.mouseButton.button == sf::Mouse::Left) {
+                event.mouseButton.button == sf::Mouse::Left) { // NOLINT
                 return item;
             }
         }

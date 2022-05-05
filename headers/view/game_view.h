@@ -26,7 +26,7 @@ private:
     sf::Sprite sprite;
     model::EntityType type;
 
-    void changeSprite(model::EntityType new_type);
+    void changeSprite(model::EntityType newType);
 };
 
 struct Map final {

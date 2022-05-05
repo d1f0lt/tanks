@@ -65,7 +65,7 @@ void showMainMenu(sf::RenderWindow &window) {
     menu.addIconToLeftUpCorner(imagesPath + "gear.png", ButtonType::SETTINGS);
 
     while (window.isOpen()) {
-        const auto res = menu.showMenu(window, backgroundSprite);
+        const auto *const res = menu.showMenu(window, backgroundSprite);
         switch (res->getType()) {
             case ButtonType::NEW_GAME: {
                 menu.flyAwayToLeft(window, backgroundSprite);

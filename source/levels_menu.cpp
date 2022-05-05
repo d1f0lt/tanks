@@ -49,12 +49,12 @@ ButtonType showLevelsMenu(sf::RenderWindow &window,
     menu.flyOutFromRight(window, backgroundSprite);
 
     while (window.isOpen()) {
-        const auto res = menu.showMenu(window, backgroundSprite);
+        const auto *res = menu.showMenu(window, backgroundSprite);
         switch (res->getType()) {
             case ButtonType::LEVEL: {
-                auto item =
+                const auto *item =
                     dynamic_cast<const MenuPictureWithDescription *>(res);
-                int level = std::stoi(item->getDescription());
+                size_t level = std::stoi(item->getDescription());
                 if (level > LEVELS_COUNT) {
                     continue;
                 }

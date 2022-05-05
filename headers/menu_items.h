@@ -63,7 +63,7 @@ struct InscriptionInfo final {
 
 struct MenuInscription final : MenuItem {
 public:
-    explicit MenuInscription(const InscriptionInfo &info,
+    explicit MenuInscription(const InscriptionInfo &parameters,
                              const sf::Vector2<float> &coordinates);
 
     [[nodiscard]] sf::Vector2<float> getSize() const final;

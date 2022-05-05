@@ -34,8 +34,9 @@ std::optional<Menu::ButtonType> startGame(sf::RenderWindow &window, int level) {
         // catch event
         sf::Event event{};
         while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed)
+            if (event.type == sf::Event::Closed) {
                 window.close();
+            }
         }
         pause.checkPause(event);
 

@@ -61,7 +61,7 @@ void Pause::drawPause(sf::RenderWindow &window) const {
 }
 
 void Pause::checkPause(const sf::Event &event) {
-    pause ^= GameController::isEscReleased(event);
+    pause ^= static_cast<int>(GameController::isEscReleased(event));
 }
 
 bool Pause::isPause() const {

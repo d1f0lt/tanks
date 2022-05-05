@@ -64,10 +64,10 @@ private:
 
     void animation(sf::RenderWindow &window,
                    const sf::Sprite &backgroundSprite,
-                   int stepsAmount,
+                   size_t stepsAmount,
                    float speed_);
 
-    void moveItems(float speed_);
+    void moveItems(float distance);
 
     friend struct Tanks::MenuController;
 };

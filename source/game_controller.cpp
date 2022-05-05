@@ -14,7 +14,7 @@ void GameController::makeMove(model::PlayableTank &player,
 
 bool GameController::isEscReleased(const sf::Event &event) {
     return (event.type == sf::Event::KeyReleased &&
-            event.key.code == sf::Keyboard::Escape);
+            event.key.code == sf::Keyboard::Escape); // NOLINT
 }
 
 void GameController::makeMove(model::PlayableTank &player) {

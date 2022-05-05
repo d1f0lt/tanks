@@ -51,7 +51,7 @@ void showNewGameMenu(sf::RenderWindow &window,
     menu.flyOutFromRight(window, backgroundSprite);
 
     while (window.isOpen()) {
-        const auto res = menu.showMenu(window, backgroundSprite);
+        const auto *const res = menu.showMenu(window, backgroundSprite);
         switch (res->getType()) {
             case ButtonType::SINGLE_PLAYER: {
                 menu.flyAwayToLeft(window, backgroundSprite);

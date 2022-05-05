@@ -7,7 +7,7 @@ namespace Tanks {
 
 namespace {
 
-std::string numberWithLeftZeros(int num, size_t numberLength) {
+std::string numberWithLeftZeros(int num, size_t numberLength) { // NOLINT
     std::string numStr(std::to_string(num));
     assert(numStr.size() <= static_cast<size_t>(numberLength));
     return std::string("0", numberLength - numStr.size()) + numStr;
@@ -84,7 +84,6 @@ void Timer::nextTick() {
 
 Environment::Environment(const std::string &path)
     : timer(path + "timer.png"),
-      menu(),
       backgroundSprite(initBackground(path)) {
     menu.addIconToLeftUpCorner(path + "pause.png", Menu::ButtonType::PAUSE);
 }
