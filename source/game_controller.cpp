@@ -38,7 +38,7 @@ void GameController::makeMove(model::PlayableTank &player,
     for (const auto *const item : items) {
         if (item->getType() != model::EntityType::FLOOR) {
             minDistance = std::min(
-                minDistance, item->dist(player));
+                minDistance, getDistanceFromTank(player, item, direction));
         }
     }
     player.move(direction, minDistance);
