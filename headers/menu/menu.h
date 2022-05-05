@@ -55,7 +55,7 @@ public:
 
 private:
     std::vector<std::unique_ptr<MenuItem>> items;
-    constexpr static int animationSpeed = 3;
+    constexpr static int animationSpeed = 4;
 
 #ifndef MENU_TEST
     [[nodiscard]] const std::vector<std::unique_ptr<MenuItem>> &getItems()

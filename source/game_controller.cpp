@@ -1,15 +1,43 @@
 #include "game_controller.h"
+#include <cassert>
 
 namespace Tanks {
 
+namespace {
+
+int getDistanceFromTank(model::PlayableTank &player, const model::Entity* const second, model::Direction dir) {
+    int distance{};
+    switch (dir) {
+        case model::Direction::UP:
+            distance = player.getTop() - second->getTop() - second->getHeight();
+            break;
+        case model::Direction::DOWN:
+            distance = second->getTop() - player.getTop() - player.getHeight();
+            break;
+        case model::Direction::LEFT:
+            distance = player.getLeft() - second->getLeft() - second->getWidth();
+            break;
+        case model::Direction::RIGHT:
+            distance = second->getLeft() - player.getLeft() - player.getWidth();
+            break;
+    }
+    assert(distance >= 0);
+    return distance;
+}
+
+}
+
 void GameController::makeMove(model::PlayableTank &player,
                               model::Direction direction) {
-    for (auto &col : player.look(direction)) {
-        if (col != nullptr && col->getType() != model::EntityType::FLOOR) {
-            return;
+    player.setDirection(direction);
+    int minDistance = player.getSpeed();
+    auto items = player.look(direction);
+    for (const auto *const item : items) {
+        if (item->getType() != model::EntityType::FLOOR) {
+            minDistance = std::min(minDistance, getDistanceFromTank(player, item, direction));
         }
     }
-    player.move(direction);
+    player.move(direction, minDistance);
 }
 
 bool GameController::isEscReleased(const sf::Event &event) {
