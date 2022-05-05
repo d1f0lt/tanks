@@ -41,6 +41,11 @@ public:
     void centralizeByHeight(
         const std::pair<float, float> &rectangleCoordinatesY);
 
+    MenuItem() = default;
+    MenuItem(const MenuItem &) = default;
+    MenuItem(MenuItem &&) = default;
+    MenuItem& operator=(const MenuItem &) = default;
+    MenuItem& operator=(MenuItem &&) = default;
     virtual ~MenuItem() = default;
 
 private:
@@ -80,13 +85,13 @@ public:
            const sf::Color &standardColor_,
            const sf::Color &hoverColor_);
 
+    [[nodiscard]] const sf::Vector2<float> &getSize() const;
     [[nodiscard]] const sf::Color &getStandardColor() const;
     [[nodiscard]] const sf::Color &getHoverColor() const;
-    [[nodiscard]] const sf::Vector2<float> &getSize() const;
 
     void setSize(const sf::Vector2<float> &newSize);
 
-protected:
+private:
     const sf::Color standardColor;
     const sf::Color hoverColor;
     sf::Vector2<float> size;
@@ -125,6 +130,11 @@ public:
     void draw(sf::RenderWindow &window) const override;
 
 protected:
+    MenuItem *getContent() const;
+    sf::RectangleShape &getRectangle() const;
+    const ButtonWithType &getButtonInfo() const;
+
+private:
     std::unique_ptr<MenuItem> content;
     mutable sf::RectangleShape rectangle;  // we want draw to be a const
     ButtonWithType info;
