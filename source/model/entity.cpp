@@ -2,62 +2,60 @@
 #include <unordered_set>
 
 namespace Tanks::model {
-Entity::Entity(int left_, int top_, int height_, int width_, EntityType type_)
-    : type(type_), rect(left_, top_, height_, width_) {
-}
-
-EntityType Entity::getType() const {
-    return type;
-}
-
-sf::Rect<int> Entity::getRect() const {
-    return rect;
-}
-
-int Entity::getWidth() const {
-    return getRect().width;
-}
-
-int Entity::getHeight() const {
-    return getRect().height;
+// TODO better random
+Entity::Entity(int left_, int top_) : left(left_), top(top_), id(rand()) {
 }
 
 int Entity::getLeft() const {
-    return getRect().left;
+    return left;
 }
 
 int Entity::getTop() const {
-    return getRect().top;
+    return top;
+}
+
+sf::IntRect Entity::getRect() const {
+    return {left, top, getHeight(), getWidth()};
 }
 
 bool Entity::intersect(const Entity &other) const {
-    return other.getRect().intersects(getRect());
+    return getRect().intersects(other.getRect());
 }
 
-void Entity::setTop(int top) {
-    rect.top = top;
+void Entity::setTop(int top_) {
+    top = top_;
 }
 
-void Entity::setLeft(int left) {
-    rect.left = left;
+void Entity::setLeft(int left_) {
+    left = left_;
 }
 
 bool Entity::isTankPassable() const {
-    static const std::unordered_set<EntityType> PASSABLE = {
-        EntityType::FLOOR, EntityType::GRASS, EntityType::BULLET};
-    return PASSABLE.count(getType()) == 1;
+    return false;
 }
 
 bool Entity::isBulletPassable() const {
-    static const std::unordered_set<EntityType> PASSABLE = {
-        EntityType::GRASS, EntityType::FLOOR, EntityType::WATER};
-    return PASSABLE.count(getType()) == 1;
+    return false;
 }
 
-bool Entity::isDestroyable() const {
-    static const std::unordered_set<EntityType> DESTROYABLE = {
-        EntityType::BRICK, EntityType::BULLET, EntityType::PLAYABLE_TANK,
-        EntityType::BOT_TANK};
-    return DESTROYABLE.count(getType()) == 1;
+namespace {
+[[nodiscard]] int segdist(int x11, int x12, int x21, int x22) {
+    if (x11 > x21) {
+        std::swap(x11, x21);
+        std::swap(x12, x22);
+    }
+    return std::max(0, x21 - x22);
+}
+}  // namespace
+
+int Entity::dist(const Entity &other) const {
+    int delta_x = segdist(getLeft(), getLeft() + getWidth() - 1,
+                          other.getLeft(), other.getLeft() - 1);
+    int delta_y = segdist(getTop(), getTop() + getHeight() - 1,
+                          other.getHeight(), other.getHeight() - 1);
+    return delta_x + delta_y;
+}
+
+Entity::Entity(int left, int top, int id) : left(left), top(top), id(id) {
 }
 }  // namespace Tanks::model

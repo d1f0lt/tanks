@@ -8,12 +8,13 @@ Projectile::Projectile(int left_,
                        std::unique_ptr<BasicHandler> handler_)
     : MovableEntity(left_,
                     top_,
-                    BULLET_SIZE,
-                    BULLET_SIZE,
-                    EntityType::BULLET,
+                    std::move(handler_),
                     direction_,
-                    BULLET_SPEED,
-                    std::move(handler_)) {
+                    BULLET_SPEED) {
+}
+
+bool Projectile::canPass(const Entity &other) const {
+    return other.isBulletPassable();
 }
 
 Projectile::Projectile(int left_,
@@ -22,11 +23,24 @@ Projectile::Projectile(int left_,
                        GameModel &model_)
     : MovableEntity(left_,
                     top_,
-                    BULLET_SIZE,
-                    BULLET_SIZE,
-                    EntityType::BULLET,
+                    std::make_unique<MovableHandler>(model_, *this),
                     direction_,
-                    BULLET_SPEED,
-                    std::make_unique<MovableHandler>(model_, *this)) {
+                    BULLET_SPEED) {
+}
+
+EntityType Projectile::getType() const {
+    return EntityType::BULLET;
+}
+
+int Projectile::getStrength() const {
+    return 1;  // TODO make constant
+}
+
+int Projectile::getWidth() const {
+    return BULLET_SIZE;
+}
+
+int Projectile::getHeight() const {
+    return BULLET_SIZE;
 }
 }  // namespace Tanks::model

@@ -25,11 +25,8 @@ enum class EntityType {
 
 class Entity {
 public:
-    explicit Entity(int left_,
-                    int top_,
-                    int height_,
-                    int width_,
-                    EntityType type_);
+    explicit Entity(int left_, int top_);
+    explicit Entity(int left, int top, int id);
 
     Entity(const Entity &) = delete;
     Entity(Entity &&) = delete;
@@ -38,30 +35,29 @@ public:
 
     virtual ~Entity() = default;
 
-    [[nodiscard]] EntityType getType() const;
-
+    [[nodiscard]] virtual EntityType getType() const = 0;
     [[nodiscard]] int getLeft() const;
     [[nodiscard]] int getTop() const;
-
-    [[nodiscard]] int getWidth() const;
-    [[nodiscard]] int getHeight() const;
+    [[nodiscard]] virtual int getWidth() const = 0;
+    [[nodiscard]] virtual int getHeight() const = 0;
+    [[nodiscard]] virtual int getStrength() const = 0;
 
     [[nodiscard]] bool intersect(const Entity &other) const;
+    [[nodiscard]] int dist(const Entity &other) const;
 
-    // TODO: make it pure virtual and override in derives
-    [[nodiscard]] bool isTankPassable() const;
-    [[nodiscard]] bool isBulletPassable() const;
-    [[nodiscard]] bool isDestroyable() const;
+    [[nodiscard]] virtual bool isTankPassable() const;
+    [[nodiscard]] virtual bool isBulletPassable() const;
+    [[nodiscard]] virtual bool canPass(const Entity &other) const = 0;
 
 protected:
     void setTop(int top);
     void setLeft(int left);
 
 private:
-    [[nodiscard]] sf::Rect<int> getRect() const;
+    [[nodiscard]] sf::IntRect getRect() const;
 
-    EntityType type;
-    sf::Rect<int> rect = {-1, -1, -1, -1};
+    int left = -1, top = -1;
+    const int id = -1;
 };
 }  // namespace Tanks::model
 

@@ -13,11 +13,21 @@ public:
                           Direction direction_,
                           std::unique_ptr<BasicHandler> handler_);
 
+    explicit PlayableTank(int left,
+                          int top,
+                          int id,
+                          std::unique_ptr<BasicHandler> handler,
+                          Direction direction,
+                          int speed);
+
     explicit PlayableTank(int left, int top, Direction dir, GameModel &model);
+    [[nodiscard]] EntityType getType() const override;
 
     using MovableEntity::move;
     using MovableEntity::setDirection;
     using Tank::shoot;
+
+    void move(Direction direction);
 };
 }  // namespace Tanks::model
 #endif  // TANKS_PLAYABLE_TANK_H

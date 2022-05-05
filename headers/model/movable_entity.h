@@ -11,20 +11,25 @@ public:
 
     explicit MovableEntity(int left,
                            int right,
-                           int width,
-                           int height,
-                           EntityType type,
+                           std::unique_ptr<BasicHandler> handler_,
                            Direction direction,
-                           int speed,
-                           std::unique_ptr<BasicHandler> handler_);
+                           int speed);
+
+    explicit MovableEntity(int left,
+                           int top,
+                           int id,
+                           std::unique_ptr<BasicHandler> handler,
+                           Direction direction,
+                           int speed);
 
     [[nodiscard]] Direction getDirection() const;
+
     [[nodiscard]] int getSpeed() const;
 
 protected:
     void setDirection(Direction dir);
 
-    void move(Direction dir);
+    void move(Direction dir, int speed_);
 
 private:
     Direction direction;

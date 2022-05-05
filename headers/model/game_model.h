@@ -19,7 +19,8 @@ class GameModel {
 public:
     explicit GameModel() = default;
 
-    [[nodiscard]] Entity &getEntityByCoords(int col, int row);
+    [[nodiscard]] Entity &getByCoords(int col, int row);
+    [[nodiscard]] Entity &getById(int id);
 
     void nextTick();
 
@@ -37,6 +38,7 @@ private:
     GameMap map;
     GroupedEntities groupedEntities;
     EntityHolder entityHolder;
+    std::unordered_map<int, Entity *> byid;
     std::unordered_map<Entity *, BasicHandler *> handlers;
 };
 }  // namespace Tanks::model
