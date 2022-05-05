@@ -4,8 +4,6 @@
 #include <SFML/Graphics.hpp>
 #include <memory>
 #include <vector>
-#include "constants.h"
-#include "controller.h"
 #include "menu.h"
 
 namespace Tanks {

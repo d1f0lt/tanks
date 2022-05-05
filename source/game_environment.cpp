@@ -1,13 +1,13 @@
 #include "game_environment.h"
 #include <cassert>
 #include "constants.h"
-#include "controller.h"
+#include "menu_controller.h"
 
 namespace Tanks {
 
 namespace {
 
-std::string numberWithLeftZeros(int num, int numberLength) {
+std::string numberWithLeftZeros(int num, size_t numberLength) {
     std::string numStr(std::to_string(num));
     assert(numStr.size() <= numberLength);
     return std::string("0", numberLength - numStr.size()) + numStr;

@@ -1,9 +1,8 @@
 #include "new_game_menu.h"
 #include <cassert>
 #include <thread>
-#include "controller.h"
-#include "game.h"
 #include "levels_menu.h"
+#include "menu_controller.h"
 
 namespace Tanks::Menu {
 

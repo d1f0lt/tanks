@@ -29,6 +29,16 @@ add_executable(model_tests model_tests.cpp
         source/model/movable_entity.cpp
         source/model/handler.cpp)
 
+add_executable(
+        menu_tests
+        menu_tests.cpp
+        source/menu.cpp
+        source/menu_items.cpp
+        source/menu_controller.cpp
+)
+
+SET(COMPILER_FLAGS_FOR_MENU_TEST "-D MENU_TEST")
+target_compile_options(menu_tests PRIVATE ${COMPILER_FLAGS_FOR_MENU_TEST})
 
 add_executable(
         tanks
@@ -40,7 +50,8 @@ add_executable(
         source/game.cpp
         source/movable_object_view.cpp
         source/map.cpp
-        source/controller.cpp
+        source/menu_controller.cpp
+        source/game_controller.cpp
         source/menu.cpp
         source/menu_items.cpp
         source/pause.cpp
@@ -52,4 +63,5 @@ add_executable(
 
 
 target_link_libraries(model_tests sfml-graphics)
+target_link_libraries(menu_tests sfml-graphics)
 target_link_libraries(tanks sfml-graphics)

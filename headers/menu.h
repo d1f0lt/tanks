@@ -48,12 +48,19 @@ public:
                         const sf::Sprite &backgroundSprite);
     void flyAwayToRight();  // without animation, to set the initial position
                             // for first animation
+#ifdef MENU_TEST
+    [[nodiscard]] const std::vector<std::unique_ptr<MenuItem>> &getItems()
+        const;
+#endif
 
 private:
     std::vector<std::unique_ptr<MenuItem>> items;
+    constexpr static int animationSpeed = 3;
 
+#ifndef MENU_TEST
     [[nodiscard]] const std::vector<std::unique_ptr<MenuItem>> &getItems()
         const;
+#endif
 
     void animation(sf::RenderWindow &window,
                    const sf::Sprite &backgroundSprite,
