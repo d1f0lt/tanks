@@ -1,11 +1,11 @@
-#include "menu.h"
+#include "menu/menu.h"
 #include <cassert>
 #include <chrono>
 #include <cmath>
 #include <string>
 #include <thread>
 #include <vector>
-#include "menu_controller.h"
+#include "menu/menu_controller.h"
 
 namespace Tanks::Menu {
 

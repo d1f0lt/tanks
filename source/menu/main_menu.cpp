@@ -1,10 +1,9 @@
-#include "main_menu.h"
+#include "menu/main_menu.h"
 #include <memory>
 #include <string>
 #include "constants.h"
 #include "menu.h"
-#include "menu_controller.h"
-#include "new_game_menu.h"
+#include "menu/new_game_menu.h"
 
 namespace Tanks::Menu {
 

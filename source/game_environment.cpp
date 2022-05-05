@@ -1,7 +1,7 @@
 #include "game_environment.h"
 #include <cassert>
 #include "constants.h"
-#include "menu_controller.h"
+#include "menu/menu.h"
 
 namespace Tanks {
 
@@ -83,7 +83,7 @@ void Timer::nextTick() {
 }
 
 Environment::Environment(const std::string &path)
-    : timer(path + "timer.png"), backgroundSprite(initBackground(path)) {
+    : timer(path + "timer.png"), menu{}, backgroundSprite(initBackground(path)) {
     menu.addIconToLeftUpCorner(path + "pause.png", Menu::ButtonType::PAUSE);
 }
 

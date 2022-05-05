@@ -4,7 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include <memory>
 #include <vector>
-#include "menu.h"
+#include "menu/menu.h"
 
 namespace Tanks {
 

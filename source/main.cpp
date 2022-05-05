@@ -1,5 +1,5 @@
 #include "constants.h"
-#include "main_menu.h"
+#include "menu/main_menu.h"
 
 int main() {
     sf::RenderWindow window(

@@ -3,7 +3,7 @@
 #include <thread>
 #include "game_controller.h"
 #include "game_environment.h"
-#include "menu_controller.h"
+#include "menu/menu_controller.h"
 #include "model/game_model.h"
 #include "pause.h"
 #include "view/game_view.h"

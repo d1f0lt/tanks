@@ -33,9 +33,9 @@ add_executable(model_tests model_tests.cpp
 add_executable(
         menu_tests
         menu_tests.cpp
-        source/menu.cpp
-        source/menu_items.cpp
-        source/menu_controller.cpp
+        source/menu/menu.cpp
+        source/menu/menu_items.cpp
+        source/menu/menu_controller.cpp
 )
 
 target_compile_options(menu_tests PRIVATE ${COMPILER_FLAGS_FOR_MENU_TEST})
@@ -43,16 +43,16 @@ target_compile_options(menu_tests PRIVATE ${COMPILER_FLAGS_FOR_MENU_TEST})
 add_executable(
         tanks
         source/main.cpp
+        source/menu/menu_controller.cpp
+        source/menu/menu.cpp
+        source/menu/menu_items.cpp
+        source/menu/main_menu.cpp
+        source/menu/new_game_menu.cpp
+        source/menu/levels_menu.cpp
         source/game.cpp
-        source/menu_controller.cpp
         source/game_controller.cpp
-        source/menu.cpp
-        source/menu_items.cpp
-        source/main_menu.cpp
-        source/new_game_menu.cpp
-        source/levels_menu.cpp
-        source/pause.cpp
         source/game_environment.cpp
+        source/pause.cpp
         source/view/game_view.cpp
         source/view/tank_view.cpp
         source/model/blocks.cpp
