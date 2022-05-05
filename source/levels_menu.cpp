@@ -25,7 +25,7 @@ Menu initMenu(const std::string &imagesPath) {
     std::vector<InscriptionInfo> inscriptions;
     inscriptions.reserve(quantityElement);
     const static int characterSize = 32;
-    for (int i = 1; i <= quantityElement; ++i) {
+    for (size_t i = 1; i <= quantityElement; ++i) {
         inscriptions.emplace_back(
             InscriptionInfo{std::to_string(i), characterSize, textColor});
     }

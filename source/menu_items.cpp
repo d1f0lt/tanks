@@ -132,7 +132,7 @@ void MenuInscription::setPosition(sf::Vector2<float> newPosition) {
 }
 
 std::string MenuInscription::getContent() const {
-    return std::string(text.getString());
+    return static_cast<std::string>(text.getString());
 }
 
 MenuButton::MenuButton(std::unique_ptr<MenuItem> &&content_,
@@ -140,8 +140,8 @@ MenuButton::MenuButton(std::unique_ptr<MenuItem> &&content_,
                        ButtonWithType info_)
     : MenuItem(coordinates),
       content(std::move(content_)),
-      info(info_),
-      rectangle(info_.getSize()) {
+      rectangle(info_.getSize()),
+      info(info_) {
     rectangle.setFillColor(info.getStandardColor());
     setPosition(coordinates);  // NOLINT
 }
