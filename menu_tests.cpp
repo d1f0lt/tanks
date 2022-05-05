@@ -1,9 +1,9 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
+#include <memory>
+#include "constants.h"
 #include "doctest.h"
 #include "menu.h"
-#include "constants.h"
-#include <memory>
 
 using namespace Tanks::Menu;
 
@@ -23,10 +23,12 @@ TEST_CASE("Picture size") {
 }
 
 TEST_CASE("standard position") {
-    auto picture = std::make_unique<MenuPicture>("../images/menu/return.png", sf::Vector2<float>{0, 0});
+    auto picture = std::make_unique<MenuPicture>("../images/menu/return.png",
+                                                 sf::Vector2<float>{0, 0});
 
     InscriptionInfo info{"123", 50, sf::Color(0, 0, 0)};
-    auto inscription = std::make_unique<MenuInscription>(info, sf::Vector2<float>(0, 0));
+    auto inscription =
+        std::make_unique<MenuInscription>(info, sf::Vector2<float>(0, 0));
 
     SUBCASE("picture") {
         REQUIRE(picture->getPosition().x == 0);
@@ -36,7 +38,8 @@ TEST_CASE("standard position") {
 
         SUBCASE("button with picture") {
             auto size = picture->getSize();
-            MenuButton btn(std::move(picture), {0, 0}, {ButtonType::EXIT, size, sf::Color(), sf::Color()});
+            MenuButton btn(std::move(picture), {0, 0},
+                           {ButtonType::EXIT, size, sf::Color(), sf::Color()});
             CHECK(btn.getPosition() == sf::Vector2<float>{0, 0});
             CHECK(btn.getPosition() == btn.getStandardPosition());
         }
@@ -50,7 +53,8 @@ TEST_CASE("standard position") {
 
         SUBCASE("button with inscription") {
             auto size = inscription->getSize();
-            MenuButton btn(std::move(inscription), {0, 0}, {ButtonType::EXIT, size, sf::Color(), sf::Color()});
+            MenuButton btn(std::move(inscription), {0, 0},
+                           {ButtonType::EXIT, size, sf::Color(), sf::Color()});
             REQUIRE(btn.getPosition() == sf::Vector2<float>{0, 0});
             CHECK(btn.getPosition() == btn.getStandardPosition());
         }
@@ -58,7 +62,9 @@ TEST_CASE("standard position") {
 
     SUBCASE("picture with description") {
         auto size = picture->getSize();
-        MenuPictureWithDescription item(std::move(picture), std::move(inscription), {0, 0}, {size, sf::Color(), sf::Color()});
+        MenuPictureWithDescription item(std::move(picture),
+                                        std::move(inscription), {0, 0},
+                                        {size, sf::Color(), sf::Color()});
         REQUIRE(item.getPosition() == sf::Vector2<float>{0, 0});
         CHECK(item.getPosition() == item.getStandardPosition());
     }
@@ -70,11 +76,13 @@ TEST_CASE("Add menu item") {
     for (int i = 0; i < steps; ++i) {
         menu.addMenuItem(std::make_unique<MenuPicture>(
             "../images/menu/return.png", sf::Vector2<float>(0, 0)));
-        CHECK(menu.getItems().size() == 3*i + 1);
-        menu.addIconToLeftUpCorner("../images/menu/return.png", ButtonType::RETURN);
-        CHECK(menu.getItems().size() == 3*i + 2);
-        menu.addIconToLeftLowerCorner("../images/menu/return.png", ButtonType::RETURN);
-        CHECK(menu.getItems().size() == 3*i + 3);
+        CHECK(menu.getItems().size() == 3 * i + 1);
+        menu.addIconToLeftUpCorner("../images/menu/return.png",
+                                   ButtonType::RETURN);
+        CHECK(menu.getItems().size() == 3 * i + 2);
+        menu.addIconToLeftLowerCorner("../images/menu/return.png",
+                                      ButtonType::RETURN);
+        CHECK(menu.getItems().size() == 3 * i + 3);
     }
 }
 
@@ -82,7 +90,8 @@ TEST_CASE("Menu animation") {
     sf::RenderWindow window;
     sf::Sprite backgroundSprite;
 
-    auto checks = [](Menu &menu, sf::RenderWindow &window, sf::Sprite &backgroundSprite, size_t elements_count) {
+    auto checks = [](Menu &menu, sf::RenderWindow &window,
+                     sf::Sprite &backgroundSprite, size_t elements_count) {
         const auto &items = menu.getItems();
         SUBCASE("check flyAwayToRight without parameters") {
             menu.flyAwayToRight();
@@ -170,7 +179,8 @@ TEST_CASE("Menu animation") {
     SUBCASE("construct from picture with description") {
         auto menu = []() {
             const static sf::Color textColor{63, 87, 210};
-            const static size_t menuWidth = static_cast<int>(Tanks::WINDOW_WIDTH / 1.5);
+            const static size_t menuWidth =
+                static_cast<int>(Tanks::WINDOW_WIDTH / 1.5);
             const static size_t quantityPerLine = 4;
             const static size_t quantityElement = 7;
             const static sf::Color standardColor(0, 0, 0, 150);
@@ -186,15 +196,16 @@ TEST_CASE("Menu animation") {
             inscriptions.reserve(quantityElement);
             const static int characterSize = 32;
             for (size_t i = 1; i <= quantityElement; ++i) {
-                inscriptions.emplace_back(
-                    InscriptionInfo{std::to_string(i), characterSize, textColor});
+                inscriptions.emplace_back(InscriptionInfo{
+                    std::to_string(i), characterSize, textColor});
             }
 
             const static sf::Color btnStandardColor(0, 0, 0, 150);
             const static sf::Color btnHoverColor(66, 66, 66, 230);
-            Button btnInfo{sf::Vector2<float>(0, 0), btnStandardColor, btnHoverColor};
-            return Menu(menuWidth, title, inscriptions, "../images/menu/levels/", quantityPerLine,
-                        btnInfo);
+            Button btnInfo{sf::Vector2<float>(0, 0), btnStandardColor,
+                           btnHoverColor};
+            return Menu(menuWidth, title, inscriptions,
+                        "../images/menu/levels/", quantityPerLine, btnInfo);
         }();
         checks(menu, window, backgroundSprite, 8);
     }
