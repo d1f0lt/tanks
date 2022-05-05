@@ -14,8 +14,7 @@ std::string numberWithLeftZeros(int num, size_t numberLength) {
 }
 
 sf::Sprite initBackground(const std::string &path) {
-    static const std::string backgroundImageFilename =
-        path + "background.png";
+    static const std::string backgroundImageFilename = path + "background.png";
     sf::Image backgroundImage;
     backgroundImage.loadFromFile(backgroundImageFilename);
     static sf::Texture backgroundTexture;  // so that the texture isn't
@@ -83,7 +82,10 @@ void Timer::nextTick() {
     }
 }
 
-Environment::Environment(const std::string &path) : timer(path + "timer.png"), menu(), backgroundSprite(initBackground(path)) {
+Environment::Environment(const std::string &path)
+    : timer(path + "timer.png"),
+      menu(),
+      backgroundSprite(initBackground(path)) {
     menu.addIconToLeftUpCorner(path + "pause.png", Menu::ButtonType::PAUSE);
 }
 

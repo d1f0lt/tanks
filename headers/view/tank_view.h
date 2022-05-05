@@ -20,6 +20,6 @@ private:
     sf::Texture texture;
     std::vector<sf::Sprite> sprites{4};
 };
-}
+}  // namespace Tanks::View
 
 #endif

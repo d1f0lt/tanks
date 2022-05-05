@@ -2,7 +2,8 @@
 
 namespace Tanks {
 
-void GameController::makeMove(model::PlayableTank &player, model::Direction direction) {
+void GameController::makeMove(model::PlayableTank &player,
+                              model::Direction direction) {
     for (auto &col : player.look(direction)) {
         if (col != nullptr && col->getType() != model::EntityType::FLOOR) {
             return;
@@ -30,7 +31,7 @@ void GameController::makeMove(model::PlayableTank &player) {
         auto direction = model::Direction::DOWN;
         makeMove(player, direction);
     } else if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Up) ||
-               sf::Keyboard::isKeyPressed(sf::Keyboard::W))) {
+                sf::Keyboard::isKeyPressed(sf::Keyboard::W))) {
         auto direction = model::Direction::UP;
         makeMove(player, direction);
     }

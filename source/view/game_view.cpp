@@ -6,7 +6,8 @@ namespace Tanks::View {
 
 BlockSpriteHolder::BlockSpriteHolder(model::EntityType type_,
                                      sf::Texture &texture,
-                                     const sf::Vector2<int> &coordinates) : type(type_) {
+                                     const sf::Vector2<int> &coordinates)
+    : type(type_) {
     sprite.setTexture(texture);
     sprite.setPosition(static_cast<float>(coordinates.x),
                        static_cast<float>(coordinates.y));
@@ -123,7 +124,9 @@ void Map::draw(sf::RenderWindow &window, model::GameModel &model) {
     for (int row = 0; row < MAP_HEIGHT; ++row) {
         for (int col = 0; col < MAP_WIDTH; ++col) {
             auto &tile = map[row][col];
-            if (tile.getType() == model::EntityType::BRICK && model.getEntityByCoords(col*TILE_SIZE, row*TILE_SIZE).getType() != model::EntityType::BRICK) {
+            if (tile.getType() == model::EntityType::BRICK &&
+                model.getEntityByCoords(col * TILE_SIZE, row * TILE_SIZE)
+                        .getType() != model::EntityType::BRICK) {
                 tile.destroy();
             }
             tile.draw(window);

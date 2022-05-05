@@ -1,9 +1,9 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
+#include <optional>
 #include "menu.h"
 #include "model/playable-tank.h"
-#include <optional>
 
 namespace Tanks {
 
@@ -13,7 +13,8 @@ public:
 
     static void makeMove(model::PlayableTank &player);
 
-    static void makeMove(model::PlayableTank &player, model::Direction direction);
+    static void makeMove(model::PlayableTank &player,
+                         model::Direction direction);
 };
 
 struct MenuController final {

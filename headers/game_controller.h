@@ -1,8 +1,8 @@
 #ifndef GAME_CONTROLLER_H
 #define GAME_CONTROLLER_H
 
-#include "model/playable-tank.h"
 #include <SFML/Graphics.hpp>
+#include "model/playable-tank.h"
 
 namespace Tanks {
 
@@ -12,7 +12,8 @@ public:
 
     static void makeMove(model::PlayableTank &player);
 
-    static void makeMove(model::PlayableTank &player, model::Direction direction);
+    static void makeMove(model::PlayableTank &player,
+                         model::Direction direction);
 };
 
 }  // namespace Tanks

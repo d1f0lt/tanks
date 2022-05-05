@@ -48,8 +48,10 @@ add_executable(
         source/game_controller.cpp
         source/menu.cpp
         source/menu_items.cpp
-        source/pause.cpp
         source/main_menu.cpp
+        source/new_game_menu.cpp
+        source/levels_menu.cpp
+        source/pause.cpp
         source/game_environment.cpp
         source/view/game_view.cpp
         source/view/tank_view.cpp
@@ -64,8 +66,6 @@ add_executable(
         source/model/foreground_entity.cpp
         source/model/movable_entity.cpp
         source/model/handler.cpp
-        source/new_game_menu.cpp
-        source/levels_menu.cpp
 )
 
 

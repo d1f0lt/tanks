@@ -40,8 +40,9 @@ sf::Sprite &TankSpriteHolder::getCurrentSprite(const model::Tank &tank) {
 
 void TankSpriteHolder::draw(sf::RenderWindow &window, const model::Tank &tank) {
     auto &sprite = getCurrentSprite(tank);
-    sprite.setPosition(static_cast<float>(MARGIN_LEFT + tank.getLeft()), MARGIN_TOP + static_cast<float>(tank.getTop()));
+    sprite.setPosition(static_cast<float>(MARGIN_LEFT + tank.getLeft()),
+                       MARGIN_TOP + static_cast<float>(tank.getTop()));
     window.draw(sprite);
 }
 
-}
+}  // namespace Tanks::View

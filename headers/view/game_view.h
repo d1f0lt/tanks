@@ -1,18 +1,20 @@
 #ifndef GAME_VIEW_H
 #define GAME_VIEW_H
 
-#include "model/game_map.h"
-#include "model/entity.h"
-#include "model/game_model.h"
+#include <string>
 #include "SFML/Graphics.hpp"
 #include "game_environment.h"
-#include <string>
+#include "model/entity.h"
+#include "model/game_map.h"
+#include "model/game_model.h"
 
 namespace Tanks::View {
 
 struct BlockSpriteHolder {
 public:
-    BlockSpriteHolder(model::EntityType type_, sf::Texture &texture, const sf::Vector2<int> &coordinates);
+    BlockSpriteHolder(model::EntityType type_,
+                      sf::Texture &texture,
+                      const sf::Vector2<int> &coordinates);
 
     void draw(sf::RenderWindow &window) const;
 
@@ -41,6 +43,6 @@ private:
     void loadLevel(int level);
 };
 
-}
+}  // namespace Tanks::View
 
 #endif
