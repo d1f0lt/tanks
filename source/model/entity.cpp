@@ -39,12 +39,13 @@ bool Entity::isBulletPassable() const {
 }
 
 namespace {
-[[nodiscard]] int segdist(int x11, int x12, int x21, int x22) {
-    if (x11 > x21) {
-        std::swap(x11, x21);
-        std::swap(x12, x22);
+[[nodiscard]] int segdist(int left1, int right1, int left2, int right2) {
+    if (left1 > left2) {
+        std::swap(left1, left2);
+        std::swap(right1, right2);
     }
-    return std::max(0, x21 - x22);
+
+    return std::max(0, left2 - right1);
 }
 }  // namespace
 
