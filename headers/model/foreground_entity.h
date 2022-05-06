@@ -17,7 +17,7 @@ public:
 
     explicit ForegroundEntity(int left,
                               int top,
-                              int id,
+                              int entityId,
                               std::unique_ptr<ForegroundHandler> handler);
 
     [[nodiscard]] std::vector<const Entity *> look(Direction direction) const;
@@ -26,9 +26,10 @@ public:
         const;
 
 protected:
-    const std::unique_ptr<BasicHandler> handler_;
+    [[nodiscard]] BasicHandler &getHandler() const;
 
 private:
+    const std::unique_ptr<BasicHandler> handler_;
     std::vector<std::vector<const Entity *>> background_;
 };
 

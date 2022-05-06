@@ -15,7 +15,7 @@ public:
 
     explicit Tank(int left,
                   int top,
-                  int id,
+                  int entityId,
                   std::unique_ptr<TankHandler> handler,
                   Direction direction,
                   int speed);

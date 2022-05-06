@@ -15,11 +15,14 @@ public:
 
     explicit PlayableTank(int left,
                           int top,
-                          int id,
+                          int entityId,
                           std::unique_ptr<TankHandler> handler,
                           Direction direction);
 
-    explicit PlayableTank(int left, int top, Direction dir, GameModel &model);
+    explicit PlayableTank(int left,
+                          int top,
+                          Direction direction,
+                          GameModel &model);
 
     [[nodiscard]] EntityType getType() const override;
 

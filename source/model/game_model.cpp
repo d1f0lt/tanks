@@ -19,7 +19,7 @@ void GameModel::nextTick() {
         auto *tank = dynamic_cast<BotTank *>(entity);
         assert(tank != nullptr);
         dynamic_cast<MovableHandler &>(*handlers_[tank])
-            .move(tank->getDirection(), 1);
+            .move(tank->getDirection(), tank->getSpeed());
     }
 
     for (auto *entity :
@@ -66,9 +66,10 @@ void GameModel::removeEntity(Entity &entity) {
     byid_.erase(entity.getId());
     handlers_.erase(&entity);
     groupedEntities_.erase(entity);
+    entityHolder_.remove(entity);
 }
 
-PlayableTank &GameModel::spawnPlayableTank(const int left, const int top) {
+PlayableTank &GameModel::spawnPlayableTank(int left, int top) {
     assert(left + TANK_SIZE < map_.getWidth());
     assert(top + TANK_SIZE < map_.getHeight());
 
@@ -102,10 +103,6 @@ void GameModel::loadLevel(int level) {
 
     assert(file.is_open() && "Unable to open map texture file");
     std::string str;
-
-    map_ = GameMap();
-    groupedEntities_ = GroupedEntities();
-    entityHolder_ = EntityHolder();
 
     for (int row = 0; row < MAP_HEIGHT; ++row) {
         std::getline(file, str);
@@ -149,9 +146,9 @@ int GameModel::getHeight() const {
     return map_.getHeight();
 }
 
-Entity &GameModel::getById(int id) {
-    assert(byid_.count(id) != 0);
-    return *byid_[id];
+Entity &GameModel::getById(int entityId) {
+    assert(byid_.count(entityId) != 0);
+    return *byid_[entityId];
 }
 
 }  // namespace Tanks::model

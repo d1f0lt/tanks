@@ -16,7 +16,7 @@ public:
 
     explicit MovableEntity(int left,
                            int top,
-                           int id,
+                           int entityId,
                            std::unique_ptr<MovableHandler> handler,
                            Direction direction);
 
@@ -24,8 +24,8 @@ public:
     [[nodiscard]] virtual int getSpeed() const = 0;
 
 protected:
-    void setDirection(Direction dir);
-    void move(Direction dir, int speed);  // TODO rename speed 2
+    void setDirection(Direction direction);
+    void move(Direction direction, int speed);
 
 private:
     Direction direction_;

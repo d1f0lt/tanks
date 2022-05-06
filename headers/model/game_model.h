@@ -21,7 +21,7 @@ public:
     explicit GameModel() = default;
 
     [[nodiscard]] Entity &getByCoords(int col, int row);
-    [[nodiscard]] Entity &getById(int id);
+    [[nodiscard]] Entity &getById(int entityId);
 
     void nextTick();
 

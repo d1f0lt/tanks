@@ -19,13 +19,13 @@ public:
     virtual ~BasicHandler() = default;
 
 protected:
-    GameModel &model_;
-    Entity &entity_;
+    GameModel &model_;  // NOLINT(misc-non-private-member-variables-in-classes)
+    Entity &entity_;    // NOLINT(misc-non-private-member-variables-in-classes)
 };
 
 class ForegroundHandler : public BasicHandler {
 public:
-    explicit ForegroundHandler(GameModel &model_, ForegroundEntity &entity);
+    explicit ForegroundHandler(GameModel &model, ForegroundEntity &entity);
 
     void setBackground();
     void restoreBackground();
@@ -33,10 +33,10 @@ public:
 
 class MovableHandler : public ForegroundHandler {
 public:
-    explicit MovableHandler(GameModel &model_, MovableEntity &entity);
+    explicit MovableHandler(GameModel &model, MovableEntity &entity);
 
     [[nodiscard]] std::vector<const Entity *> look(Direction direction);
-    void move(Direction entity, int speed);
+    void move(Direction direction, int speed);
 
 protected:
     template <typename T>
@@ -60,7 +60,7 @@ protected:
 
 class TankHandler : public MovableHandler {
 public:
-    explicit TankHandler(GameModel &model_, Tank &entity);
+    explicit TankHandler(GameModel &model, Tank &entity);
 
     void shoot();
 };

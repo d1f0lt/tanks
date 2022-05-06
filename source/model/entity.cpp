@@ -3,6 +3,7 @@
 
 namespace Tanks::model {
 // TODO better random
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 Entity::Entity(int left, int top) : left_(left), top_(top), id_(rand()) {
 }
 
@@ -58,7 +59,9 @@ int Entity::dist(const Entity &other) const {
     return delta_x + delta_y;
 }
 
-Entity::Entity(int left, int top, int id) : left_(left), top_(top), id_(id) {
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
+Entity::Entity(int left, int top, int entityId)
+    : left_(left), top_(top), id_(entityId) {
 }
 
 int Entity::getId() const {

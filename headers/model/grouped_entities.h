@@ -13,7 +13,7 @@ public:
     [[nodiscard]] const std::vector<std::vector<Entity *>> &snapshotAll() const;
 
 private:
-    std::vector<std::vector<Entity *>> entities{25};
+    std::vector<std::vector<Entity *>> entities_{25};
 };
 
 }  // namespace Tanks::model

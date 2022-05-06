@@ -13,7 +13,7 @@ BasicHandler::BasicHandler(GameModel &model_, Entity &entity_)
 }
 
 std::vector<const Entity *> MovableHandler::look(Direction direction) {
-    auto &movableEntity = static_cast<MovableEntity &>(entity_);
+    auto &movableEntity = dynamic_cast<MovableEntity &>(entity_);
     // retuns square [left, right) x [down, top)
     int left = -1;
     int top = -1;
@@ -56,7 +56,7 @@ std::vector<const Entity *> MovableHandler::look(Direction direction) {
         }
     }
 
-    return std::vector(buff.begin(), buff.end());
+    return {buff.begin(), buff.end()};
 }
 
 void ForegroundHandler::restoreBackground() {
@@ -64,45 +64,45 @@ void ForegroundHandler::restoreBackground() {
 
     std::unordered_set<const Entity *> restored;
 
-    for (int y = 0; y < entity_.getHeight(); y++) {
-        for (int x = 0; x < entity_.getWidth(); x++) {
-            if (restored.count(real_entity.background_[y][x]) != 0) {
-                real_entity.background_[y][x] = nullptr;
+    for (int row = 0; row < entity_.getHeight(); row++) {
+        for (int col = 0; col < entity_.getWidth(); col++) {
+            if (restored.count(real_entity.background_[row][col]) != 0) {
+                real_entity.background_[row][col] = nullptr;
                 continue;
             }
-            restored.insert(real_entity.background_[y][x]);
+            restored.insert(real_entity.background_[row][col]);
             model_.map_.insert(
-                const_cast<Entity &>(*real_entity.background_[y][x]));
-            real_entity.background_[y][x] = nullptr;
+                const_cast<Entity &>(*real_entity.background_[row][col]));
+            real_entity.background_[row][col] = nullptr;
         }
     }
 }
 
 void ForegroundHandler::setBackground() {
-    auto &real_entity = dynamic_cast<ForegroundEntity &>(entity_);
-    real_entity.background_.resize(
+    auto &entity = dynamic_cast<ForegroundEntity &>(entity_);
+    entity.background_.resize(
         entity_.getHeight(),
         std::vector<const Entity *>(entity_.getWidth(), nullptr));
 
-    int y0 = entity_.getTop();
-    int x0 = entity_.getLeft();
-    for (int y = entity_.getTop(); y < entity_.getTop() + entity_.getHeight();
-         y++) {
-        for (int x = entity_.getLeft();
-             x < entity_.getLeft() + entity_.getWidth(); x++) {
-            real_entity.background_[y - y0][x - x0] = &model_.getByCoords(x, y);
+    int top = entity_.getTop();
+    int left = entity_.getLeft();
+    int height = entity_.getHeight();
+    int width = entity_.getWidth();
+    for (int row = entity_.getTop(); row < entity_.getTop() + height; row++) {
+        for (int col = entity_.getLeft(); col < left + width; col++) {
+            entity.background_[row - top][col - left] =
+                &model_.getByCoords(col, row);
         }
     }
     model_.map_.insert(entity_);
 }
 
-ForegroundHandler::ForegroundHandler(GameModel &model_,
-                                     ForegroundEntity &entity)
-    : BasicHandler(model_, entity) {
+ForegroundHandler::ForegroundHandler(GameModel &model, ForegroundEntity &entity)
+    : BasicHandler(model, entity) {
 }
 
-MovableHandler::MovableHandler(GameModel &model_, MovableEntity &entity)
-    : ForegroundHandler(model_, entity) {
+MovableHandler::MovableHandler(GameModel &model, MovableEntity &entity)
+    : ForegroundHandler(model, entity) {
 }
 
 void MovableHandler::move(Direction direction, int speed) {
@@ -170,8 +170,8 @@ void TankHandler::shoot() {
         model_));
 }
 
-TankHandler::TankHandler(GameModel &model_, Tank &entity)
-    : MovableHandler(model_, entity) {
+TankHandler::TankHandler(GameModel &model, Tank &entity)
+    : MovableHandler(model, entity) {
 }
 
 ProjectileHandler::ProjectileHandler(GameModel &model, MovableEntity &entity)

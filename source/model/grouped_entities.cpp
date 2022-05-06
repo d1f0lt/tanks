@@ -9,20 +9,20 @@ void GroupedEntities::insert(Entity &entity) {
     // 3 - bullets
     // 4 - grass
     // TODO make it independent from order in EntityType
-    entities[static_cast<unsigned>(entity.getType())].emplace_back(&entity);
+    entities_[static_cast<unsigned>(entity.getType())].emplace_back(&entity);
 }
 
 void GroupedEntities::erase(Entity &entity) {
-    auto i = static_cast<unsigned>(entity.getType());
-    assert(std::find(entities[i].begin(), entities[i].end(), &entity) !=
-           entities[i].end());
+    auto type = static_cast<unsigned>(entity.getType());
+    assert(std::find(entities_[type].begin(), entities_[type].end(), &entity) !=
+           entities_[type].end());
 
-    entities[i].erase(
-        std::find(entities[i].begin(), entities[i].end(), &entity));
+    entities_[type].erase(
+        std::find(entities_[type].begin(), entities_[type].end(), &entity));
 }
 
 const std::vector<std::vector<Entity *>> &GroupedEntities::snapshotAll() const {
-    return entities;
+    return entities_;
 }
 
 }  // namespace Tanks::model
