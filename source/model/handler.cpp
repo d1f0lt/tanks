@@ -164,13 +164,13 @@ ProjectileHandler::ProjectileHandler(GameModel &model, MovableEntity &entity)
     : MovableHandler(model, entity) {
 }
 
-bool ProjectileHandler::destroy() {
+bool ProjectileHandler::isBreakOnNextTick() {
     auto &bullet = dynamic_cast<Projectile &>(entity);
     auto vec = bullet.look(bullet.getDirection());
     int dist = bullet.getSpeed() + 1;
     std::vector<Entity *> closest;
     for (const auto *a : vec) {
-        if (a->getStrength() > 0 && a->getStrength() < 2) {
+        if (a->getStrength() > 0) {
             if (bullet.dist(*a) < dist) {
                 closest = {const_cast<Entity *>(a)};
                 dist = bullet.dist(*(a));
@@ -181,21 +181,48 @@ bool ProjectileHandler::destroy() {
     }
 
     for (auto *a : closest) {
-        int left = a->getLeft(), top = a->getTop();
-        bool is_block = false;
-        if (dynamic_cast<Block *>(a)) {
-            is_block = true;
-        }
-        model.removeEntity(*a);
-        if (is_block) {
-            model.addEntity(std::make_unique<Floor>(left, top));
-        }
-        // TODO method .die() for entitie
+        destroyByBullet(*a);
     }
     if (!closest.empty()) {
         model.removeEntity(bullet);
         return true;
     }
     return false;
+}
+
+void ProjectileHandler::destroyByBullet(Entity &other) {
+    if (other.getStrength() > entity.getStrength()) {
+        return;
+    }
+
+    if (!dynamic_cast<Block *>(&other)) {
+        model.removeEntity(other);
+        return;
+    }
+    int left = other.getLeft();
+    int top = other.getTop();
+    model.removeEntity(other);
+    model.addEntity(std::make_unique<Floor>(left, top));
+}
+
+bool ProjectileHandler::isBreakOnCreation() {
+    auto &bullet = dynamic_cast<Projectile &>(entity);
+    assert(bullet.snapshotBackground().empty());  // true only on creation
+    bool survive = true;
+
+    for (int row = bullet.getTop(); row < bullet.getTop() + bullet.getHeight();
+         row++) {
+        for (int col = bullet.getLeft();
+             col < bullet.getLeft() + bullet.getWidth(); col++) {
+            auto &object = model.getByCoords(col, row);
+            if (object.getStrength() != 0) {  // TODO .doInteract
+                dynamic_cast<ProjectileHandler *>(model.handlers[&bullet])
+                    ->destroyByBullet(object);
+                survive = false;
+            }
+        }
+    }
+
+    return !survive;
 }
 }  // namespace Tanks::model

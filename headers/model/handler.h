@@ -49,7 +49,10 @@ class ProjectileHandler : public MovableHandler {
 public:
     explicit ProjectileHandler(GameModel &model, MovableEntity &entity);
 
-    [[nodiscard]] bool destroy();
+    void destroyByBullet(Entity &other);
+
+    [[nodiscard]] bool isBreakOnNextTick();
+    [[nodiscard]] bool isBreakOnCreation();
 };
 
 }  // namespace Tanks::model

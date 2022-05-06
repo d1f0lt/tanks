@@ -28,7 +28,8 @@ void GameModel::nextTick() {
         auto *bullet = dynamic_cast<Projectile *>(entity);
         assert(bullet != nullptr);
 
-        if (dynamic_cast<ProjectileHandler &>(*handlers[bullet]).destroy()) {
+        if (dynamic_cast<ProjectileHandler &>(*handlers[bullet])
+                .isBreakOnNextTick()) {
             continue;
         }
         dynamic_cast<MovableHandler &>(*handlers[bullet])
@@ -36,15 +37,24 @@ void GameModel::nextTick() {
     }
 }
 
-Entity &GameModel::addEntity(std::unique_ptr<Entity> entity) {
+void GameModel::addEntity(std::unique_ptr<Entity> entity) {
+    if (auto *bullet = dynamic_cast<Projectile *>(entity.get())) {
+        if (dynamic_cast<ProjectileHandler *>(handlers[bullet])
+                ->isBreakOnCreation()) {
+            handlers.erase(bullet);
+            return;
+        }
+    }
+
     if (auto *in_foreground = dynamic_cast<ForegroundEntity *>(entity.get())) {
         dynamic_cast<ForegroundHandler &>(*handlers[in_foreground])
             .setBackground();
     }
 
+    byid.emplace(entity->getId(), entity.get());
     map.insert(*entity);
     groupedEntities.insert(*entity);
-    return entityHolder.insert(std::move(entity));
+    entityHolder.insert(std::move(entity));
 }
 
 void GameModel::removeEntity(Entity &entity) {
@@ -53,8 +63,8 @@ void GameModel::removeEntity(Entity &entity) {
             .restoreBackground();
     }
 
+    byid.erase(entity.getId());
     handlers.erase(&entity);
-    //    map.erase(entity);
     groupedEntities.erase(entity);
 }
 
@@ -68,8 +78,8 @@ PlayableTank &GameModel::spawnPlayableTank(const int left, const int top) {
         }
     }
 
-    return static_cast<PlayableTank &>(addEntity(
-        std::make_unique<PlayableTank>(left, top, Direction::UP, *this)));
+    addEntity(std::make_unique<PlayableTank>(left, top, Direction::UP, *this));
+    return dynamic_cast<PlayableTank &>(getByCoords(left, top));
 }
 
 void GameModel::loadLevel(int level) {

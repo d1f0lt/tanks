@@ -60,4 +60,9 @@ int Entity::dist(const Entity &other) const {
 
 Entity::Entity(int left, int top, int id) : left(left), top(top), id(id) {
 }
+
+int Entity::getId() const {
+    return id;
+}
+
 }  // namespace Tanks::model

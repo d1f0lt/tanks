@@ -33,7 +33,7 @@ public:
     [[nodiscard]] int getWidth() const;
 
 private:
-    Entity &addEntity(std::unique_ptr<Entity> entity);
+    void addEntity(std::unique_ptr<Entity> entity);
     void removeEntity(Entity &entity);
 
     GameMap map;

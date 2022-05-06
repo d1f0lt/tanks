@@ -3,7 +3,7 @@
 #include "constants.h"
 
 namespace Tanks::model {
-Block::Block(int left, int right) : Entity(left, right) {
+Block::Block(int left, int top) : Entity(left, top) {
 }
 
 int Block::getHeight() const {
@@ -37,7 +37,7 @@ int Steel::getStrength() const {
     return static_cast<int>(Strength::STEEL);
 }
 
-Steel::Steel(int left, int right) : Block(left, right) {
+Steel::Steel(int left, int top) : Block(left, top) {
 }
 
 LevelBorder::LevelBorder(int left, int top, EntityType type_)
@@ -60,7 +60,7 @@ int Floor::getStrength() const {
     return static_cast<int>(Strength::FLOOR);
 }
 
-Floor::Floor(int left, int right) : Block(left, right) {
+Floor::Floor(int left, int top) : Block(left, top) {
 }
 
 bool Floor::isTankPassable() const {
@@ -71,7 +71,7 @@ bool Floor::isBulletPassable() const {
     return true;
 }
 
-Water::Water(int left, int right) : Block(left, right) {
+Water::Water(int left, int top) : Block(left, top) {
 }
 
 EntityType Water::getType() const {

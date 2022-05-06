@@ -36,6 +36,8 @@ public:
     virtual ~Entity() = default;
 
     [[nodiscard]] virtual EntityType getType() const = 0;
+    [[nodiscard]] int getId() const;
+
     [[nodiscard]] int getLeft() const;
     [[nodiscard]] int getTop() const;
     [[nodiscard]] virtual int getWidth() const = 0;

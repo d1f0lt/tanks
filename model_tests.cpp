@@ -252,3 +252,24 @@ TEST_CASE("Bullet fly above water") {
     auto &floor = model.getByCoords(TILE_SIZE * 19, TILE_SIZE * 15);
     CHECK(floor.getType() == Tanks::model::EntityType::FLOOR);
 }
+
+TEST_CASE("Bullet destroy on creation") {
+    using namespace Tanks::model;
+    using namespace Tanks;
+    using Tanks::model::Direction;
+    using Tanks::model::EntityType;
+
+    GameModel model;
+    model.loadLevel(1);
+    auto &tank = model.spawnPlayableTank(
+        Tanks::TILE_SIZE * 3, Tanks::TILE_SIZE * 1 + TILE_SIZE - TANK_SIZE);
+    tank.setDirection(Tanks::model::Direction::DOWN);
+
+    auto &brick = model.getByCoords(TILE_SIZE * 3, TILE_SIZE * 2);
+    CHECK(brick.getType() == EntityType::BRICK);
+
+    tank.shoot();
+
+    auto &floor = model.getByCoords(TILE_SIZE * 3, TILE_SIZE * 2);
+    CHECK(floor.getType() == Tanks::model::EntityType::FLOOR);
+}
