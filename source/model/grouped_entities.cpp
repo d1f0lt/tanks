@@ -25,8 +25,4 @@ const std::vector<std::vector<Entity *>> &GroupedEntities::snapshotAll() const {
     return entities;
 }
 
-GroupedEntities::GroupedEntities()
-    : entities(25) {  // TODO create as many as need
-}
-
 }  // namespace Tanks::model

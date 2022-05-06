@@ -40,12 +40,12 @@ int Steel::getStrength() const {
 Steel::Steel(int left, int top) : Block(left, top) {
 }
 
-LevelBorder::LevelBorder(int left, int top, EntityType type_)
-    : Block(left, top), type(type_) {
+LevelBorder::LevelBorder(int left, int top, EntityType type)
+    : Block(left, top), type_(type) {
 }
 
 EntityType LevelBorder::getType() const {
-    return type;
+    return type_;
 }
 
 int LevelBorder::getStrength() const {

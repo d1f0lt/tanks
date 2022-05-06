@@ -36,11 +36,11 @@ private:
     void addEntity(std::unique_ptr<Entity> entity);
     void removeEntity(Entity &entity);
 
-    GameMap map;
-    GroupedEntities groupedEntities;
-    EntityHolder entityHolder;
-    std::unordered_map<int, Entity *> byid;
-    std::unordered_map<Entity *, BasicHandler *> handlers;
+    GameMap map_;
+    GroupedEntities groupedEntities_;
+    EntityHolder entityHolder_;
+    std::unordered_map<int, Entity *> byid_;
+    std::unordered_map<Entity *, BasicHandler *> handlers_;
 };
 }  // namespace Tanks::model
 

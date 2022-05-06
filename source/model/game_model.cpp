@@ -9,68 +9,68 @@
 
 namespace Tanks::model {
 Entity &GameModel::getByCoords(int col, int row) {
-    return map.getEntityByCoords(col, row);
+    return map_.getEntityByCoords(col, row);
 }
 
 void GameModel::nextTick() {
     for (auto *entity :
-         groupedEntities
+         groupedEntities_
              .snapshotAll()[static_cast<unsigned>(EntityType::BOT_TANK)]) {
         auto *tank = dynamic_cast<BotTank *>(entity);
         assert(tank != nullptr);
-        dynamic_cast<MovableHandler &>(*handlers[tank])
+        dynamic_cast<MovableHandler &>(*handlers_[tank])
             .move(tank->getDirection(), 1);
     }
 
     for (auto *entity :
-         groupedEntities
+         groupedEntities_
              .snapshotAll()[static_cast<unsigned>(EntityType::BULLET)]) {
         auto *bullet = dynamic_cast<Projectile *>(entity);
         assert(bullet != nullptr);
 
-        if (dynamic_cast<ProjectileHandler &>(*handlers[bullet])
+        if (dynamic_cast<ProjectileHandler &>(*handlers_[bullet])
                 .isBreakOnNextTick()) {
             continue;
         }
-        dynamic_cast<MovableHandler &>(*handlers[bullet])
+        dynamic_cast<MovableHandler &>(*handlers_[bullet])
             .move(bullet->getDirection(), bullet->getSpeed());
     }
 }
 
 void GameModel::addEntity(std::unique_ptr<Entity> entity) {
     if (auto *bullet = dynamic_cast<Projectile *>(entity.get())) {
-        if (dynamic_cast<ProjectileHandler *>(handlers[bullet])
+        if (dynamic_cast<ProjectileHandler *>(handlers_[bullet])
                 ->isBreakOnCreation()) {
-            handlers.erase(bullet);
+            handlers_.erase(bullet);
             return;
         }
     }
 
     if (auto *in_foreground = dynamic_cast<ForegroundEntity *>(entity.get())) {
-        dynamic_cast<ForegroundHandler &>(*handlers[in_foreground])
+        dynamic_cast<ForegroundHandler &>(*handlers_[in_foreground])
             .setBackground();
     }
 
-    byid.emplace(entity->getId(), entity.get());
-    map.insert(*entity);
-    groupedEntities.insert(*entity);
-    entityHolder.insert(std::move(entity));
+    byid_.emplace(entity->getId(), entity.get());
+    map_.insert(*entity);
+    groupedEntities_.insert(*entity);
+    entityHolder_.insert(std::move(entity));
 }
 
 void GameModel::removeEntity(Entity &entity) {
     if (auto *foreground = dynamic_cast<ForegroundEntity *>(&entity)) {
-        dynamic_cast<ForegroundHandler &>(*handlers[foreground])
+        dynamic_cast<ForegroundHandler &>(*handlers_[foreground])
             .restoreBackground();
     }
 
-    byid.erase(entity.getId());
-    handlers.erase(&entity);
-    groupedEntities.erase(entity);
+    byid_.erase(entity.getId());
+    handlers_.erase(&entity);
+    groupedEntities_.erase(entity);
 }
 
 PlayableTank &GameModel::spawnPlayableTank(const int left, const int top) {
-    assert(left + TANK_SIZE < map.getWidth());
-    assert(top + TANK_SIZE < map.getHeight());
+    assert(left + TANK_SIZE < map_.getWidth());
+    assert(top + TANK_SIZE < map_.getHeight());
 
     for (int row = top; row < top + TANK_SIZE; row++) {
         for (int col = left; col < left + TANK_SIZE; col++) {
@@ -103,9 +103,9 @@ void GameModel::loadLevel(int level) {
     assert(file.is_open() && "Unable to open map texture file");
     std::string str;
 
-    map = GameMap();
-    groupedEntities = GroupedEntities();
-    entityHolder = EntityHolder();
+    map_ = GameMap();
+    groupedEntities_ = GroupedEntities();
+    entityHolder_ = EntityHolder();
 
     for (int row = 0; row < MAP_HEIGHT; ++row) {
         std::getline(file, str);
@@ -142,16 +142,16 @@ void GameModel::loadLevel(int level) {
 }
 
 int GameModel::getWidth() const {
-    return map.getWidth();
+    return map_.getWidth();
 }
 
 int GameModel::getHeight() const {
-    return map.getHeight();
+    return map_.getHeight();
 }
 
 Entity &GameModel::getById(int id) {
-    assert(byid.count(id) != 0);
-    return *byid[id];
+    assert(byid_.count(id) != 0);
+    return *byid_[id];
 }
 
 }  // namespace Tanks::model

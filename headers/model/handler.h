@@ -19,8 +19,8 @@ public:
     virtual ~BasicHandler() = default;
 
 protected:
-    GameModel &model;
-    Entity &entity;
+    GameModel &model_;
+    Entity &entity_;
 };
 
 class ForegroundHandler : public BasicHandler {
@@ -36,20 +36,20 @@ public:
     explicit MovableHandler(GameModel &model_, MovableEntity &entity);
 
     [[nodiscard]] std::vector<const Entity *> look(Direction direction);
-    void move(Direction direction, int speed);
+    void move(Direction entity, int speed);
 
 protected:
     template <typename T>
     std::vector<const Entity *> nearest(Direction direction, T cond) {
         int dist = INT_MAX;
         std::vector<const Entity *> res;
-        for (const auto *obj : look(direction)) {
-            if (cond(obj)) {
-                if (entity.dist(*obj) <= dist) {
-                    if (entity.dist(*obj) == dist) {
-                        res = {obj};
+        for (const auto *entity : look(direction)) {
+            if (cond(entity)) {
+                if (entity_.dist(*entity) <= dist) {
+                    if (entity_.dist(*entity) == dist) {
+                        res = {entity};
                     } else {
-                        res.push_back(obj);
+                        res.push_back(entity);
                     }
                 }
             }

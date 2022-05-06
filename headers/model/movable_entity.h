@@ -11,29 +11,24 @@ public:
 
     explicit MovableEntity(int left,
                            int right,
-                           std::unique_ptr<BasicHandler> handler_,
-                           Direction direction,
-                           int speed);
+                           std::unique_ptr<MovableHandler> handler,
+                           Direction direction);
 
     explicit MovableEntity(int left,
                            int top,
                            int id,
-                           std::unique_ptr<BasicHandler> handler,
-                           Direction direction,
-                           int speed);
+                           std::unique_ptr<MovableHandler> handler,
+                           Direction direction);
 
     [[nodiscard]] Direction getDirection() const;
-
-    [[nodiscard]] int getSpeed() const;
+    [[nodiscard]] virtual int getSpeed() const = 0;
 
 protected:
     void setDirection(Direction dir);
-
-    void move(Direction dir, int speed_);
+    void move(Direction dir, int speed);  // TODO rename speed 2
 
 private:
-    Direction direction;
-    int speed = 0;
+    Direction direction_;
 };
 }  // namespace Tanks::model
 

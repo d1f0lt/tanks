@@ -4,32 +4,24 @@
 namespace Tanks::model {
 ForegroundEntity::ForegroundEntity(int left,
                                    int top,
-                                   std::unique_ptr<BasicHandler> handler_)
-    : Entity(left, top), handler(std::move(handler_)) {
+                                   std::unique_ptr<ForegroundHandler> handler)
+    : Entity(left, top), handler_(std::move(handler)) {
 }
 
 ForegroundEntity::ForegroundEntity(int left,
                                    int top,
                                    int id,
-                                   std::unique_ptr<BasicHandler> handler)
-    : Entity(left, top, id), handler(std::move(handler)) {
+                                   std::unique_ptr<ForegroundHandler> handler)
+    : Entity(left, top, id), handler_(std::move(handler)) {
 }
 
 std::vector<const Entity *> ForegroundEntity::look(Direction direction) const {
-    return dynamic_cast<MovableHandler &>(*handler).look(direction);
-}
-
-void ForegroundEntity::restoreBackground() {
-    dynamic_cast<ForegroundHandler &>(*handler).restoreBackground();
-}
-
-void ForegroundEntity::setBackground() {
-    dynamic_cast<ForegroundHandler &>(*handler).setBackground();
+    return dynamic_cast<MovableHandler &>(*handler_).look(direction);
 }
 
 std::vector<std::vector<const Entity *>> ForegroundEntity::snapshotBackground()
     const {
-    return background;
+    return background_;
 }
 
 }  // namespace Tanks::model

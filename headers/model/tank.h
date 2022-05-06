@@ -7,15 +7,16 @@
 namespace Tanks::model {
 class Tank : public MovableEntity {
 public:
-    explicit Tank(int left_,
-                  int top_,
-                  Direction direction_,
-                  std::unique_ptr<BasicHandler> handler_);
+    explicit Tank(int left,
+                  int top,
+                  std::unique_ptr<TankHandler> handler,
+                  Direction direction,
+                  int speed);
 
     explicit Tank(int left,
                   int top,
                   int id,
-                  std::unique_ptr<BasicHandler> handler,
+                  std::unique_ptr<TankHandler> handler,
                   Direction direction,
                   int speed);
 
@@ -23,19 +24,23 @@ public:
     [[nodiscard]] int getHeight() const override;
 
     [[nodiscard]] int getStrength() const override;
+    [[nodiscard]] EntityType getType() const override;
+    [[nodiscard]] int getSpeed() const override;
     [[nodiscard]] bool canPass(const Entity &other) const override;
-    EntityType getType() const override;
 
 protected:
     void shoot();
+
+private:
+    int speed_ = -1;
 };
 
 class BotTank : public Tank {
 public:
-    explicit BotTank(int left_,
-                     int top_,
-                     Direction direction_,
-                     std::unique_ptr<BasicHandler> handler_);
+    explicit BotTank(int left,
+                     int top,
+                     Direction direction,
+                     std::unique_ptr<TankHandler> handler);
 };
 
 }  // namespace Tanks::model

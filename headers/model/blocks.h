@@ -60,13 +60,13 @@ public:
 
 class LevelBorder : public Block {
 public:
-    explicit LevelBorder(int left, int top, EntityType type_);
+    explicit LevelBorder(int left, int top, EntityType type);
 
     [[nodiscard]] EntityType getType() const final;
     [[nodiscard]] int getStrength() const final;
 
 private:
-    EntityType type;
+    const EntityType type_;
 };
 
 }  // namespace Tanks::model

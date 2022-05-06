@@ -7,15 +7,13 @@
 namespace Tanks::model {
 class GroupedEntities {
 public:
-    explicit GroupedEntities();
-
     void insert(Entity &entity);
     void erase(Entity &entity);
 
     [[nodiscard]] const std::vector<std::vector<Entity *>> &snapshotAll() const;
 
 private:
-    std::vector<std::vector<Entity *>> entities;
+    std::vector<std::vector<Entity *>> entities{25};
 };
 
 }  // namespace Tanks::model
