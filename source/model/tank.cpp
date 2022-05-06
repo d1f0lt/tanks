@@ -33,7 +33,7 @@ int Tank::getHeight() const {
 }
 
 int Tank::getStrength() const {
-    return 0;
+    return 1;
 }
 
 Tank::Tank(int left,

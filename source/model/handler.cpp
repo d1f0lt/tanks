@@ -106,33 +106,46 @@ MovableHandler::MovableHandler(GameModel &model_, MovableEntity &entity)
 
 void MovableHandler::move(Direction direction, int speed) {
     // TODO lock model
-    auto &real_entity = dynamic_cast<MovableEntity &>(entity);
+    auto &movable = dynamic_cast<MovableEntity &>(entity);
 
-    real_entity.setDirection(direction);
-    real_entity.restoreBackground();
+    movable.setDirection(direction);
+    movable.restoreBackground();
+
+    auto bullets = nearest(direction, [](const Entity *obj) {
+        return dynamic_cast<const Projectile *>(obj) != nullptr;
+    });
+
+    if (!bullets.empty()) {
+        for (const auto *obj : bullets) {
+            model.removeEntity(const_cast<Entity &>(*obj));
+        }
+        model.removeEntity(entity);
+        return;
+    }
 
     int dist = speed;
-    for (const auto *object : real_entity.look(direction)) {
-        if (!real_entity.canPass(*object)) {
-            dist = std::min(dist, real_entity.dist(*object) - 1);
-        }
+    auto block = nearest(direction, [&movable](const Entity *obj) {
+        return !movable.canPass(*obj);
+    });
+    if (!block.empty()) {
+        dist = std::min(dist, entity.dist(*block[0]) - 1);
     }
 
     switch (direction) {
         case Direction::UP:
-            real_entity.setTop(entity.getTop() - dist);
+            movable.setTop(entity.getTop() - dist);
             break;
         case Direction::LEFT:
-            real_entity.setLeft(entity.getLeft() - dist);
+            movable.setLeft(entity.getLeft() - dist);
             break;
         case Direction::DOWN:
-            real_entity.setTop(entity.getTop() + dist);
+            movable.setTop(entity.getTop() + dist);
             break;
         case Direction::RIGHT:
-            real_entity.setLeft(entity.getLeft() + dist);
+            movable.setLeft(entity.getLeft() + dist);
             break;
     }
-    real_entity.setBackground();
+    movable.setBackground();
 }
 
 void TankHandler::shoot() {
@@ -166,22 +179,12 @@ ProjectileHandler::ProjectileHandler(GameModel &model, MovableEntity &entity)
 
 bool ProjectileHandler::isBreakOnNextTick() {
     auto &bullet = dynamic_cast<Projectile &>(entity);
-    auto vec = bullet.look(bullet.getDirection());
-    int dist = bullet.getSpeed() + 1;
-    std::vector<Entity *> closest;
-    for (const auto *a : vec) {
-        if (a->getStrength() > 0) {
-            if (bullet.dist(*a) < dist) {
-                closest = {const_cast<Entity *>(a)};
-                dist = bullet.dist(*(a));
-            } else if (bullet.dist(*a) == dist) {
-                closest.push_back(const_cast<Entity *>(a));
-            }
-        }
-    }
+    auto closest = nearest(bullet.getDirection(), [](const Entity *obj) {
+        return obj->getStrength() > 0;
+    });
 
     for (auto *a : closest) {
-        destroyByBullet(*a);
+        destroyByBullet(const_cast<Entity &>(*a));
     }
     if (!closest.empty()) {
         model.removeEntity(bullet);

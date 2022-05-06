@@ -1,6 +1,7 @@
 #ifndef TANKS_HANDLER_H
 #define TANKS_HANDLER_H
 
+#include <climits>
 #include "entity.h"
 #include "model/entities_fwd.h"
 
@@ -36,6 +37,25 @@ public:
 
     [[nodiscard]] std::vector<const Entity *> look(Direction direction);
     void move(Direction direction, int speed);
+
+protected:
+    template <typename T>
+    std::vector<const Entity *> nearest(Direction direction, T cond) {
+        int dist = INT_MAX;
+        std::vector<const Entity *> res;
+        for (const auto *obj : look(direction)) {
+            if (cond(obj)) {
+                if (entity.dist(*obj) <= dist) {
+                    if (entity.dist(*obj) == dist) {
+                        res = {obj};
+                    } else {
+                        res.push_back(obj);
+                    }
+                }
+            }
+        }
+        return res;
+    }
 };
 
 class TankHandler : public MovableHandler {
@@ -49,10 +69,11 @@ class ProjectileHandler : public MovableHandler {
 public:
     explicit ProjectileHandler(GameModel &model, MovableEntity &entity);
 
-    void destroyByBullet(Entity &other);
-
     [[nodiscard]] bool isBreakOnNextTick();
     [[nodiscard]] bool isBreakOnCreation();
+
+protected:
+    void destroyByBullet(Entity &other);
 };
 
 }  // namespace Tanks::model

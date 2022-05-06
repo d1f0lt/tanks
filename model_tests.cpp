@@ -3,6 +3,7 @@
 #include <array>
 #include <cassert>
 #include <iostream>
+#include <random>
 #include "doctest.h"
 #include "model/blocks.h"
 #include "model/game_model.h"
@@ -272,4 +273,40 @@ TEST_CASE("Bullet destroy on creation") {
 
     auto &floor = model.getByCoords(TILE_SIZE * 3, TILE_SIZE * 2);
     CHECK(floor.getType() == Tanks::model::EntityType::FLOOR);
+}
+
+TEST_CASE("Shoot static tank") {
+    using namespace Tanks::model;
+    using namespace Tanks;
+    using Tanks::model::Direction;
+    using Tanks::model::EntityType;
+
+    GameModel model;
+    model.loadLevel(1);
+    auto &tank1 = model.spawnPlayableTank(Tanks::TILE_SIZE * 2, TILE_SIZE);
+    auto &tank2 = model.spawnPlayableTank(TILE_SIZE * 3, TILE_SIZE);
+
+    tank1.setDirection(Tanks::model::Direction::RIGHT);
+    tank1.shoot();
+    model.nextTick();
+    auto &floor = model.getByCoords(TILE_SIZE * 3, TILE_SIZE);
+    CHECK(floor.getType() == EntityType::FLOOR);
+}
+
+TEST_CASE("tank move on bullet") {
+    using namespace Tanks::model;
+    using namespace Tanks;
+    using Tanks::model::Direction;
+    using Tanks::model::EntityType;
+
+    GameModel model;
+    model.loadLevel(1);
+    auto &tank1 = model.spawnPlayableTank(Tanks::TILE_SIZE, TILE_SIZE);
+    auto &tank2 = model.spawnPlayableTank(TILE_SIZE * 2, TILE_SIZE);
+
+    tank1.setDirection(Tanks::model::Direction::LEFT);
+    tank1.shoot();
+    tank2.move(Direction::RIGHT);
+    auto &floor = model.getByCoords(TILE_SIZE, TILE_SIZE);
+    CHECK(floor.getType() == EntityType::FLOOR);
 }
