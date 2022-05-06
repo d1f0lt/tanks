@@ -29,6 +29,12 @@ public:
 
     void setBackground();
     void restoreBackground();
+
+    [[nodiscard]] std::vector<std::vector<const Entity *>> snapshotBackground()
+        const;
+
+private:
+    std::vector<std::vector<Entity *>> background_;
 };
 
 class MovableHandler : public ForegroundHandler {
@@ -39,11 +45,13 @@ public:
     void move(Direction direction, int speed);
 
 protected:
+    [[nodiscard]] std::vector<Entity *> lookMutable(Direction direction);
+
     template <typename T>
-    std::vector<const Entity *> nearest(Direction direction, T cond) {
+    std::vector<Entity *> nearest(Direction direction, T cond) {
         int dist = INT_MAX;
-        std::vector<const Entity *> res;
-        for (const auto *entity : look(direction)) {
+        std::vector<Entity *> res;
+        for (auto *entity : lookMutable(direction)) {
             if (cond(entity)) {
                 if (entity_.dist(*entity) <= dist) {
                     if (entity_.dist(*entity) == dist) {

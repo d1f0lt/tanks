@@ -1,5 +1,4 @@
 #include "model/foreground_entity.h"
-#include <cassert>
 
 namespace Tanks::model {
 ForegroundEntity::ForegroundEntity(int left,
@@ -21,7 +20,7 @@ std::vector<const Entity *> ForegroundEntity::look(Direction direction) const {
 
 std::vector<std::vector<const Entity *>> ForegroundEntity::snapshotBackground()
     const {
-    return background_;
+    return dynamic_cast<ForegroundHandler &>(getHandler()).snapshotBackground();
 }
 
 BasicHandler &ForegroundEntity::getHandler() const {

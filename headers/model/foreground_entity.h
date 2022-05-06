@@ -30,7 +30,6 @@ protected:
 
 private:
     const std::unique_ptr<BasicHandler> handler_;
-    std::vector<std::vector<const Entity *>> background_;
 };
 
 }  // namespace Tanks::model
