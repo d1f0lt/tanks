@@ -169,7 +169,7 @@ bool ProjectileHandler::destroy() {
     auto vec = bullet.look(bullet.getDirection());
     int dist = bullet.getSpeed() + 1;
     std::vector<Entity *> closest;
-    for (auto *a : vec) {
+    for (const auto *a : vec) {
         if (a->getStrength() > 0 && a->getStrength() < 2) {
             if (bullet.dist(*a) < dist) {
                 closest = {const_cast<Entity *>(a)};

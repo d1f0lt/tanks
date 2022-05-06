@@ -145,7 +145,7 @@ TEST_CASE("Tank simple shoot") {
     CHECK(bullet.getLeft() == TILE_SIZE + TANK_SIZE + bullet.getSpeed());
 }
 
-TEST_CASE("Shoot, bullet should die") {
+TEST_CASE("Shoot, bullet die") {
     using namespace Tanks::model;
     using namespace Tanks;
 
@@ -166,7 +166,7 @@ TEST_CASE("Shoot, bullet should die") {
     model.nextTick();
     CHECK(bullet.getTop() == Tanks::TILE_SIZE + Tanks::TANK_SIZE / 2);
     CHECK(bullet.getLeft() == TILE_SIZE + TANK_SIZE + bullet.getSpeed());
-    for (int i = 0; i < 20000; i++) {
+    for (int i = 0; i < 50; i++) {
         model.nextTick();
     }
 }
@@ -202,4 +202,53 @@ TEST_CASE("3 Bullets destroy 3 bricks") {
         auto &floor = model.getByCoords(x, y);
         CHECK(floor.getType() == Tanks::model::EntityType::FLOOR);
     }
+}
+
+TEST_CASE("Bullet fly above water") {
+    using namespace Tanks::model;
+    using namespace Tanks;
+    using Tanks::model::Direction;
+    using Tanks::model::EntityType;
+
+    GameModel model;
+    model.loadLevel(1);
+    auto &tank = model.spawnPlayableTank(TILE_SIZE * 4, TILE_SIZE * 15);
+
+    tank.setDirection(Tanks::model::Direction::RIGHT);
+    auto &brick = model.getByCoords(TILE_SIZE * 19, TILE_SIZE * 15);
+    CHECK(brick.getType() == EntityType::BRICK);
+    auto &water = model.getByCoords(TILE_SIZE * 15, TILE_SIZE * 15);
+    CHECK(water.getType() == Tanks::model::EntityType::WATER);
+    tank.shoot();
+    auto &bullet = dynamic_cast<Projectile &>(
+        model.getByCoords(tank.getLeft() + tank.getWidth(),
+                          tank.getTop() + tank.getHeight() / 2));
+
+    int tWater = bullet.dist(water) / BULLET_SPEED +
+                 (bullet.dist(water) % BULLET_SPEED != 0);
+    for (int i = 0; i < tWater; i++) {
+        auto &waterNow = model.getByCoords(
+            TILE_SIZE * 15, TILE_SIZE * 15 + tank.getHeight() / 2);
+        CHECK(&water == &waterNow);
+        model.nextTick();
+    }
+
+    auto &notWaterNow = model.getByCoords(
+        TILE_SIZE * 15 + 2, TILE_SIZE * 15 + tank.getHeight() / 2);
+    CHECK(&notWaterNow == &bullet);
+
+    int tBrick = bullet.dist(brick) / BULLET_SPEED +
+                 (bullet.dist(brick) % BULLET_SPEED != 0);
+    for (int i = 0; i < tBrick; i++) {
+        auto &brickNow = model.getByCoords(TILE_SIZE * 19, TILE_SIZE * 15);
+        CHECK(&brick == &brickNow);
+        model.nextTick();
+    }
+
+    auto &waterNow = model.getByCoords(TILE_SIZE * 15 + 1,
+                                       TILE_SIZE * 15 + tank.getHeight() / 2);
+    CHECK(&waterNow == &water);
+
+    auto &floor = model.getByCoords(TILE_SIZE * 19, TILE_SIZE * 15);
+    CHECK(floor.getType() == Tanks::model::EntityType::FLOOR);
 }
