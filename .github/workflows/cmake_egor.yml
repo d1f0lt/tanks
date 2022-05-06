@@ -8,15 +8,14 @@ jobs:
       - uses: actions/checkout@v3
       - run: clang-format-12 --version
       - run: for file in $(find . -iname '*.cpp' -or -iname '*.c' -or -iname '*.h' -and -not -iname 'doctest.h' ); do diff -u <(cat "$file") <(clang-format-12 "$file") || exit 1; done
-  #  clang-tidy:
-  #    runs-on: ubuntu-latest
-  #    timeout-minutes: 2
-  #    steps:
-  #      - uses: actions/checkout@v3
-  #      - run: sudo apt-get update && sudo apt-get install clang-tidy-12
-  #      - run: clang-tidy-12 --version
-  #      # - run: clang-tidy-12 $(find . -iname '*_test.cpp') --checks=-readability-function-cognitive-complexity
-  #      - run: clang-tidy-12 '--extra-arg=-Iheaders/' $(find . -path '*/CMakeFiles/*' -prune -or \( -iname '*.cpp' -and -not -iname '*_test.cpp' -or -iname '*.h' -and -not -iname 'doctest.h' \) -print) -Iheaders
+  clang-tidy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v3
+      - run: sudo apt-get update && sudo apt-get install clang-tidy-12
+      - run: clang-tidy-12 --version
+      - run: clang-tidy-12 '--extra-arg=-Iheaders/' $(find . -path '*/CMakeFiles/*' -prune -or \( -iname '*.cpp' -and -not -iname '*tests.cpp' -or -iname '*.h' -and -not -iname 'doctest.h' \) -print) 
   cppcheck:
     runs-on: ubuntu-latest
     timeout-minutes: 1
