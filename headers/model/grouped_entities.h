@@ -10,7 +10,7 @@ public:
     void insert(Entity &entity);
     void erase(Entity &entity);
 
-    [[nodiscard]] const std::vector<std::vector<Entity *>> &snapshotAll() const;
+    [[nodiscard]] std::vector<std::vector<Entity *>> &snapshotAll() const;
 
 private:
     std::vector<std::vector<Entity *>> entities_{25};

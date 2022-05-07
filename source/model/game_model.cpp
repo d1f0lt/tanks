@@ -151,4 +151,9 @@ Entity &GameModel::getById(int entityId) {
     return *byid_[entityId];
 }
 
+std::vector<const Entity *> GameModel::getAll(EntityType type) {
+    auto vec = groupedEntities_.snapshotAll()[static_cast<unsigned>(type)];
+    return {vec.begin(), vec.end()};
+}
+
 }  // namespace Tanks::model
