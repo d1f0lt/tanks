@@ -13,32 +13,35 @@ Entity &GameModel::getByCoords(int col, int row) {
 }
 
 void GameModel::nextTick() {
-    for (const auto &entity :
+    for (auto *entity :
          groupedEntities_
              .getAllByLink()[static_cast<unsigned>(EntityType::BOT_TANK)]) {
-        auto &tank = entityCast<BotTank &>(entity);
-        dynamic_cast<MovableHandler &>(*handlers_[&tank])
-            .move(tank.getDirection(), tank.getSpeed());
+        auto *tank = dynamic_cast<BotTank *>(entity);
+        assert(tank != nullptr);
+        dynamic_cast<MovableHandler &>(*handlers_[tank])
+            .move(tank->getDirection(), tank->getSpeed());
     }
-    for (const auto &entity :
+
+    for (auto *entity :
          groupedEntities_
              .getAllByLink()[static_cast<unsigned>(EntityType::BULLET)]) {
-        auto &bullet = entityCast<Projectile &>(entity);
+        auto *bullet = dynamic_cast<Projectile *>(entity);
+        assert(bullet != nullptr);
 
-        if (dynamic_cast<ProjectileHandler &>(*handlers_[&bullet])
+        if (dynamic_cast<ProjectileHandler &>(*handlers_[bullet])
                 .isBreakOnNextTick()) {
             continue;
         }
-        dynamic_cast<MovableHandler &>(*handlers_[&bullet])
-            .move(bullet.getDirection(), bullet.getSpeed());
+        dynamic_cast<MovableHandler &>(*handlers_[bullet])
+            .move(bullet->getDirection(), bullet->getSpeed());
     }
     currentTick++;
 }
 
 void GameModel::addEntity(std::unique_ptr<Entity> entity) {
     if (auto *bullet = dynamic_cast<Projectile *>(entity.get())) {
-        if (dynamic_cast<ProjectileHandler &>(*handlers_[bullet])
-                .isBreakOnCreation()) {
+        if (dynamic_cast<ProjectileHandler *>(handlers_[bullet])
+                ->isBreakOnCreation()) {
             handlers_.erase(bullet);
             return;
         }
@@ -49,7 +52,7 @@ void GameModel::addEntity(std::unique_ptr<Entity> entity) {
             .setBackground();
     }
 
-    byId_.emplace(entity->getId(), *entity);
+    byid_.emplace(entity->getId(), entity.get());
     map_.insert(*entity);
     groupedEntities_.insert(*entity);
     entityHolder_.insert(std::move(entity));
@@ -61,7 +64,7 @@ void GameModel::removeEntity(Entity &entity) {
             .restoreBackground();
     }
 
-    byId_.erase(entity.getId());
+    byid_.erase(entity.getId());
     handlers_.erase(&entity);
     groupedEntities_.erase(entity);
     entityHolder_.remove(entity);
@@ -144,17 +147,15 @@ int GameModel::getHeight() const {
     return map_.getHeight();
 }
 
-std::optional<std::reference_wrapper<Entity>> GameModel::getById(int entityId) {
-    if (byId_.count(entityId) == 0) {
-        return std::nullopt;
-    }
-    return byId_.at(entityId);
+Entity &GameModel::getById(int entityId) {
+    assert(byid_.count(entityId) != 0);
+    return *byid_[entityId];
 }
 
-std::vector<std::reference_wrapper<Entity>> GameModel::getAll(EntityType type) {
-    return groupedEntities_.snapshotAll()[static_cast<unsigned>(type)];
+std::vector<const Entity *> GameModel::getAll(EntityType type) {
+    auto vec = groupedEntities_.snapshotAll()[static_cast<unsigned>(type)];
+    return {vec.begin(), vec.end()};
 }
-
 int GameModel::getTick() const {
     return currentTick;
 }

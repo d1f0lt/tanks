@@ -10,14 +10,12 @@ public:
     void insert(Entity &entity);
     void erase(Entity &entity);
 
-    [[nodiscard]] std::vector<std::vector<std::reference_wrapper<Entity>>>
-    snapshotAll() const;
+    [[nodiscard]] std::vector<std::vector<Entity *>> snapshotAll() const;
 
-    [[nodiscard]] const std::vector<std::vector<std::reference_wrapper<Entity>>>
-        &getAllByLink();
+    [[nodiscard]] const std::vector<std::vector<Entity *>> &getAllByLink() const;
 
 private:
-    std::vector<std::vector<std::reference_wrapper<Entity>>> entities_{25};
+    std::vector<std::vector<Entity *>> entities_{25};
 };
 
 }  // namespace Tanks::model

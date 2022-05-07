@@ -9,7 +9,6 @@ namespace Tanks::model {
 BasicHandler::BasicHandler(GameModel &model_, Entity &entity_)
     : model_(model_), entity_(entity_) {
     assert(model_.handlers_.count(&entity_) == 0);
-
     model_.handlers_[&entity_] = this;
 }
 
@@ -28,23 +27,24 @@ void ForegroundHandler::restoreBackground() {
             }
             restored.insert(background_[row][col]);
             model_.map_.insert(*background_[row][col]);
+            background_[row][col] = nullptr;
         }
     }
-    background_.clear();
 }
 
 void ForegroundHandler::setBackground() {
     background_.resize(entity_.getHeight(),
                        std::vector<Entity *>(entity_.getWidth(), nullptr));
 
-    int left = entity_.getLeft();
     int top = entity_.getTop();
-    for (int row = 0; row < entity_.getHeight(); row++) {
-        for (int col = 0; col < entity_.getWidth(); col++) {
-            background_[row][col] = &model_.getByCoords(col + left, row + top);
+    int left = entity_.getLeft();
+    int height = entity_.getHeight();
+    int width = entity_.getWidth();
+    for (int row = entity_.getTop(); row < entity_.getTop() + height; row++) {
+        for (int col = entity_.getLeft(); col < left + width; col++) {
+            background_[row - top][col - left] = &model_.getByCoords(col, row);
         }
     }
-
     model_.map_.insert(entity_);
 }
 
@@ -227,7 +227,6 @@ void ProjectileHandler::destroyByBullet(Entity &other) {
         model_.removeEntity(other);
         return;
     }
-
     int left = other.getLeft();
     int top = other.getTop();
     model_.removeEntity(other);
@@ -245,8 +244,8 @@ bool ProjectileHandler::isBreakOnCreation() {
              col < bullet.getLeft() + bullet.getWidth(); col++) {
             auto &entity = model_.getByCoords(col, row);
             if (entity.getStrength() != 0) {  // TODO .doInteract
-                dynamic_cast<ProjectileHandler &>(*model_.handlers_[&bullet])
-                    .destroyByBullet(entity);
+                dynamic_cast<ProjectileHandler *>(model_.handlers_[&bullet])
+                    ->destroyByBullet(entity);
                 survive = false;
             }
         }

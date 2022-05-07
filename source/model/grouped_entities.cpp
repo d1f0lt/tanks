@@ -3,28 +3,30 @@
 
 namespace Tanks::model {
 void GroupedEntities::insert(Entity &entity) {
-    entities_[static_cast<unsigned>(entity.getType())].emplace_back(entity);
+    // 0 - usual blocks
+    // 1 - bot-Tanks
+    // 2 - playable Tanks
+    // 3 - bullets
+    // 4 - grass
+    // TODO make it independent from order in EntityType
+    entities_[static_cast<unsigned>(entity.getType())].emplace_back(&entity);
 }
 
 void GroupedEntities::erase(Entity &entity) {
     auto type = static_cast<unsigned>(entity.getType());
-    for (auto iter = entities_[type].begin(); iter != entities_[type].end();
-         iter++) {
-        auto now = *iter;
-        if (&now.get() == &entity) {
-            entities_[type].erase(iter);
-            return;
-        }
-    }
+    assert(std::find(entities_[type].begin(), entities_[type].end(), &entity) !=
+           entities_[type].end());
+
+    entities_[type].erase(
+        std::find(entities_[type].begin(), entities_[type].end(), &entity));
 }
 
-std::vector<std::vector<std::reference_wrapper<Entity>>>
-GroupedEntities::snapshotAll() const {
+std::vector<std::vector<Entity *>> GroupedEntities::snapshotAll() const {
     return entities_;
 }
 
-const std::vector<std::vector<std::reference_wrapper<Entity>>>
-    &GroupedEntities::getAllByLink() {
+const std::vector<std::vector<Entity *>> &GroupedEntities::getAllByLink()
+    const {
     return entities_;
 }
 
