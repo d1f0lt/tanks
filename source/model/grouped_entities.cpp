@@ -21,7 +21,7 @@ void GroupedEntities::erase(Entity &entity) {
         std::find(entities_[type].begin(), entities_[type].end(), &entity));
 }
 
-std::vector<std::vector<Entity *>> &GroupedEntities::snapshotAll() const {
+const std::vector<std::vector<Entity *>> &GroupedEntities::snapshotAll() const {
     return entities_;
 }
 
