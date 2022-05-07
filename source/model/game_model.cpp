@@ -2,6 +2,7 @@
 #include <cassert>
 #include <fstream>
 #include <iostream>
+#include <optional>
 #include <thread>
 #include <unordered_map>
 #include "model/blocks.h"
@@ -35,7 +36,7 @@ void GameModel::nextTick() {
         dynamic_cast<MovableHandler &>(*handlers_[bullet])
             .move(bullet->getDirection(), bullet->getSpeed());
     }
-    currentTick++;
+    currentTick_++;
 }
 
 void GameModel::addEntity(std::unique_ptr<Entity> entity) {
@@ -52,7 +53,7 @@ void GameModel::addEntity(std::unique_ptr<Entity> entity) {
             .setBackground();
     }
 
-    byid_.emplace(entity->getId(), entity.get());
+    byId_.emplace(entity->getId(), entity.get());
     map_.insert(*entity);
     groupedEntities_.insert(*entity);
     entityHolder_.insert(std::move(entity));
@@ -64,7 +65,7 @@ void GameModel::removeEntity(Entity &entity) {
             .restoreBackground();
     }
 
-    byid_.erase(entity.getId());
+    byId_.erase(entity.getId());
     handlers_.erase(&entity);
     groupedEntities_.erase(entity);
     entityHolder_.remove(entity);
@@ -147,9 +148,9 @@ int GameModel::getHeight() const {
     return map_.getHeight();
 }
 
-Entity &GameModel::getById(int entityId) {
-    assert(byid_.count(entityId) != 0);
-    return *byid_[entityId];
+std::optional<std::reference_wrapper<Entity>> GameModel::getById(int entityId) {
+    assert(byId_.count(entityId) != 0);
+    return *byId_[entityId];
 }
 
 std::vector<const Entity *> GameModel::getAll(EntityType type) {
@@ -157,7 +158,7 @@ std::vector<const Entity *> GameModel::getAll(EntityType type) {
     return {vec.begin(), vec.end()};
 }
 int GameModel::getTick() const {
-    return currentTick;
+    return currentTick_;
 }
 
 }  // namespace Tanks::model
