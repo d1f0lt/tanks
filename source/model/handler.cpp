@@ -202,7 +202,8 @@ bool ProjectileHandler::isBreakOnNextTick() {
 }
 
 void ProjectileHandler::destroyByBullet(Entity &other) {
-    if (other.getStrength() > entity_.getStrength()) {
+    if (other.getStrength() > entity_.getStrength() ||
+        other.getStrength() == 0) {
         return;
     }
 

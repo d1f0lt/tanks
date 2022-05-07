@@ -234,10 +234,6 @@ TEST_CASE("Bullet fly above water") {
         model.nextTick();
     }
 
-    auto &notWaterNow = model.getByCoords(
-        TILE_SIZE * 15 + 2, TILE_SIZE * 15 + tank.getHeight() / 2);
-    CHECK(&notWaterNow == &bullet);
-
     int tBrick = bullet.dist(brick) / BULLET_SPEED +
                  (bullet.dist(brick) % BULLET_SPEED != 0);
     for (int i = 0; i < tBrick; i++) {
@@ -309,4 +305,85 @@ TEST_CASE("tank move on bullet") {
     tank2.move(Direction::RIGHT);
     auto &floor = model.getByCoords(TILE_SIZE, TILE_SIZE);
     CHECK(floor.getType() == EntityType::FLOOR);
+}
+
+TEST_CASE("Bullet destroy 2 blocks on creation") {
+    using namespace Tanks::model;
+    using namespace Tanks;
+    using Tanks::model::Direction;
+    using Tanks::model::EntityType;
+
+    GameModel model;
+    model.loadLevel(1);
+    auto &tank = model.spawnPlayableTank(Tanks::TILE_SIZE * 10 + TILE_SIZE / 2,
+                                         TILE_SIZE * 15);
+    tank.setDirection(Tanks::model::Direction::DOWN);
+    auto &brick1 = model.getByCoords(TILE_SIZE * 10, TILE_SIZE * 16);
+    auto &brick2 = model.getByCoords(TILE_SIZE * 11, TILE_SIZE * 16);
+    CHECK(brick1.getType() == EntityType::BRICK);
+    CHECK(brick2.getType() == EntityType::BRICK);
+
+    tank.shoot();
+
+    model.nextTick();
+
+    auto &floor1 = model.getByCoords(TILE_SIZE * 10, TILE_SIZE * 16);
+    auto &floor2 = model.getByCoords(TILE_SIZE * 11, TILE_SIZE * 16);
+    CHECK(floor1.getType() == EntityType::FLOOR);
+    CHECK(floor2.getType() == EntityType::FLOOR);
+}
+
+TEST_CASE("Bullet destroy 2 blocks on nextTick") {
+    using namespace Tanks::model;
+    using namespace Tanks;
+    using Tanks::model::Direction;
+    using Tanks::model::EntityType;
+
+    GameModel model;
+    model.loadLevel(1);
+    auto &tank = model.spawnPlayableTank(Tanks::TILE_SIZE * 10 + TILE_SIZE / 2,
+                                         TILE_SIZE * 15 - BULLET_SIZE);
+    tank.setDirection(Tanks::model::Direction::DOWN);
+    tank.shoot();
+
+    auto &brick1 = model.getByCoords(TILE_SIZE * 10, TILE_SIZE * 16);
+    auto &brick2 = model.getByCoords(TILE_SIZE * 11, TILE_SIZE * 16);
+    CHECK(brick1.getType() == EntityType::BRICK);
+    CHECK(brick2.getType() == EntityType::BRICK);
+
+    model.nextTick();
+
+    auto &floor1 = model.getByCoords(TILE_SIZE * 10, TILE_SIZE * 16);
+    auto &floor2 = model.getByCoords(TILE_SIZE * 11, TILE_SIZE * 16);
+    CHECK(floor1.getType() == EntityType::FLOOR);
+    CHECK(floor2.getType() == EntityType::FLOOR);
+}
+
+TEST_CASE("Bullet destroy 1 of blocks on creation, then shoot again") {
+    using namespace Tanks::model;
+    using namespace Tanks;
+    using Tanks::model::Direction;
+    using Tanks::model::EntityType;
+
+    GameModel model;
+    model.loadLevel(1);
+    auto &tank = model.spawnPlayableTank(TILE_SIZE * 10 + TILE_SIZE - TANK_SIZE,
+                                         TILE_SIZE * 15);
+    tank.setDirection(Tanks::model::Direction::DOWN);
+
+    auto &brick1 = model.getByCoords(TILE_SIZE * 10, TILE_SIZE * 16);
+    auto &brick2 = model.getByCoords(TILE_SIZE * 11, TILE_SIZE * 16);
+    CHECK(brick1.getType() == EntityType::BRICK);
+    CHECK(brick2.getType() == EntityType::BRICK);
+
+    tank.shoot();
+
+    auto &floor1 = model.getByCoords(TILE_SIZE * 10, TILE_SIZE * 16);
+    auto &floor2 = model.getByCoords(TILE_SIZE * 11, TILE_SIZE * 16);
+    CHECK(floor1.getType() == EntityType::FLOOR);
+    CHECK(&floor2 == &brick2);
+
+    model.nextTick();
+    tank.shoot();
+    model.nextTick();
 }
