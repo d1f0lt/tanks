@@ -15,7 +15,7 @@ Entity &GameModel::getByCoords(int col, int row) {
 void GameModel::nextTick() {
     for (auto *entity :
          groupedEntities_
-             .snapshotAll()[static_cast<unsigned>(EntityType::BOT_TANK)]) {
+             .getAllByLink()[static_cast<unsigned>(EntityType::BOT_TANK)]) {
         auto *tank = dynamic_cast<BotTank *>(entity);
         assert(tank != nullptr);
         dynamic_cast<MovableHandler &>(*handlers_[tank])
@@ -24,7 +24,7 @@ void GameModel::nextTick() {
 
     for (auto *entity :
          groupedEntities_
-             .snapshotAll()[static_cast<unsigned>(EntityType::BULLET)]) {
+             .getAllByLink()[static_cast<unsigned>(EntityType::BULLET)]) {
         auto *bullet = dynamic_cast<Projectile *>(entity);
         assert(bullet != nullptr);
 
