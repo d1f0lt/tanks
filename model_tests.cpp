@@ -73,6 +73,7 @@ TEST_CASE("multiple moves") {
     const int MOVES = 9;
     for (int i = 0; i < MOVES; i++) {
         realTank.move(Tanks::model::Direction::DOWN);
+        model.nextTick();
     }
 
     CHECK(realTank.getTop() == TILE_SIZE + MOVES * realTank.getSpeed());
@@ -80,6 +81,62 @@ TEST_CASE("multiple moves") {
     model.nextTick();
     right = realTank.look(Tanks::model::Direction::RIGHT);
     CHECK(right.back()->getType() == Tanks::model::EntityType::FLOOR);
+}
+
+TEST_CASE("Can't do 2 moves on 1 tick") {
+    using namespace Tanks::model;
+    using namespace Tanks;
+    using Tanks::model::Direction;
+    using Tanks::model::EntityType;
+
+    Tanks::model::GameModel model;
+    model.loadLevel(1);
+    auto &tank = model.spawnPlayableTank(TILE_SIZE, TILE_SIZE);
+    int left = tank.getLeft(), top = tank.getTop();
+    tank.move(Tanks::model::Direction::RIGHT);
+    int left1 = tank.getLeft(), top1 = tank.getTop();
+    tank.move(Tanks::model::Direction::RIGHT);
+    CHECK(left1 == tank.getLeft());
+    CHECK(top1 == tank.getTop());
+    model.nextTick();
+    CHECK(left1 == tank.getLeft());
+    CHECK(top1 == tank.getTop());
+}
+
+TEST_CASE("Can move and shoot on 1 tick") {
+    using namespace Tanks::model;
+    using namespace Tanks;
+    using Tanks::model::Direction;
+    using Tanks::model::EntityType;
+
+    Tanks::model::GameModel model;
+    model.loadLevel(1);
+    auto &tank = model.spawnPlayableTank(TILE_SIZE, TILE_SIZE);
+    int left = tank.getLeft(), top = tank.getTop();
+    tank.move(Tanks::model::Direction::RIGHT);
+    int left1 = tank.getLeft(), top1 = tank.getTop();
+    tank.move(Tanks::model::Direction::RIGHT);
+    CHECK(left1 == left + tank.getSpeed());
+    CHECK(top1 == top);
+    tank.shoot();
+    CHECK(left1 == left + tank.getSpeed());
+    CHECK(top1 == top);
+}
+
+TEST_CASE("Can't shoot then move on 1 tick") {
+    Tanks::model::GameModel model;
+    model.loadLevel(1);
+    auto &tank = model.spawnPlayableTank(TILE_SIZE, TILE_SIZE);
+    int left = tank.getLeft(), top = tank.getTop();
+    tank.setDirection(Tanks::model::Direction::RIGHT);
+    CHECK(model.getTick() == 0);
+    tank.shoot();
+    CHECK(model.getTick() == 0);
+    tank.move(Tanks::model::Direction::RIGHT);
+    CHECK(left == tank.getLeft());
+    CHECK(top == tank.getTop());
+    model.nextTick();
+    CHECK(model.getTick() == 1);
 }
 
 TEST_CASE("Block check") {

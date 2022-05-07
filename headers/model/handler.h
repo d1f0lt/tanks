@@ -42,7 +42,7 @@ public:
     explicit MovableHandler(GameModel &model, MovableEntity &entity);
 
     [[nodiscard]] std::vector<const Entity *> look(Direction direction);
-    void move(Direction direction, int speed);
+    virtual void move(Direction direction, int speed);
 
 protected:
     [[nodiscard]] std::vector<Entity *> lookMutable(Direction direction);
@@ -70,7 +70,12 @@ class TankHandler : public MovableHandler {
 public:
     explicit TankHandler(GameModel &model, Tank &entity);
 
+    void move(Direction dir, int speed) override;
     void shoot();
+
+private:
+    int lastMoveTick = -1;
+    int lastShootTick = -1;
 };
 
 class ProjectileHandler : public MovableHandler {

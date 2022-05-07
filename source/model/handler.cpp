@@ -85,7 +85,7 @@ void MovableHandler::move(Direction direction, int speed) {
         return dynamic_cast<const Projectile *>(entity) != nullptr;
     });
 
-    if (!bullets.empty() && movable.dist(*bullets[0]) < dist) {
+    if (!bullets.empty() && movable.dist(*bullets[0]) <= dist) {
         for (auto *entity : bullets) {
             model_.removeEntity(*entity);
         }
@@ -109,6 +109,7 @@ void MovableHandler::move(Direction direction, int speed) {
     }
     setBackground();
 }
+
 std::vector<Entity *> MovableHandler::lookMutable(Direction direction) {
     auto &movableEntity = dynamic_cast<MovableEntity &>(entity_);
     // retuns square [left, right) x [down, top)
@@ -157,6 +158,13 @@ std::vector<Entity *> MovableHandler::lookMutable(Direction direction) {
 }
 
 void TankHandler::shoot() {
+    // TODO lock model
+    if (model_.getTick() <= lastShootTick) {
+        return;
+    }
+
+    lastShootTick = model_.getTick();
+
     auto &tank = dynamic_cast<Tank &>(entity_);
 
     static const std::unordered_map<Direction, int> DCOL = {
@@ -179,6 +187,14 @@ void TankHandler::shoot() {
 
 TankHandler::TankHandler(GameModel &model, Tank &entity)
     : MovableHandler(model, entity) {
+}
+void TankHandler::move(Direction dir, int speed) {
+    // TODO lock model
+    if (model_.getTick() <= std::max(lastShootTick, lastMoveTick)) {
+        return;
+    }
+    lastMoveTick = model_.getTick();
+    MovableHandler::move(dir, speed);
 }
 
 ProjectileHandler::ProjectileHandler(GameModel &model, MovableEntity &entity)

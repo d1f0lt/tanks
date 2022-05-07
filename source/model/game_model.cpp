@@ -35,6 +35,7 @@ void GameModel::nextTick() {
         dynamic_cast<MovableHandler &>(*handlers_[bullet])
             .move(bullet->getDirection(), bullet->getSpeed());
     }
+    currentTick++;
 }
 
 void GameModel::addEntity(std::unique_ptr<Entity> entity) {
@@ -154,6 +155,9 @@ Entity &GameModel::getById(int entityId) {
 std::vector<const Entity *> GameModel::getAll(EntityType type) {
     auto vec = groupedEntities_.snapshotAll()[static_cast<unsigned>(type)];
     return {vec.begin(), vec.end()};
+}
+int GameModel::getTick() const {
+    return currentTick;
 }
 
 }  // namespace Tanks::model

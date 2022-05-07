@@ -33,6 +33,7 @@ public:
     [[nodiscard]] int getWidth() const;
 
     [[nodiscard]] std::vector<const Entity *> getAll(EntityType type);
+    [[nodiscard]] int getTick() const;
 
 private:
     void addEntity(std::unique_ptr<Entity> entity);
@@ -43,6 +44,7 @@ private:
     EntityHolder entityHolder_;
     std::unordered_map<int, Entity *> byid_;
     std::unordered_map<Entity *, BasicHandler *> handlers_;
+    int currentTick = 0;
 };
 }  // namespace Tanks::model
 
