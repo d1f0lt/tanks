@@ -73,24 +73,24 @@ void MovableHandler::move(Direction direction, int speed) {
     movable.setDirection(direction);
     restoreBackground();
 
-    auto bullets = nearest(direction, [](const Entity *entity) {
-        return dynamic_cast<const Projectile *>(entity) != nullptr;
-    });
-
-    if (!bullets.empty()) {
-        for (auto *entity : bullets) {
-            model_.removeEntity(*entity);
-        }
-        model_.removeEntity(entity_);
-        return;
-    }
-
     int dist = speed;
     auto block = nearest(direction, [&movable](const Entity *entity) {
         return !movable.canPass(*entity);
     });
     if (!block.empty()) {
         dist = std::min(dist, entity_.dist(*block[0]) - 1);
+    }
+
+    auto bullets = nearest(direction, [](const Entity *entity) {
+        return dynamic_cast<const Projectile *>(entity) != nullptr;
+    });
+
+    if (!bullets.empty() && movable.dist(*bullets[0]) < dist) {
+        for (auto *entity : bullets) {
+            model_.removeEntity(*entity);
+        }
+        model_.removeEntity(entity_);
+        return;
     }
 
     switch (direction) {

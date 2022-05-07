@@ -22,6 +22,7 @@ public:
     [[nodiscard]] int getStrength() const override;
     [[nodiscard]] int getSpeed() const override;
 
+    [[nodiscard]] bool isTankPassable() const override;
     [[nodiscard]] bool canPass(const Entity &other) const override;
 };
 }  // namespace Tanks::model
