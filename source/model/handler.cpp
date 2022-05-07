@@ -160,16 +160,16 @@ void TankHandler::shoot() {
     auto &tank = dynamic_cast<Tank &>(entity_);
 
     static const std::unordered_map<Direction, int> DCOL = {
-        {Tanks::model::Direction::UP, entity_.getWidth() / 2},
-        {Tanks::model::Direction::DOWN, entity_.getWidth() / 2},
-        {Tanks::model::Direction::RIGHT, entity_.getWidth()},
-        {Tanks::model::Direction::LEFT, -1}};
+        {Tanks::model::Direction::UP, entity_.getWidth() / 2 - 8},
+        {Tanks::model::Direction::DOWN, entity_.getWidth() / 2 - 8},
+        {Tanks::model::Direction::RIGHT, entity_.getWidth() + 3},
+        {Tanks::model::Direction::LEFT, -12}};
 
     static const std::unordered_map<Direction, int> DROW = {
-        {Tanks::model::Direction::UP, -1},
-        {Tanks::model::Direction::DOWN, entity_.getHeight()},
-        {Tanks::model::Direction::RIGHT, entity_.getHeight() / 2},
-        {Tanks::model::Direction::LEFT, entity_.getHeight() / 2}};
+        {Tanks::model::Direction::UP, -12},
+        {Tanks::model::Direction::DOWN, entity_.getHeight() + 3},
+        {Tanks::model::Direction::RIGHT, entity_.getHeight() / 2 - 14},
+        {Tanks::model::Direction::LEFT, entity_.getHeight() / 2 - 14}};
 
     model_.addEntity(std::make_unique<Projectile>(
         entity_.getLeft() + DCOL.at(tank.getDirection()),

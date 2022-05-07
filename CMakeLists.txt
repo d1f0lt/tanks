@@ -55,6 +55,7 @@ add_executable(
         source/pause.cpp
         source/view/game_view.cpp
         source/view/tank_view.cpp
+        source/view/bullets_view.cpp
         source/model/blocks.cpp
         source/model/entity.cpp
         source/model/game_model.cpp

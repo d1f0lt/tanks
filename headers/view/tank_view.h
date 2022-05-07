@@ -13,12 +13,12 @@ public:
 
     void draw(sf::RenderWindow &window, const model::Tank &tank);
 
-    sf::Sprite &getCurrentSprite(const model::Tank &tank);
-
 private:
     sf::Image image;
     sf::Texture texture;
     std::vector<sf::Sprite> sprites{4};
+
+    sf::Sprite &getCurrentSprite(const model::Tank &tank);
 };
 }  // namespace Tanks::View
 

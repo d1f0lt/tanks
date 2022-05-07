@@ -8,6 +8,7 @@
 #include "pause.h"
 #include "view/game_view.h"
 #include "view/tank_view.h"
+#include "view/bullets_view.h"
 
 namespace Tanks {
 
@@ -22,11 +23,13 @@ std::optional<Menu::ButtonType> startGame(sf::RenderWindow &window, int level) {
     auto &player =
         model.spawnPlayableTank(tankStartCoordinates.x, tankStartCoordinates.y);
 
-    View::TankSpriteHolder greenTank(imagesPath + "tanks/green_tank.png");
+    View::TankSpriteHolder greenTankView(imagesPath + "tanks/green_tank.png");
+
+    View::BulletsSpriteHolder bulletsView(imagesPath + "bullet.png");
+
+    View::Map mapView(imagesPath + "map.png", level);
 
     Environment environment(imagesPath + "environment/");
-
-    View::Map map(imagesPath + "map.png", level);
 
     Pause pause;
 
@@ -47,17 +50,21 @@ std::optional<Menu::ButtonType> startGame(sf::RenderWindow &window, int level) {
                 assert(signal.value()->getType() == Menu::ButtonType::PAUSE);
                 pause.makePause();
             } else {
+                model.nextTick();
+                GameController::makeShot(player);
                 GameController::makeMove(player);
             }
         }
-        model.nextTick();
         // redraw
         window.clear();
         environment.draw(window, pause.isPause());
 
-        map.draw(window, model);
+        mapView.draw(window, model);
 
-        greenTank.draw(window, player);
+        greenTankView.draw(window, player);
+
+        const auto &bullets = model.getAll(model::EntityType::BULLET);
+        bulletsView.draw(window, bullets);
 
         if (pause.isPause()) {
             if (auto signal =

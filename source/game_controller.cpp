@@ -2,15 +2,15 @@
 
 namespace Tanks {
 
+bool GameController::isEscReleased(const sf::Event &event) {
+    return (event.type == sf::Event::KeyReleased &&
+            event.key.code == sf::Keyboard::Escape);  // NOLINT
+}
+
 void GameController::makeMove(model::PlayableTank &player,
                               model::Direction direction) {
     player.setDirection(direction);
     player.move(direction);
-}
-
-bool GameController::isEscReleased(const sf::Event &event) {
-    return (event.type == sf::Event::KeyReleased &&
-            event.key.code == sf::Keyboard::Escape);  // NOLINT
 }
 
 void GameController::makeMove(model::PlayableTank &player) {
@@ -31,6 +31,15 @@ void GameController::makeMove(model::PlayableTank &player) {
         auto direction = model::Direction::UP;
         makeMove(player, direction);
     }
+}
+
+void GameController::makeShot(model::PlayableTank &player) {
+    static sf::Clock timer;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && timer.getElapsedTime().asSeconds() > RELOAD_TIME) {
+        player.shoot();
+        timer.restart();
+    }
+
 }
 
 }  // namespace Tanks

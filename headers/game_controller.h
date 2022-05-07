@@ -14,6 +14,8 @@ public:
 
     static void makeMove(model::PlayableTank &player,
                          model::Direction direction);
+
+    static void makeShot(model::PlayableTank &player);
 };
 
 }  // namespace Tanks
