@@ -21,7 +21,7 @@ public:
     void eraseByCoords(int col, int row);
 
 private:
-    std::vector<std::vector<Entity *>> map;
+    std::vector<std::vector<Entity *>> map_;
 };
 }  // namespace Tanks::model
 

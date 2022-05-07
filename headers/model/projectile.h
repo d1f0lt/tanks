@@ -6,20 +6,21 @@
 namespace Tanks::model {
 class Projectile : public MovableEntity {
 public:
-    explicit Projectile(int left_,
-                        int top_,
-                        Direction direction_,
-                        std::unique_ptr<BasicHandler> handler_);
+    explicit Projectile(int left,
+                        int top,
+                        Direction direction,
+                        std::unique_ptr<ProjectileHandler> handler);
 
-    explicit Projectile(int left_,
-                        int top_,
-                        Direction direction_,
-                        GameModel &model_);
+    explicit Projectile(int left,
+                        int top,
+                        Direction direction,
+                        GameModel &model);
 
     [[nodiscard]] EntityType getType() const override;
     [[nodiscard]] int getWidth() const override;
     [[nodiscard]] int getHeight() const override;
     [[nodiscard]] int getStrength() const override;
+    [[nodiscard]] int getSpeed() const override;
 
     [[nodiscard]] bool canPass(const Entity &other) const override;
 };

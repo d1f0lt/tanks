@@ -13,7 +13,7 @@ public:
     void remove(Entity &entity);
 
 private:
-    std::vector<std::unique_ptr<Entity>> buffer;
+    std::vector<std::unique_ptr<Entity>> buffer_;
 };
 }  // namespace Tanks::model
 

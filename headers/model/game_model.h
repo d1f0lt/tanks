@@ -15,12 +15,13 @@ class GameModel {
     friend ForegroundHandler;
     friend MovableHandler;
     friend TankHandler;
+    friend ProjectileHandler;
 
 public:
     explicit GameModel() = default;
 
     [[nodiscard]] Entity &getByCoords(int col, int row);
-    [[nodiscard]] Entity &getById(int id);
+    [[nodiscard]] Entity &getById(int entityId);
 
     void nextTick();
 
@@ -32,14 +33,14 @@ public:
     [[nodiscard]] int getWidth() const;
 
 private:
-    Entity &addEntity(std::unique_ptr<Entity> entity);
+    void addEntity(std::unique_ptr<Entity> entity);
     void removeEntity(Entity &entity);
 
-    GameMap map;
-    GroupedEntities groupedEntities;
-    EntityHolder entityHolder;
-    std::unordered_map<int, Entity *> byid;
-    std::unordered_map<Entity *, BasicHandler *> handlers;
+    GameMap map_;
+    GroupedEntities groupedEntities_;
+    EntityHolder entityHolder_;
+    std::unordered_map<int, Entity *> byid_;
+    std::unordered_map<Entity *, BasicHandler *> handlers_;
 };
 }  // namespace Tanks::model
 

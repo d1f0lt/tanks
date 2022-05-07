@@ -1,6 +1,7 @@
 #ifndef TANKS_HANDLER_H
 #define TANKS_HANDLER_H
 
+#include <climits>
 #include "entity.h"
 #include "model/entities_fwd.h"
 
@@ -17,41 +18,70 @@ public:
 
     virtual ~BasicHandler() = default;
 
-    virtual void setBackground() = 0;
-    virtual void restoreBackground() = 0;
-
-    [[nodiscard]] virtual std::vector<const Entity *> look(Direction direction);
-
-    virtual void move(Direction direction, int speed);
-
-    virtual void shoot();
-
 protected:
-    GameModel &model;
-    Entity &entity;
+    GameModel &model_;  // NOLINT(misc-non-private-member-variables-in-classes)
+    Entity &entity_;    // NOLINT(misc-non-private-member-variables-in-classes)
 };
 
 class ForegroundHandler : public BasicHandler {
 public:
-    explicit ForegroundHandler(GameModel &model_, ForegroundEntity &entity);
+    explicit ForegroundHandler(GameModel &model, ForegroundEntity &entity);
 
-    void setBackground() final;
-    void restoreBackground() final;
+    void setBackground();
+    void restoreBackground();
+
+    [[nodiscard]] std::vector<std::vector<const Entity *>> snapshotBackground()
+        const;
+
+private:
+    std::vector<std::vector<Entity *>> background_;
 };
 
 class MovableHandler : public ForegroundHandler {
 public:
-    explicit MovableHandler(GameModel &model_, MovableEntity &entity);
+    explicit MovableHandler(GameModel &model, MovableEntity &entity);
 
-    [[nodiscard]] std::vector<const Entity *> look(Direction direction) final;
-    void move(Direction direction, int speed) final;
+    [[nodiscard]] std::vector<const Entity *> look(Direction direction);
+    void move(Direction direction, int speed);
+
+protected:
+    [[nodiscard]] std::vector<Entity *> lookMutable(Direction direction);
+
+    template <typename T>
+    std::vector<Entity *> nearest(Direction direction, T cond) {
+        int dist = INT_MAX;
+        std::vector<Entity *> res;
+        for (auto *entity : lookMutable(direction)) {
+            if (cond(entity)) {
+                if (entity_.dist(*entity) <= dist) {
+                    if (entity_.dist(*entity) == dist) {
+                        res = {entity};
+                    } else {
+                        res.push_back(entity);
+                    }
+                }
+            }
+        }
+        return res;
+    }
 };
 
 class TankHandler : public MovableHandler {
 public:
-    explicit TankHandler(GameModel &model_, Tank &entity);
+    explicit TankHandler(GameModel &model, Tank &entity);
 
-    void shoot() final;
+    void shoot();
+};
+
+class ProjectileHandler : public MovableHandler {
+public:
+    explicit ProjectileHandler(GameModel &model, MovableEntity &entity);
+
+    [[nodiscard]] bool isBreakOnNextTick();
+    [[nodiscard]] bool isBreakOnCreation();
+
+protected:
+    void destroyByBullet(Entity &other);
 };
 
 }  // namespace Tanks::model

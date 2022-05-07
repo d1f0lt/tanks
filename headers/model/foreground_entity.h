@@ -13,12 +13,12 @@ class ForegroundEntity : public Entity {
 public:
     explicit ForegroundEntity(int left,
                               int top,
-                              std::unique_ptr<BasicHandler> handler_);
+                              std::unique_ptr<ForegroundHandler> handler);
 
     explicit ForegroundEntity(int left,
                               int top,
-                              int id,
-                              std::unique_ptr<BasicHandler> handler);
+                              int entityId,
+                              std::unique_ptr<ForegroundHandler> handler);
 
     [[nodiscard]] std::vector<const Entity *> look(Direction direction) const;
 
@@ -26,12 +26,10 @@ public:
         const;
 
 protected:
-    void restoreBackground();
-    void setBackground();
-    std::unique_ptr<BasicHandler> handler;
+    [[nodiscard]] BasicHandler &getHandler() const;
 
 private:
-    std::vector<std::vector<const Entity *>> background;
+    const std::unique_ptr<BasicHandler> handler_;
 };
 
 }  // namespace Tanks::model

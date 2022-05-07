@@ -15,7 +15,7 @@ enum class Strength {
 
 class Block : public Entity {
 public:
-    explicit Block(int left, int right);
+    explicit Block(int left, int top);
 
     [[nodiscard]] int getHeight() const final;
     [[nodiscard]] int getWidth() const final;
@@ -25,7 +25,7 @@ public:
 
 class Floor final : public Block {
 public:
-    explicit Floor(int left, int right);
+    explicit Floor(int left, int top);
 
     [[nodiscard]] EntityType getType() const override;
     [[nodiscard]] bool isTankPassable() const final;
@@ -35,7 +35,8 @@ public:
 
 class Water final : public Block {
 public:
-    explicit Water(int left, int right);
+    explicit Water(int left, int top);
+
     [[nodiscard]] EntityType getType() const override;
     [[nodiscard]] bool isBulletPassable() const override;
     [[nodiscard]] int getStrength() const override;
@@ -51,7 +52,7 @@ public:
 
 class Steel final : public Block {
 public:
-    explicit Steel(int left, int right);
+    explicit Steel(int left, int top);
 
     [[nodiscard]] EntityType getType() const final;
     [[nodiscard]] int getStrength() const final;
@@ -59,13 +60,13 @@ public:
 
 class LevelBorder : public Block {
 public:
-    explicit LevelBorder(int left, int top, EntityType type_);
+    explicit LevelBorder(int left, int top, EntityType type);
 
     [[nodiscard]] EntityType getType() const final;
     [[nodiscard]] int getStrength() const final;
 
 private:
-    EntityType type;
+    const EntityType type_;
 };
 
 }  // namespace Tanks::model

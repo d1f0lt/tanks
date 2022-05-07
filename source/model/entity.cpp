@@ -3,31 +3,32 @@
 
 namespace Tanks::model {
 // TODO better random
-Entity::Entity(int left_, int top_) : left(left_), top(top_), id(rand()) {
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
+Entity::Entity(int left, int top) : left_(left), top_(top), id_(rand()) {
 }
 
 int Entity::getLeft() const {
-    return left;
+    return left_;
 }
 
 int Entity::getTop() const {
-    return top;
+    return top_;
 }
 
 sf::IntRect Entity::getRect() const {
-    return {left, top, getHeight(), getWidth()};
+    return {left_, top_, getHeight(), getWidth()};
 }
 
 bool Entity::intersect(const Entity &other) const {
     return getRect().intersects(other.getRect());
 }
 
-void Entity::setTop(int top_) {
-    top = top_;
+void Entity::setTop(int top) {
+    top_ = top;
 }
 
-void Entity::setLeft(int left_) {
-    left = left_;
+void Entity::setLeft(int left) {
+    left_ = left;
 }
 
 bool Entity::isTankPassable() const {
@@ -58,6 +59,13 @@ int Entity::dist(const Entity &other) const {
     return delta_x + delta_y;
 }
 
-Entity::Entity(int left, int top, int id) : left(left), top(top), id(id) {
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
+Entity::Entity(int left, int top, int entityId)
+    : left_(left), top_(top), id_(entityId) {
 }
+
+int Entity::getId() const {
+    return id_;
+}
+
 }  // namespace Tanks::model
