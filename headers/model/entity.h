@@ -61,6 +61,16 @@ private:
     int left_ = -1, top_ = -1;
     const int id_ = -1;
 };
+
+template <typename T>
+T &entityCast(std::reference_wrapper<Entity> entity) {
+    return dynamic_cast<T &>(entity.get());
+}
+
+template <typename T>
+T &entityCast(Entity &entity) {
+    return dynamic_cast<T &>(entity);
+}
 }  // namespace Tanks::model
 
 #endif  // TANKS_ENTITY_H
