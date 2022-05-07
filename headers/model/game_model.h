@@ -32,6 +32,8 @@ public:
     [[nodiscard]] int getHeight() const;
     [[nodiscard]] int getWidth() const;
 
+    [[nodiscard]] std::vector<const Entity *> getAll(EntityType type);
+
 private:
     void addEntity(std::unique_ptr<Entity> entity);
     void removeEntity(Entity &entity);
