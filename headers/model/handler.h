@@ -2,6 +2,7 @@
 #define TANKS_HANDLER_H
 
 #include <climits>
+#include "constants.h"
 #include "entity.h"
 #include "model/entities_fwd.h"
 
@@ -75,7 +76,7 @@ public:
 
 private:
     int lastMoveTick = -1;
-    int lastShootTick = -1;
+    int lastShootTick = -RELOAD_TICKS - 1;
 };
 
 class ProjectileHandler : public MovableHandler {

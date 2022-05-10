@@ -259,6 +259,9 @@ TEST_CASE("3 Bullets destroy 3 bricks") {
         }
         auto &floor = model.getByCoords(x, y);
         CHECK(floor.getType() == Tanks::model::EntityType::FLOOR);
+        for (int i = 0; i < RELOAD_TICKS; i++) {
+            model.nextTick();
+        }
     }
 }
 

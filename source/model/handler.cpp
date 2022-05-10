@@ -159,7 +159,7 @@ std::vector<Entity *> MovableHandler::lookMutable(Direction direction) {
 
 void TankHandler::shoot() {
     // TODO lock model
-    if (model_.getTick() <= lastShootTick) {
+    if (model_.getTick() <= lastShootTick + RELOAD_TICKS) {
         return;
     }
 
@@ -188,11 +188,13 @@ void TankHandler::shoot() {
 TankHandler::TankHandler(GameModel &model, Tank &entity)
     : MovableHandler(model, entity) {
 }
+
 void TankHandler::move(Direction dir, int speed) {
     // TODO lock model
     if (model_.getTick() <= std::max(lastShootTick, lastMoveTick)) {
         return;
     }
+
     lastMoveTick = model_.getTick();
     MovableHandler::move(dir, speed);
 }

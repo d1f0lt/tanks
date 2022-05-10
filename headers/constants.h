@@ -15,6 +15,7 @@ const int TANK_SIZE = 48;     // TANK_WIDTH = TANK_HEIGHT = 48
 constexpr int DEFAULT_TANK_SPEED = 5;
 constexpr int BULLET_SPEED = 10;
 constexpr int BULLET_SIZE = 10;
+constexpr int RELOAD_TICKS = 10;
 
 }  // namespace Tanks
 
