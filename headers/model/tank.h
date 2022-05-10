@@ -9,12 +9,6 @@ class Tank : public MovableEntity {
 public:
     explicit Tank(int left,
                   int top,
-                  std::unique_ptr<TankHandler> handler,
-                  Direction direction,
-                  int speed);
-
-    explicit Tank(int left,
-                  int top,
                   int entityId,
                   std::unique_ptr<TankHandler> handler,
                   Direction direction,
@@ -35,13 +29,7 @@ private:
     int speed_ = -1;
 };
 
-class BotTank : public Tank {
-public:
-    explicit BotTank(int left,
-                     int top,
-                     Direction direction,
-                     std::unique_ptr<TankHandler> handler);
-};
+class BotTank : public Tank {};
 
 }  // namespace Tanks::model
 

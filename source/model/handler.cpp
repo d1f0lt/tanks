@@ -182,7 +182,7 @@ void TankHandler::shoot() {
     model_.addEntity(std::make_unique<Projectile>(
         entity_.getLeft() + DCOL.at(tank.getDirection()),
         entity_.getTop() + DROW.at(tank.getDirection()), tank.getDirection(),
-        model_));
+        model_, model_.getCurrentId()));
 }
 
 TankHandler::TankHandler(GameModel &model, Tank &entity)
@@ -232,7 +232,7 @@ void ProjectileHandler::destroyByBullet(Entity &other) {
     int left = other.getLeft();
     int top = other.getTop();
     model_.removeEntity(other);
-    model_.addEntity(std::make_unique<Floor>(left, top));
+    model_.addEntity(std::make_unique<Floor>(left, top, model_.getCurrentId()));
 }
 
 bool ProjectileHandler::isBreakOnCreation() {

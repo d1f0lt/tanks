@@ -9,12 +9,8 @@ public:
     explicit Projectile(int left,
                         int top,
                         Direction direction,
-                        std::unique_ptr<ProjectileHandler> handler);
-
-    explicit Projectile(int left,
-                        int top,
-                        Direction direction,
-                        GameModel &model);
+                        GameModel &model,
+                        int entityId);
 
     [[nodiscard]] EntityType getType() const override;
     [[nodiscard]] int getWidth() const override;

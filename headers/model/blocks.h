@@ -15,7 +15,7 @@ enum class Strength {
 
 class Block : public Entity {
 public:
-    explicit Block(int left, int top);
+    explicit Block(int left, int top, int entityId);
 
     [[nodiscard]] int getHeight() const final;
     [[nodiscard]] int getWidth() const final;
@@ -25,7 +25,7 @@ public:
 
 class Floor final : public Block {
 public:
-    explicit Floor(int left, int top);
+    explicit Floor(int left, int top, int entityId);
 
     [[nodiscard]] EntityType getType() const override;
     [[nodiscard]] bool isTankPassable() const final;
@@ -35,7 +35,7 @@ public:
 
 class Water final : public Block {
 public:
-    explicit Water(int left, int top);
+    explicit Water(int left, int top, int entityId);
 
     [[nodiscard]] EntityType getType() const override;
     [[nodiscard]] bool isBulletPassable() const override;
@@ -44,7 +44,7 @@ public:
 
 class Brick final : public Block {
 public:
-    explicit Brick(int left, int top);
+    explicit Brick(int left, int top, int entityId);
 
     [[nodiscard]] EntityType getType() const final;
     [[nodiscard]] int getStrength() const final;
@@ -52,7 +52,7 @@ public:
 
 class Steel final : public Block {
 public:
-    explicit Steel(int left, int top);
+    explicit Steel(int left, int top, int entityId);
 
     [[nodiscard]] EntityType getType() const final;
     [[nodiscard]] int getStrength() const final;
@@ -60,7 +60,7 @@ public:
 
 class LevelBorder : public Block {
 public:
-    explicit LevelBorder(int left, int top, EntityType type);
+    explicit LevelBorder(int left, int top, EntityType type, int entityId);
 
     [[nodiscard]] EntityType getType() const final;
     [[nodiscard]] int getStrength() const final;

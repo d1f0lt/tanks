@@ -3,9 +3,6 @@
 
 namespace Tanks::model {
 // TODO better random
-// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-Entity::Entity(int left, int top) : left_(left), top_(top), id_(rand()) {
-}
 
 int Entity::getLeft() const {
     return left_;

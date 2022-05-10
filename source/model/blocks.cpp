@@ -3,7 +3,7 @@
 #include "constants.h"
 
 namespace Tanks::model {
-Block::Block(int left, int top) : Entity(left, top) {
+Block::Block(int left, int top, int entityId) : Entity(left, top, entityId) {
 }
 
 int Block::getHeight() const {
@@ -26,7 +26,7 @@ int Brick::getStrength() const {
     return static_cast<int>(Strength::BRICK);
 }
 
-Brick::Brick(int left, int top) : Block(left, top) {
+Brick::Brick(int left, int top, int entityId) : Block(left, top, entityId) {
 }
 
 EntityType Steel::getType() const {
@@ -37,11 +37,11 @@ int Steel::getStrength() const {
     return static_cast<int>(Strength::STEEL);
 }
 
-Steel::Steel(int left, int top) : Block(left, top) {
+Steel::Steel(int left, int top, int entityId) : Block(left, top, entityId) {
 }
 
-LevelBorder::LevelBorder(int left, int top, EntityType type)
-    : Block(left, top), type_(type) {
+LevelBorder::LevelBorder(int left, int top, EntityType type, int entityId)
+    : Block(left, top, entityId), type_(type) {
 }
 
 EntityType LevelBorder::getType() const {
@@ -60,7 +60,7 @@ int Floor::getStrength() const {
     return static_cast<int>(Strength::FLOOR);
 }
 
-Floor::Floor(int left, int top) : Block(left, top) {
+Floor::Floor(int left, int top, int entityId) : Block(left, top, 0) {
 }
 
 bool Floor::isTankPassable() const {
@@ -71,7 +71,7 @@ bool Floor::isBulletPassable() const {
     return true;
 }
 
-Water::Water(int left, int top) : Block(left, top) {
+Water::Water(int left, int top, int entityId) : Block(left, top, 0) {
 }
 
 EntityType Water::getType() const {

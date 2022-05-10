@@ -6,13 +6,6 @@ void MovableEntity::move(Direction direction, int speed) {
     dynamic_cast<MovableHandler &>(getHandler()).move(direction, speed);
 }
 
-MovableEntity::MovableEntity(int left,
-                             int right,
-                             std::unique_ptr<MovableHandler> handler,
-                             Direction direction)
-    : ForegroundEntity(left, right, std::move(handler)), direction_(direction) {
-}
-
 Direction MovableEntity::getDirection() const {
     return direction_;
 }

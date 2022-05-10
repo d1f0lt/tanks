@@ -43,6 +43,11 @@ private:
     void addEntity(std::unique_ptr<Entity> entity);
     void removeEntity(Entity &entity);
 
+    [[nodiscard]] int getCurrentId() {
+        static int currentId = 0;
+        return currentId++;
+    }
+
     GameMap map_;
     GroupedEntities groupedEntities_;
     EntityHolder entityHolder_;

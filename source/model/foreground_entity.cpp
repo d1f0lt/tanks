@@ -1,11 +1,6 @@
 #include "model/foreground_entity.h"
 
 namespace Tanks::model {
-ForegroundEntity::ForegroundEntity(int left,
-                                   int top,
-                                   std::unique_ptr<ForegroundHandler> handler)
-    : Entity(left, top), handler_(std::move(handler)) {
-}
 
 ForegroundEntity::ForegroundEntity(int left,
                                    int top,

@@ -81,7 +81,8 @@ PlayableTank &GameModel::spawnPlayableTank(int left, int top) {
         }
     }
 
-    addEntity(std::make_unique<PlayableTank>(left, top, Direction::UP, *this));
+    addEntity(std::make_unique<PlayableTank>(left, top, getCurrentId(),
+                                             Direction::UP, *this));
     return dynamic_cast<PlayableTank &>(getByCoords(left, top));
 }
 
@@ -113,27 +114,27 @@ void GameModel::loadLevel(int level) {
 
             switch (CHAR_TO_TYPE.at(str[col])) {
                 case (EntityType::BRICK):
-                    addEntity(std::make_unique<Brick>(realCol * TILE_SIZE,
-                                                      row * TILE_SIZE));
+                    addEntity(std::make_unique<Brick>(
+                        realCol * TILE_SIZE, row * TILE_SIZE, getCurrentId()));
                     break;
                 case (EntityType::FLOOR):
-                    addEntity(std::make_unique<Floor>(realCol * TILE_SIZE,
-                                                      row * TILE_SIZE));
+                    addEntity(std::make_unique<Floor>(
+                        realCol * TILE_SIZE, row * TILE_SIZE, getCurrentId()));
                     break;
                 case (EntityType::GRASS):
                     break;
                 case (EntityType::STEEL):
-                    addEntity(std::make_unique<Steel>(realCol * TILE_SIZE,
-                                                      row * TILE_SIZE));
+                    addEntity(std::make_unique<Steel>(
+                        realCol * TILE_SIZE, row * TILE_SIZE, getCurrentId()));
                     break;
                 case (EntityType::WATER):
-                    addEntity(std::make_unique<Water>(realCol * TILE_SIZE,
-                                                      row * TILE_SIZE));
+                    addEntity(std::make_unique<Water>(
+                        realCol * TILE_SIZE, row * TILE_SIZE, getCurrentId()));
                     break;
                 default:
                     addEntity(std::make_unique<LevelBorder>(
                         realCol * TILE_SIZE, row * TILE_SIZE,
-                        CHAR_TO_TYPE.at(str[col])));
+                        CHAR_TO_TYPE.at(str[col]), getCurrentId()));
                     break;
             }
         }
