@@ -5,6 +5,7 @@
 #include <memory>
 #include <vector>
 #include "constants.h"
+#include "menu_items.h"
 
 namespace Tanks {
 
@@ -12,82 +13,62 @@ struct MenuController;
 
 namespace Menu {
 
-enum class ButtonType {
-    NEW_GAME,
-    RESUME,
-    SETTINGS,
-    CREATE_MAP,
-    RATING,
-    EXIT,
-    PAUSE
-};
-
-std::string convertButtonTypeToString(ButtonType type);
-
-struct MenuItem;
-
 struct Menu final {
 public:
     explicit Menu() = default;
 
-    explicit Menu(const std::string &imagesPath,
-                  int menuWidth,
-                  const std::vector<ButtonType> &buttonTypes,
-                  int buttonsHeight,
-                  const sf::Color &buttonsStandardColor,
-                  const sf::Color &buttonsHoverColor);  // TODO make struct for
-                                                        // buttons parameters
+    explicit Menu(size_t menuWidth,
+                  const InscriptionInfo &titleInfo,
+                  const InscriptionInfo &inscriptionsInfo,
+                  const std::vector<ButtonWithType> &buttonsInfo);  // for most
 
-    void drawMenu(sf::RenderWindow &window) const;
+    explicit Menu(size_t menuWidth,
+                  const InscriptionInfo &titleInfo,
+                  const std::vector<InscriptionInfo> &inscriptions,
+                  const std::string &path,
+                  size_t quantityPerLine,
+                  Button btnInfo);  // for levels
+
+    void draw(sf::RenderWindow &window) const;
+    const MenuButton *showMenu(sf::RenderWindow &window,
+                               const sf::Sprite &background);
 
     void addMenuItem(std::unique_ptr<MenuItem> &&item);
+    void addIconToLeftUpCorner(const std::string &filename, ButtonType type);
+    void addIconToLeftLowerCorner(const std::string &filename, ButtonType type);
+
+    // animations
+    void flyOutFromLeft(sf::RenderWindow &window,
+                        const sf::Sprite &backgroundSprite);
+    void flyAwayToLeft(sf::RenderWindow &window,
+                       const sf::Sprite &backgroundSprite);
+    void flyOutFromRight(sf::RenderWindow &window,
+                         const sf::Sprite &backgroundSprite);
+    void flyAwayToRight(sf::RenderWindow &window,
+                        const sf::Sprite &backgroundSprite);
+    void flyAwayToRight();  // without animation, to set the initial position
+                            // for first animation
+#ifdef MENU_TEST
+    [[nodiscard]] const std::vector<std::unique_ptr<MenuItem>> &getItems()
+        const;
+#endif
 
 private:
     std::vector<std::unique_ptr<MenuItem>> items;
+    constexpr static int animationSpeed = 3;
 
+#ifndef MENU_TEST
     [[nodiscard]] const std::vector<std::unique_ptr<MenuItem>> &getItems()
         const;
+#endif
 
-    friend struct Tanks::MenuController;
-};
+    void animation(sf::RenderWindow &window,
+                   const sf::Sprite &backgroundSprite,
+                   int stepsAmount,
+                   float speed_);
 
-struct MenuItem {
-public:
-    explicit MenuItem(const std::string &path,
-                      const sf::Vector2<float> &coordinates);
+    void moveItems(float speed_);
 
-    virtual void drawSprite(sf::RenderWindow &window) const;
-
-protected:
-    sf::Image inscriptionImage;
-    sf::Texture inscriptionTexture;
-    sf::Sprite inscriptionSprite;
-
-    friend struct Menu;
-};
-
-struct MenuButton final : MenuItem {
-public:
-    MenuButton(const std::string &path,
-               const sf::Vector2<float> &coordinates,
-               const sf::Vector2<float> &rectangleSize,
-               const sf::Color &rectangleColor_,
-               const sf::Color &rectangleHoverColor_,
-               ButtonType type_);
-
-    void drawSprite(sf::RenderWindow &window) const final;
-
-    ButtonType getType() const;
-
-    void hover();
-
-private:
-    mutable sf::RectangleShape rectangle;  // we want drawSprite to be a const
-    sf::Color rectangleStandardColor;
-    sf::Color rectangleHoverColor;
-    ButtonType type;
-
-    friend struct Menu;
     friend struct Tanks::MenuController;
 };
 
