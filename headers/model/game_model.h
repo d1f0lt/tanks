@@ -35,6 +35,8 @@ public:
     [[nodiscard]] int getWidth() const;
 
     [[nodiscard]] std::vector<const Entity *> getAll(EntityType type);
+    [[nodiscard]] std::vector<std::vector<const Entity *>> getAll();
+
     [[nodiscard]] int getTick() const;
 
 private:
