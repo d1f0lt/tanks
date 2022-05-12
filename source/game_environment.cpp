@@ -1,44 +1,47 @@
 #include "game_environment.h"
 #include <cassert>
 #include "constants.h"
-#include "controller.h"
+#include "menu_controller.h"
 
 namespace Tanks {
 
 namespace {
 
-std::string numberWithLeftZeros(int num, int numberLength) {
+std::string numberWithLeftZeros(int num, size_t numberLength) {
     std::string numStr(std::to_string(num));
     assert(numStr.size() <= numberLength);
     return std::string("0", numberLength - numStr.size()) + numStr;
 }
+
 }  // namespace
 
-Timer::Timer(const std::string &path) {
-    image.loadFromFile(path);
+Timer::Timer(const std::string &filename) {
+    image.loadFromFile(filename);
     texture.loadFromImage(image);
     sprite.setTexture(texture);
-    const int marginRight = MARGIN_LEFT / 4;
-    const int marginTop = MARGIN_TOP + TILE_SIZE;
+    const static int marginRight = MARGIN_LEFT / 4;
+    const static int marginTop = MARGIN_TOP + TILE_SIZE;
+    const static int marginFromSprite = 100;
     sprite.setPosition(
         static_cast<float>(MARGIN_LEFT - image.getSize().x - marginRight),
         marginTop);
 
     // text
-    font.loadFromFile("../fonts/base.ttf");
+    font.loadFromFile("../fonts/base_bold.ttf");
 
     time.setFont(font);
     time.setString("00:00");
     time.setCharacterSize(28);
     time.setPosition(
         sprite.getPosition().x + (static_cast<float>(image.getSize().x) -
-                                  time.getGlobalBounds().width) /
+                                  time.getLocalBounds().width) /
                                      2,
-        sprite.getPosition().y + static_cast<float>(image.getSize().y));
+        sprite.getPosition().y + static_cast<float>(image.getSize().y) +
+            marginFromSprite);
     restart();
 }
 
-void Timer::drawTimer(sf::RenderWindow &window) const {
+void Timer::draw(sf::RenderWindow &window) const {
     window.draw(sprite);
     window.draw(time);
 }
@@ -68,36 +71,20 @@ void Timer::nextTick() {
 
 Environment::Environment(const std::string &path)
     : timer(path + "timer.png"), menu() {
-    addPauseButton(path);
+    menu.addIconToLeftUpCorner(path + "pause.png", Menu::ButtonType::PAUSE);
 }
 
 void Environment::draw(sf::RenderWindow &window, Pause &pause) const {
     if (!pause.isPause()) {
         timer.nextTick();
-        menu.drawMenu(window);
+        menu.draw(window);
     } else {
         timer.restart();
     }
-    timer.drawTimer(window);
+    timer.draw(window);
 }
 
 const Menu::Menu &Environment::getMenu() const {
     return menu;
 }
-
-void Environment::addPauseButton(const std::string &path) {
-    static const std::string imageFilename = path + "pause.png";
-    sf::Image image;
-    image.loadFromFile(imageFilename);
-    const int margin = 5;
-    const sf::Vector2<float> coordinates{2 * margin, 2 * margin};
-    const sf::Vector2<float> rectangleSize{
-        static_cast<float>(image.getSize().x) + margin,
-        static_cast<float>(image.getSize().y) + margin};
-    auto item = std::make_unique<Menu::MenuButton>(
-        imageFilename, coordinates, rectangleSize, sf::Color(0, 0, 0, 0),
-        sf::Color(128, 128, 128, 128), Menu::ButtonType::PAUSE);
-    menu.addMenuItem(std::move(item));
-}
-
 }  // namespace Tanks

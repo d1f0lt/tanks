@@ -22,6 +22,7 @@ constexpr int RELOAD_TICKS = 10;
 // menu
 constexpr int LEVELS_COUNT = 1;
 constexpr int TEXT_MARGIN = 10;
+
 }  // namespace Tanks
 
 #endif  // CONSTANCE_H_

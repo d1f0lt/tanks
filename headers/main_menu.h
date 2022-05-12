@@ -5,7 +5,7 @@
 
 namespace Tanks::Menu {
 
-void menu(sf::RenderWindow &window);
+void showMainMenu(sf::RenderWindow &window);
 
 }
 
