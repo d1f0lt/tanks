@@ -60,7 +60,7 @@ int Floor::getStrength() const {
     return static_cast<int>(Strength::FLOOR);
 }
 
-Floor::Floor(int left, int top, int entityId) : Block(left, top, 0) {
+Floor::Floor(int left, int top, int entityId) : Block(left, top, entityId) {
 }
 
 bool Floor::isTankPassable() const {
@@ -71,7 +71,7 @@ bool Floor::isBulletPassable() const {
     return true;
 }
 
-Water::Water(int left, int top, int entityId) : Block(left, top, 0) {
+Water::Water(int left, int top, int entityId) : Block(left, top, entityId) {
 }
 
 EntityType Water::getType() const {
