@@ -9,12 +9,8 @@ public:
     explicit Projectile(int left,
                         int top,
                         Direction direction,
-                        std::unique_ptr<ProjectileHandler> handler);
-
-    explicit Projectile(int left,
-                        int top,
-                        Direction direction,
-                        GameModel &model);
+                        GameModel &model,
+                        int entityId);
 
     [[nodiscard]] EntityType getType() const override;
     [[nodiscard]] int getWidth() const override;
@@ -22,6 +18,7 @@ public:
     [[nodiscard]] int getStrength() const override;
     [[nodiscard]] int getSpeed() const override;
 
+    [[nodiscard]] bool isTankPassable() const override;
     [[nodiscard]] bool canPass(const Entity &other) const override;
 };
 }  // namespace Tanks::model

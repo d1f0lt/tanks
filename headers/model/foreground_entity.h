@@ -13,10 +13,6 @@ class ForegroundEntity : public Entity {
 public:
     explicit ForegroundEntity(int left,
                               int top,
-                              std::unique_ptr<ForegroundHandler> handler);
-
-    explicit ForegroundEntity(int left,
-                              int top,
                               int entityId,
                               std::unique_ptr<ForegroundHandler> handler);
 

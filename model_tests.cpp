@@ -73,6 +73,7 @@ TEST_CASE("multiple moves") {
     const int MOVES = 9;
     for (int i = 0; i < MOVES; i++) {
         realTank.move(Tanks::model::Direction::DOWN);
+        model.nextTick();
     }
 
     CHECK(realTank.getTop() == TILE_SIZE + MOVES * realTank.getSpeed());
@@ -80,6 +81,62 @@ TEST_CASE("multiple moves") {
     model.nextTick();
     right = realTank.look(Tanks::model::Direction::RIGHT);
     CHECK(right.back()->getType() == Tanks::model::EntityType::FLOOR);
+}
+
+TEST_CASE("Can't do 2 moves on 1 tick") {
+    using namespace Tanks::model;
+    using namespace Tanks;
+    using Tanks::model::Direction;
+    using Tanks::model::EntityType;
+
+    Tanks::model::GameModel model;
+    model.loadLevel(1);
+    auto &tank = model.spawnPlayableTank(TILE_SIZE, TILE_SIZE);
+    int left = tank.getLeft(), top = tank.getTop();
+    tank.move(Tanks::model::Direction::RIGHT);
+    int left1 = tank.getLeft(), top1 = tank.getTop();
+    tank.move(Tanks::model::Direction::RIGHT);
+    CHECK(left1 == tank.getLeft());
+    CHECK(top1 == tank.getTop());
+    model.nextTick();
+    CHECK(left1 == tank.getLeft());
+    CHECK(top1 == tank.getTop());
+}
+
+TEST_CASE("Can move and shoot on 1 tick") {
+    using namespace Tanks::model;
+    using namespace Tanks;
+    using Tanks::model::Direction;
+    using Tanks::model::EntityType;
+
+    Tanks::model::GameModel model;
+    model.loadLevel(1);
+    auto &tank = model.spawnPlayableTank(TILE_SIZE, TILE_SIZE);
+    int left = tank.getLeft(), top = tank.getTop();
+    tank.move(Tanks::model::Direction::RIGHT);
+    int left1 = tank.getLeft(), top1 = tank.getTop();
+    tank.move(Tanks::model::Direction::RIGHT);
+    CHECK(left1 == left + tank.getSpeed());
+    CHECK(top1 == top);
+    tank.shoot();
+    CHECK(left1 == left + tank.getSpeed());
+    CHECK(top1 == top);
+}
+
+TEST_CASE("Can't shoot then move on 1 tick") {
+    Tanks::model::GameModel model;
+    model.loadLevel(1);
+    auto &tank = model.spawnPlayableTank(TILE_SIZE, TILE_SIZE);
+    int left = tank.getLeft(), top = tank.getTop();
+    tank.setDirection(Tanks::model::Direction::RIGHT);
+    CHECK(model.getTick() == 0);
+    tank.shoot();
+    CHECK(model.getTick() == 0);
+    tank.move(Tanks::model::Direction::RIGHT);
+    CHECK(left == tank.getLeft());
+    CHECK(top == tank.getTop());
+    model.nextTick();
+    CHECK(model.getTick() == 1);
 }
 
 TEST_CASE("Block check") {
@@ -202,6 +259,9 @@ TEST_CASE("3 Bullets destroy 3 bricks") {
         }
         auto &floor = model.getByCoords(x, y);
         CHECK(floor.getType() == Tanks::model::EntityType::FLOOR);
+        for (int i = 0; i < RELOAD_TICKS; i++) {
+            model.nextTick();
+        }
     }
 }
 
@@ -233,10 +293,6 @@ TEST_CASE("Bullet fly above water") {
         CHECK(&water == &waterNow);
         model.nextTick();
     }
-
-    auto &notWaterNow = model.getByCoords(
-        TILE_SIZE * 15 + 2, TILE_SIZE * 15 + tank.getHeight() / 2);
-    CHECK(&notWaterNow == &bullet);
 
     int tBrick = bullet.dist(brick) / BULLET_SPEED +
                  (bullet.dist(brick) % BULLET_SPEED != 0);
@@ -309,4 +365,85 @@ TEST_CASE("tank move on bullet") {
     tank2.move(Direction::RIGHT);
     auto &floor = model.getByCoords(TILE_SIZE, TILE_SIZE);
     CHECK(floor.getType() == EntityType::FLOOR);
+}
+
+TEST_CASE("Bullet destroy 2 blocks on creation") {
+    using namespace Tanks::model;
+    using namespace Tanks;
+    using Tanks::model::Direction;
+    using Tanks::model::EntityType;
+
+    GameModel model;
+    model.loadLevel(1);
+    auto &tank = model.spawnPlayableTank(Tanks::TILE_SIZE * 10 + TILE_SIZE / 2,
+                                         TILE_SIZE * 15);
+    tank.setDirection(Tanks::model::Direction::DOWN);
+    auto &brick1 = model.getByCoords(TILE_SIZE * 10, TILE_SIZE * 16);
+    auto &brick2 = model.getByCoords(TILE_SIZE * 11, TILE_SIZE * 16);
+    CHECK(brick1.getType() == EntityType::BRICK);
+    CHECK(brick2.getType() == EntityType::BRICK);
+
+    tank.shoot();
+
+    model.nextTick();
+
+    auto &floor1 = model.getByCoords(TILE_SIZE * 10, TILE_SIZE * 16);
+    auto &floor2 = model.getByCoords(TILE_SIZE * 11, TILE_SIZE * 16);
+    CHECK(floor1.getType() == EntityType::FLOOR);
+    CHECK(floor2.getType() == EntityType::FLOOR);
+}
+
+TEST_CASE("Bullet destroy 2 blocks on nextTick") {
+    using namespace Tanks::model;
+    using namespace Tanks;
+    using Tanks::model::Direction;
+    using Tanks::model::EntityType;
+
+    GameModel model;
+    model.loadLevel(1);
+    auto &tank = model.spawnPlayableTank(Tanks::TILE_SIZE * 10 + TILE_SIZE / 2,
+                                         TILE_SIZE * 15 - BULLET_SIZE);
+    tank.setDirection(Tanks::model::Direction::DOWN);
+    tank.shoot();
+
+    auto &brick1 = model.getByCoords(TILE_SIZE * 10, TILE_SIZE * 16);
+    auto &brick2 = model.getByCoords(TILE_SIZE * 11, TILE_SIZE * 16);
+    CHECK(brick1.getType() == EntityType::BRICK);
+    CHECK(brick2.getType() == EntityType::BRICK);
+
+    model.nextTick();
+
+    auto &floor1 = model.getByCoords(TILE_SIZE * 10, TILE_SIZE * 16);
+    auto &floor2 = model.getByCoords(TILE_SIZE * 11, TILE_SIZE * 16);
+    CHECK(floor1.getType() == EntityType::FLOOR);
+    CHECK(floor2.getType() == EntityType::FLOOR);
+}
+
+TEST_CASE("Bullet destroy 1 of blocks on creation, then shoot again") {
+    using namespace Tanks::model;
+    using namespace Tanks;
+    using Tanks::model::Direction;
+    using Tanks::model::EntityType;
+
+    GameModel model;
+    model.loadLevel(1);
+    auto &tank = model.spawnPlayableTank(TILE_SIZE * 10 + TILE_SIZE - TANK_SIZE,
+                                         TILE_SIZE * 15);
+    tank.setDirection(Tanks::model::Direction::DOWN);
+
+    auto &brick1 = model.getByCoords(TILE_SIZE * 10, TILE_SIZE * 16);
+    auto &brick2 = model.getByCoords(TILE_SIZE * 11, TILE_SIZE * 16);
+    CHECK(brick1.getType() == EntityType::BRICK);
+    CHECK(brick2.getType() == EntityType::BRICK);
+
+    tank.shoot();
+
+    auto &floor1 = model.getByCoords(TILE_SIZE * 10, TILE_SIZE * 16);
+    auto &floor2 = model.getByCoords(TILE_SIZE * 11, TILE_SIZE * 16);
+    CHECK(floor1.getType() == EntityType::FLOOR);
+    CHECK(&floor2 == &brick2);
+
+    model.nextTick();
+    tank.shoot();
+    model.nextTick();
 }

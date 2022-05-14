@@ -2,7 +2,6 @@
 #define CONSTANCE_H_
 
 namespace Tanks {
-
 // general
 constexpr int WINDOW_WIDTH = 1920;
 constexpr int WINDOW_HEIGHT = 1080;
@@ -15,9 +14,9 @@ constexpr int MAP_HEIGHT = 19;    // number of vertical tiles
 constexpr int MAP_WIDTH = 24;     // number of horizontal tiles
 constexpr int TANK_SIZE = 48;     // TANK_WIDTH = TANK_HEIGHT = 48
 constexpr int DEFAULT_TANK_SPEED = 5;
-constexpr int BULLET_SPEED = 7;
-constexpr int BULLET_SIZE = 2;
-constexpr int RELOAD_TIME = 1;
+constexpr int BULLET_SPEED = 10;
+constexpr int BULLET_SIZE = 10;
+constexpr int RELOAD_TICKS = 10;
 
 // menu
 constexpr int LEVELS_COUNT = 1;

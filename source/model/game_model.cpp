@@ -2,6 +2,7 @@
 #include <cassert>
 #include <fstream>
 #include <iostream>
+#include <optional>
 #include <thread>
 #include <unordered_map>
 #include "model/blocks.h"
@@ -35,6 +36,7 @@ void GameModel::nextTick() {
         dynamic_cast<MovableHandler &>(*handlers_[bullet])
             .move(bullet->getDirection(), bullet->getSpeed());
     }
+    currentTick_++;
 }
 
 void GameModel::addEntity(std::unique_ptr<Entity> entity) {
@@ -51,7 +53,7 @@ void GameModel::addEntity(std::unique_ptr<Entity> entity) {
             .setBackground();
     }
 
-    byid_.emplace(entity->getId(), entity.get());
+    byId_.emplace(entity->getId(), entity.get());
     map_.insert(*entity);
     groupedEntities_.insert(*entity);
     entityHolder_.insert(std::move(entity));
@@ -63,7 +65,7 @@ void GameModel::removeEntity(Entity &entity) {
             .restoreBackground();
     }
 
-    byid_.erase(entity.getId());
+    byId_.erase(entity.getId());
     handlers_.erase(&entity);
     groupedEntities_.erase(entity);
     entityHolder_.remove(entity);
@@ -79,7 +81,8 @@ PlayableTank &GameModel::spawnPlayableTank(int left, int top) {
         }
     }
 
-    addEntity(std::make_unique<PlayableTank>(left, top, Direction::UP, *this));
+    addEntity(std::make_unique<PlayableTank>(left, top, getCurrentId(),
+                                             Direction::UP, *this));
     return dynamic_cast<PlayableTank &>(getByCoords(left, top));
 }
 
@@ -111,27 +114,27 @@ void GameModel::loadLevel(int level) {
 
             switch (CHAR_TO_TYPE.at(str[col])) {
                 case (EntityType::BRICK):
-                    addEntity(std::make_unique<Brick>(realCol * TILE_SIZE,
-                                                      row * TILE_SIZE));
+                    addEntity(std::make_unique<Brick>(
+                        realCol * TILE_SIZE, row * TILE_SIZE, getCurrentId()));
                     break;
                 case (EntityType::FLOOR):
-                    addEntity(std::make_unique<Floor>(realCol * TILE_SIZE,
-                                                      row * TILE_SIZE));
+                    addEntity(std::make_unique<Floor>(
+                        realCol * TILE_SIZE, row * TILE_SIZE, getCurrentId()));
                     break;
                 case (EntityType::GRASS):
                     break;
                 case (EntityType::STEEL):
-                    addEntity(std::make_unique<Steel>(realCol * TILE_SIZE,
-                                                      row * TILE_SIZE));
+                    addEntity(std::make_unique<Steel>(
+                        realCol * TILE_SIZE, row * TILE_SIZE, getCurrentId()));
                     break;
                 case (EntityType::WATER):
-                    addEntity(std::make_unique<Water>(realCol * TILE_SIZE,
-                                                      row * TILE_SIZE));
+                    addEntity(std::make_unique<Water>(
+                        realCol * TILE_SIZE, row * TILE_SIZE, getCurrentId()));
                     break;
                 default:
                     addEntity(std::make_unique<LevelBorder>(
                         realCol * TILE_SIZE, row * TILE_SIZE,
-                        CHAR_TO_TYPE.at(str[col])));
+                        CHAR_TO_TYPE.at(str[col]), getCurrentId()));
                     break;
             }
         }
@@ -146,14 +149,27 @@ int GameModel::getHeight() const {
     return map_.getHeight();
 }
 
-Entity &GameModel::getById(int entityId) {
-    assert(byid_.count(entityId) != 0);
-    return *byid_[entityId];
+std::optional<std::reference_wrapper<Entity>> GameModel::getById(int entityId) {
+    assert(byId_.count(entityId) != 0);
+    return *byId_[entityId];
 }
 
 std::vector<const Entity *> GameModel::getAll(EntityType type) {
     auto vec = groupedEntities_.snapshotAll()[static_cast<unsigned>(type)];
     return {vec.begin(), vec.end()};
+}
+
+int GameModel::getTick() const {
+    return currentTick_;
+}
+
+std::vector<std::vector<const Entity *>> GameModel::getAll() {
+    const auto &all = groupedEntities_.getAllByLink();
+    std::vector<std::vector<const Entity *>> res;
+    for (const auto &line : all) {
+        res.emplace_back(line.begin(), line.end());
+    }
+    return res;
 }
 
 }  // namespace Tanks::model

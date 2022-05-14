@@ -6,18 +6,12 @@
 namespace Tanks::model {
 Tank::Tank(int left,
            int top,
+           int entityId,
            std::unique_ptr<TankHandler> handler,
            Direction direction,
            int speed)
-    : MovableEntity(left, top, std::move(handler), direction), speed_(speed) {
-}
-
-bool Tank::canPass(const Entity &other) const {
-    return other.isTankPassable();
-}
-
-void Tank::shoot() {
-    dynamic_cast<TankHandler &>(getHandler()).shoot();
+    : MovableEntity(left, top, entityId, std::move(handler), direction),
+      speed_(speed) {
 }
 
 int Tank::getWidth() const {
@@ -32,15 +26,6 @@ int Tank::getStrength() const {
     return 1;
 }
 
-Tank::Tank(int left,
-           int top,
-           int entityId,
-           std::unique_ptr<TankHandler> handler,
-           Direction direction,
-           int speed)
-    : MovableEntity(left, top, entityId, std::move(handler), direction),
-      speed_(speed) {
-}
 EntityType Tank::getType() const {
     return EntityType::LEFT_DOWN_CORNER;
 }
@@ -49,19 +34,22 @@ int Tank::getSpeed() const {
     return speed_;
 }
 
-PlayableTank::PlayableTank(int left,
-                           int top,
-                           Direction direction,
-                           std::unique_ptr<TankHandler> handler)
-    : Tank(left, top, std::move(handler), direction, DEFAULT_TANK_SPEED) {
+bool Tank::canPass(const Entity &other) const {
+    return other.isTankPassable();
+}
+
+void Tank::shoot() {
+    dynamic_cast<TankHandler &>(getHandler()).shoot();
 }
 
 PlayableTank::PlayableTank(int left,
                            int top,
+                           int entityId,
                            Direction direction,
                            GameModel &model)
     : Tank(left,
            top,
+           entityId,
            std::make_unique<TankHandler>(model, *this),
            direction,
            DEFAULT_TANK_SPEED) {
@@ -87,10 +75,4 @@ void PlayableTank::move(Direction direction) {
     move(direction, getSpeed());
 }
 
-BotTank::BotTank(int left,
-                 int top,
-                 Direction direction,
-                 std::unique_ptr<TankHandler> handler)
-    : Tank(left, top, std::move(handler), direction, DEFAULT_TANK_SPEED) {
-}
 }  // namespace Tanks::model

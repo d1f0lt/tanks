@@ -10,11 +10,6 @@ public:
     friend MovableHandler;
 
     explicit MovableEntity(int left,
-                           int right,
-                           std::unique_ptr<MovableHandler> handler,
-                           Direction direction);
-
-    explicit MovableEntity(int left,
                            int top,
                            int entityId,
                            std::unique_ptr<MovableHandler> handler,

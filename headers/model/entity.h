@@ -25,7 +25,6 @@ enum class EntityType {
 
 class Entity {
 public:
-    explicit Entity(int left, int top);
     explicit Entity(int left, int top, int entityId);
 
     Entity(const Entity &) = delete;

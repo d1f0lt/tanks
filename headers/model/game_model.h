@@ -1,6 +1,7 @@
 #ifndef TANKS_GAME_MODEL_H
 #define TANKS_GAME_MODEL_H
 
+#include <optional>
 #include <queue>
 #include <unordered_map>
 #include "entity_holder.h"
@@ -21,7 +22,8 @@ public:
     explicit GameModel() = default;
 
     [[nodiscard]] Entity &getByCoords(int col, int row);
-    [[nodiscard]] Entity &getById(int entityId);
+    [[nodiscard]] std::optional<std::reference_wrapper<Entity>> getById(
+        int entityId);
 
     void nextTick();
 
@@ -33,16 +35,25 @@ public:
     [[nodiscard]] int getWidth() const;
 
     [[nodiscard]] std::vector<const Entity *> getAll(EntityType type);
+    [[nodiscard]] std::vector<std::vector<const Entity *>> getAll();
+
+    [[nodiscard]] int getTick() const;
 
 private:
     void addEntity(std::unique_ptr<Entity> entity);
     void removeEntity(Entity &entity);
 
+    [[nodiscard]] int getCurrentId() {
+        static int currentId = 0;
+        return currentId++;
+    }
+
     GameMap map_;
     GroupedEntities groupedEntities_;
     EntityHolder entityHolder_;
-    std::unordered_map<int, Entity *> byid_;
+    std::unordered_map<int, Entity *> byId_;
     std::unordered_map<Entity *, BasicHandler *> handlers_;
+    int currentTick_ = 0;
 };
 }  // namespace Tanks::model
 

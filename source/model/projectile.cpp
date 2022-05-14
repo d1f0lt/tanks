@@ -2,20 +2,19 @@
 #include "constants.h"
 
 namespace Tanks::model {
-Projectile::Projectile(int left,
-                       int top,
-                       Direction direction,
-                       std::unique_ptr<ProjectileHandler> handler)
-    : MovableEntity(left, top, std::move(handler), direction) {
-}
 
 bool Projectile::canPass(const Entity &other) const {
     return other.isBulletPassable();
 }
 
-Projectile::Projectile(int left, int top, Direction direction, GameModel &model)
+Projectile::Projectile(int left,
+                       int top,
+                       Direction direction,
+                       GameModel &model,
+                       int entityId)
     : MovableEntity(left,
                     top,
+                    entityId,
                     std::make_unique<ProjectileHandler>(model, *this),
                     direction) {
 }
@@ -38,5 +37,9 @@ int Projectile::getHeight() const {
 
 int Projectile::getSpeed() const {
     return BULLET_SPEED;
+}
+
+bool Projectile::isTankPassable() const {
+    return true;
 }
 }  // namespace Tanks::model

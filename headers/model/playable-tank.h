@@ -10,17 +10,13 @@ class PlayableTank : public Tank {
 public:
     explicit PlayableTank(int left,
                           int top,
-                          Direction direction,
-                          std::unique_ptr<TankHandler> handler);
-
-    explicit PlayableTank(int left,
-                          int top,
                           int entityId,
                           std::unique_ptr<TankHandler> handler,
                           Direction direction);
 
     explicit PlayableTank(int left,
                           int top,
+                          int entityId,
                           Direction direction,
                           GameModel &model);
 

@@ -2,6 +2,8 @@
 #define TANKS_HANDLER_H
 
 #include <climits>
+#include <vector>
+#include "constants.h"
 #include "entity.h"
 #include "model/entities_fwd.h"
 
@@ -42,7 +44,7 @@ public:
     explicit MovableHandler(GameModel &model, MovableEntity &entity);
 
     [[nodiscard]] std::vector<const Entity *> look(Direction direction);
-    void move(Direction direction, int speed);
+    virtual void move(Direction direction, int speed);
 
 protected:
     [[nodiscard]] std::vector<Entity *> lookMutable(Direction direction);
@@ -70,7 +72,12 @@ class TankHandler : public MovableHandler {
 public:
     explicit TankHandler(GameModel &model, Tank &entity);
 
+    void move(Direction dir, int speed) override;
     void shoot();
+
+private:
+    int lastMoveTick = -1;
+    int lastShootTick = -RELOAD_TICKS - 1;
 };
 
 class ProjectileHandler : public MovableHandler {
