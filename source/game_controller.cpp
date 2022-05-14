@@ -37,7 +37,6 @@ void GameController::makeShot(model::PlayableTank &player) {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
         player.shoot();
     }
-
 }
 
 }  // namespace Tanks

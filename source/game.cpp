@@ -6,9 +6,9 @@
 #include "menu/menu_controller.h"
 #include "model/game_model.h"
 #include "pause.h"
+#include "view/bullets_view.h"
 #include "view/game_view.h"
 #include "view/tank_view.h"
-#include "view/bullets_view.h"
 
 namespace Tanks {
 
