@@ -13,7 +13,7 @@ SET(GCC_WARNINGS "-Wall -Wextra")
 #SET(GCC_OPTIMIZE "-Og -g -ftrapv") # Latest is integer overflow protection
 #SET(GCC_OPTIMIZE "-O2 -DNDEBUG") # RELEASE
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_WARNINGS} ${SANITIZERS} ${GCC_OPTIMIZE}")
-SET(COMPILER_FLAGS_FOR_MENU_TEST "-D MENU_TEST")
+SET(COMPILER_FLAGS_FOR_MENU_TESTS "-D MENU_TEST")
 
 find_package(SFML 2.5 COMPONENTS graphics audio REQUIRED)
 
@@ -38,7 +38,7 @@ add_executable(
         source/menu/menu_controller.cpp
 )
 
-target_compile_options(menu_tests PRIVATE ${COMPILER_FLAGS_FOR_MENU_TEST})
+target_compile_options(menu_tests PRIVATE ${COMPILER_FLAGS_FOR_MENU_TESTS})
 
 add_executable(
         tanks

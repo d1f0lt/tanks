@@ -34,10 +34,8 @@ void GameController::makeMove(model::PlayableTank &player) {
 }
 
 void GameController::makeShot(model::PlayableTank &player) {
-    static sf::Clock timer;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && timer.getElapsedTime().asSeconds() > RELOAD_TIME) {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
         player.shoot();
-        timer.restart();
     }
 
 }
