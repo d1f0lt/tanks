@@ -10,7 +10,7 @@ jobs:
       - run: for file in $(find . -iname '*.cpp' -or -iname '*.c' -or -iname '*.h' -and -not -iname 'doctest.h' ); do diff -u <(cat "$file") <(clang-format-12 "$file") || exit 1; done
   clang-tidy:
     runs-on: ubuntu-latest
-    timeout-minutes: 2
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v3
       - run: sudo apt-get update && sudo apt-get install clang-tidy-12 libsfml-dev
