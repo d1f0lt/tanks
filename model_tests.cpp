@@ -1,6 +1,7 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
 #include <array>
+#include <boost/asio.hpp>
 #include <cassert>
 #include <iostream>
 #include <random>
@@ -11,6 +12,7 @@
 
 using namespace Tanks;
 using namespace Tanks::model;
+using namespace boost::asio::ip;
 
 const std::array<Tanks::model::Direction, 4> DIRECTIONS = {
     Tanks::model::Direction::UP, Tanks::model::Direction::DOWN,

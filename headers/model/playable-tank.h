@@ -18,6 +18,7 @@ public:
                           int top,
                           int entityId,
                           Direction direction,
+                          std::istream &is,
                           GameModel &model);
 
     [[nodiscard]] EntityType getType() const override;

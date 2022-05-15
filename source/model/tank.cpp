@@ -46,6 +46,7 @@ PlayableTank::PlayableTank(int left,
                            int top,
                            int entityId,
                            Direction direction,
+                           std::istream &is,
                            GameModel &model)
     : Tank(left,
            top,

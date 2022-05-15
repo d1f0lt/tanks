@@ -14,6 +14,16 @@ Entity &GameModel::getByCoords(int col, int row) {
 }
 
 void GameModel::nextTick() {
+    while (!events_.empty()) {
+        auto event = std::move(events_.front());
+        events_.pop();
+        if (auto *ptr = dynamic_cast<TankMove *>(event.get())) {
+            Tank *ent = dynamic_cast<Tank *>(&getById(ptr->getId())->get());
+            TankHandler *h = dynamic_cast<TankHandler *>(handlers_.at(ent));
+            h->move(ptr->getDirection(), ent->getSpeed());
+        }
+    }
+
     for (auto *entity :
          groupedEntities_
              .getAllByLink()[static_cast<unsigned>(EntityType::BOT_TANK)]) {
@@ -72,18 +82,7 @@ void GameModel::removeEntity(Entity &entity) {
 }
 
 PlayableTank &GameModel::spawnPlayableTank(int left, int top) {
-    assert(left + TANK_SIZE < map_.getWidth());
-    assert(top + TANK_SIZE < map_.getHeight());
-
-    for (int row = top; row < top + TANK_SIZE; row++) {
-        for (int col = left; col < left + TANK_SIZE; col++) {
-            assert(getByCoords(col, row).isTankPassable());
-        }
-    }
-
-    addEntity(std::make_unique<PlayableTank>(left, top, getCurrentId(),
-                                             Direction::UP, *this));
-    return dynamic_cast<PlayableTank &>(getByCoords(left, top));
+    return spawnPlayableTank(left, top, getCurrentId());
 }
 
 void GameModel::loadLevel(int level) {
@@ -170,6 +169,28 @@ std::vector<std::vector<const Entity *>> GameModel::getAll() {
         res.emplace_back(line.begin(), line.end());
     }
     return res;
+}
+
+int GameModel::addPlayer(boost::asio::ip::tcp::iostream &ios) {
+    int id = getCurrentId();
+    auto &tank = spawnPlayableTank(TILE_SIZE, TILE_SIZE, id);
+    listen(ios);
+    return id;
+}
+
+PlayableTank &GameModel::spawnPlayableTank(int left, int top, int id) {
+    assert(left + TANK_SIZE < map_.getWidth());
+    assert(top + TANK_SIZE < map_.getHeight());
+
+    for (int row = top; row < top + TANK_SIZE; row++) {
+        for (int col = left; col < left + TANK_SIZE; col++) {
+            assert(getByCoords(col, row).isTankPassable());
+        }
+    }
+
+    addEntity(
+        std::make_unique<PlayableTank>(left, top, id, Direction::UP, *this));
+    return dynamic_cast<PlayableTank &>(getByCoords(left, top));
 }
 
 }  // namespace Tanks::model

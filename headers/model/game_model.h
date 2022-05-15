@@ -1,10 +1,12 @@
 #ifndef TANKS_GAME_MODEL_H
 #define TANKS_GAME_MODEL_H
 
+#include <boost/asio.hpp>
 #include <optional>
 #include <queue>
 #include <unordered_map>
 #include "entity_holder.h"
+#include "model/event.h"
 #include "model/game_map.h"
 #include "model/grouped_entities.h"
 #include "model/handler.h"
@@ -27,6 +29,8 @@ public:
 
     void nextTick();
 
+    int addPlayer(boost::asio::ip::tcp::iostream &ios);
+
     [[nodiscard]] PlayableTank &spawnPlayableTank(int left, int top);
 
     void loadLevel(int level);
@@ -40,12 +44,20 @@ public:
     [[nodiscard]] int getTick() const;
 
 private:
+    [[nodiscard]] PlayableTank &spawnPlayableTank(int left, int top, int id);
+
     void addEntity(std::unique_ptr<Entity> entity);
     void removeEntity(Entity &entity);
 
     [[nodiscard]] int getCurrentId() {
-        static int currentId = 0;
-        return currentId++;
+        return currentId_;
+    }
+
+    void listen(boost::asio::ip::tcp::iostream &client) {
+        while (true) {
+            auto event = readEvent(client);
+            events_.emplace(std::move(event));
+        }
     }
 
     GameMap map_;
@@ -54,6 +66,8 @@ private:
     std::unordered_map<int, Entity *> byId_;
     std::unordered_map<Entity *, BasicHandler *> handlers_;
     int currentTick_ = 0;
+    std::queue<std::unique_ptr<Event>> events_;
+    int currentId_ = 0;
 };
 }  // namespace Tanks::model
 

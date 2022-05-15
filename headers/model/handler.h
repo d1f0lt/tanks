@@ -2,6 +2,7 @@
 #define TANKS_HANDLER_H
 
 #include <climits>
+#include <ostream>
 #include <vector>
 #include "constants.h"
 #include "entity.h"
@@ -21,8 +22,10 @@ public:
     virtual ~BasicHandler() = default;
 
 protected:
-    GameModel &model_;  // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes)
-    Entity &entity_;    // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes)
+    GameModel &
+        model_;  // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes)
+    Entity &
+        entity_;  // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes)
 };
 
 class ForegroundHandler : public BasicHandler {
@@ -73,11 +76,24 @@ public:
     explicit TankHandler(GameModel &model, Tank &entity);
 
     void move(Direction dir, int speed) override;
+    void move(Direction direction);
     void shoot();
 
 private:
     int lastMoveTick = -1;
     int lastShootTick = -RELOAD_TICKS - 1;
+};
+
+class PlayableTankHandler : public TankHandler {
+public:
+    explicit PlayableTankHandler(GameModel &model,
+                                 PlayableTank &tank,
+                                 std::ostream &os);
+
+    void sendMove(Direction direction, int speed);
+
+private:
+    std::ostream &os_;
 };
 
 class ProjectileHandler : public MovableHandler {
