@@ -1,10 +1,10 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
 #include <array>
-#include <boost/asio.hpp>
 #include <cassert>
-#include <iostream>
 #include <random>
+#include <sstream>
+#include <thread>
 #include "doctest.h"
 #include "model/blocks.h"
 #include "model/game_model.h"
@@ -31,7 +31,24 @@ TEST_CASE("Single move and checking background") {
     model.loadLevel(1);
     Tanks::model::Entity *brick00 = &model.getByCoords(TILE_SIZE, TILE_SIZE);
 
-    auto &real_tank = model.spawnPlayableTank(TILE_SIZE, TILE_SIZE);
+    boost::asio::io_context io_context;
+    constexpr int port = 23456;
+    std::thread([&]() {
+        tcp::acceptor acceptor(io_context, tcp::endpoint(tcp::v4(), port));
+        while (true) {
+            tcp::socket s = acceptor.accept();
+        }
+    }).detach();
+
+    //    boost::asio::io_context io_context;
+    tcp::socket s(io_context);
+    boost::asio::connect(
+        s, tcp::resolver(io_context).resolve("localhost", "23456"));
+    //    tcp::iostream ios(std::move(s));
+
+    //    int id = model.addPlayer(ios);
+    auto &real_tank = dynamic_cast<PlayableTank &>(model.getById(id)->get());
+
     CHECK(real_tank.getLeft() == TILE_SIZE);
     CHECK(real_tank.getTop() == TILE_SIZE);
     auto &tank = static_cast<Tanks::model::Entity &>(real_tank);
@@ -47,9 +64,11 @@ TEST_CASE("Single move and checking background") {
     Tanks::model::Entity &ptr2 = model.getByCoords(TILE_SIZE, TILE_SIZE);
     model.nextTick();
 
+    CHECK(real_tank.getTop() == TILE_SIZE + real_tank.getSpeed());
     CHECK(brick00 == &model.getByCoords(TILE_SIZE, TILE_SIZE));
 }
 
+/*
 TEST_CASE("multiple moves") {
     Tanks::model::GameModel model;
     model.loadLevel(1);
@@ -449,3 +468,5 @@ TEST_CASE("Bullet destroy 1 of blocks on creation, then shoot again") {
     tank.shoot();
     model.nextTick();
 }
+
+*/

@@ -203,13 +203,6 @@ void TankHandler::move(Direction direction) {
     move(direction, dynamic_cast<Tank &>(entity_).getSpeed());
 }
 
-void TankHandler::sendMove(Direction, int speed) {
-}
-
-void TankHandler::sendMove(Direction direction) {
-    sendMove(direction, dynamic_cast<Tank &>(entity_).getSpeed());
-}
-
 ProjectileHandler::ProjectileHandler(GameModel &model, MovableEntity &entity)
     : MovableHandler(model, entity) {
 }

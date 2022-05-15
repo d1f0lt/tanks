@@ -18,7 +18,7 @@ void writeInt(std::ostream &os, const T &a) {
 
 std::int32_t readInt(std::istream &is) {
     static std::int32_t buff = 0;
-    is.read(reinterpret_cast<char *>(&buff), sizeof(buff));
+    is.readsome(reinterpret_cast<char *>(&buff), sizeof(buff));
     return buff;
 }
 }  // namespace
@@ -51,6 +51,7 @@ void TankMove::execute() {
 int TankMove::getId() const {
     return id_;
 }
+
 Direction TankMove::getDirection() const {
     return direction_;
 }
@@ -66,6 +67,8 @@ std::unique_ptr<Event> readEvent(std::istream &is) {
             return tmp;
         }();
 
+    int a;
+    is >> a;
     auto type = static_cast<EventType>(readInt(is));
     return readers.at(type)(is);
 };

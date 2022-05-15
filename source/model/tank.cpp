@@ -46,12 +46,12 @@ PlayableTank::PlayableTank(int left,
                            int top,
                            int entityId,
                            Direction direction,
-                           std::istream &is,
+                           std::ostream &is,
                            GameModel &model)
     : Tank(left,
            top,
            entityId,
-           std::make_unique<TankHandler>(model, *this),
+           std::make_unique<PlayableTankHandler>(model, *this, is),
            direction,
            DEFAULT_TANK_SPEED) {
 }
@@ -63,7 +63,7 @@ EntityType PlayableTank::getType() const {
 PlayableTank::PlayableTank(int left,
                            int top,
                            int entityId,
-                           std::unique_ptr<TankHandler> handler,
+                           std::unique_ptr<PlayableTankHandler> handler,
                            Direction direction)
     : Tank(left,
            top,
@@ -74,6 +74,10 @@ PlayableTank::PlayableTank(int left,
 }
 void PlayableTank::move(Direction direction) {
     move(direction, getSpeed());
+}
+
+void PlayableTank::move(Direction direction, int speed) {
+    dynamic_cast<PlayableTankHandler &>(getHandler()).move(direction, speed);
 }
 
 }  // namespace Tanks::model

@@ -81,8 +81,10 @@ void GameModel::removeEntity(Entity &entity) {
     entityHolder_.remove(entity);
 }
 
-PlayableTank &GameModel::spawnPlayableTank(int left, int top) {
-    return spawnPlayableTank(left, top, getCurrentId());
+PlayableTank &GameModel::spawnPlayableTank(int left,
+                                           int top,
+                                           std::ostream &os) {
+    return spawnPlayableTank(left, top, getCurrentId(), os);
 }
 
 void GameModel::loadLevel(int level) {
@@ -173,12 +175,15 @@ std::vector<std::vector<const Entity *>> GameModel::getAll() {
 
 int GameModel::addPlayer(boost::asio::ip::tcp::iostream &ios) {
     int id = getCurrentId();
-    auto &tank = spawnPlayableTank(TILE_SIZE, TILE_SIZE, id);
-    listen(ios);
+    auto &tank = spawnPlayableTank(TILE_SIZE, TILE_SIZE, id, ios);
+    std::thread([&]() { listen(ios); }).detach();
     return id;
 }
 
-PlayableTank &GameModel::spawnPlayableTank(int left, int top, int id) {
+PlayableTank &GameModel::spawnPlayableTank(int left,
+                                           int top,
+                                           int id,
+                                           std::ostream &os) {
     assert(left + TANK_SIZE < map_.getWidth());
     assert(top + TANK_SIZE < map_.getHeight());
 
@@ -188,9 +193,16 @@ PlayableTank &GameModel::spawnPlayableTank(int left, int top, int id) {
         }
     }
 
-    addEntity(
-        std::make_unique<PlayableTank>(left, top, id, Direction::UP, *this));
+    addEntity(std::make_unique<PlayableTank>(left, top, id, Direction::UP, os,
+                                             *this));
     return dynamic_cast<PlayableTank &>(getByCoords(left, top));
+}
+
+void GameModel::listen(boost::asio::ip::tcp::iostream &client) {
+    while (true) {
+        auto event = readEvent(client);
+        events_.emplace(std::move(event));
+    }
 }
 
 }  // namespace Tanks::model

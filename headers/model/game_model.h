@@ -27,11 +27,13 @@ public:
     [[nodiscard]] std::optional<std::reference_wrapper<Entity>> getById(
         int entityId);
 
-    void nextTick();
+    virtual void nextTick();
 
     int addPlayer(boost::asio::ip::tcp::iostream &ios);
 
-    [[nodiscard]] PlayableTank &spawnPlayableTank(int left, int top);
+    [[nodiscard]] PlayableTank &spawnPlayableTank(int left,
+                                                  int top,
+                                                  std::ostream &os);
 
     void loadLevel(int level);
 
@@ -44,7 +46,10 @@ public:
     [[nodiscard]] int getTick() const;
 
 private:
-    [[nodiscard]] PlayableTank &spawnPlayableTank(int left, int top, int id);
+    [[nodiscard]] PlayableTank &spawnPlayableTank(int left,
+                                                  int top,
+                                                  int id,
+                                                  std::ostream &os);
 
     void addEntity(std::unique_ptr<Entity> entity);
     void removeEntity(Entity &entity);
@@ -53,12 +58,7 @@ private:
         return currentId_;
     }
 
-    void listen(boost::asio::ip::tcp::iostream &client) {
-        while (true) {
-            auto event = readEvent(client);
-            events_.emplace(std::move(event));
-        }
-    }
+    void listen(boost::asio::ip::tcp::iostream &client);
 
     GameMap map_;
     GroupedEntities groupedEntities_;

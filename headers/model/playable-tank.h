@@ -11,21 +11,19 @@ public:
     explicit PlayableTank(int left,
                           int top,
                           int entityId,
-                          std::unique_ptr<TankHandler> handler,
+                          std::unique_ptr<PlayableTankHandler> handler,
                           Direction direction);
 
     explicit PlayableTank(int left,
                           int top,
                           int entityId,
                           Direction direction,
-                          std::istream &is,
+                          std::ostream &is,
                           GameModel &model);
 
     [[nodiscard]] EntityType getType() const override;
 
-    using MovableEntity::move;
-    using MovableEntity::setDirection;
-    using Tank::shoot;
+    void move(Direction direction, int speed) override;
 
     void move(Direction direction);
 };

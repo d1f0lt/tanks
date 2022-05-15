@@ -19,8 +19,8 @@ public:
     [[nodiscard]] virtual int getSpeed() const = 0;
 
 protected:
-    void setDirection(Direction direction);
-    void move(Direction direction, int speed);
+    virtual void setDirection(Direction direction);
+    virtual void move(Direction direction, int speed);
 
 private:
     Direction direction_;
