@@ -1,4 +1,5 @@
 #include "model/event.h"
+#include <boost/asio.hpp>
 #include <cinttypes>
 #include <functional>
 #include <istream>
@@ -11,19 +12,21 @@ namespace Tanks::model {
 namespace {
 
 template <typename T>
-void writeInt(std::ostream &os, const T &a) {
+void writeInt(boost::asio::ip::tcp::socket &os, const T &a) {
     auto tmp = static_cast<std::int32_t>(a);
-    os.write(reinterpret_cast<const char *>(&tmp), sizeof(T));
+    os.write_some(
+        boost::asio::buffer(reinterpret_cast<const char *>(&tmp), sizeof(T)));
 }
 
-std::int32_t readInt(std::istream &is) {
+std::int32_t readInt(boost::asio::ip::tcp::socket &is) {
     static std::int32_t buff = 0;
-    is.readsome(reinterpret_cast<char *>(&buff), sizeof(buff));
+    boost::asio::read(
+        is, boost::asio::buffer(reinterpret_cast<char *>(&buff), sizeof(buff)));
     return buff;
 }
 }  // namespace
 
-void TankMove::writeTo(std::ostream &os,
+void TankMove::writeTo(boost::asio::ip::tcp::socket &os,
                        int id,
                        Direction direction,
                        int speed) {
@@ -33,7 +36,7 @@ void TankMove::writeTo(std::ostream &os,
     writeInt(os, speed);
 }
 
-std::unique_ptr<Event> TankMove::readFrom(std::istream &is) {
+std::unique_ptr<Event> TankMove::readFrom(boost::asio::ip::tcp::socket &is) {
     auto id = readInt(is);
     auto direction = static_cast<Direction>(readInt(is));
     auto speed = readInt(is);
@@ -56,19 +59,17 @@ Direction TankMove::getDirection() const {
     return direction_;
 }
 
-std::unique_ptr<Event> readEvent(std::istream &is) {
-    const std::unordered_map<EventType,
-                             std::unique_ptr<Event> (*)(std::istream &)>
+std::unique_ptr<Event> readEvent(boost::asio::ip::tcp::socket &is) {
+    const std::unordered_map<EventType, std::unique_ptr<Event> (*)(
+                                            boost::asio::ip::tcp::socket &)>
         readers = []() {
-            std::unordered_map<EventType,
-                               std::unique_ptr<Event> (*)(std::istream &)>
+            std::unordered_map<EventType, std::unique_ptr<Event> (*)(
+                                              boost::asio::ip::tcp::socket &)>
                 tmp;
             tmp[EventType::TANK_MOVE] = TankMove::readFrom;
             return tmp;
         }();
 
-    int a;
-    is >> a;
     auto type = static_cast<EventType>(readInt(is));
     return readers.at(type)(is);
 };

@@ -37,6 +37,9 @@ TEST_CASE("Single move and checking background") {
         tcp::acceptor acceptor(io_context, tcp::endpoint(tcp::v4(), port));
         while (true) {
             tcp::socket s = acceptor.accept();
+            while (true) {
+                std::this_thread::sleep_for(std::chrono::seconds(1000));
+            }
         }
     }).detach();
 
@@ -46,7 +49,8 @@ TEST_CASE("Single move and checking background") {
         s, tcp::resolver(io_context).resolve("localhost", "23456"));
     //    tcp::iostream ios(std::move(s));
 
-    //    int id = model.addPlayer(ios);
+    //    tcp::iostream ios(std::move(s));
+    int id = model.addPlayer(s);
     auto &real_tank = dynamic_cast<PlayableTank &>(model.getById(id)->get());
 
     CHECK(real_tank.getLeft() == TILE_SIZE);

@@ -18,7 +18,7 @@ public:
                           int top,
                           int entityId,
                           Direction direction,
-                          std::ostream &is,
+                          boost::asio::ip::tcp::socket &is,
                           GameModel &model);
 
     [[nodiscard]] EntityType getType() const override;

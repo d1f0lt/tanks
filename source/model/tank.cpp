@@ -1,4 +1,6 @@
 #include "model/tank.h"
+#include <boost/asio/basic_stream_socket.hpp>
+#include <boost/asio/ip/tcp.hpp>
 #include <queue>
 #include "constants.h"
 #include "model/playable-tank.h"
@@ -46,7 +48,7 @@ PlayableTank::PlayableTank(int left,
                            int top,
                            int entityId,
                            Direction direction,
-                           std::ostream &is,
+                           boost::asio::ip::tcp::socket &is,
                            GameModel &model)
     : Tank(left,
            top,

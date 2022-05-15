@@ -83,7 +83,7 @@ void GameModel::removeEntity(Entity &entity) {
 
 PlayableTank &GameModel::spawnPlayableTank(int left,
                                            int top,
-                                           std::ostream &os) {
+                                           boost::asio::ip::tcp::socket &os) {
     return spawnPlayableTank(left, top, getCurrentId(), os);
 }
 
@@ -173,7 +173,7 @@ std::vector<std::vector<const Entity *>> GameModel::getAll() {
     return res;
 }
 
-int GameModel::addPlayer(boost::asio::ip::tcp::iostream &ios) {
+int GameModel::addPlayer(boost::asio::ip::tcp::socket &ios) {
     int id = getCurrentId();
     auto &tank = spawnPlayableTank(TILE_SIZE, TILE_SIZE, id, ios);
     std::thread([&]() { listen(ios); }).detach();
@@ -183,7 +183,7 @@ int GameModel::addPlayer(boost::asio::ip::tcp::iostream &ios) {
 PlayableTank &GameModel::spawnPlayableTank(int left,
                                            int top,
                                            int id,
-                                           std::ostream &os) {
+                                           boost::asio::ip::tcp::socket &os) {
     assert(left + TANK_SIZE < map_.getWidth());
     assert(top + TANK_SIZE < map_.getHeight());
 
@@ -195,10 +195,11 @@ PlayableTank &GameModel::spawnPlayableTank(int left,
 
     addEntity(std::make_unique<PlayableTank>(left, top, id, Direction::UP, os,
                                              *this));
+
     return dynamic_cast<PlayableTank &>(getByCoords(left, top));
 }
 
-void GameModel::listen(boost::asio::ip::tcp::iostream &client) {
+void GameModel::listen(boost::asio::ip::tcp::socket &client) {
     while (true) {
         auto event = readEvent(client);
         events_.emplace(std::move(event));

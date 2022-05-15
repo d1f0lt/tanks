@@ -1,6 +1,7 @@
 #ifndef TANKS_EVENT_H
 #define TANKS_EVENT_H
 
+#include <boost/asio/ip/tcp.hpp>
 #include <cinttypes>
 #include <iosfwd>
 #include <memory>
@@ -22,12 +23,12 @@ public:
 
     void execute() final;
 
-    static void writeTo(std::ostream &os,
+    static void writeTo(boost::asio::ip::tcp::socket &os,
                         int id,
                         Direction direction,
                         int speed);
 
-    static std::unique_ptr<Event> readFrom(std::istream &is);
+    static std::unique_ptr<Event> readFrom(boost::asio::ip::tcp::socket &is);
 
     [[nodiscard]] int getId() const;
     [[nodiscard]] Direction getDirection() const;
@@ -38,7 +39,7 @@ private:
     int speed_;
 };
 
-std::unique_ptr<Event> readEvent(std::istream &is);
+std::unique_ptr<Event> readEvent(boost::asio::ip::tcp::socket &is);
 
 // class BonusSpawn : public Event {
 // public:

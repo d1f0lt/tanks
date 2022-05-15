@@ -1,6 +1,8 @@
 #ifndef TANKS_HANDLER_H
 #define TANKS_HANDLER_H
 
+#include <boost/asio/buffered_stream_fwd.hpp>
+#include <boost/asio/ip/tcp.hpp>
 #include <climits>
 #include <ostream>
 #include <vector>
@@ -88,12 +90,12 @@ class PlayableTankHandler : public TankHandler {
 public:
     explicit PlayableTankHandler(GameModel &model,
                                  PlayableTank &tank,
-                                 std::ostream &os);
+                                 boost::asio::ip::tcp::socket &os);
 
     void sendMove(Direction direction, int speed);
 
 private:
-    std::ostream &os_;
+    boost::asio::ip::tcp::socket &os_;
 };
 
 class ProjectileHandler : public MovableHandler {

@@ -27,7 +27,8 @@ add_executable(model_tests model_tests.cpp
         source/model/entity_holder.cpp
         source/model/foreground_entity.cpp
         source/model/movable_entity.cpp
-        source/model/handler.cpp)
+        source/model/handler.cpp
+        source/model/event.cpp)
 
 add_executable(
         menu_tests

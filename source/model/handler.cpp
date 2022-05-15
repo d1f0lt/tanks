@@ -261,7 +261,7 @@ bool ProjectileHandler::isBreakOnCreation() {
 }
 PlayableTankHandler::PlayableTankHandler(GameModel &model,
                                          PlayableTank &tank,
-                                         std::ostream &os)
+                                         boost::asio::ip::tcp::socket &os)
     : TankHandler(model, tank), os_(os) {
 }
 
