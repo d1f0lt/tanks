@@ -20,8 +20,9 @@ std::optional<Menu::ButtonType> startGame(sf::RenderWindow &window, int level) {
 
     model::GameModel model;
     model.loadLevel(level);
-    auto &player =
-        model.spawnPlayableTank(tankStartCoordinates.x, tankStartCoordinates.y);
+    const auto playerId =
+        model.spawnPlayableTank(tankStartCoordinates.x, tankStartCoordinates.y)
+            .getId();
 
     View::TankSpriteHolder greenTankView(imagesPath + "tanks/green_tank.png");
 
@@ -43,6 +44,8 @@ std::optional<Menu::ButtonType> startGame(sf::RenderWindow &window, int level) {
         }
         pause.checkPause(event);
 
+        auto player = model.getById(playerId);
+
         if (!pause.isPause()) {
             if (auto signal = MenuController::control(environment.getMenu(),
                                                       window, event);
@@ -51,8 +54,13 @@ std::optional<Menu::ButtonType> startGame(sf::RenderWindow &window, int level) {
                 pause.makePause();
             } else {
                 model.nextTick();
-                GameController::makeShot(player);
-                GameController::makeMove(player);
+                player = model.getById(playerId);
+                if (player.has_value()) {
+                    auto &playerTank = dynamic_cast<model::PlayableTank &>(
+                        player.value().get());
+                    GameController::makeShot(playerTank);
+                    GameController::makeMove(playerTank);
+                }
             }
         }
         // redraw
@@ -61,7 +69,11 @@ std::optional<Menu::ButtonType> startGame(sf::RenderWindow &window, int level) {
 
         mapView.draw(window, model);
 
-        greenTankView.draw(window, player);
+        if (player.has_value()) {
+            auto &playerTank =
+                dynamic_cast<model::PlayableTank &>(player.value().get());
+            greenTankView.draw(window, playerTank);
+        }
 
         const auto &bullets = model.getAll(model::EntityType::BULLET);
         bulletsView.draw(window, bullets);
