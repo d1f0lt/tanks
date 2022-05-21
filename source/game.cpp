@@ -29,7 +29,8 @@ void makeAction(std::optional<std::reference_wrapper<model::Entity>> &player) {
 
 }  // namespace
 
-std::optional<Menu::ButtonType> startGame( // NOLINT(readability-function-cognitive-complexity)
+std::optional<Menu::ButtonType>
+startGame(  // NOLINT(readability-function-cognitive-complexity)
     sf::RenderWindow &window,
     int level) {
     static const std::string imagesPath = "../images/";
