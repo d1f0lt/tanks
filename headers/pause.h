@@ -20,7 +20,7 @@ public:
 
     void checkPause(const sf::Event &event);
 
-    const Menu::Menu &getMenu() const;
+    [[nodiscard]] const Menu::Menu &getMenu() const;
 
     void unpause();
 

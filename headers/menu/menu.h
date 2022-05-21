@@ -54,7 +54,7 @@ public:
 #endif
 
 private:
-    std::vector<std::unique_ptr<MenuItem>> items;
+    std::vector<std::unique_ptr<MenuItem>> items{};
     constexpr static int animationSpeed = 4;
 
 #ifndef MENU_TEST

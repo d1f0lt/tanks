@@ -43,7 +43,7 @@ private:
     void addEntity(std::unique_ptr<Entity> entity);
     void removeEntity(Entity &entity);
 
-    [[nodiscard]] int getCurrentId() {
+    [[nodiscard]] int getCurrentId() {  // NOLINT
         static int currentId = 0;
         return currentId++;
     }

@@ -18,7 +18,7 @@ public:
 
     void draw(sf::RenderWindow &window) const;
 
-    model::EntityType getType() const;
+    [[nodiscard]] model::EntityType getType() const;
 
     void destroy();
 

@@ -167,7 +167,9 @@ std::vector<std::vector<const Entity *>> GameModel::getAll() {
     const auto &all = groupedEntities_.getAllByLink();
     std::vector<std::vector<const Entity *>> res;
     for (const auto &line : all) {
-        res.emplace_back(line.begin(), line.end());
+        res.emplace_back(
+            line.begin(),
+            line.end());  // NOLINT(performance-inefficient-vector-operation)
     }
     return res;
 }

@@ -1,5 +1,6 @@
 #include "menu/menu_items.h"
 #include <cassert>
+#include <unordered_map>
 #include "constants.h"
 
 namespace Tanks::Menu {

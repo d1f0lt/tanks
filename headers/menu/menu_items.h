@@ -2,6 +2,7 @@
 #define MENU_ITEMS_H
 
 #include <SFML/Graphics.hpp>
+#include <memory>
 
 namespace Tanks::Menu {
 
@@ -50,15 +51,15 @@ public:
 
 private:
     sf::Vector2<float>
-        standardCoordinates;  // for animation, if the MenuItem is contained
-                              // within another MenuItem, then the values may
-                              // most likely be incorrect
+        standardCoordinates{};  // for animation, if the MenuItem is contained
+                                // within another MenuItem, then the values may
+                                // most likely be incorrect
 };
 
 struct InscriptionInfo final {
-    const std::string inscription;
-    const size_t characterSize;
-    const sf::Color textColor;
+    const std::string inscription{};
+    const size_t characterSize{};
+    const sf::Color textColor{};
 };
 
 struct MenuInscription final : MenuItem {
@@ -118,7 +119,7 @@ public:
                const sf::Vector2<float> &coordinates,
                ButtonWithType info);
 
-    ButtonType getType() const;
+    [[nodiscard]] ButtonType getType() const;
 
     void hover();
 
@@ -130,9 +131,9 @@ public:
     void draw(sf::RenderWindow &window) const override;
 
 protected:
-    MenuItem *getContent() const;
-    sf::RectangleShape &getRectangle() const;
-    const ButtonWithType &getButtonInfo() const;
+    [[nodiscard]] MenuItem *getContent() const;
+    [[nodiscard]] sf::RectangleShape &getRectangle() const;
+    [[nodiscard]] const ButtonWithType &getButtonInfo() const;
 
 private:
     std::unique_ptr<MenuItem> content;

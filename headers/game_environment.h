@@ -32,11 +32,11 @@ public:
 
     void draw(sf::RenderWindow &window, bool isPause) const;
 
-    const Menu::Menu &getMenu() const;
+    [[nodiscard]] const Menu::Menu &getMenu() const;
 
 private:
     mutable Timer timer;
-    Menu::Menu menu;
+    Menu::Menu menu{};
     sf::Sprite backgroundSprite;
 };
 

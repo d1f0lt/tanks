@@ -21,8 +21,8 @@ public:
     virtual ~BasicHandler() = default;
 
 protected:
-    GameModel &model_;  // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes)
-    Entity &entity_;    // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes)
+    GameModel &model_;  // NOLINT
+    Entity &entity_;    // NOLINT
 };
 
 class ForegroundHandler : public BasicHandler {
