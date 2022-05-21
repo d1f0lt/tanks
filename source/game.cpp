@@ -29,9 +29,9 @@ void makeAction(std::optional<std::reference_wrapper<model::Entity>> &player) {
 
 }  // namespace
 
-std::optional<Menu::ButtonType> startGame(
+std::optional<Menu::ButtonType> startGame( // NOLINT(readability-function-cognitive-complexity)
     sf::RenderWindow &window,
-    int level) {  // NOLINT(readability-function-cognitive-complexity)
+    int level) {
     static const std::string imagesPath = "../images/";
     const sf::Vector2<int> tankStartCoordinates = {
         TILE_SIZE * 6 + (TILE_SIZE - TANK_SIZE) / 2,
