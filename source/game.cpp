@@ -12,7 +12,26 @@
 
 namespace Tanks {
 
-std::optional<Menu::ButtonType> startGame(sf::RenderWindow &window, int level) {
+namespace {
+
+model::PlayableTank &getPlayerTank(
+    std::optional<std::reference_wrapper<model::Entity>> &player) {
+    return dynamic_cast<model::PlayableTank &>(player.value().get());
+}
+
+void makeAction(std::optional<std::reference_wrapper<model::Entity>> &player) {
+    if (player.has_value()) {
+        auto &playerTank = getPlayerTank(player);
+        GameController::makeShot(playerTank);
+        GameController::makeMove(playerTank);
+    }
+}
+
+}  // namespace
+
+std::optional<Menu::ButtonType> startGame(
+    sf::RenderWindow &window,
+    int level) {  // NOLINT(readability-function-cognitive-complexity)
     static const std::string imagesPath = "../images/";
     const sf::Vector2<int> tankStartCoordinates = {
         TILE_SIZE * 6 + (TILE_SIZE - TANK_SIZE) / 2,
@@ -55,30 +74,9 @@ std::optional<Menu::ButtonType> startGame(sf::RenderWindow &window, int level) {
             } else {
                 model.nextTick();
                 player = model.getById(playerId);
-                if (player.has_value()) {
-                    auto &playerTank = dynamic_cast<model::PlayableTank &>(
-                        player.value().get());
-                    GameController::makeShot(playerTank);
-                    GameController::makeMove(playerTank);
-                }
+                makeAction(player);
             }
-        }
-        // redraw
-        window.clear();
-        environment.draw(window, pause.isPause());
-
-        mapView.draw(window, model);
-
-        if (player.has_value()) {
-            auto &playerTank =
-                dynamic_cast<model::PlayableTank &>(player.value().get());
-            greenTankView.draw(window, playerTank);
-        }
-
-        const auto &bullets = model.getAll(model::EntityType::BULLET);
-        bulletsView.draw(window, bullets);
-
-        if (pause.isPause()) {
+        } else {
             if (auto signal =
                     MenuController::control(pause.getMenu(), window, event);
                 signal != std::nullopt) {
@@ -94,6 +92,23 @@ std::optional<Menu::ButtonType> startGame(sf::RenderWindow &window, int level) {
                         break;
                 }
             }
+        }
+
+        // redraw
+        window.clear();
+        environment.draw(window, pause.isPause());
+
+        mapView.draw(window, model);
+
+        if (player.has_value()) {
+            auto &playerTank = getPlayerTank(player);
+            greenTankView.draw(window, playerTank);
+        }
+
+        const auto &bullets = model.getAll(model::EntityType::BULLET);
+        bulletsView.draw(window, bullets);
+
+        if (pause.isPause()) {
             pause.drawPause(window);
         }
 
