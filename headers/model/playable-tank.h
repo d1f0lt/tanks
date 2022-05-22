@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <queue>
+#include "model/playable_tank_handler.h"
 #include "model/tank.h"
 
 namespace Tanks::model {

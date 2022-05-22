@@ -5,10 +5,11 @@
 #include <random>
 #include <sstream>
 #include <thread>
+#include "boost/asio.hpp"
 #include "doctest.h"
 #include "model/blocks.h"
-#include "model/game_model.h"
 #include "model/projectile.h"
+#include "model/server_game_model.h"
 
 using namespace Tanks;
 using namespace Tanks::model;
@@ -19,7 +20,7 @@ const std::array<Tanks::model::Direction, 4> DIRECTIONS = {
     Tanks::model::Direction::LEFT, Tanks::model::Direction::RIGHT};
 
 TEST_CASE("Game creation") {
-    Tanks::model::GameModel model;
+    Tanks::model::ServerModel model;
     model.loadLevel(1);
     auto &brick00 = model.getByCoords(TILE_SIZE, TILE_SIZE);
 
@@ -27,7 +28,7 @@ TEST_CASE("Game creation") {
 }
 
 TEST_CASE("Single move and checking background") {
-    Tanks::model::GameModel model;
+    Tanks::model::ServerModel model;
     model.loadLevel(1);
     Tanks::model::Entity *brick00 = &model.getByCoords(TILE_SIZE, TILE_SIZE);
 
@@ -59,7 +60,7 @@ TEST_CASE("Single move and checking background") {
     CHECK(&tank == &real_tank);
 
     for (auto &row : real_tank.snapshotBackground()) {
-        for (auto *entity : row) {
+        for (const auto *entity : row) {
             CHECK(entity != nullptr);
         }
     }

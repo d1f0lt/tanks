@@ -1,17 +1,15 @@
 #ifndef TANKS_HANDLER_H
 #define TANKS_HANDLER_H
 
-#include <boost/asio/buffered_stream_fwd.hpp>
-#include <boost/asio/ip/tcp.hpp>
 #include <climits>
 #include <ostream>
 #include <vector>
 #include "constants.h"
-#include "entity.h"
 #include "model/entities_fwd.h"
+#include "model/entity.h"
+#include "model/game_model_fwd.h"
 
 namespace Tanks::model {
-class GameModel;  // TODO GameModel fwd
 class BasicHandler {
 public:
     explicit BasicHandler(GameModel &model_, Entity &entity);
@@ -24,10 +22,12 @@ public:
     virtual ~BasicHandler() = default;
 
 protected:
-    GameModel &
-        model_;  // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes)
-    Entity &
-        entity_;  // NOLINT(cppcoreguidelines-non-private-member-variables-in-classes)
+    [[nodiscard]] Entity &getEntity() const;
+    [[nodiscard]] GameModel &getModel() const;
+
+private:
+    GameModel &model_;
+    Entity &entity_;
 };
 
 class ForegroundHandler : public BasicHandler {
@@ -40,6 +40,7 @@ public:
     [[nodiscard]] std::vector<std::vector<const Entity *>> snapshotBackground()
         const;
 
+protected:
 private:
     std::vector<std::vector<Entity *>> background_;
 };
@@ -60,8 +61,8 @@ protected:
         std::vector<Entity *> res;
         for (auto *entity : lookMutable(direction)) {
             if (cond(entity)) {
-                if (entity_.dist(*entity) <= dist) {
-                    if (entity_.dist(*entity) == dist) {
+                if (getEntity().dist(*entity) <= dist) {
+                    if (getEntity().dist(*entity) == dist) {
                         res = {entity};
                     } else {
                         res.push_back(entity);
@@ -77,25 +78,13 @@ class TankHandler : public MovableHandler {
 public:
     explicit TankHandler(GameModel &model, Tank &entity);
 
-    void move(Direction dir, int speed) override;
+    void move(Direction dir, int speed) final;
     void move(Direction direction);
     void shoot();
 
 private:
-    int lastMoveTick = -1;
-    int lastShootTick = -RELOAD_TICKS - 1;
-};
-
-class PlayableTankHandler : public TankHandler {
-public:
-    explicit PlayableTankHandler(GameModel &model,
-                                 PlayableTank &tank,
-                                 boost::asio::ip::tcp::socket &os);
-
-    void sendMove(Direction direction, int speed);
-
-private:
-    boost::asio::ip::tcp::socket &os_;
+    int lastMoveTick_ = -1;
+    int lastShootTick_ = -RELOAD_TICKS - 1;
 };
 
 class ProjectileHandler : public MovableHandler {

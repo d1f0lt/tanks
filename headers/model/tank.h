@@ -1,7 +1,6 @@
 #ifndef TANKS_TANK_H
 #define TANKS_TANK_H
 
-#include "game_map.h"
 #include "movable_entity.h"
 
 namespace Tanks::model {

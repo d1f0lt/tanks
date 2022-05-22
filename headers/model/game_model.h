@@ -1,7 +1,6 @@
 #ifndef TANKS_GAME_MODEL_H
 #define TANKS_GAME_MODEL_H
 
-#include <boost/asio.hpp>
 #include <optional>
 #include <queue>
 #include <unordered_map>
@@ -22,17 +21,13 @@ class GameModel {
 
 public:
     explicit GameModel() = default;
+    virtual ~GameModel() = default;
 
     [[nodiscard]] Entity &getByCoords(int col, int row);
     [[nodiscard]] std::optional<std::reference_wrapper<Entity>> getById(
         int entityId);
 
-    virtual void nextTick();
-
-    int addPlayer(boost::asio::ip::tcp::socket &ios);
-
-    [[nodiscard]] PlayableTank &
-    spawnPlayableTank(int left, int top, boost::asio::ip::tcp::socket &os);
+    void nextTick();
 
     void loadLevel(int level);
 
@@ -44,31 +39,31 @@ public:
 
     [[nodiscard]] int getTick() const;
 
+protected:
+    virtual void executeEvents() = 0;
+
+    [[nodiscard]] BasicHandler &getHandler(Entity &entity);
+
+    [[nodiscard]] const std::vector<std::vector<Entity *>> &getAllByLink();
+
 private:
-    [[nodiscard]] PlayableTank &spawnPlayableTank(
-        int left,
-        int top,
-        int id,
-        boost::asio::ip::tcp::socket &os);
-
-    void addEntity(std::unique_ptr<Entity> entity);
-    void removeEntity(Entity &entity);
-
-    [[nodiscard]] int getCurrentId() {
-        return currentId_++;
-    }
-
-    void listen(boost::asio::ip::tcp::socket &client);
-
-    GameMap map_;
     GroupedEntities groupedEntities_;
     EntityHolder entityHolder_;
     std::unordered_map<int, Entity *> byId_;
     std::unordered_map<Entity *, BasicHandler *> handlers_;
     int currentTick_ = 0;
-    std::queue<std::unique_ptr<Event>> events_;
     int currentId_ = 0;
+
+protected:
+    void addEntity(std::unique_ptr<Entity> entity);
+    void removeEntity(Entity &entity);
+    [[nodiscard]] int getCurrentId() {
+        return currentId_++;
+    }
+
+    GameMap map_;
 };
+
 }  // namespace Tanks::model
 
 #endif  // TANKS_GAME_MODEL_H

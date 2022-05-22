@@ -26,10 +26,10 @@ std::int32_t readInt(boost::asio::ip::tcp::socket &is) {
 }
 }  // namespace
 
-void TankMove::writeTo(boost::asio::ip::tcp::socket &os,
-                       int id,
-                       Direction direction,
-                       int speed) {
+void TankMove::sendTo(boost::asio::ip::tcp::socket &os,
+                      int id,
+                      Direction direction,
+                      int speed) {
     writeInt(os, EventType::TANK_MOVE);
     writeInt(os, id);
     writeInt(os, direction);
@@ -47,7 +47,7 @@ TankMove::TankMove(int id, Direction direction, int speed)
     : id_(id), direction_(direction), speed_(speed) {
 }
 
-void TankMove::execute() {
+void TankMove::acceptExecutor() {
     return;
 }
 
@@ -57,6 +57,13 @@ int TankMove::getId() const {
 
 Direction TankMove::getDirection() const {
     return direction_;
+}
+int TankMove::getSpeed() const {
+    return speed_;
+}
+
+void TankMove::sendTo(boost::asio::ip::tcp::socket &os) {
+    TankMove::sendTo(os, id_, direction_, speed_);
 }
 
 std::unique_ptr<Event> readEvent(boost::asio::ip::tcp::socket &is) {

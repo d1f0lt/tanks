@@ -13,42 +13,6 @@ Entity &GameModel::getByCoords(int col, int row) {
     return map_.getEntityByCoords(col, row);
 }
 
-void GameModel::nextTick() {
-    while (!events_.empty()) {
-        auto event = std::move(events_.front());
-        events_.pop();
-        if (auto *ptr = dynamic_cast<TankMove *>(event.get())) {
-            Tank *ent = dynamic_cast<Tank *>(&getById(ptr->getId())->get());
-            TankHandler *h = dynamic_cast<TankHandler *>(handlers_.at(ent));
-            h->move(ptr->getDirection(), ent->getSpeed());
-        }
-    }
-
-    for (auto *entity :
-         groupedEntities_
-             .getAllByLink()[static_cast<unsigned>(EntityType::BOT_TANK)]) {
-        auto *tank = dynamic_cast<BotTank *>(entity);
-        assert(tank != nullptr);
-        dynamic_cast<MovableHandler &>(*handlers_[tank])
-            .move(tank->getDirection(), tank->getSpeed());
-    }
-
-    for (auto *entity :
-         groupedEntities_
-             .getAllByLink()[static_cast<unsigned>(EntityType::BULLET)]) {
-        auto *bullet = dynamic_cast<Projectile *>(entity);
-        assert(bullet != nullptr);
-
-        if (dynamic_cast<ProjectileHandler &>(*handlers_[bullet])
-                .isBreakOnNextTick()) {
-            continue;
-        }
-        dynamic_cast<MovableHandler &>(*handlers_[bullet])
-            .move(bullet->getDirection(), bullet->getSpeed());
-    }
-    currentTick_++;
-}
-
 void GameModel::addEntity(std::unique_ptr<Entity> entity) {
     if (auto *bullet = dynamic_cast<Projectile *>(entity.get())) {
         if (dynamic_cast<ProjectileHandler *>(handlers_[bullet])
@@ -79,12 +43,6 @@ void GameModel::removeEntity(Entity &entity) {
     handlers_.erase(&entity);
     groupedEntities_.erase(entity);
     entityHolder_.remove(entity);
-}
-
-PlayableTank &GameModel::spawnPlayableTank(int left,
-                                           int top,
-                                           boost::asio::ip::tcp::socket &os) {
-    return spawnPlayableTank(left, top, getCurrentId(), os);
 }
 
 void GameModel::loadLevel(int level) {
@@ -173,37 +131,18 @@ std::vector<std::vector<const Entity *>> GameModel::getAll() {
     return res;
 }
 
-int GameModel::addPlayer(boost::asio::ip::tcp::socket &ios) {
-    int id = getCurrentId();
-    auto &tank = spawnPlayableTank(TILE_SIZE, TILE_SIZE, id, ios);
-    std::thread([&]() { listen(ios); }).detach();
-    return id;
+void GameModel::nextTick() {
+    // TODO lock model
+    executeEvents();
+    currentTick_++;
 }
 
-PlayableTank &GameModel::spawnPlayableTank(int left,
-                                           int top,
-                                           int id,
-                                           boost::asio::ip::tcp::socket &os) {
-    assert(left + TANK_SIZE < map_.getWidth());
-    assert(top + TANK_SIZE < map_.getHeight());
-
-    for (int row = top; row < top + TANK_SIZE; row++) {
-        for (int col = left; col < left + TANK_SIZE; col++) {
-            assert(getByCoords(col, row).isTankPassable());
-        }
-    }
-
-    addEntity(std::make_unique<PlayableTank>(left, top, id, Direction::UP, os,
-                                             *this));
-
-    return dynamic_cast<PlayableTank &>(getByCoords(left, top));
+BasicHandler &GameModel::getHandler(Entity &entity) {
+    return *handlers_.at(&entity);
 }
 
-void GameModel::listen(boost::asio::ip::tcp::socket &client) {
-    while (true) {
-        auto event = readEvent(client);
-        events_.emplace(std::move(event));
-    }
+const std::vector<std::vector<Entity *>> &GameModel::getAllByLink() {
+    return groupedEntities_.getAllByLink();
 }
 
 }  // namespace Tanks::model

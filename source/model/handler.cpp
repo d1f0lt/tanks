@@ -12,6 +12,13 @@ BasicHandler::BasicHandler(GameModel &model_, Entity &entity_)
     model_.handlers_[&entity_] = this;
 }
 
+Entity &BasicHandler::getEntity() const {
+    return entity_;
+}
+GameModel &BasicHandler::getModel() const {
+    return model_;
+}
+
 std::vector<const Entity *> MovableHandler::look(Direction direction) {
     auto res = lookMutable(direction);
     return {res.begin(), res.end()};
@@ -19,33 +26,36 @@ std::vector<const Entity *> MovableHandler::look(Direction direction) {
 
 void ForegroundHandler::restoreBackground() {
     std::unordered_set<Entity *> restored;
-    for (int row = 0; row < entity_.getHeight(); row++) {
-        for (int col = 0; col < entity_.getWidth(); col++) {
+    for (int row = 0; row < getEntity().getHeight(); row++) {
+        for (int col = 0; col < getEntity().getWidth(); col++) {
             if (restored.count(background_[row][col]) != 0) {
                 background_[row][col] = nullptr;
                 continue;
             }
             restored.insert(background_[row][col]);
-            model_.map_.insert(*background_[row][col]);
+            getModel().map_.insert(*background_[row][col]);
             background_[row][col] = nullptr;
         }
     }
 }
 
 void ForegroundHandler::setBackground() {
-    background_.resize(entity_.getHeight(),
-                       std::vector<Entity *>(entity_.getWidth(), nullptr));
+    background_.resize(getEntity().getHeight(),
+                       std::vector<Entity *>(getEntity().getWidth(), nullptr));
 
-    int top = entity_.getTop();
-    int left = entity_.getLeft();
-    int height = entity_.getHeight();
-    int width = entity_.getWidth();
-    for (int row = entity_.getTop(); row < entity_.getTop() + height; row++) {
-        for (int col = entity_.getLeft(); col < left + width; col++) {
-            background_[row - top][col - left] = &model_.getByCoords(col, row);
+    auto &entity = getEntity();
+
+    int top = entity.getTop();
+    int left = entity.getLeft();
+    int height = entity.getHeight();
+    int width = entity.getWidth();
+    for (int row = entity.getTop(); row < entity.getTop() + height; row++) {
+        for (int col = entity.getLeft(); col < left + width; col++) {
+            background_[row - top][col - left] =
+                &getModel().getByCoords(col, row);
         }
     }
-    model_.map_.insert(entity_);
+    getModel().map_.insert(entity);
 }
 
 ForegroundHandler::ForegroundHandler(GameModel &model, ForegroundEntity &entity)
@@ -55,7 +65,7 @@ ForegroundHandler::ForegroundHandler(GameModel &model, ForegroundEntity &entity)
 std::vector<std::vector<const Entity *>> ForegroundHandler::snapshotBackground()
     const {
     std::vector<std::vector<const Entity *>> vec;
-    vec.reserve(entity_.getHeight());
+    vec.reserve(getEntity().getHeight());
     for (const auto &line : background_) {
         vec.emplace_back(line.begin(), line.end());
     }
@@ -68,7 +78,7 @@ MovableHandler::MovableHandler(GameModel &model, MovableEntity &entity)
 
 void MovableHandler::move(Direction direction, int speed) {
     // TODO lock model
-    auto &movable = dynamic_cast<MovableEntity &>(entity_);
+    auto &movable = dynamic_cast<MovableEntity &>(getEntity());
 
     movable.setDirection(direction);
     restoreBackground();
@@ -78,7 +88,7 @@ void MovableHandler::move(Direction direction, int speed) {
         return !movable.canPass(*entity);
     });
     if (!block.empty()) {
-        dist = std::min(dist, entity_.dist(*block[0]) - 1);
+        dist = std::min(dist, getEntity().dist(*block[0]) - 1);
     }
 
     auto bullets = nearest(direction, [](const Entity *entity) {
@@ -87,31 +97,31 @@ void MovableHandler::move(Direction direction, int speed) {
 
     if (!bullets.empty() && movable.dist(*bullets[0]) <= dist) {
         for (auto *entity : bullets) {
-            model_.removeEntity(*entity);
+            getModel().removeEntity(*entity);
         }
-        model_.removeEntity(entity_);
+        getModel().removeEntity(getEntity());
         return;
     }
 
     switch (direction) {
         case Direction::UP:
-            movable.setTop(entity_.getTop() - dist);
+            movable.setTop(getEntity().getTop() - dist);
             break;
         case Direction::LEFT:
-            movable.setLeft(entity_.getLeft() - dist);
+            movable.setLeft(getEntity().getLeft() - dist);
             break;
         case Direction::DOWN:
-            movable.setTop(entity_.getTop() + dist);
+            movable.setTop(getEntity().getTop() + dist);
             break;
         case Direction::RIGHT:
-            movable.setLeft(entity_.getLeft() + dist);
+            movable.setLeft(getEntity().getLeft() + dist);
             break;
     }
     setBackground();
 }
 
 std::vector<Entity *> MovableHandler::lookMutable(Direction direction) {
-    auto &movableEntity = dynamic_cast<MovableEntity &>(entity_);
+    auto &movableEntity = dynamic_cast<MovableEntity &>(getEntity());
     // retuns square [left, right) x [down, top)
     int left = -1;
     int top = -1;
@@ -119,30 +129,30 @@ std::vector<Entity *> MovableHandler::lookMutable(Direction direction) {
     int down = -1;
     switch (direction) {
         case (Direction::UP):
-            left = entity_.getLeft();
-            right = left + entity_.getWidth();
-            down = entity_.getTop() - 1;
+            left = getEntity().getLeft();
+            right = left + getEntity().getWidth();
+            down = getEntity().getTop() - 1;
             top = std::max(-1, down - movableEntity.getSpeed());
             break;
         case (Direction::DOWN):
-            left = entity_.getLeft();
-            right = left + entity_.getWidth();
-            top = entity_.getTop() + entity_.getHeight() - 1;
-            down = std::min(model_.getHeight() - 1,
+            left = getEntity().getLeft();
+            right = left + getEntity().getWidth();
+            top = getEntity().getTop() + getEntity().getHeight() - 1;
+            down = std::min(getModel().getHeight() - 1,
                             top + movableEntity.getSpeed());
             break;
         case (Direction::LEFT):
-            right = entity_.getLeft();
+            right = getEntity().getLeft();
             left = std::max(0, right - movableEntity.getSpeed());
-            top = entity_.getTop() - 1;
-            down = top + entity_.getHeight();
+            top = getEntity().getTop() - 1;
+            down = top + getEntity().getHeight();
             break;
         case (Direction::RIGHT):
-            left = entity_.getLeft() + entity_.getWidth();
-            right =
-                std::min(model_.getWidth(), left + movableEntity.getSpeed());
-            top = entity_.getTop() - 1;
-            down = top + entity_.getHeight();
+            left = getEntity().getLeft() + getEntity().getWidth();
+            right = std::min(getModel().getWidth(),
+                             left + movableEntity.getSpeed());
+            top = getEntity().getTop() - 1;
+            down = top + getEntity().getHeight();
             break;
     }
 
@@ -150,7 +160,7 @@ std::vector<Entity *> MovableHandler::lookMutable(Direction direction) {
     buff.reserve(movableEntity.getSpeed());
     for (int row = down; row > top; row--) {
         for (int col = left; col < right; col++) {
-            buff.insert(&model_.getByCoords(col, row));
+            buff.insert(&getModel().getByCoords(col, row));
         }
     }
 
@@ -159,30 +169,30 @@ std::vector<Entity *> MovableHandler::lookMutable(Direction direction) {
 
 void TankHandler::shoot() {
     // TODO lock model
-    if (model_.getTick() <= lastShootTick + RELOAD_TICKS) {
+    if (getModel().getTick() <= lastShootTick_ + RELOAD_TICKS) {
         return;
     }
 
-    lastShootTick = model_.getTick();
+    lastShootTick_ = getModel().getTick();
 
-    auto &tank = dynamic_cast<Tank &>(entity_);
+    auto &tank = dynamic_cast<Tank &>(getEntity());
 
     static const std::unordered_map<Direction, int> DCOL = {
-        {Tanks::model::Direction::UP, entity_.getWidth() / 2},
-        {Tanks::model::Direction::DOWN, entity_.getWidth() / 2},
-        {Tanks::model::Direction::RIGHT, entity_.getWidth()},
+        {Tanks::model::Direction::UP, getEntity().getWidth() / 2},
+        {Tanks::model::Direction::DOWN, getEntity().getWidth() / 2},
+        {Tanks::model::Direction::RIGHT, getEntity().getWidth()},
         {Tanks::model::Direction::LEFT, -1}};
 
     static const std::unordered_map<Direction, int> DROW = {
         {Tanks::model::Direction::UP, -1},
-        {Tanks::model::Direction::DOWN, entity_.getHeight()},
-        {Tanks::model::Direction::RIGHT, entity_.getHeight() / 2},
-        {Tanks::model::Direction::LEFT, entity_.getHeight() / 2}};
+        {Tanks::model::Direction::DOWN, getEntity().getHeight()},
+        {Tanks::model::Direction::RIGHT, getEntity().getHeight() / 2},
+        {Tanks::model::Direction::LEFT, getEntity().getHeight() / 2}};
 
-    model_.addEntity(std::make_unique<Projectile>(
-        entity_.getLeft() + DCOL.at(tank.getDirection()),
-        entity_.getTop() + DROW.at(tank.getDirection()), tank.getDirection(),
-        model_, model_.getCurrentId()));
+    getModel().addEntity(std::make_unique<Projectile>(
+        getEntity().getLeft() + DCOL.at(tank.getDirection()),
+        getEntity().getTop() + DROW.at(tank.getDirection()),
+        tank.getDirection(), getModel(), getModel().getCurrentId()));
 }
 
 TankHandler::TankHandler(GameModel &model, Tank &entity)
@@ -190,17 +200,16 @@ TankHandler::TankHandler(GameModel &model, Tank &entity)
 }
 
 void TankHandler::move(Direction dir, int speed) {
-    // TODO lock model
-    if (model_.getTick() <= std::max(lastShootTick, lastMoveTick)) {
+    if (getModel().getTick() <= std::max(lastShootTick_, lastMoveTick_)) {
         return;
     }
 
-    lastMoveTick = model_.getTick();
+    lastMoveTick_ = getModel().getTick();
     MovableHandler::move(dir, speed);
 }
 
 void TankHandler::move(Direction direction) {
-    move(direction, dynamic_cast<Tank &>(entity_).getSpeed());
+    move(direction, dynamic_cast<Tank &>(getEntity()).getSpeed());
 }
 
 ProjectileHandler::ProjectileHandler(GameModel &model, MovableEntity &entity)
@@ -208,7 +217,7 @@ ProjectileHandler::ProjectileHandler(GameModel &model, MovableEntity &entity)
 }
 
 bool ProjectileHandler::isBreakOnNextTick() {
-    auto &bullet = dynamic_cast<Projectile &>(entity_);
+    auto &bullet = dynamic_cast<Projectile &>(getEntity());
     auto closest = nearest(bullet.getDirection(), [](const Entity *entity) {
         return entity->getStrength() > 0;
     });
@@ -217,30 +226,31 @@ bool ProjectileHandler::isBreakOnNextTick() {
         destroyByBullet(*entity);
     }
     if (!closest.empty()) {
-        model_.removeEntity(bullet);
+        getModel().removeEntity(bullet);
         return true;
     }
     return false;
 }
 
 void ProjectileHandler::destroyByBullet(Entity &other) {
-    if (other.getStrength() > entity_.getStrength() ||
+    if (other.getStrength() > getEntity().getStrength() ||
         other.getStrength() == 0) {
         return;
     }
 
     if (dynamic_cast<Block *>(&other) == nullptr) {
-        model_.removeEntity(other);
+        getModel().removeEntity(other);
         return;
     }
     int left = other.getLeft();
     int top = other.getTop();
-    model_.removeEntity(other);
-    model_.addEntity(std::make_unique<Floor>(left, top, model_.getCurrentId()));
+    getModel().removeEntity(other);
+    getModel().addEntity(
+        std::make_unique<Floor>(left, top, getModel().getCurrentId()));
 }
 
 bool ProjectileHandler::isBreakOnCreation() {
-    auto &bullet = dynamic_cast<Projectile &>(entity_);
+    auto &bullet = dynamic_cast<Projectile &>(getEntity());
     assert(bullet.snapshotBackground().empty());  // true only on creation
     bool survive = true;
 
@@ -248,25 +258,16 @@ bool ProjectileHandler::isBreakOnCreation() {
          row++) {
         for (int col = bullet.getLeft();
              col < bullet.getLeft() + bullet.getWidth(); col++) {
-            auto &entity = model_.getByCoords(col, row);
+            auto &entity = getModel().getByCoords(col, row);
             if (entity.getStrength() != 0) {  // TODO .doInteract
-                dynamic_cast<ProjectileHandler *>(model_.handlers_[&bullet])
-                    ->destroyByBullet(entity);
+                dynamic_cast<ProjectileHandler &>(getModel().getHandler(bullet))
+                    .destroyByBullet(entity);
                 survive = false;
             }
         }
     }
 
     return !survive;
-}
-PlayableTankHandler::PlayableTankHandler(GameModel &model,
-                                         PlayableTank &tank,
-                                         boost::asio::ip::tcp::socket &os)
-    : TankHandler(model, tank), os_(os) {
-}
-
-void PlayableTankHandler::sendMove(Direction direction, int speed) {
-    TankMove::writeTo(os_, entity_.getId(), direction, speed);
 }
 
 }  // namespace Tanks::model

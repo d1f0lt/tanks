@@ -9,8 +9,8 @@ message("CMake runtime output directory: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
 
 SET(GCC_WARNINGS "-Wall -Wextra")
-#SET(SANITIZERS "-fsanitize=address,undefined,leak,vptr")
-#SET(GCC_OPTIMIZE "-Og -g -ftrapv") # Latest is integer overflow protection
+SET(SANITIZERS "-fsanitize=address,undefined,leak,vptr")
+SET(GCC_OPTIMIZE "-Og -g -ftrapv") # Latest is integer overflow protection
 #SET(GCC_OPTIMIZE "-O2 -DNDEBUG") # RELEASE
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_WARNINGS} ${SANITIZERS} ${GCC_OPTIMIZE}")
 
@@ -28,7 +28,7 @@ add_executable(model_tests model_tests.cpp
         source/model/foreground_entity.cpp
         source/model/movable_entity.cpp
         source/model/handler.cpp
-        source/model/event.cpp)
+        source/model/event.cpp source/model/server_game_model.cpp headers/model/server_game_model.h source/model/playable_tank_handler.cpp headers/model/playable_tank_handler.h)
 
 add_executable(
         menu_tests
@@ -60,7 +60,7 @@ add_executable(
         source/game_environment.cpp
         source/new_game_menu.cpp
         source/levels_menu.cpp
-)
+        source/model/server_game_model.cpp headers/model/server_game_model.h source/model/playable_tank_handler.cpp headers/model/playable_tank_handler.h)
 
 
 target_link_libraries(model_tests sfml-graphics)
