@@ -16,6 +16,10 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_WARNINGS} ${SANITIZERS} ${GCC_OPTI
 SET(COMPILER_FLAGS_FOR_MENU_TESTS "-D MENU_TEST")
 
 find_package(SFML 2.5 COMPONENTS graphics audio REQUIRED)
+find_package(SQLite3 REQUIRED)
+
+link_libraries(sfml-graphics)
+link_libraries(sqlite3)
 
 add_executable(model_tests model_tests.cpp
         source/model/blocks.cpp
@@ -33,6 +37,7 @@ add_executable(model_tests model_tests.cpp
 add_executable(
         menu_tests
         menu_tests.cpp
+        source/database.cpp
         source/menu/menu.cpp
         source/menu/menu_items.cpp
         source/menu/menu_controller.cpp
@@ -46,6 +51,7 @@ add_executable(
         source/menu/menu_controller.cpp
         source/menu/menu.cpp
         source/menu/menu_items.cpp
+        source/menu/users_menu.cpp
         source/menu/main_menu.cpp
         source/menu/new_game_menu.cpp
         source/menu/levels_menu.cpp
@@ -53,6 +59,7 @@ add_executable(
         source/game_controller.cpp
         source/game_environment.cpp
         source/pause.cpp
+        source/database.cpp
         source/view/game_view.cpp
         source/view/tank_view.cpp
         source/view/bullets_view.cpp
@@ -68,8 +75,3 @@ add_executable(
         source/model/movable_entity.cpp
         source/model/handler.cpp
 )
-
-
-target_link_libraries(model_tests sfml-graphics)
-target_link_libraries(menu_tests sfml-graphics)
-target_link_libraries(tanks sfml-graphics)
