@@ -210,3 +210,43 @@ TEST_CASE("Menu animation") {
         checks(menu, window, backgroundSprite, 8);
     }
 }
+
+#include "database.h"
+
+TEST_CASE("Players database") {
+    const std::string tableName = "players";
+    const std::string dbFilename = "../.data/menu_test_" + tableName + "_database.dblite";
+    PlayersDatabase db(dbFilename);
+    db.dropTable(tableName);
+    db.createTable("../.data/pattern_for_" + tableName + ".txt");
+
+    db.insert(PlayersDatabaseFields{"first"});
+    REQUIRE(db.getNumberOfRows(tableName) == 1);
+    db.insert(PlayersDatabaseFields{"second"});
+    REQUIRE(db.getNumberOfRows(tableName) == 2);
+    PlayersDatabaseFields thirdData{"third", 10, 20, 30, 40};
+    db.insert(thirdData);
+    REQUIRE(db.getNumberOfRows(tableName) == 3);
+
+    auto second = db.getInfoByName("second");
+    auto third = db.getInfoByName("third");
+    auto first = db.getInfoByName("first");
+
+    auto check = [](PlayersDatabaseFields &current, PlayersDatabaseFields &correct) {
+        CHECK(current.name == correct.name);
+        CHECK(current.money == correct.money);
+        CHECK(current.tankSpeed == correct.tankSpeed);
+        CHECK(current.bulletSpeed == correct.bulletSpeed);
+        CHECK(current.reloadTicks == correct.reloadTicks);
+    };
+
+    PlayersDatabaseFields correct{"first"};
+
+    check(first, correct);
+
+    correct.name = "second";
+    check(second, correct);
+
+    correct = thirdData;
+    check(third, correct);
+}
