@@ -19,6 +19,10 @@ GameModel &BasicHandler::getModel() const {
     return model_;
 }
 
+BasicHandler::~BasicHandler() {
+    getModel().handlers_.erase(&getEntity());
+}
+
 std::vector<const Entity *> MovableHandler::look(Direction direction) {
     auto res = lookMutable(direction);
     return {res.begin(), res.end()};
@@ -192,7 +196,7 @@ void TankHandler::shoot() {
     getModel().addEntity(std::make_unique<Projectile>(
         getEntity().getLeft() + DCOL.at(tank.getDirection()),
         getEntity().getTop() + DROW.at(tank.getDirection()),
-        tank.getDirection(), getModel(), getModel().getCurrentId()));
+        tank.getDirection(), getModel(), getModel().getIncrId()));
 }
 
 TankHandler::TankHandler(GameModel &model, Tank &entity)
@@ -216,7 +220,7 @@ ProjectileHandler::ProjectileHandler(GameModel &model, MovableEntity &entity)
     : MovableHandler(model, entity) {
 }
 
-bool ProjectileHandler::isBreakOnNextTick() {
+bool ProjectileHandler::breakIfBreakable() {
     auto &bullet = dynamic_cast<Projectile &>(getEntity());
     auto closest = nearest(bullet.getDirection(), [](const Entity *entity) {
         return entity->getStrength() > 0;
@@ -246,7 +250,7 @@ void ProjectileHandler::destroyByBullet(Entity &other) {
     int top = other.getTop();
     getModel().removeEntity(other);
     getModel().addEntity(
-        std::make_unique<Floor>(left, top, getModel().getCurrentId()));
+        std::make_unique<Floor>(left, top, getModel().getIncrId()));
 }
 
 bool ProjectileHandler::isBreakOnCreation() {
@@ -268,6 +272,15 @@ bool ProjectileHandler::isBreakOnCreation() {
     }
 
     return !survive;
+}
+
+void ProjectileHandler::interactOnNextTick() {
+    if (breakIfBreakable()) {
+        return;
+    }
+
+    auto &bullet = dynamic_cast<Projectile &>(getEntity());
+    move(bullet.getDirection(), bullet.getSpeed());
 }
 
 }  // namespace Tanks::model

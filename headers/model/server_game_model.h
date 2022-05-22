@@ -7,24 +7,14 @@
 
 namespace Tanks::model {
 class ServerModel : public GameModel {
-    [[nodiscard]] PlayableTank &spawnPlayableTank(
-        int left,
-        int top,
-        int id,
-        boost::asio::ip::tcp::socket &os);
-    void listen(boost::asio::ip::tcp::socket &client);
-
-protected:
-    void executeEvents() override;
+public:
+    int addPlayer(boost::asio::ip::tcp::socket &ios);
 
 private:
     std::queue<std::unique_ptr<Event>> events_;
 
-public:
-    [[nodiscard]] PlayableTank &
-    spawnPlayableTank(int left, int top, boost::asio::ip::tcp::socket &os);
-
-    int addPlayer(boost::asio::ip::tcp::socket &ios);
+    void listen(boost::asio::ip::tcp::socket &client);
+    void executeAllEvents() override;
 };
 }  // namespace Tanks::model
 

@@ -17,7 +17,6 @@ void GameModel::addEntity(std::unique_ptr<Entity> entity) {
     if (auto *bullet = dynamic_cast<Projectile *>(entity.get())) {
         if (dynamic_cast<ProjectileHandler *>(handlers_[bullet])
                 ->isBreakOnCreation()) {
-            handlers_.erase(bullet);
             return;
         }
     }
@@ -40,7 +39,6 @@ void GameModel::removeEntity(Entity &entity) {
     }
 
     byId_.erase(entity.getId());
-    handlers_.erase(&entity);
     groupedEntities_.erase(entity);
     entityHolder_.remove(entity);
 }
@@ -74,26 +72,26 @@ void GameModel::loadLevel(int level) {
             switch (CHAR_TO_TYPE.at(str[col])) {
                 case (EntityType::BRICK):
                     addEntity(std::make_unique<Brick>(
-                        realCol * TILE_SIZE, row * TILE_SIZE, getCurrentId()));
+                        realCol * TILE_SIZE, row * TILE_SIZE, getIncrId()));
                     break;
                 case (EntityType::FLOOR):
                     addEntity(std::make_unique<Floor>(
-                        realCol * TILE_SIZE, row * TILE_SIZE, getCurrentId()));
+                        realCol * TILE_SIZE, row * TILE_SIZE, getIncrId()));
                     break;
                 case (EntityType::GRASS):
                     break;
                 case (EntityType::STEEL):
                     addEntity(std::make_unique<Steel>(
-                        realCol * TILE_SIZE, row * TILE_SIZE, getCurrentId()));
+                        realCol * TILE_SIZE, row * TILE_SIZE, getIncrId()));
                     break;
                 case (EntityType::WATER):
                     addEntity(std::make_unique<Water>(
-                        realCol * TILE_SIZE, row * TILE_SIZE, getCurrentId()));
+                        realCol * TILE_SIZE, row * TILE_SIZE, getIncrId()));
                     break;
                 default:
                     addEntity(std::make_unique<LevelBorder>(
                         realCol * TILE_SIZE, row * TILE_SIZE,
-                        CHAR_TO_TYPE.at(str[col]), getCurrentId()));
+                        CHAR_TO_TYPE.at(str[col]), getIncrId()));
                     break;
             }
         }
@@ -109,7 +107,9 @@ int GameModel::getHeight() const {
 }
 
 std::optional<std::reference_wrapper<Entity>> GameModel::getById(int entityId) {
-    assert(byId_.count(entityId) != 0);
+    if (byId_.count(entityId) == 0) {
+        return std::nullopt;
+    }
     return *byId_[entityId];
 }
 
@@ -133,7 +133,8 @@ std::vector<std::vector<const Entity *>> GameModel::getAll() {
 
 void GameModel::nextTick() {
     // TODO lock model
-    executeEvents();
+    executeAllEvents();
+    moveBullets();
     currentTick_++;
 }
 
@@ -145,4 +146,26 @@ const std::vector<std::vector<Entity *>> &GameModel::getAllByLink() {
     return groupedEntities_.getAllByLink();
 }
 
+void GameModel::executeEvent(Event &event) {
+    event.acceptExecutor(EventExecutor(*this));
+}
+
+void GameModel::moveBullets() {
+    for (auto *entity :
+         getAllByLink()[static_cast<unsigned>(EntityType::BULLET)]) {
+        auto *bullet = dynamic_cast<Projectile *>(entity);
+        assert(bullet != nullptr);
+
+        dynamic_cast<ProjectileHandler &>(getHandler(*bullet))
+            .interactOnNextTick();
+    }
+}
+
+int GameModel::getIncrId() {
+    return currentId_++;
+}
+
+GameMap &GameModel::getMap() {
+    return map_;
+}
 }  // namespace Tanks::model

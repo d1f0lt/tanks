@@ -19,7 +19,7 @@ public:
     BasicHandler &operator=(const BasicHandler &) = delete;
     BasicHandler &operator=(BasicHandler &&) = delete;
 
-    virtual ~BasicHandler() = default;
+    virtual ~BasicHandler();
 
 protected:
     [[nodiscard]] Entity &getEntity() const;
@@ -91,7 +91,9 @@ class ProjectileHandler : public MovableHandler {
 public:
     explicit ProjectileHandler(GameModel &model, MovableEntity &entity);
 
-    [[nodiscard]] bool isBreakOnNextTick();
+    void interactOnNextTick();
+
+    [[nodiscard]] bool breakIfBreakable();
     [[nodiscard]] bool isBreakOnCreation();
 
 protected:

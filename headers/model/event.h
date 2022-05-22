@@ -6,30 +6,30 @@
 #include <iosfwd>
 #include <memory>
 #include "model/entity.h"
+#include "model/event_executor.h"
 
 namespace Tanks::model {
-enum class EventType { TANK_MOVE = 1 };
+using boost::asio::ip::tcp;
+
+enum class EventType { TANK_MOVE = 1, SPAWN_TANK = 2 };
 
 class Event {
 public:
     virtual ~Event() = default;
 
-    virtual void acceptExecutor() = 0;
-    virtual void sendTo(boost::asio::ip::tcp::socket &os) = 0;
+    virtual void acceptExecutor(const EventExecutor &executor) = 0;
+    virtual void sendTo(tcp::socket &os) = 0;
 };
 
 class TankMove : public Event {
 public:
     explicit TankMove(int id, Direction direction, int speed);
 
-    void acceptExecutor() final;
-    void sendTo(boost::asio::ip::tcp::socket &os) override;
-    static void sendTo(boost::asio::ip::tcp::socket &os,
-                       int id,
-                       Direction direction,
-                       int speed);
+    void acceptExecutor(const EventExecutor &executor) final;
+    void sendTo(tcp::socket &os) override;
+    static void sendTo(tcp::socket &os, int id, Direction direction, int speed);
 
-    static std::unique_ptr<Event> readFrom(boost::asio::ip::tcp::socket &is);
+    static std::unique_ptr<Event> readFrom(tcp::socket &is);
 
     [[nodiscard]] int getId() const;
     [[nodiscard]] Direction getDirection() const;
@@ -41,7 +41,26 @@ private:
     const int speed_;
 };
 
-std::unique_ptr<Event> readEvent(boost::asio::ip::tcp::socket &is);
+class SpawnTank : public Event {
+public:
+    explicit SpawnTank(int tankId, Direction direction, int type);
+    void sendTo(tcp::socket &os) override;
+    void acceptExecutor(const EventExecutor &executor) override;
+
+    static void sendTo(tcp::socket &os,
+                       int tankId,
+                       Direction direction,
+                       int type);
+
+    [[nodiscard]] static std::unique_ptr<Event> readFrom(tcp::socket &socket);
+
+private:
+    const int tankId_;
+    const Direction direction_;
+    const int type_;
+};
+
+std::unique_ptr<Event> readEvent(tcp::socket &is);
 
 // class BonusSpawn : public Event {
 // public:

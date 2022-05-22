@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include "entity_holder.h"
 #include "model/event.h"
+#include "model/event_executor.h"
 #include "model/game_map.h"
 #include "model/grouped_entities.h"
 #include "model/handler.h"
@@ -13,6 +14,8 @@
 
 namespace Tanks::model {
 class GameModel {
+    friend EventExecutor;
+
     friend BasicHandler;
     friend ForegroundHandler;
     friend MovableHandler;
@@ -40,28 +43,30 @@ public:
     [[nodiscard]] int getTick() const;
 
 protected:
-    virtual void executeEvents() = 0;
+    void addEntity(std::unique_ptr<Entity> entity);
+    void removeEntity(Entity &entity);
+
+    virtual void executeAllEvents() = 0;
+    void executeEvent(Event &event);
+
+    void moveBullets();
 
     [[nodiscard]] BasicHandler &getHandler(Entity &entity);
 
     [[nodiscard]] const std::vector<std::vector<Entity *>> &getAllByLink();
 
+    [[nodiscard]] int getIncrId();
+
+    [[nodiscard]] GameMap &getMap();
+
 private:
+    GameMap map_;
     GroupedEntities groupedEntities_;
-    EntityHolder entityHolder_;
     std::unordered_map<int, Entity *> byId_;
     std::unordered_map<Entity *, BasicHandler *> handlers_;
     int currentTick_ = 0;
     int currentId_ = 0;
-
-protected:
-    void addEntity(std::unique_ptr<Entity> entity);
-    void removeEntity(Entity &entity);
-    [[nodiscard]] int getCurrentId() {
-        return currentId_++;
-    }
-
-    GameMap map_;
+    EntityHolder entityHolder_;
 };
 
 }  // namespace Tanks::model

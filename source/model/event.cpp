@@ -47,8 +47,8 @@ TankMove::TankMove(int id, Direction direction, int speed)
     : id_(id), direction_(direction), speed_(speed) {
 }
 
-void TankMove::acceptExecutor() {
-    return;
+void TankMove::acceptExecutor(const EventExecutor &executor) {
+    executor.execute(*this);
 }
 
 int TankMove::getId() const {
@@ -74,11 +74,38 @@ std::unique_ptr<Event> readEvent(boost::asio::ip::tcp::socket &is) {
                                               boost::asio::ip::tcp::socket &)>
                 tmp;
             tmp[EventType::TANK_MOVE] = TankMove::readFrom;
+            tmp[EventType::SPAWN_TANK] = SpawnTank::readFrom;
             return tmp;
         }();
 
     auto type = static_cast<EventType>(readInt(is));
     return readers.at(type)(is);
 };
+
+SpawnTank::SpawnTank(int tankId, Direction direction, int type)
+    : tankId_(tankId), direction_(direction), type_(type) {
+}
+
+void SpawnTank::sendTo(boost::asio::ip::tcp::socket &os) {
+    SpawnTank::sendTo(os, tankId_, direction_, type_);
+}
+
+void SpawnTank::acceptExecutor(const EventExecutor &executor) {
+}
+void SpawnTank::sendTo(boost::asio::ip::tcp::socket &os,
+                       int tankId,
+                       Direction direction,
+                       int type) {
+    writeInt(os, tankId);
+    writeInt(os, direction);
+    writeInt(os, type);
+}
+
+std::unique_ptr<Event> SpawnTank::readFrom(tcp::socket &socket) {
+    auto tankId = readInt(socket);
+    auto direction = static_cast<Direction>(readInt(socket));
+    auto type = readInt(socket);
+    return std::make_unique<SpawnTank>(tankId, direction, type);
+}
 
 }  // namespace Tanks::model
