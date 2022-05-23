@@ -1,4 +1,5 @@
 #include "model/foreground_entity.h"
+#include "model/handler.h"
 
 namespace Tanks::model {
 

@@ -3,20 +3,22 @@
 
 #include <boost/asio/ip/tcp.hpp>
 #include "model/handler.h"
+#include "model/playable_tank_handler_fwd.h"
 
 namespace Tanks::model {
+using boost::asio::ip::tcp;
 
-class PlayableTankHandler : public TankHandler {
+class PlayerActionsHandler {
 public:
-    explicit PlayableTankHandler(GameModel &model,
-                                 PlayableTank &tank,
-                                 boost::asio::ip::tcp::socket &os);
+    explicit PlayerActionsHandler(int id, tcp::socket &socket);
 
-    void sendMove(Direction direction, int speed);
+    void move(Direction direction, int speed);
 
 private:
-    boost::asio::ip::tcp::socket &os_;
+    const int id_;
+    tcp::socket &socket_;
 };
+
 }  // namespace Tanks::model
 
 #endif  // TANKS_PLAYABLE_TANK_HANDLER_H

@@ -14,6 +14,8 @@ private:
 public:
     void execute(TankMove &event) const;
 
+    void execute(SpawnTank &event) const;
+
 protected:
     [[nodiscard]] GameModel &getModel() const;
 

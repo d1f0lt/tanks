@@ -3,13 +3,12 @@
 #include "model/playable-tank.h"
 
 namespace Tanks::model {
-PlayableTankHandler::PlayableTankHandler(GameModel &model,
-                                         PlayableTank &tank,
-                                         boost::asio::ip::tcp::socket &os)
-    : TankHandler(model, tank), os_(os) {
+PlayerActionsHandler::PlayerActionsHandler(int id, tcp::socket &socket)
+    : id_(id), socket_(socket) {
 }
 
-void PlayableTankHandler::sendMove(Direction direction, int speed) {
-    TankMove::sendTo(os_, getEntity().getId(), direction, speed);
+void PlayerActionsHandler::move(Direction direction, int speed) {
+    TankMove::sendTo(socket_, id_, direction, speed);
 }
+
 }  // namespace Tanks::model

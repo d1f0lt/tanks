@@ -1,6 +1,7 @@
 #ifndef TANKS_PROJECTILE_H
 #define TANKS_PROJECTILE_H
 
+#include "game_model_fwd.h"
 #include "movable_entity.h"
 
 namespace Tanks::model {

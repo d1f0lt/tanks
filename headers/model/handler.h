@@ -2,7 +2,7 @@
 #define TANKS_HANDLER_H
 
 #include <climits>
-#include <ostream>
+#include <memory>
 #include <vector>
 #include "constants.h"
 #include "model/entities_fwd.h"

@@ -1,6 +1,7 @@
 #ifndef TANKS_TANK_H
 #define TANKS_TANK_H
 
+#include "game_model.h"
 #include "movable_entity.h"
 
 namespace Tanks::model {
@@ -13,13 +14,8 @@ public:
                   Direction direction,
                   int speed);
 
-    [[nodiscard]] int getWidth() const override;
-    [[nodiscard]] int getHeight() const override;
-
-    [[nodiscard]] int getStrength() const override;
-    [[nodiscard]] EntityType getType() const override;
-    [[nodiscard]] int getSpeed() const override;
     [[nodiscard]] bool canPass(const Entity &other) const override;
+    [[nodiscard]] int getSpeed() const final;
 
 protected:
     void shoot();
@@ -28,7 +24,21 @@ private:
     int speed_ = -1;
 };
 
-class BotTank : public Tank {};
+class MediumTank : public Tank {
+public:
+    explicit MediumTank(int left,
+                        int top,
+                        int entityId,
+                        GameModel& model,
+                        Direction direction,
+                        int speed);
+
+    [[nodiscard]] int getWidth() const override;
+    [[nodiscard]] int getHeight() const override;
+
+    [[nodiscard]] int getStrength() const override;
+    [[nodiscard]] EntityType getType() const override;
+};
 
 }  // namespace Tanks::model
 

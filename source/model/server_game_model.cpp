@@ -3,7 +3,18 @@
 #include "model/projectile.h"
 
 namespace Tanks::model {
-void ServerModel::listen(boost::asio::ip::tcp::socket &client) {
+using boost::asio::ip::tcp;
+
+int ServerModel::addPlayer(tcp::socket &socket) {
+    int id = getIncrId();
+    events_.emplace(
+        std::make_unique<SpawnTank>(id, TILE_SIZE, TILE_SIZE, Direction::LEFT));
+    //    auto &tank = spawnPlayableTank(TILE_SIZE, TILE_SIZE, id, socket);
+    std::thread([&]() { receiveTurns(socket); }).detach();
+    return id;
+}
+
+void ServerModel::receiveTurns(tcp::socket &client) {
     try {
         while (true) {
             auto event = readEvent(client);
@@ -18,14 +29,6 @@ void ServerModel::listen(boost::asio::ip::tcp::socket &client) {
     }
 }
 
-int ServerModel::addPlayer(boost::asio::ip::tcp::socket &ios) {
-    int id = getIncrId();
-//    events_.emplace(SpawnTank(id));
-    //    auto &tank = spawnPlayableTank(TILE_SIZE, TILE_SIZE, id, ios);
-    std::thread([&]() { listen(ios); }).detach();
-    return id;
-}
-
 void ServerModel::executeAllEvents() {
     while (!events_.empty()) {
         auto event = std::move(events_.front());
@@ -35,7 +38,7 @@ void ServerModel::executeAllEvents() {
 
     for (auto *entity :
          getAllByLink()[static_cast<unsigned>(EntityType::BOT_TANK)]) {
-        auto *tank = dynamic_cast<BotTank *>(entity);
+        auto *tank = dynamic_cast<Tank *>(entity);
         assert(tank != nullptr);
         dynamic_cast<MovableHandler &>(getHandler(*tank))
             .move(tank->getDirection(), tank->getSpeed());

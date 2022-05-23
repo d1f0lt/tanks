@@ -1,5 +1,6 @@
 #include "model/projectile.h"
 #include "constants.h"
+#include "model/handler.h"
 
 namespace Tanks::model {
 

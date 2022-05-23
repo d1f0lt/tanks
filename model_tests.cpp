@@ -52,7 +52,7 @@ TEST_CASE("Single move and checking background") {
 
     //    tcp::iostream ios(std::move(s));
     int id = model.addPlayer(s);
-    auto &real_tank = dynamic_cast<PlayableTank &>(model.getById(id)->get());
+    auto &real_tank = dynamic_cast<Tank &>(model.getById(id)->get());
 
     CHECK(real_tank.getLeft() == TILE_SIZE);
     CHECK(real_tank.getTop() == TILE_SIZE);
@@ -65,7 +65,7 @@ TEST_CASE("Single move and checking background") {
         }
     }
 
-    real_tank.move(Tanks::model::Direction::DOWN, real_tank.getSpeed());
+//    real_tank.move(Tanks::model::Direction::DOWN, real_tank.getSpeed());
     Tanks::model::Entity &ptr2 = model.getByCoords(TILE_SIZE, TILE_SIZE);
     model.nextTick();
 

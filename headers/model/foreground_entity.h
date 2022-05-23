@@ -4,7 +4,7 @@
 #include <memory>
 #include <vector>
 #include "entity.h"
-#include "model/handler.h"
+#include "model/handler_fwd.h"
 
 namespace Tanks::model {
 class ForegroundEntity : public Entity {

@@ -66,7 +66,7 @@ void TankMove::sendTo(boost::asio::ip::tcp::socket &os) {
     TankMove::sendTo(os, id_, direction_, speed_);
 }
 
-std::unique_ptr<Event> readEvent(boost::asio::ip::tcp::socket &is) {
+std::unique_ptr<Event> readEvent(boost::asio::ip::tcp::socket &socket) {
     const std::unordered_map<EventType, std::unique_ptr<Event> (*)(
                                             boost::asio::ip::tcp::socket &)>
         readers = []() {
@@ -78,34 +78,53 @@ std::unique_ptr<Event> readEvent(boost::asio::ip::tcp::socket &is) {
             return tmp;
         }();
 
-    auto type = static_cast<EventType>(readInt(is));
-    return readers.at(type)(is);
+    auto type = static_cast<EventType>(readInt(socket));
+    return readers.at(type)(socket);
 };
 
-SpawnTank::SpawnTank(int tankId, Direction direction, int type)
-    : tankId_(tankId), direction_(direction), type_(type) {
-}
-
-void SpawnTank::sendTo(boost::asio::ip::tcp::socket &os) {
-    SpawnTank::sendTo(os, tankId_, direction_, type_);
+void SpawnTank::sendTo(boost::asio::ip::tcp::socket &socket) {
+    SpawnTank::sendTo(socket, tankId_, left_, top_, direction_);
 }
 
 void SpawnTank::acceptExecutor(const EventExecutor &executor) {
+    executor.execute(*this);
 }
-void SpawnTank::sendTo(boost::asio::ip::tcp::socket &os,
+
+void SpawnTank::sendTo(boost::asio::ip::tcp::socket &socket,
                        int tankId,
-                       Direction direction,
-                       int type) {
-    writeInt(os, tankId);
-    writeInt(os, direction);
-    writeInt(os, type);
+                       int left,
+                       int top,
+                       Direction direction) {
+    writeInt(socket, tankId);
+    writeInt(socket, left);
+    writeInt(socket, top);
+    writeInt(socket, direction);
 }
 
 std::unique_ptr<Event> SpawnTank::readFrom(tcp::socket &socket) {
     auto tankId = readInt(socket);
+    auto left = readInt(socket);
+    auto top = readInt(socket);
     auto direction = static_cast<Direction>(readInt(socket));
-    auto type = readInt(socket);
-    return std::make_unique<SpawnTank>(tankId, direction, type);
+    return std::make_unique<SpawnTank>(tankId, left, top, direction);
+}
+
+SpawnTank::SpawnTank(int tankId, int left, int top, Direction direction)
+    : tankId_(tankId), left_(left), top_(top), direction_(direction) {
+}
+int SpawnTank::getTankId() const {
+    return tankId_;
+}
+int SpawnTank::getLeft() const {
+    return left_;
+}
+
+int SpawnTank::getTop() const {
+    return top_;
+}
+
+Direction SpawnTank::getDirection() const {
+    return direction_;
 }
 
 }  // namespace Tanks::model

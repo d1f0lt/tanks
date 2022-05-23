@@ -20,4 +20,10 @@ void EventExecutor::execute(TankMove &event) const {
     dynamic_cast<TankHandler &>(model.getHandler(*tank))
         .move(event.getDirection(), event.getSpeed());
 }
+
+void EventExecutor::execute(SpawnTank &event) const {
+    getModel().addEntity(std::make_unique<MediumTank>(
+        event.getLeft(), event.getTop(), event.getTankId(), getModel(),
+        event.getDirection(), DEFAULT_TANK_SPEED));
+}
 }  // namespace Tanks::model

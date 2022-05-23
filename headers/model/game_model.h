@@ -1,8 +1,10 @@
 #ifndef TANKS_GAME_MODEL_H
 #define TANKS_GAME_MODEL_H
 
+#include <chrono>
 #include <optional>
 #include <queue>
+#include <random>
 #include <unordered_map>
 #include "entity_holder.h"
 #include "model/event.h"
@@ -13,8 +15,11 @@
 #include "model/playable-tank.h"
 
 namespace Tanks::model {
+class Spawner;  // Todo spawner fwd
+
 class GameModel {
     friend EventExecutor;
+    friend Spawner;
 
     friend BasicHandler;
     friend ForegroundHandler;
@@ -59,6 +64,8 @@ protected:
 
     [[nodiscard]] GameMap &getMap();
 
+    int getRnd();
+
 private:
     GameMap map_;
     GroupedEntities groupedEntities_;
@@ -66,6 +73,7 @@ private:
     std::unordered_map<Entity *, BasicHandler *> handlers_;
     int currentTick_ = 0;
     int currentId_ = 0;
+    std::mt19937 rnd{42};
     EntityHolder entityHolder_;
 };
 

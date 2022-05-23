@@ -43,24 +43,32 @@ private:
 
 class SpawnTank : public Event {
 public:
-    explicit SpawnTank(int tankId, Direction direction, int type);
-    void sendTo(tcp::socket &os) override;
+    explicit SpawnTank(int tankId, int left, int top, Direction direction);
+
+    void sendTo(tcp::socket &socket) override;
     void acceptExecutor(const EventExecutor &executor) override;
 
-    static void sendTo(tcp::socket &os,
+    static void sendTo(tcp::socket &socket,
                        int tankId,
-                       Direction direction,
-                       int type);
+                       int left,
+                       int top,
+                       Direction direction);
 
     [[nodiscard]] static std::unique_ptr<Event> readFrom(tcp::socket &socket);
 
+    int getTankId() const;
+    int getLeft() const;
+    int getTop() const;
+    Direction getDirection() const;
+
 private:
     const int tankId_;
+    const int left_;
+    const int top_;
     const Direction direction_;
-    const int type_;
 };
 
-std::unique_ptr<Event> readEvent(tcp::socket &is);
+std::unique_ptr<Event> readEvent(tcp::socket &socket);
 
 // class BonusSpawn : public Event {
 // public:

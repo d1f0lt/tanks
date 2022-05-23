@@ -4,6 +4,7 @@
 namespace Tanks::model {
 class Event;
 class TankMove;
+class SpawnTank;
 }  // namespace Tanks::model
 
 #endif  // TANKS_EVENT_FWD_H

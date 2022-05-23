@@ -168,4 +168,8 @@ int GameModel::getIncrId() {
 GameMap &GameModel::getMap() {
     return map_;
 }
+
+int GameModel::getRnd() {
+    return static_cast<int>(rnd());
+}
 }  // namespace Tanks::model

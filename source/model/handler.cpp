@@ -37,7 +37,7 @@ void ForegroundHandler::restoreBackground() {
                 continue;
             }
             restored.insert(background_[row][col]);
-            getModel().map_.insert(*background_[row][col]);
+            getModel().getMap().insert(*background_[row][col]);
             background_[row][col] = nullptr;
         }
     }
