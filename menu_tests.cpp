@@ -142,7 +142,8 @@ TEST_CASE("Menu animation") {
     SUBCASE("construct from buttons") {
         auto menu = ([]() {
             const static sf::Color textColor;
-            const static auto menuWidth = static_cast<size_t>(Tanks::WINDOW_WIDTH / 3.4);
+            const static auto menuWidth =
+                static_cast<size_t>(Tanks::WINDOW_WIDTH / 3.4);
 
             // title
             const static std::string titleText = "JUST TANKS";
@@ -163,13 +164,13 @@ TEST_CASE("Menu animation") {
             buttons.reserve(buttonTypes.size());
             inscriptions.reserve(buttonTypes.size());
             for (auto type : buttonTypes) {
-                buttons.emplace_back(
-                    ButtonWithType(type, sf::Vector2<float>(menuWidth, buttonsHeight),
-                                   btnStandardColor, btnHoverColor));
+                buttons.emplace_back(ButtonWithType(
+                    type, sf::Vector2<float>(menuWidth, buttonsHeight),
+                    btnStandardColor, btnHoverColor));
                 InscriptionInfo info{convertButtonTypeToString(type),
                                      inscriptionsCharacterSize, textColor};
-                auto item =
-                    std::make_unique<MenuInscription>(info, sf::Vector2<float>{0, 0});
+                auto item = std::make_unique<MenuInscription>(
+                    info, sf::Vector2<float>{0, 0});
                 inscriptions.emplace_back(std::move(item));
             }
 
@@ -230,7 +231,8 @@ TEST_CASE("Players database") {
     REQUIRE(db.getNumberOfRows(tableName) == 1);
     db.insert(PlayerInfo{PlayerGeneral{"second"}, {}, {}});
     REQUIRE(db.getNumberOfRows(tableName) == 2);
-    PlayerInfo thirdData{PlayerGeneral{"third", 10}, PlayerSkills{10, 20, 30}, PlayerSettings{40, 50}};
+    PlayerInfo thirdData{PlayerGeneral{"third", 10}, PlayerSkills{10, 20, 30},
+                         PlayerSettings{40, 50}};
     db.insert(thirdData);
     REQUIRE(db.getNumberOfRows(tableName) == 3);
 
