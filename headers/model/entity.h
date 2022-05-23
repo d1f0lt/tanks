@@ -4,7 +4,7 @@
 #include <SFML/Graphics/Rect.hpp>
 
 namespace Tanks::model {
-enum class Direction { UP, RIGHT, DOWN, LEFT };
+enum class Direction { UP = 0, RIGHT = 1, DOWN = 2, LEFT = 3 };
 
 enum class EntityType {
     LEFT_UP_CORNER,

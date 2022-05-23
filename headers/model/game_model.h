@@ -5,6 +5,7 @@
 #include <optional>
 #include <queue>
 #include <random>
+#include <shared_mutex>
 #include <unordered_map>
 #include "entity_holder.h"
 #include "model/event.h"
@@ -64,7 +65,9 @@ protected:
 
     [[nodiscard]] GameMap &getMap();
 
-    int getRnd();
+    [[nodiscard]] int getRnd();
+
+    [[nodiscard]] std::shared_mutex &getMutex() const;
 
 private:
     GameMap map_;
@@ -75,6 +78,7 @@ private:
     int currentId_ = 0;
     std::mt19937 rnd{42};
     EntityHolder entityHolder_;
+    mutable std::shared_mutex sharedMutex_;
 };
 
 }  // namespace Tanks::model

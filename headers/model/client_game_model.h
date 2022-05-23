@@ -13,6 +13,9 @@ public:
 
     [[nodiscard]] PlayerActionsHandler getHandler();
 
+protected:
+    void executeAllEvents() override;
+
 private:
     const int playerId_;
     tcp::socket socket_;

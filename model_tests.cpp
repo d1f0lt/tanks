@@ -1,14 +1,11 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
 #include <array>
-#include <cassert>
-#include <random>
-#include <sstream>
 #include <thread>
 #include "boost/asio.hpp"
 #include "doctest.h"
 #include "model/blocks.h"
-#include "model/projectile.h"
+#include "model/client_game_model.h"
 #include "model/server_game_model.h"
 
 using namespace Tanks;
@@ -28,31 +25,27 @@ TEST_CASE("Game creation") {
 }
 
 TEST_CASE("Single move and checking background") {
-    Tanks::model::ServerModel model;
-    model.loadLevel(1);
-    Tanks::model::Entity *brick00 = &model.getByCoords(TILE_SIZE, TILE_SIZE);
+    Tanks::model::ServerModel serverModel;
+    serverModel.loadLevel(1);
+    Tanks::model::Entity *brick00 =
+        &serverModel.getByCoords(TILE_SIZE, TILE_SIZE);
 
     boost::asio::io_context io_context;
-    constexpr int port = 23456;
-    std::thread([&]() {
-        tcp::acceptor acceptor(io_context, tcp::endpoint(tcp::v4(), port));
-        while (true) {
-            tcp::socket s = acceptor.accept();
-            while (true) {
-                std::this_thread::sleep_for(std::chrono::seconds(1000));
-            }
-        }
-    }).detach();
+    tcp::acceptor acceptor(io_context, tcp::endpoint(tcp::v4(), 0));
+    tcp::socket server(io_context);
+    auto connection = std::thread([&]() { server = acceptor.accept(); });
 
-    //    boost::asio::io_context io_context;
-    tcp::socket s(io_context);
+    tcp::socket client(io_context);
     boost::asio::connect(
-        s, tcp::resolver(io_context).resolve("localhost", "23456"));
-    //    tcp::iostream ios(std::move(s));
+        client, tcp::resolver(io_context).resolve(acceptor.local_endpoint()));
+    connection.join();
 
-    //    tcp::iostream ios(std::move(s));
-    int id = model.addPlayer(s);
-    auto &real_tank = dynamic_cast<Tank &>(model.getById(id)->get());
+    int id = serverModel.addPlayer(server);
+
+    ClientModel clientModel(id, std::move(client));
+
+    serverModel.nextTick();
+    auto &real_tank = dynamic_cast<Tank &>(serverModel.getById(id)->get());
 
     CHECK(real_tank.getLeft() == TILE_SIZE);
     CHECK(real_tank.getTop() == TILE_SIZE);
@@ -65,12 +58,17 @@ TEST_CASE("Single move and checking background") {
         }
     }
 
-//    real_tank.move(Tanks::model::Direction::DOWN, real_tank.getSpeed());
-    Tanks::model::Entity &ptr2 = model.getByCoords(TILE_SIZE, TILE_SIZE);
-    model.nextTick();
+    auto controller = clientModel.getHandler();
+
+    controller.move(Tanks::model::Direction::DOWN, real_tank.getSpeed());
+
+    //        real_tank.move(Tanks::serverModel::Direction::DOWN,
+    //        real_tank.getSpeed());
+    Tanks::model::Entity &ptr2 = serverModel.getByCoords(TILE_SIZE, TILE_SIZE);
+    serverModel.nextTick();
 
     CHECK(real_tank.getTop() == TILE_SIZE + real_tank.getSpeed());
-    CHECK(brick00 == &model.getByCoords(TILE_SIZE, TILE_SIZE));
+    CHECK(brick00 == &serverModel.getByCoords(TILE_SIZE, TILE_SIZE));
 }
 
 /*

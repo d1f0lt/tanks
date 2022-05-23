@@ -30,17 +30,28 @@ std::vector<const Entity *> MovableHandler::look(Direction direction) {
 
 void ForegroundHandler::restoreBackground() {
     std::unordered_set<Entity *> restored;
-    for (int row = 0; row < getEntity().getHeight(); row++) {
-        for (int col = 0; col < getEntity().getWidth(); col++) {
-            if (restored.count(background_[row][col]) != 0) {
-                background_[row][col] = nullptr;
+    for (auto &row : background_) {
+        for (auto *entity : row) {
+            if (restored.count(entity) != 0) {
                 continue;
             }
-            restored.insert(background_[row][col]);
-            getModel().getMap().insert(*background_[row][col]);
-            background_[row][col] = nullptr;
+            restored.insert(entity);
+            getModel().getMap().insert(*entity);
         }
+        row.clear();
     }
+    background_.clear();
+    //    for (int row = 0; row < getEntity().getHeight(); row++) {
+    //        for (int col = 0; col < getEntity().getWidth(); col++) {
+    //            if (restored.count(background_[row][col]) != 0) {
+    //                background_[row][col] = nullptr;
+    //                continue;
+    //            }
+    //            restored.insert(background_[row][col]);
+    //            getModel().getMap().insert(*background_[row][col]);
+    //            background_[row][col] = nullptr;
+    //        }
+    //    }
 }
 
 void ForegroundHandler::setBackground() {

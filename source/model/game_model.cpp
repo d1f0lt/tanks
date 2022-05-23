@@ -2,6 +2,7 @@
 #include <cassert>
 #include <fstream>
 #include <iostream>
+#include <mutex>
 #include <optional>
 #include <thread>
 #include <unordered_map>
@@ -132,6 +133,8 @@ std::vector<std::vector<const Entity *>> GameModel::getAll() {
 }
 
 void GameModel::nextTick() {
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    std::unique_lock lock(getMutex());
     // TODO lock model
     executeAllEvents();
     moveBullets();
@@ -172,4 +175,9 @@ GameMap &GameModel::getMap() {
 int GameModel::getRnd() {
     return static_cast<int>(rnd());
 }
+
+std::shared_mutex &GameModel::getMutex() const {
+    return sharedMutex_;
+}
+
 }  // namespace Tanks::model
