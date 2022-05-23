@@ -71,5 +71,6 @@ jobs:
       - run: cmake --build . --verbose ${{matrix.compiler.cmake-build-flags}} ${{matrix.sanitize.cmake-build-flags}}
       - working-directory: ./bin
         run: ${{matrix.sanitize.run-prefix}} ./model_tests
-      - run: ${{matrix.sanitize.run-prefix}} ./menu_tests
+      - working-directory: ./bin
+        run: ${{matrix.sanitize.run-prefix}} ./menu_tests
  
