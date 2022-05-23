@@ -33,8 +33,10 @@ Menu initMenu() {
         buttons.emplace_back(
             ButtonWithType{type, sf::Vector2<float>(menuWidth, buttonsHeight),
                            btnStandardColor, btnHoverColor});
-        InscriptionInfo info{convertButtonTypeToString(type), inscriptionsCharacterSize, textColor};
-        auto item = std::make_unique<MenuInscription>(info, sf::Vector2<float>{0, 0});
+        InscriptionInfo info{convertButtonTypeToString(type),
+                             inscriptionsCharacterSize, textColor};
+        auto item =
+            std::make_unique<MenuInscription>(info, sf::Vector2<float>{0, 0});
         inscriptions.emplace_back(std::move(item));
     }
 

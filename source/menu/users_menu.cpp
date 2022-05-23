@@ -1,9 +1,9 @@
 #include "menu/users_menu.h"
-#include "menu/menu.h"
-#include "database.h"
-#include "menu/main_menu.h"
 #include <cassert>
 #include <memory>
+#include "database.h"
+#include "menu/main_menu.h"
+#include "menu/menu.h"
 
 namespace Tanks::Menu {
 
@@ -11,7 +11,7 @@ namespace {
 
 PlayersDatabase initDatabase() {
     const static std::string path = "../.data/";
-    PlayersDatabase db(path); // NOLINT
+    PlayersDatabase db(path);  // NOLINT
     return db;
 }
 
@@ -27,7 +27,7 @@ sf::Sprite initBackground(const std::string &imagesPath) {
     return backgroundSprite;
 }
 
-Menu initMenu(PlayersDatabase &db, const std::string &imagesPath) { // NOLINT
+Menu initMenu(PlayersDatabase &db, const std::string &imagesPath) {  // NOLINT
     const static sf::Color textColor{63, 87, 210};
     const static auto menuWidth = static_cast<size_t>(WINDOW_WIDTH / 3.4);
 
@@ -49,26 +49,30 @@ Menu initMenu(PlayersDatabase &db, const std::string &imagesPath) { // NOLINT
     buttons.reserve(usernames.size());
     items.reserve(usernames.size());
     for (const auto &name : usernames) {
-        buttons.emplace_back(
-            ButtonWithType(ButtonType::USER, sf::Vector2<float>(menuWidth, buttonsHeight),
-                           btnStandardColor, btnHoverColor));
+        buttons.emplace_back(ButtonWithType(
+            ButtonType::USER, sf::Vector2<float>(menuWidth, buttonsHeight),
+            btnStandardColor, btnHoverColor));
         InscriptionInfo info{name, inscriptionsCharacterSize, textColor};
-        auto inscription = std::make_unique<MenuInscription>(info, sf::Vector2<float>{0, 0});
+        auto inscription =
+            std::make_unique<MenuInscription>(info, sf::Vector2<float>{0, 0});
         items.emplace_back(std::move(inscription));
     }
     if (items.size() < 6) {
-        buttons.emplace_back(ButtonWithType(ButtonType::NEW_USER, sf::Vector2<float>(menuWidth, buttonsHeight), btnStandardColor, btnHoverColor));
-        auto picture = std::make_unique<MenuPicture>(imagesPath + "plus.png", sf::Vector2<float>(0, 0));
+        buttons.emplace_back(ButtonWithType(
+            ButtonType::NEW_USER, sf::Vector2<float>(menuWidth, buttonsHeight),
+            btnStandardColor, btnHoverColor));
+        auto picture = std::make_unique<MenuPicture>(imagesPath + "plus.png",
+                                                     sf::Vector2<float>(0, 0));
         items.emplace_back(std::move(picture));
     }
 
     return Menu(menuWidth, title, items, buttons);
 }
 
-}
+}  // namespace
 
 void showUsersMenu(sf::RenderWindow &window) {
-    PlayersDatabase db(initDatabase()); // NOLINT
+    PlayersDatabase db(initDatabase());  // NOLINT
 
     const static std::string imagesPath = "../images/menu/";
     sf::Sprite backgroundSprite(initBackground(imagesPath));
@@ -99,8 +103,6 @@ void showUsersMenu(sf::RenderWindow &window) {
                 assert(false);
         }
     }
-
 }
 
-}
-
+}  // namespace Tanks::Menu

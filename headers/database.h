@@ -4,8 +4,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "sqlite3.h"
 #include "constants.h"
+#include "sqlite3.h"
 
 namespace Tanks {
 
@@ -26,15 +26,15 @@ public:
     void exec(const std::string &request);
 
     void createTable(const std::string &patternFilename);
-    [[maybe_unused]] void dropTable(const std::string &patternFilename);
+    [[maybe_unused]] void dropTable(const std::string &tableName);
 
-    [[nodiscard]] int getNumberOfRows(const std::string &patternFilename) const;
+    [[nodiscard]] int getNumberOfRows(const std::string &tableName) const;
 
     void disconnectFromDatabase();
 
 protected:
-    sqlite3 *db = nullptr; // NOLINT
-    sqlite3_stmt *stmt = nullptr; // NOLINT
+    sqlite3 *db = nullptr;         // NOLINT
+    sqlite3_stmt *stmt = nullptr;  // NOLINT
 
     void connectToDatabase(const std::string &filename);
 };
@@ -84,8 +84,8 @@ private:
     PlayerSkills getSkillsInfoByName(const std::string &username);
 };
 
-}
+}  // namespace Menu
 
-}
+}  // namespace Tanks
 
 #endif

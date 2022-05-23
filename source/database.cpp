@@ -13,7 +13,7 @@ Database::~Database() {
 }
 
 void Database::exec(const std::string &request) {
-    char *err = nullptr;
+    char *err = nullptr;  // NOLINT
     if (sqlite3_exec(db, request.c_str(), nullptr, nullptr, &err) !=
         SQLITE_OK) {
         std::string errMsg(err);
@@ -36,14 +36,14 @@ static int callback(void *count,
                     char **argv,
                     [[maybe_unused]] char **azColName) {
     int *c = static_cast<int *>(count);
-    *c = atoi(argv[0]);
+    *c = atoi(*argv);
     return 0;
 }
 // NOLINTEND
 
 int Database::getNumberOfRows(const std::string &tableName) const {
     int count = 0;
-    char *err = nullptr;
+    char *err = nullptr;  // NOLINT
     if (sqlite3_exec(db, ("select count(*) from " + tableName).c_str(),
                      callback, &count, &err) != SQLITE_OK) {
         std::string errMsg(err);
@@ -135,9 +135,8 @@ std::vector<std::string> PlayersDatabase::getAllUsernames() {
     res.reserve(cnt);
     for (size_t i = 0; i < cnt; ++i) {
         sqlite3_step(stmt);
-        // NOLINTNEXTLINE
         res.emplace_back(std::string(reinterpret_cast<const char *>(
-            sqlite3_column_text(stmt, 0))));
+            sqlite3_column_text(stmt, 0))));  // NOLINT
     }
     return res;
 }
@@ -149,7 +148,8 @@ std::string convert(int64_t val) {
 }
 
 std::string playersAddRequest(PlayerGeneral &info) {
-    std::string req = "INSERT INTO players (name,money,registration_date) VALUES(";
+    std::string req =
+        "INSERT INTO players (name,money,registration_date) VALUES(";
     req += "'" + info.name + "'," + convert(info.money) + "DATETIME('now'));";
     return req;
 }
@@ -157,7 +157,8 @@ std::string playersAddRequest(PlayerGeneral &info) {
 std::string skillsAddRequest(PlayerInfo &info) {
     auto &skills = info.skills;
     std::string req =
-        "INSERT INTO skills (name,tank_speed,bullet_speed,reload_ticks) VALUES(";
+        "INSERT INTO skills (name,tank_speed,bullet_speed,reload_ticks) "
+        "VALUES(";
     req += "'" + info.general.name + "',";
     req += convert(skills.tankSpeed) + convert(skills.bulletSpeed) +
            std::to_string(skills.reloadTicks) + ");";
@@ -182,20 +183,23 @@ void PlayersDatabase::insert(PlayerInfo info) {
     exec(settingsAddRequest(info));
 }
 
-    bool PlayersDatabase::checkOnline(const std::string &username) {
-    const std::string request = "SELECT online FROM players WHERE name = '" + username + "';";
+bool PlayersDatabase::checkOnline(const std::string &username) {
+    const std::string request =
+        "SELECT online FROM players WHERE name = '" + username + "';";
     sqlite3_prepare_v2(db, request.c_str(), -1, &stmt, nullptr);
     sqlite3_step(stmt);
     return static_cast<bool>(sqlite3_column_bytes(stmt, 0));
 }
 
 void PlayersDatabase::makeOnline(const std::string &username) {
-    const std::string request = "UPDATE players SET online = 'TRUE' WHERE name = '" + username + "';";
+    const std::string request =
+        "UPDATE players SET online = 'TRUE' WHERE name = '" + username + "';";
     exec(request);
 }
 
 void PlayersDatabase::makeOffline(const std::string &username) {
-    const std::string request = "UPDATE players SET online = 'FALSE' WHERE name = '" + username + "';";
+    const std::string request =
+        "UPDATE players SET online = 'FALSE' WHERE name = '" + username + "';";
     exec(request);
 }
 
