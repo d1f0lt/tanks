@@ -17,10 +17,7 @@ Menu initMenu() {
     InscriptionInfo title{titleText, titleCharacterSize, textColor};
 
     // inscriptions
-    const static std::string inscriptionsText;
     const static size_t inscriptionsCharacterSize = 50;
-    InscriptionInfo inscriptions{inscriptionsText, inscriptionsCharacterSize,
-                                 textColor};
 
     // buttons
     const static std::vector<ButtonType> buttonTypes = {
@@ -29,11 +26,16 @@ Menu initMenu() {
     const static sf::Color btnStandardColor(0, 0, 0, 150);
     const static sf::Color btnHoverColor(66, 66, 66, 230);
     std::vector<ButtonWithType> buttons;
+    std::vector<std::unique_ptr<MenuItem>> inscriptions;
     buttons.reserve(buttonTypes.size());
+    inscriptions.reserve(buttonTypes.size());
     for (auto type : buttonTypes) {
         buttons.emplace_back(
             ButtonWithType{type, sf::Vector2<float>(menuWidth, buttonsHeight),
                            btnStandardColor, btnHoverColor});
+        InscriptionInfo info{convertButtonTypeToString(type), inscriptionsCharacterSize, textColor};
+        auto item = std::make_unique<MenuInscription>(info, sf::Vector2<float>{0, 0});
+        inscriptions.emplace_back(std::move(item));
     }
 
     return Menu(menuWidth, title, inscriptions, buttons);

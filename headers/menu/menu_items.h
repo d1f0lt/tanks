@@ -10,7 +10,6 @@ enum class ButtonType {
     NEW_GAME,
     RESUME,
     SETTINGS,
-    CREATE_MAP,
     RATING,
     RETURN,
     EXIT,
@@ -18,7 +17,10 @@ enum class ButtonType {
     UPGRADE,
     SINGLE_PLAYER,
     MULTIPLAYER,
-    LEVEL
+    LEVEL,
+    USER,
+    NEW_USER,
+    USERS
 };
 
 std::string convertButtonTypeToString(ButtonType type);
@@ -119,12 +121,12 @@ public:
                const sf::Vector2<float> &coordinates,
                ButtonWithType info);
 
-    [[nodiscard]] ButtonType getType() const;
-
     void hover();
 
+    [[nodiscard]] ButtonType getType() const;
     [[nodiscard]] sf::Vector2<float> getSize() const override;
     [[nodiscard]] sf::Vector2<float> getPosition() const override;
+    [[nodiscard]] std::string getInscription() const;
 
     void setPosition(sf::Vector2<float> newPosition) override;
 

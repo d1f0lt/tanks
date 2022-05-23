@@ -11,9 +11,10 @@ namespace Tanks::Menu {
 
 Menu::Menu(size_t menuWidth,
            const InscriptionInfo &titleInfo,  // NOLINT
-           const InscriptionInfo &inscriptionsInfo,
-           const std::vector<ButtonWithType> &buttonsInfo) {
-    const size_t buttonsCount = buttonsInfo.size();
+           std::vector<std::unique_ptr<MenuItem>> &inscriptions,
+           const std::vector<ButtonWithType> &buttons) {
+    assert(inscriptions.size() == buttons.size());
+    const size_t buttonsCount = buttons.size();
     const static size_t marginBetweenButtons = 10;
     const static size_t marginFromTitle = marginBetweenButtons * 8;
     const size_t marginLeft = (WINDOW_WIDTH - menuWidth) / 2;
@@ -26,7 +27,7 @@ Menu::Menu(size_t menuWidth,
 
     const size_t menuHeight =
         static_cast<size_t>(title->getSize().y) + marginFromTitle +
-        buttonsCount * static_cast<size_t>(buttonsInfo[0].getSize().y) +
+        buttonsCount * static_cast<size_t>(buttons[0].getSize().y) +
         (buttonsCount - 1) * marginBetweenButtons;
     const size_t marginTop = (WINDOW_HEIGHT - menuHeight) / 2;
 
@@ -42,14 +43,9 @@ Menu::Menu(size_t menuWidth,
 
     // buttons
     for (size_t i = 0; i < buttonsCount; ++i) {
-        auto btnInfo = buttonsInfo[i];
-        InscriptionInfo inscriptionInfo{
-            convertButtonTypeToString(btnInfo.getType()),
-            inscriptionsInfo.characterSize, inscriptionsInfo.textColor};
-        auto content = std::make_unique<MenuInscription>(inscriptionInfo,
-                                                         currentCoordinates);
+        auto btnInfo = buttons[i];
         items.emplace_back(std::make_unique<MenuButton>(
-            std::move(content), currentCoordinates, btnInfo));
+            std::move(inscriptions[i]), currentCoordinates, btnInfo));
         currentCoordinates.y += static_cast<float>(items[i + 1]->getSize().y) +
                                 marginBetweenButtons;
     }

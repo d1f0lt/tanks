@@ -11,7 +11,6 @@ std::string convertButtonTypeToString(const ButtonType type) {
         {ButtonType::EXIT, "EXIT"},
         {ButtonType::RESUME, "RESUME"},
         {ButtonType::SETTINGS, "SETTINGS"},
-        {ButtonType::CREATE_MAP, "CREATE MAP"},
         {ButtonType::RATING, "RATING"},
         {ButtonType::PAUSE, "PAUSE"},
         {ButtonType::UPGRADE, "UPGRADE"},
@@ -154,12 +153,12 @@ void MenuButton::draw(sf::RenderWindow &window) const {
         info.getStandardColor());  // recover after possible hover;
 }
 
-ButtonType MenuButton::getType() const {
-    return info.getType();
-}
-
 void MenuButton::hover() {
     rectangle.setFillColor(info.getHoverColor());
+}
+
+ButtonType MenuButton::getType() const {
+    return info.getType();
 }
 
 sf::Vector2<float> MenuButton::getPosition() const {
@@ -168,6 +167,12 @@ sf::Vector2<float> MenuButton::getPosition() const {
 
 sf::Vector2<float> MenuButton::getSize() const {
     return rectangle.getSize();
+}
+
+std::string MenuButton::getInscription() const {
+    auto *inscription = dynamic_cast<MenuInscription *>(content.get());
+    assert(inscription != nullptr);
+    return inscription->getContent();
 }
 
 void MenuButton::setPosition(sf::Vector2<float> newPosition) {

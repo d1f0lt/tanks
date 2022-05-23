@@ -77,7 +77,7 @@ public:
 
 private:
     int lastMoveTick = -1;
-    int lastShootTick = -RELOAD_TICKS - 1;
+    int lastShootTick = -DEFAULT_RELOAD_TICKS - 1;
 };
 
 class ProjectileHandler : public MovableHandler {

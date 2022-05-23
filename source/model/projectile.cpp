@@ -36,7 +36,7 @@ int Projectile::getHeight() const {
 }
 
 int Projectile::getSpeed() const {
-    return BULLET_SPEED;
+    return DEFAULT_BULLET_SPEED;
 }
 
 bool Projectile::isTankPassable() const {

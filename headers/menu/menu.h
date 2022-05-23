@@ -19,7 +19,7 @@ public:
 
     explicit Menu(size_t menuWidth,
                   const InscriptionInfo &titleInfo,
-                  const InscriptionInfo &inscriptionsInfo,
+                  std::vector<std::unique_ptr<MenuItem>> &inscriptions,
                   const std::vector<ButtonWithType> &buttonsInfo);  // for most
 
     explicit Menu(size_t menuWidth,

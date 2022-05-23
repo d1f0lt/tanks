@@ -159,7 +159,7 @@ std::vector<Entity *> MovableHandler::lookMutable(Direction direction) {
 
 void TankHandler::shoot() {
     // TODO lock model
-    if (model_.getTick() <= lastShootTick + RELOAD_TICKS) {
+    if (model_.getTick() <= lastShootTick + DEFAULT_RELOAD_TICKS) {
         return;
     }
 
