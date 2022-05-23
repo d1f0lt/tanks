@@ -142,33 +142,35 @@ TEST_CASE("Menu animation") {
     SUBCASE("construct from buttons") {
         auto menu = ([]() {
             const static sf::Color textColor;
-            const static auto menuWidth =
-                static_cast<size_t>(Tanks::WINDOW_WIDTH / 3.4);
+            const static auto menuWidth = static_cast<size_t>(Tanks::WINDOW_WIDTH / 3.4);
 
             // title
             const static std::string titleText = "JUST TANKS";
             const static size_t titleCharacterSize = 80;
             InscriptionInfo title{titleText, titleCharacterSize, textColor};
 
-            // inscriptions
-            const static std::string inscriptionsText;
             const static size_t inscriptionsCharacterSize = 50;
-            InscriptionInfo inscriptions{inscriptionsText,
-                                         inscriptionsCharacterSize, textColor};
 
             // buttons
             const static std::vector<ButtonType> buttonTypes = {
-                ButtonType::NEW_GAME, ButtonType::UPGRADE,
-                ButtonType::CREATE_MAP, ButtonType::RATING};
+                ButtonType::NEW_GAME, ButtonType::UPGRADE, ButtonType::SETTINGS,
+                ButtonType::RATING};
             const static size_t buttonsHeight = 100;
-            const static sf::Color btnStandardColor;
-            const static sf::Color btnHoverColor;
+            const static sf::Color btnStandardColor(0, 0, 0, 150);
+            const static sf::Color btnHoverColor(66, 66, 66, 230);
             std::vector<ButtonWithType> buttons;
+            std::vector<std::unique_ptr<MenuItem>> inscriptions;
             buttons.reserve(buttonTypes.size());
+            inscriptions.reserve(buttonTypes.size());
             for (auto type : buttonTypes) {
-                buttons.emplace_back(ButtonWithType(
-                    type, sf::Vector2<float>(menuWidth, buttonsHeight),
-                    btnStandardColor, btnHoverColor));
+                buttons.emplace_back(
+                    ButtonWithType(type, sf::Vector2<float>(menuWidth, buttonsHeight),
+                                   btnStandardColor, btnHoverColor));
+                InscriptionInfo info{convertButtonTypeToString(type),
+                                     inscriptionsCharacterSize, textColor};
+                auto item =
+                    std::make_unique<MenuInscription>(info, sf::Vector2<float>{0, 0});
+                inscriptions.emplace_back(std::move(item));
             }
 
             return Menu(menuWidth, title, inscriptions, buttons);
@@ -215,36 +217,49 @@ TEST_CASE("Menu animation") {
 
 TEST_CASE("Players database") {
     const std::string tableName = "players";
-    const std::string dbFilename = "../.data/menu_test_" + tableName + "_database.dblite";
-    PlayersDatabase db(dbFilename);
-    db.dropTable(tableName);
-    db.createTable("../.data/pattern_for_" + tableName + ".txt");
+    const std::string path = "../.data/";
+    PlayersDatabase db(path + "menu_test_");
+    db.dropTable("players");
+    db.dropTable("settings");
+    db.dropTable("skills");
+    db.createTable(path + "pattern_for_players.txt");
+    db.createTable(path + "pattern_for_settings.txt");
+    db.createTable(path + "pattern_for_skills.txt");
 
-    db.insert(PlayersDatabaseFields{"first"});
+    db.insert(PlayerInfo{PlayerGeneral{"first"}, {}, {}});
     REQUIRE(db.getNumberOfRows(tableName) == 1);
-    db.insert(PlayersDatabaseFields{"second"});
+    db.insert(PlayerInfo{PlayerGeneral{"second"}, {}, {}});
     REQUIRE(db.getNumberOfRows(tableName) == 2);
-    PlayersDatabaseFields thirdData{"third", 10, 20, 30, 40};
+    PlayerInfo thirdData{PlayerGeneral{"third", 10}, PlayerSkills{10, 20, 30}, PlayerSettings{40, 50}};
     db.insert(thirdData);
     REQUIRE(db.getNumberOfRows(tableName) == 3);
+
+    auto usernames = db.getAllUsernames();
+    REQUIRE(usernames.size() == 3);
+
+    CHECK(usernames[0] == "first");
+    CHECK(usernames[1] == "second");
+    CHECK(usernames[2] == "third");
 
     auto second = db.getInfoByName("second");
     auto third = db.getInfoByName("third");
     auto first = db.getInfoByName("first");
 
-    auto check = [](PlayersDatabaseFields &current, PlayersDatabaseFields &correct) {
-        CHECK(current.name == correct.name);
-        CHECK(current.money == correct.money);
-        CHECK(current.tankSpeed == correct.tankSpeed);
-        CHECK(current.bulletSpeed == correct.bulletSpeed);
-        CHECK(current.reloadTicks == correct.reloadTicks);
+    auto check = [](PlayerInfo &current, PlayerInfo &correct) {
+        CHECK(current.general.name == correct.general.name);
+        CHECK(current.general.money == correct.general.money);
+        CHECK(current.skills.tankSpeed == correct.skills.tankSpeed);
+        CHECK(current.skills.bulletSpeed == correct.skills.bulletSpeed);
+        CHECK(current.skills.reloadTicks == correct.skills.reloadTicks);
+        CHECK(current.settings.musicVolume == correct.settings.musicVolume);
+        CHECK(current.settings.soundsVolume == correct.settings.soundsVolume);
     };
 
-    PlayersDatabaseFields correct{"first"};
+    PlayerInfo correct{PlayerGeneral{"first"}};
 
     check(first, correct);
 
-    correct.name = "second";
+    correct.general.name = "second";
     check(second, correct);
 
     correct = thirdData;

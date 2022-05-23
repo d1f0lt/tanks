@@ -3,7 +3,9 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 #include "sqlite3.h"
+#include "constants.h"
 
 namespace Tanks {
 
@@ -22,7 +24,7 @@ public:
     void createTable(const std::string &patternFilename);
     [[maybe_unused]] void dropTable(const std::string &patternFilename);
 
-    int getNumberOfRows(const std::string &patternFilename);
+    [[nodiscard]] int getNumberOfRows(const std::string &patternFilename) const;
 
 protected:
     sqlite3 *db = nullptr; // NOLINT
@@ -35,22 +37,40 @@ private:
 
 namespace Menu {
 
-struct PlayersDatabaseFields {
+struct PlayerGeneral {
     std::string name;
     int64_t money{};
-    int tankSpeed{};
-    int bulletSpeed{};
-    int reloadTicks{};
+};
+
+struct PlayerSettings {
+    int musicVolume = 50;
+    int soundsVolume = 50;
+};
+
+struct PlayerSkills {
+    int tankSpeed = DEFAULT_TANK_SPEED;
+    int bulletSpeed = DEFAULT_BULLET_SPEED;
+    int reloadTicks = DEFAULT_RELOAD_TICKS;
+};
+
+struct PlayerInfo {
+    PlayerGeneral general;
+    PlayerSkills skills{};
+    PlayerSettings settings{};
 };
 
 struct PlayersDatabase : Database {
 public:
-    PlayersDatabase(const std::string &filename);
+    PlayersDatabase(const std::string &path);
 
-    PlayersDatabaseFields getInfoByName(const std::string &username);
+    PlayerInfo getInfoByName(const std::string &username);
+    std::vector<std::string> getAllUsernames();
 
-    void insert(PlayersDatabaseFields info);
-
+    void insert(PlayerInfo info);
+private:
+    PlayerGeneral getGeneralInfoByName(const std::string &username);
+    PlayerSettings getSettingsInfoByName(const std::string &username);
+    PlayerSkills getSkillsInfoByName(const std::string &username);
 };
 
 }
