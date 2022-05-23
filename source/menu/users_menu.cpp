@@ -82,9 +82,13 @@ void showUsersMenu(sf::RenderWindow &window) {
         switch (res->getType()) {
             case ButtonType::USER: {
                 auto person = db.getInfoByName(res->getInscription());
-                menu.flyAwayToLeft(window, backgroundSprite);
-                showMainMenu(window, backgroundSprite);
-                menu.flyOutFromLeft(window, backgroundSprite);
+                if (db.checkOnline(person.general.name)) {
+                    db.makeOnline(person.general.name);
+                    menu.flyAwayToLeft(window, backgroundSprite);
+                    showMainMenu(window, backgroundSprite);
+                    menu.flyOutFromLeft(window, backgroundSprite);
+                    db.makeOffline(person.general.name);
+                }
             } break;
             case ButtonType::NEW_USER:
                 break;

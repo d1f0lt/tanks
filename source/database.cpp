@@ -5,22 +5,20 @@
 
 namespace Tanks {
 
-Database::Database(const std::string &filename) {  // NOLINT
-    assert(filename.find_last_of(".dblite"));
-    connectToDatabase(filename);
+DatabaseError::DatabaseError(const std::string &err) : std::runtime_error(err) {
 }
 
 Database::~Database() {
-    sqlite3_close(db);
+    disconnectFromDatabase();
 }
 
-void Database::exec(const std::string &request) {  // NOLINT
+void Database::exec(const std::string &request) {
     char *err = nullptr;
     if (sqlite3_exec(db, request.c_str(), nullptr, nullptr, &err) !=
         SQLITE_OK) {
-        std::cerr << err << std::endl;
+        std::string errMsg(err);
         sqlite3_free(err);
-        exit(1);
+        throw DatabaseError(errMsg);
     }
 }
 
@@ -48,17 +46,22 @@ int Database::getNumberOfRows(const std::string &tableName) const {
     char *err = nullptr;
     if (sqlite3_exec(db, ("select count(*) from " + tableName).c_str(),
                      callback, &count, &err) != SQLITE_OK) {
+        std::string errMsg(err);
         sqlite3_free(err);
-        exit(1);
+        throw DatabaseError(errMsg);
     }
     return count;
 }
 
 void Database::connectToDatabase(const std::string &filename) {
-    if (sqlite3_open((filename).c_str(), &db) != SQLITE_OK) {
-        std::cerr << "Cannot open file: '" + filename + "'" << std::endl;
-        exit(1);
+    assert(filename.find_last_of(".dblite"));
+    if (sqlite3_open(filename.c_str(), &db) != SQLITE_OK) {
+        throw DatabaseError("Cannot open file: '" + filename + "'");
     }
+}
+
+void Database::disconnectFromDatabase() {
+    sqlite3_close_v2(db);
 }
 
 void Database::dropTable(const std::string &tableName) {
@@ -68,8 +71,8 @@ void Database::dropTable(const std::string &tableName) {
 
 namespace Menu {
 
-PlayersDatabase::PlayersDatabase(const std::string &path)
-    : Database(path + "players.dblite") {
+PlayersDatabase::PlayersDatabase(const std::string &path) {
+    connectToDatabase(path + "players.dblite");
 #ifndef MENU_TEST
     createTable(path + "pattern_for_players.txt");
     createTable(path + "pattern_for_settings.txt");
@@ -173,10 +176,27 @@ std::string settingsAddRequest(PlayerInfo &info) {
 
 }  // namespace
 
-void PlayersDatabase::insert(PlayerInfo info) {  // NOLINT
+void PlayersDatabase::insert(PlayerInfo info) {
     exec(playersAddRequest(info.general));
     exec(skillsAddRequest(info));
     exec(settingsAddRequest(info));
+}
+
+    bool PlayersDatabase::checkOnline(const std::string &username) {
+    const std::string request = "SELECT online FROM players WHERE name = '" + username + "';";
+    sqlite3_prepare_v2(db, request.c_str(), -1, &stmt, nullptr);
+    sqlite3_step(stmt);
+    return static_cast<bool>(sqlite3_column_bytes(stmt, 0));
+}
+
+void PlayersDatabase::makeOnline(const std::string &username) {
+    const std::string request = "UPDATE players SET online = 'TRUE' WHERE name = '" + username + "';";
+    exec(request);
+}
+
+void PlayersDatabase::makeOffline(const std::string &username) {
+    const std::string request = "UPDATE players SET online = 'FALSE' WHERE name = '" + username + "';";
+    exec(request);
 }
 
 }  // namespace Menu

@@ -9,9 +9,13 @@
 
 namespace Tanks {
 
+struct DatabaseError : std::runtime_error {
+    DatabaseError(const std::string &err);
+};
+
 struct Database {
 public:
-    Database(const std::string &filename);
+    Database() = default;
 
     Database(const Database &) = delete;
     Database(Database &&) = default;
@@ -26,11 +30,11 @@ public:
 
     [[nodiscard]] int getNumberOfRows(const std::string &patternFilename) const;
 
+    void disconnectFromDatabase();
+
 protected:
     sqlite3 *db = nullptr; // NOLINT
     sqlite3_stmt *stmt = nullptr; // NOLINT
-
-private:
 
     void connectToDatabase(const std::string &filename);
 };
@@ -67,6 +71,13 @@ public:
     std::vector<std::string> getAllUsernames();
 
     void insert(PlayerInfo info);
+
+    bool checkOnline(const std::string &username);
+
+    void makeOnline(const std::string &username);
+
+    void makeOffline(const std::string &username);
+
 private:
     PlayerGeneral getGeneralInfoByName(const std::string &username);
     PlayerSettings getSettingsInfoByName(const std::string &username);
