@@ -40,7 +40,7 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
 
     model::GameModel model;
     model.loadLevel(level);
-    const auto playerId =
+    const int playerId =
         model.spawnPlayableTank(tankStartCoordinates.x, tankStartCoordinates.y)
             .getId();
 
