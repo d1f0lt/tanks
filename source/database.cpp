@@ -74,9 +74,9 @@ namespace Menu {
 PlayersDatabase::PlayersDatabase(const std::string &path) {
     connectToDatabase(path + "players.dblite");
 #ifndef MENU_TEST
-    createTable(path + "pattern_for_players.txt");
-    createTable(path + "pattern_for_settings.txt");
-    createTable(path + "pattern_for_skills.txt");
+    createTable(path + "pattern_for_players.sql");
+    createTable(path + "pattern_for_settings.sql");
+    createTable(path + "pattern_for_skills.sql");
 #endif
 }
 
@@ -135,8 +135,8 @@ std::vector<std::string> PlayersDatabase::getAllUsernames() {
     res.reserve(cnt);
     for (size_t i = 0; i < cnt; ++i) {
         sqlite3_step(stmt);
-        res.emplace_back(std::string(reinterpret_cast<const char *>(
-            sqlite3_column_text(stmt, 0))));  // NOLINT
+        res.emplace_back(std::string(reinterpret_cast<const char *>(  // NOLINT
+            sqlite3_column_text(stmt, 0))));
     }
     return res;
 }
@@ -149,8 +149,8 @@ std::string convert(int64_t val) {
 
 std::string playersAddRequest(PlayerGeneral &info) {
     std::string req =
-        "INSERT INTO players (name,money,registration_date) VALUES(";
-    req += "'" + info.name + "'," + convert(info.money) + "DATETIME('now'));";
+        "INSERT INTO players (name,money) VALUES(";
+    req += "'" + info.name + "'," + std::to_string(info.money) + ");";
     return req;
 }
 

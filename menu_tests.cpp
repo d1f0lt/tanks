@@ -223,15 +223,15 @@ TEST_CASE("Players database") {
     db.dropTable("players");
     db.dropTable("settings");
     db.dropTable("skills");
-    db.createTable(path + "pattern_for_players.txt");
-    db.createTable(path + "pattern_for_settings.txt");
-    db.createTable(path + "pattern_for_skills.txt");
+    db.createTable(path + "pattern_for_players.sql");
+    db.createTable(path + "pattern_for_settings.sql");
+    db.createTable(path + "pattern_for_skills.sql");
 
     db.insert(PlayerInfo{PlayerGeneral{"first"}, {}, {}});
     REQUIRE(db.getNumberOfRows(tableName) == 1);
     db.insert(PlayerInfo{PlayerGeneral{"second"}, {}, {}});
     REQUIRE(db.getNumberOfRows(tableName) == 2);
-    PlayerInfo thirdData{PlayerGeneral{"third", 10}, PlayerSkills{10, 20, 30},
+    PlayerInfo thirdData{PlayerGeneral{"third", 10}, PlayerSkills{7, 13, 50},
                          PlayerSettings{40, 50}};
     db.insert(thirdData);
     REQUIRE(db.getNumberOfRows(tableName) == 3);

@@ -1,5 +1,0 @@
-CREATE TABLE IF NOT EXISTS settings (
-    name VARCHAR(10) PRIMARY KEY NOT NULL,
-    music_volume INTEGER DEFAULT 50 NOT NULL,
-    sounds_volume INTEGER DEFAULT 50 NOT NULL
-);
