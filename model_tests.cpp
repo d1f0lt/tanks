@@ -1,8 +1,8 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 
 #include <array>
+#include <boost/asio/connect.hpp>
 #include <thread>
-#include "boost/asio.hpp"
 #include "doctest.h"
 #include "model/blocks.h"
 #include "model/client_game_model.h"
