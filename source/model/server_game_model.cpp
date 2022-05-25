@@ -1,6 +1,7 @@
 #include "model/server_game_model.h"
 #include <thread>
 #include "model/event.h"
+#include "model/network_utils.h"
 #include "model/projectile.h"
 
 namespace Tanks::model {
@@ -8,11 +9,10 @@ using boost::asio::ip::tcp;
 
 int ServerModel::addPlayer(tcp::socket &socket) {
     int id = getIncrId();
-    // TODO sendInt
     players_.emplace(id, socket);
+
     events_.emplace(
         std::make_unique<SpawnTank>(id, TILE_SIZE, TILE_SIZE, Direction::LEFT));
-    //    auto &tank = spawnPlayableTank(TILE_SIZE, TILE_SIZE, id, socket);
     std::thread([&]() { receiveTurns(socket); }).detach();
     return id;
 }
@@ -30,21 +30,13 @@ void ServerModel::receiveTurns(tcp::socket &client) {
     } catch (boost::system::system_error &e) {
         std::string msg(e.what());
         if (msg == "read: Bad file descriptor [system:9]" ||
-            msg == "read: Connection reset by peer [system:104]") {
+            msg == "read: Connection reset by peer [system:104]" ||
+            msg == "read: End of file [asio.misc:2]") {
             return;  // Connection was closed
         }
         throw e;
     }
 }
-
-namespace {
-template <typename T>
-void sendInt(boost::asio::ip::tcp::socket &os, const T &a) {
-    static thread_local auto tmp = static_cast<std::int32_t>(a);
-    os.write_some(
-        boost::asio::buffer(reinterpret_cast<const char *>(&tmp), sizeof(T)));
-}
-}  // namespace
 
 void ServerModel::sendEventsToClients(
     std::queue<std::unique_ptr<Event>> events) {
@@ -71,14 +63,14 @@ void ServerModel::executeAllEvents() {
     }
 
     for (auto id : bots_) {
-        auto event = eventByBot(id);
+        auto event = getEventByBot(id);
         executeEvent(*event);
         eventsToSend.emplace(std::move(event));
     }
     sendEventsToClients(std::move(eventsToSend));
 }
 
-std::unique_ptr<Event> ServerModel::eventByBot(int botId) {
+std::unique_ptr<Event> ServerModel::getEventByBot(int botId) {
     return std::make_unique<TankMove>(
         botId, Direction::RIGHT,
         dynamic_cast<Tank &>(getById(botId)->get()).getSpeed());

@@ -3,22 +3,17 @@
 
 namespace Tanks::model {
 void GroupedEntities::insert(Entity &entity) {
-    // 0 - usual blocks
-    // 1 - bot-Tanks
-    // 2 - playable Tanks
-    // 3 - bullets
-    // 4 - grass
-    // TODO make it independent from order in EntityType
-    entities_[static_cast<unsigned>(entity.getType())].emplace_back(&entity);
+    auto type = static_cast<unsigned>(entity.getType());
+    entities_[type].emplace_back(&entity);
+    idToIterator_.emplace(entity.getId(),
+                          std::tuple{type, entities_[type].end() - 1});
 }
 
 void GroupedEntities::erase(Entity &entity) {
-    auto type = static_cast<unsigned>(entity.getType());
-    assert(std::find(entities_[type].begin(), entities_[type].end(), &entity) !=
-           entities_[type].end());
-
-    entities_[type].erase(
-        std::find(entities_[type].begin(), entities_[type].end(), &entity));
+    int entityId = entity.getId();
+    auto [i, iter] = idToIterator_[entityId];
+    entities_[i].erase(iter);
+    idToIterator_.erase(i);
 }
 
 std::vector<std::vector<Entity *>> GroupedEntities::snapshotAll() const {

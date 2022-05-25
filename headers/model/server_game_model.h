@@ -12,7 +12,7 @@ using boost::asio::ip::tcp;
 
 class ServerModel : public GameModel {
 public:
-    int addPlayer(boost::asio::ip::tcp::socket &socket);
+    [[nodiscard]] int addPlayer(boost::asio::ip::tcp::socket &socket);
 
 private:
     std::queue<std::unique_ptr<Event>> events_;
@@ -23,7 +23,7 @@ private:
     void receiveTurns(tcp::socket &client);
     void executeAllEvents() override;
 
-    [[nodiscard]] std::unique_ptr<Event> eventByBot(int botId);
+    [[nodiscard]] std::unique_ptr<Event> getEventByBot(int botId);
 
     void sendEventsToClients(std::queue<std::unique_ptr<Event>> events);
 };

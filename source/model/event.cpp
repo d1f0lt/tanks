@@ -55,11 +55,11 @@ void TankMove::sendTo(boost::asio::ip::tcp::socket &os) {
 }
 
 std::unique_ptr<Event> readEvent(boost::asio::ip::tcp::socket &socket) {
-    const std::unordered_map<EventType, std::unique_ptr<Event> (*)(
-                                            boost::asio::ip::tcp::socket &)>
+    static const std::unordered_map<EventType,
+                                    std::unique_ptr<Event> (*)(tcp::socket &)>
         readers = []() {
-            std::unordered_map<EventType, std::unique_ptr<Event> (*)(
-                                              boost::asio::ip::tcp::socket &)>
+            std::unordered_map<EventType,
+                               std::unique_ptr<Event> (*)(tcp::socket &)>
                 tmp;
             tmp[EventType::TANK_MOVE] = TankMove::readFrom;
             tmp[EventType::SPAWN_TANK] = SpawnTank::readFrom;
@@ -67,10 +67,12 @@ std::unique_ptr<Event> readEvent(boost::asio::ip::tcp::socket &socket) {
         }();
 
     auto type = static_cast<EventType>(receiveInt(socket));
+    assert(static_cast<unsigned>(type) != 0);
     return readers.at(type)(socket);
 };
 
 void SpawnTank::sendTo(boost::asio::ip::tcp::socket &socket) {
+    static_assert(static_cast<std::int32_t>(EventType::SPAWN_TANK) == 2);
     SpawnTank::sendTo(socket, tankId_, left_, top_, direction_);
 }
 
@@ -83,6 +85,7 @@ void SpawnTank::sendTo(boost::asio::ip::tcp::socket &socket,
                        int left,
                        int top,
                        Direction direction) {
+    sendInt(socket, EventType::SPAWN_TANK);
     sendInt(socket, tankId);
     sendInt(socket, left);
     sendInt(socket, top);

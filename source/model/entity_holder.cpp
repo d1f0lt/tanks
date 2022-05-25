@@ -7,7 +7,7 @@ Entity &EntityHolder::insert(std::unique_ptr<Entity> entity) {
     return *buffer_.back();
 }
 
-void EntityHolder::remove(Entity &entity) {
+void EntityHolder::erase(Entity &entity) {
     for (unsigned i = 0; i < buffer_.size(); i++) {
         if (&entity == buffer_[i].get()) {
             std::swap(buffer_[i], buffer_.back());

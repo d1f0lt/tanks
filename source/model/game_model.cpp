@@ -33,15 +33,12 @@ void GameModel::addEntity(std::unique_ptr<Entity> entity) {
     entityHolder_.insert(std::move(entity));
 }
 
-void GameModel::removeEntity(Entity &entity) {
-    if (auto *foreground = dynamic_cast<ForegroundEntity *>(&entity)) {
-        dynamic_cast<ForegroundHandler &>(*handlers_[foreground])
+void GameModel::eraseEntity(Entity &entity) {
+    if (dynamic_cast<ForegroundEntity *>(&entity) != nullptr) {
+        dynamic_cast<ForegroundHandler &>(getHandler(entity))
             .restoreBackground();
     }
-
-    byId_.erase(entity.getId());
-    groupedEntities_.erase(entity);
-    entityHolder_.remove(entity);
+    entityHolder_.erase(entity);  // Other cleared in handler destructor
 }
 
 void GameModel::loadLevel(int level) {
@@ -135,7 +132,6 @@ std::vector<std::vector<const Entity *>> GameModel::getAll() {
 void GameModel::nextTick() {
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
     std::unique_lock lock(getMutex());
-    // TODO lock model
     executeAllEvents();
     moveBullets();
     currentTick_++;

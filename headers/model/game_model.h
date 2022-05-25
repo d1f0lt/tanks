@@ -50,7 +50,7 @@ public:
 
 protected:
     void addEntity(std::unique_ptr<Entity> entity);
-    void removeEntity(Entity &entity);
+    void eraseEntity(Entity &entity);
 
     virtual void executeAllEvents() = 0;
     void executeEvent(Event &event);

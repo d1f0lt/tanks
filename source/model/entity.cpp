@@ -2,8 +2,6 @@
 #include <unordered_set>
 
 namespace Tanks::model {
-// TODO better random
-
 int Entity::getLeft() const {
     return left_;
 }

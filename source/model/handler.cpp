@@ -15,12 +15,15 @@ BasicHandler::BasicHandler(GameModel &model_, Entity &entity_)
 Entity &BasicHandler::getEntity() const {
     return entity_;
 }
+
 GameModel &BasicHandler::getModel() const {
     return model_;
 }
 
 BasicHandler::~BasicHandler() {
     getModel().handlers_.erase(&getEntity());
+    getModel().byId_.erase(getEntity().getId());
+    getModel().groupedEntities_.erase(getEntity());
 }
 
 std::vector<const Entity *> MovableHandler::look(Direction direction) {
@@ -40,23 +43,14 @@ void ForegroundHandler::restoreBackground() {
         }
         row.clear();
     }
-    background_.clear();
-    //    for (int row = 0; row < getEntity().getHeight(); row++) {
-    //        for (int col = 0; col < getEntity().getWidth(); col++) {
-    //            if (restored.count(background_[row][col]) != 0) {
-    //                background_[row][col] = nullptr;
-    //                continue;
-    //            }
-    //            restored.insert(background_[row][col]);
-    //            getModel().getMap().insert(*background_[row][col]);
-    //            background_[row][col] = nullptr;
-    //        }
-    //    }
 }
 
 void ForegroundHandler::setBackground() {
-    background_.resize(getEntity().getHeight(),
-                       std::vector<Entity *>(getEntity().getWidth(), nullptr));
+    if (background_.empty()) {
+        background_.resize(
+            getEntity().getHeight(),
+            std::vector<Entity *>(getEntity().getWidth(), nullptr));
+    }
 
     auto &entity = getEntity();
 
@@ -65,6 +59,7 @@ void ForegroundHandler::setBackground() {
     int height = entity.getHeight();
     int width = entity.getWidth();
     for (int row = entity.getTop(); row < entity.getTop() + height; row++) {
+        background_[row - top].resize(width);
         for (int col = entity.getLeft(); col < left + width; col++) {
             background_[row - top][col - left] =
                 &getModel().getByCoords(col, row);
@@ -92,7 +87,6 @@ MovableHandler::MovableHandler(GameModel &model, MovableEntity &entity)
 }
 
 void MovableHandler::move(Direction direction, int speed) {
-    // TODO lock model
     auto &movable = dynamic_cast<MovableEntity &>(getEntity());
 
     movable.setDirection(direction);
@@ -102,6 +96,7 @@ void MovableHandler::move(Direction direction, int speed) {
     auto block = nearest(direction, [&movable](const Entity *entity) {
         return !movable.canPass(*entity);
     });
+
     if (!block.empty()) {
         dist = std::min(dist, getEntity().dist(*block[0]) - 1);
     }
@@ -112,9 +107,9 @@ void MovableHandler::move(Direction direction, int speed) {
 
     if (!bullets.empty() && movable.dist(*bullets[0]) <= dist) {
         for (auto *entity : bullets) {
-            getModel().removeEntity(*entity);
+            getModel().eraseEntity(*entity);
         }
-        getModel().removeEntity(getEntity());
+        getModel().eraseEntity(getEntity());
         return;
     }
 
@@ -183,7 +178,6 @@ std::vector<Entity *> MovableHandler::lookMutable(Direction direction) {
 }
 
 void TankHandler::shoot() {
-    // TODO lock model
     if (getModel().getTick() <= lastShootTick_ + RELOAD_TICKS) {
         return;
     }
@@ -241,7 +235,7 @@ bool ProjectileHandler::breakIfBreakable() {
         destroyByBullet(*entity);
     }
     if (!closest.empty()) {
-        getModel().removeEntity(bullet);
+        getModel().eraseEntity(bullet);
         return true;
     }
     return false;
@@ -254,12 +248,12 @@ void ProjectileHandler::destroyByBullet(Entity &other) {
     }
 
     if (dynamic_cast<Block *>(&other) == nullptr) {
-        getModel().removeEntity(other);
+        getModel().eraseEntity(other);
         return;
     }
     int left = other.getLeft();
     int top = other.getTop();
-    getModel().removeEntity(other);
+    getModel().eraseEntity(other);
     getModel().addEntity(
         std::make_unique<Floor>(left, top, getModel().getIncrId()));
 }

@@ -40,7 +40,6 @@ public:
     [[nodiscard]] std::vector<std::vector<const Entity *>> snapshotBackground()
         const;
 
-protected:
 private:
     std::vector<std::vector<Entity *>> background_;
 };
@@ -62,11 +61,13 @@ protected:
         for (auto *entity : lookMutable(direction)) {
             if (cond(entity)) {
                 if (getEntity().dist(*entity) <= dist) {
-                    if (getEntity().dist(*entity) == dist) {
+                    if (getEntity().dist(*entity) < dist) {
                         res = {entity};
                     } else {
-                        res.push_back(entity);
+                        res.emplace_back(entity);
                     }
+                } else {
+                    break;  // TODO check it
                 }
             }
         }

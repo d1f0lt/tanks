@@ -1,6 +1,7 @@
 #ifndef TANKS_GROUPED_ENTITIES_H
 #define TANKS_GROUPED_ENTITIES_H
 
+#include <unordered_map>
 #include <vector>
 #include "entity.h"
 
@@ -17,6 +18,8 @@ public:
 
 private:
     std::vector<std::vector<Entity *>> entities_{25};
+    std::unordered_map<int, std::tuple<int, std::vector<Entity *>::iterator>>
+        idToIterator_;
 };
 
 }  // namespace Tanks::model

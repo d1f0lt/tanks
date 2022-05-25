@@ -4,9 +4,10 @@
 namespace Tanks::model {
 std::int32_t receiveInt(boost::asio::ip::tcp::socket &socket) {
     std::int32_t buff = 0;
-    boost::asio::read(
+    auto res = boost::asio::read(
         socket,
         boost::asio::buffer(reinterpret_cast<char *>(&buff), sizeof(buff)));
+    assert(res == 4);
     return buff;
 }
 }  // namespace Tanks::model

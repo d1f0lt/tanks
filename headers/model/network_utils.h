@@ -4,11 +4,13 @@
 #include <boost/asio/ip/tcp.hpp>
 
 namespace Tanks::model {
+using boost::asio::buffer;
 template <typename T>
 void sendInt(boost::asio::ip::tcp::socket &socket, T a) {
-    auto tmp = static_cast<std::int32_t>(a);
-    socket.write_some(
-        boost::asio::buffer(reinterpret_cast<const char *>(&tmp), sizeof(T)));
+    auto buff = static_cast<std::int32_t>(a);
+    auto res = socket.write_some(
+        buffer(reinterpret_cast<const char *>(&buff), sizeof(buff)));
+    assert(res == sizeof(buff));
 }
 
 std::int32_t receiveInt(boost::asio::ip::tcp::socket &socket);

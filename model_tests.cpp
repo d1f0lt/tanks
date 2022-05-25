@@ -43,8 +43,10 @@ TEST_CASE("Single move and checking background") {
     int id = serverModel.addPlayer(server);
 
     ClientModel clientModel(id, std::move(client));
+    clientModel.loadLevel(1);
 
     serverModel.nextTick();
+    clientModel.nextTick();
     auto &real_tank = dynamic_cast<Tank &>(serverModel.getById(id)->get());
 
     CHECK(real_tank.getLeft() == TILE_SIZE);
@@ -62,10 +64,9 @@ TEST_CASE("Single move and checking background") {
 
     controller.move(Tanks::model::Direction::DOWN, real_tank.getSpeed());
 
-    //        real_tank.move(Tanks::serverModel::Direction::DOWN,
-    //        real_tank.getSpeed());
     Tanks::model::Entity &ptr2 = serverModel.getByCoords(TILE_SIZE, TILE_SIZE);
     serverModel.nextTick();
+    clientModel.nextTick();
 
     CHECK(real_tank.getTop() == TILE_SIZE + real_tank.getSpeed());
     CHECK(brick00 == &serverModel.getByCoords(TILE_SIZE, TILE_SIZE));
