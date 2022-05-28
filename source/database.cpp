@@ -237,7 +237,7 @@ void PlayersDatabase::insert(const std::string &name) {
     insert(info);
 }
 
-bool PlayersDatabase::checkOnline(const std::string &username) {
+bool PlayersDatabase::isOnline(const std::string &username) {
     const std::string request =
         "SELECT online FROM players WHERE name = '" + username + "';";
     bool flag = isConnected();
@@ -246,7 +246,7 @@ bool PlayersDatabase::checkOnline(const std::string &username) {
     }
     sqlite3_prepare_v2(db, request.c_str(), -1, &stmt, nullptr);
     sqlite3_step(stmt);
-    auto ans = static_cast<bool>(sqlite3_column_bytes(stmt, 0));
+    auto ans = static_cast<bool>(sqlite3_column_int(stmt, 0));
     sqlite3_finalize(stmt);
     if (!flag) {
         disconnectFromDatabase();
@@ -256,7 +256,7 @@ bool PlayersDatabase::checkOnline(const std::string &username) {
 
 void PlayersDatabase::makeOnline(const std::string &username) {
     const std::string request =
-        "UPDATE players SET online = 'TRUE' WHERE name = '" + username + "';";
+        "UPDATE players SET online = 1 WHERE name = '" + username + "';";
     bool flag = isConnected();
     if (!flag) {
         connect();
@@ -269,7 +269,7 @@ void PlayersDatabase::makeOnline(const std::string &username) {
 
 void PlayersDatabase::makeOffline(const std::string &username) {
     const std::string request =
-        "UPDATE players SET online = 'FALSE' WHERE name = '" + username + "';";
+        "UPDATE players SET online = 0 WHERE name = '" + username + "';";
     bool flag = isConnected();
     if (!flag) {
         connect();

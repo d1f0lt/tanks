@@ -248,6 +248,9 @@ TEST_CASE("Players database") {
     auto second = db.getInfoByName("second");
     auto third = db.getInfoByName("third");
     auto first = db.getInfoByName("first");
+    CHECK(!db.isOnline("first"));
+    CHECK(!db.isOnline("second"));
+    CHECK(!db.isOnline("third"));
 
     auto check = [](PlayerInfo &current, PlayerInfo &correct) {
         CHECK(current.general.name == correct.general.name);

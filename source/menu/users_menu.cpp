@@ -97,9 +97,11 @@ void showUsersMenu(sf::RenderWindow &window) {
         const auto *const res = menu.showMenu(window, backgroundSprite);
         switch (res->getType()) {
             case ButtonType::USER: {
+                db.connect();
                 auto person = db.getInfoByName(res->getInscription());
-                if (db.checkOnline(person.general.name)) {
+                if (!db.isOnline(person.general.name)) {
                     db.makeOnline(person.general.name);
+                    db.disconnectFromDatabase();
                     menu.flyAwayToLeft(window, backgroundSprite);
                     showMainMenu(window, backgroundSprite);
                     db.makeOffline(person.general.name);
