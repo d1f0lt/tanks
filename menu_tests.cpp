@@ -227,9 +227,9 @@ TEST_CASE("Players database") {
     db.createTable(path + "pattern_for_settings.sql");
     db.createTable(path + "pattern_for_skills.sql");
 
-    db.insert(PlayerInfo{PlayerGeneral{"first"}, {}, {}});
+    db.insert("first");
     REQUIRE(db.getNumberOfRows(tableName) == 1);
-    db.insert(PlayerInfo{PlayerGeneral{"second"}, {}, {}});
+    db.insert("second");
     REQUIRE(db.getNumberOfRows(tableName) == 2);
     PlayerInfo thirdData{PlayerGeneral{"third", 10}, PlayerSkills{7, 13, 50},
                          PlayerSettings{40, 50}};
