@@ -74,12 +74,16 @@ public:
     [[nodiscard]] std::string getContent() const;
 
     void setPosition(sf::Vector2<float> newPosition) final;
+    void setContent(const std::string &newString);
+    void setTextColor(const sf::Color &color);
 
     void draw(sf::RenderWindow &window) const final;
 
 private:
     sf::Font font;
     sf::Text text;
+
+    void updateOrigin();
 };
 
 struct Button {

@@ -15,6 +15,7 @@ public:
     static std::optional<Menu::MenuButton *> control(const Menu::Menu &menu,
                                                      sf::RenderWindow &window,
                                                      const sf::Event &event);
+    static std::optional<std::string> textEntered(const Menu::Menu &menu, sf::Event &event);
 };
 
 }  // namespace Tanks

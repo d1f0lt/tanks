@@ -106,12 +106,12 @@ MenuInscription::MenuInscription(const InscriptionInfo &parameters,
                                  const sf::Vector2<float> &coordinates)
     : MenuItem(coordinates) {
     font.loadFromFile("../fonts/base_bold.ttf");
-    text.setFillColor(parameters.textColor);
+    setTextColor(parameters.textColor);
     text.setFont(font);
     text.setCharacterSize(parameters.characterSize);
-    text.setString(parameters.inscription);
-    text.setPosition(coordinates);
-    text.setOrigin(text.getLocalBounds().left, text.getLocalBounds().top);
+    setContent(parameters.inscription);
+    updateOrigin();
+    setPosition(coordinates);
 }
 
 void MenuInscription::draw(sf::RenderWindow &window) const {
@@ -127,8 +127,20 @@ sf::Vector2<float> MenuInscription::getPosition() const {
     return text.getPosition();
 }
 
+void MenuInscription::updateOrigin() {
+    text.setOrigin(text.getLocalBounds().left, text.getLocalBounds().top);
+}
+
 void MenuInscription::setPosition(sf::Vector2<float> newPosition) {
-    text.setPosition(newPosition.x, newPosition.y);  // fix bugs
+    text.setPosition(newPosition.x, newPosition.y);
+}
+
+void MenuInscription::setContent(const std::string &newString) {
+    text.setString(newString);
+}
+
+void MenuInscription::setTextColor(const sf::Color &color) {
+    text.setFillColor(color);
 }
 
 std::string MenuInscription::getContent() const {
