@@ -2,9 +2,9 @@
 
 #include <memory>
 #include "constants.h"
+#include "database.h"
 #include "doctest.h"
 #include "menu/menu.h"
-#include "database.h"
 
 using namespace Tanks::Menu;
 
