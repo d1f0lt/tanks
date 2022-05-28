@@ -4,6 +4,7 @@
 #include "constants.h"
 #include "doctest.h"
 #include "menu/menu.h"
+#include "database.h"
 
 using namespace Tanks::Menu;
 
