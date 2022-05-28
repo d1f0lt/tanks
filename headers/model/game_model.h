@@ -13,7 +13,7 @@
 #include "model/game_map.h"
 #include "model/grouped_entities.h"
 #include "model/handler.h"
-#include "model/playable-tank.h"
+#include "model/tank_handler.h"
 
 namespace Tanks::model {
 class Spawner;  // Todo spawner fwd
@@ -27,6 +27,7 @@ class GameModel {
     friend MovableHandler;
     friend TankHandler;
     friend ProjectileHandler;
+    friend BonusHandler;
 
 public:
     explicit GameModel() = default;
@@ -43,8 +44,8 @@ public:
     [[nodiscard]] int getHeight() const;
     [[nodiscard]] int getWidth() const;
 
-    [[nodiscard]] std::vector<const Entity *> getAll(EntityType type);
-    [[nodiscard]] std::vector<std::vector<const Entity *>> getAll();
+    [[nodiscard]] std::vector<const Entity *> getAll(EntityType type)const;
+    [[nodiscard]] std::vector<std::vector<const Entity *>> getAll() const;
 
     [[nodiscard]] int getTick() const;
 
@@ -61,10 +62,9 @@ protected:
 
     [[nodiscard]] const std::vector<std::vector<Entity *>> &getAllByLink();
 
-    [[nodiscard]] int getIncrId();
-
     [[nodiscard]] GameMap &getMap();
 
+    [[nodiscard]] int getIncrId();
     [[nodiscard]] int getRnd();
 
     [[nodiscard]] std::shared_mutex &getMutex() const;

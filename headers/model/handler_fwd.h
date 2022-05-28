@@ -6,6 +6,8 @@ class BasicHandler;
 class ForegroundHandler;
 class MovableHandler;
 class TankHandler;
+class BonusHandler;
+class WalkOnWaterHandler;
 
 class TankHandlerCreator;
 }  // namespace Tanks::model

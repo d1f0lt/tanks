@@ -5,7 +5,6 @@
 #include <shared_mutex>
 #include <unordered_set>
 #include "model/game_model.h"
-#include "model/playable-tank.h"
 
 namespace Tanks::model {
 using boost::asio::ip::tcp;

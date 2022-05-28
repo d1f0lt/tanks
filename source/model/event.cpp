@@ -1,37 +1,30 @@
 #include "model/event.h"
-#include <cinttypes>
-#include <functional>
-#include <istream>
-#include <ostream>
 #include <unordered_map>
-#include <vector>
 #include "model/network_utils.h"
 
 namespace Tanks::model {
-
-namespace {}  // namespace
-
-void TankMove::sendTo(boost::asio::ip::tcp::socket &os,
-                      int id,
+void TankMove::sendTo(boost::asio::ip::tcp::socket &socket,
+                      int tankId,
                       Direction direction,
                       int speed) {
-    sendInt(os, EventType::TANK_MOVE);
+    sendInt(socket, EventType::TANK_MOVE);
 
-    sendInt(os, id);
-    sendInt(os, direction);
-    sendInt(os, speed);
+    sendInt(socket, tankId);
+    sendInt(socket, direction);
+    sendInt(socket, speed);
 }
 
-std::unique_ptr<Event> TankMove::readFrom(boost::asio::ip::tcp::socket &is) {
-    auto id = receiveInt(is);
-    auto direction = static_cast<Direction>(receiveInt(is));
-    auto speed = receiveInt(is);
+std::unique_ptr<Event> TankMove::readFrom(
+    boost::asio::ip::tcp::socket &socket) {
+    auto tankId = receiveInt(socket);
+    auto direction = static_cast<Direction>(receiveInt(socket));
+    auto speed = receiveInt(socket);
 
-    return std::make_unique<TankMove>(id, direction, speed);
+    return std::make_unique<TankMove>(tankId, direction, speed);
 }
 
-TankMove::TankMove(int id, Direction direction, int speed)
-    : id_(id), direction_(direction), speed_(speed) {
+TankMove::TankMove(int tankId, Direction direction, int speed)
+    : id_(tankId), direction_(direction), speed_(speed) {
 }
 
 void TankMove::acceptExecutor(const EventExecutor &executor) {
@@ -50,8 +43,8 @@ int TankMove::getSpeed() const {
     return speed_;
 }
 
-void TankMove::sendTo(boost::asio::ip::tcp::socket &os) {
-    TankMove::sendTo(os, id_, direction_, speed_);
+void TankMove::sendTo(boost::asio::ip::tcp::socket &socket) {
+    TankMove::sendTo(socket, id_, direction_, speed_);
 }
 
 std::unique_ptr<Event> readEvent(boost::asio::ip::tcp::socket &socket) {

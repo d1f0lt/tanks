@@ -3,6 +3,7 @@
 
 #include <boost/asio/ip/tcp.hpp>
 #include "model/game_model.h"
+#include "playable_tank_handler.h"
 
 namespace Tanks::model {
 using boost::asio::ip::tcp;

@@ -18,8 +18,6 @@ public:
 
 private:
     std::vector<std::vector<Entity *>> entities_{25};
-    std::unordered_map<int, std::tuple<int, std::vector<Entity *>::iterator>>
-        idToIterator_;
 };
 
 }  // namespace Tanks::model

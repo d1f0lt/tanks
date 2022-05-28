@@ -1,5 +1,6 @@
 #include "model/event_executor.h"
 #include "model/game_model.h"
+#include "model/tank.h"
 
 namespace Tanks::model {
 
@@ -23,7 +24,8 @@ void EventExecutor::execute(TankMove &event) const {
 
 void EventExecutor::execute(SpawnTank &event) const {
     getModel().addEntity(std::make_unique<MediumTank>(
-        event.getLeft(), event.getTop(), event.getTankId(), getModel(),
-        event.getDirection(), DEFAULT_TANK_SPEED));
+        event.getLeft(), event.getTop(), event.getTankId(),
+        TankHandlerCreator(getModel()), event.getDirection(),
+        DEFAULT_TANK_SPEED));
 }
 }  // namespace Tanks::model

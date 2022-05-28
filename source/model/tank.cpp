@@ -1,7 +1,7 @@
 #include "model/tank.h"
 #include <queue>
 #include "constants.h"
-#include "model/handler.h"
+#include "model/tank_handler.h"
 
 namespace Tanks::model {
 Tank::Tank(int left,
@@ -29,13 +29,13 @@ int MediumTank::getWidth() const {
 MediumTank::MediumTank(int left,
                        int top,
                        int entityId,
-                       GameModel &model,
+                       const TankHandlerCreator &handlerCreator,
                        Direction direction,
                        int speed)
     : Tank(left,
            top,
            entityId,
-           std::make_unique<TankHandler>(model, *this),
+           handlerCreator.createTankHandler(*this),
            direction,
            speed) {
 }

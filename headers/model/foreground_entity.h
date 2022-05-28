@@ -20,12 +20,6 @@ public:
 
     [[nodiscard]] std::vector<std::vector<const Entity *>> snapshotBackground()
         const;
-
-protected:
-    [[nodiscard]] BasicHandler &getHandler() const;
-
-private:
-    const std::unique_ptr<BasicHandler> handler_;
 };
 
 }  // namespace Tanks::model

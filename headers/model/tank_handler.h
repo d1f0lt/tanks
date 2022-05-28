@@ -1,0 +1,60 @@
+#ifndef TANKS_TANK_HANDLER_H
+#define TANKS_TANK_HANDLER_H
+
+#include "model/handler.h"
+
+namespace Tanks::model {
+class TankHandler : public MovableHandler {
+public:
+    explicit TankHandler(GameModel &model, Tank &entity);
+
+    void move(Direction direction, int speed) override;
+    void move(Direction direction);
+    virtual void shoot();
+
+private:
+    int lastMoveTick_ = -1;
+    int lastShootTick_ = -RELOAD_TICKS - 1;
+};
+
+class TankMovableOnWaterHandler : public TankHandler {
+public:
+    explicit TankMovableOnWaterHandler(GameModel &model,
+                                       Tank &entity,
+                                       int beginLive);
+
+    void move(Direction dir, int speed) override;
+    void shoot() final;
+
+private:
+    const int beginLive_;
+
+    void stopBonus();
+};
+
+class TankHandlerCreator {
+public:
+    explicit TankHandlerCreator(GameModel &model);
+    virtual ~TankHandlerCreator() = default;
+
+    [[nodiscard]] virtual std::unique_ptr<TankHandler> createTankHandler(
+        Tank &tank) const;
+
+protected:
+    [[nodiscard]] GameModel &getModel() const;
+
+private:
+    GameModel &model_;
+};
+
+class TankMovableOnWaterHandlerCreator : public TankHandlerCreator {
+public:
+    explicit TankMovableOnWaterHandlerCreator(GameModel &model);
+
+private:
+    [[nodiscard]] std::unique_ptr<TankHandler> createTankHandler(
+        Tank &tank) const override;
+};
+}  // namespace Tanks::model
+
+#endif  // TANKS_TANK_HANDLER_H

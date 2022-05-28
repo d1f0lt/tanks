@@ -50,18 +50,22 @@ public:
 
     [[nodiscard]] std::vector<const Entity *> look(Direction direction);
     virtual void move(Direction direction, int speed);
+    void setDirection(Direction direction);
+
+    void setPosition(int left, int top);
 
 protected:
     [[nodiscard]] std::vector<Entity *> lookMutable(Direction direction);
 
     template <typename T>
     std::vector<Entity *> nearest(Direction direction, T cond) {
-        int dist = INT_MAX;
+        int minDist = INT_MAX;
         std::vector<Entity *> res;
         for (auto *entity : lookMutable(direction)) {
             if (cond(entity)) {
-                if (getEntity().dist(*entity) <= dist) {
-                    if (getEntity().dist(*entity) < dist) {
+                if (getEntity().dist(*entity) <= minDist) {
+                    if (int dist = getEntity().dist(*entity); dist < minDist) {
+                        minDist = getEntity().dist(*entity);
                         res = {entity};
                     } else {
                         res.emplace_back(entity);
@@ -75,30 +79,30 @@ protected:
     }
 };
 
-class TankHandler : public MovableHandler {
-public:
-    explicit TankHandler(GameModel &model, Tank &entity);
-
-    void move(Direction dir, int speed) final;
-    void move(Direction direction);
-    void shoot();
-
-private:
-    int lastMoveTick_ = -1;
-    int lastShootTick_ = -RELOAD_TICKS - 1;
-};
-
 class ProjectileHandler : public MovableHandler {
 public:
     explicit ProjectileHandler(GameModel &model, MovableEntity &entity);
 
     void interactOnNextTick();
 
-    [[nodiscard]] bool breakIfBreakable();
     [[nodiscard]] bool isBreakOnCreation();
 
 protected:
+    [[nodiscard]] bool breakIfBreakable();
     void destroyByBullet(Entity &other);
+};
+
+class BonusHandler : public ForegroundHandler {
+public:
+    explicit BonusHandler(GameModel &model, Bonus &entity);
+
+    virtual void apply(Tank &tank) = 0;
+};
+
+class WalkOnWaterHandler : public BonusHandler {
+public:
+    explicit WalkOnWaterHandler(GameModel &model, WalkOnWater &entity);
+    void apply(Tank &tank) override;
 };
 
 }  // namespace Tanks::model

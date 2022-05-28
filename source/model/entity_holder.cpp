@@ -1,5 +1,6 @@
 #include "model/entity_holder.h"
 #include <cassert>
+#include "model/handler.h"
 
 namespace Tanks::model {
 Entity &EntityHolder::insert(std::unique_ptr<Entity> entity) {

@@ -1,7 +1,7 @@
 #ifndef TANKS_TANK_H
 #define TANKS_TANK_H
 
-#include "game_model.h"
+#include "game_model_fwd.h"
 #include "movable_entity.h"
 
 namespace Tanks::model {
@@ -29,7 +29,7 @@ public:
     explicit MediumTank(int left,
                         int top,
                         int entityId,
-                        GameModel& model,
+                        const TankHandlerCreator &handlerCreator,
                         Direction direction,
                         int speed);
 

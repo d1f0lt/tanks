@@ -3,6 +3,7 @@
 #include "model/event.h"
 #include "model/network_utils.h"
 #include "model/projectile.h"
+#include "model/tank.h"
 
 namespace Tanks::model {
 using boost::asio::ip::tcp;
@@ -31,7 +32,8 @@ void ServerModel::receiveTurns(tcp::socket &client) {
         std::string msg(e.what());
         if (msg == "read: Bad file descriptor [system:9]" ||
             msg == "read: Connection reset by peer [system:104]" ||
-            msg == "read: End of file [asio.misc:2]") {
+            msg == "read: End of file [asio.misc:2]" ||
+            msg == "write_some: Bad file descriptor [system:9]") {
             return;  // Connection was closed
         }
         throw e;

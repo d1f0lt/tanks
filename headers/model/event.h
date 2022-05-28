@@ -18,18 +18,21 @@ public:
     virtual ~Event() = default;
 
     virtual void acceptExecutor(const EventExecutor &executor) = 0;
-    virtual void sendTo(tcp::socket &os) = 0;
+    virtual void sendTo(tcp::socket &socket) = 0;
 };
 
 class TankMove : public Event {
 public:
-    explicit TankMove(int id, Direction direction, int speed);
+    explicit TankMove(int tankId, Direction direction, int speed);
 
     void acceptExecutor(const EventExecutor &executor) final;
-    void sendTo(tcp::socket &os) override;
-    static void sendTo(tcp::socket &os, int id, Direction direction, int speed);
+    void sendTo(tcp::socket &socket) override;
+    static void sendTo(tcp::socket &socket,
+                       int tankId,
+                       Direction direction,
+                       int speed);
 
-    static std::unique_ptr<Event> readFrom(tcp::socket &is);
+    static std::unique_ptr<Event> readFrom(tcp::socket &socket);
 
     [[nodiscard]] int getId() const;
     [[nodiscard]] Direction getDirection() const;
@@ -56,10 +59,10 @@ public:
 
     [[nodiscard]] static std::unique_ptr<Event> readFrom(tcp::socket &socket);
 
-    int getTankId() const;
-    int getLeft() const;
-    int getTop() const;
-    Direction getDirection() const;
+    [[nodiscard]] int getTankId() const;
+    [[nodiscard]] int getLeft() const;
+    [[nodiscard]] int getTop() const;
+    [[nodiscard]] Direction getDirection() const;
 
 private:
     const int tankId_;

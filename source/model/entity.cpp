@@ -1,5 +1,6 @@
 #include "model/entity.h"
 #include <unordered_set>
+#include "model/handler.h"
 
 namespace Tanks::model {
 int Entity::getLeft() const {
@@ -55,12 +56,23 @@ int Entity::dist(const Entity &other) const {
 }
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-Entity::Entity(int left, int top, int entityId)
-    : left_(left), top_(top), id_(entityId) {
+Entity::Entity(int left,
+               int top,
+               int entityId,
+               std::unique_ptr<BasicHandler> handler)
+    : left_(left), top_(top), id_(entityId), handler_(std::move(handler)) {
 }
 
 int Entity::getId() const {
     return id_;
+}
+
+BasicHandler &Entity::getHandler() const {
+    return *handler_;
+}
+
+std::unique_ptr<BasicHandler> &Entity::getAccessToHandler() {
+    return handler_;
 }
 
 }  // namespace Tanks::model

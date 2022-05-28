@@ -1,9 +1,12 @@
 #include "model/handler.h"
 #include <model/game_model.h>
 #include <cassert>
+#include <memory>
 #include <unordered_set>
 #include "model/blocks.h"
+#include "model/bonus.h"
 #include "model/projectile.h"
+#include "model/tank.h"
 
 namespace Tanks::model {
 BasicHandler::BasicHandler(GameModel &model_, Entity &entity_)
@@ -22,8 +25,6 @@ GameModel &BasicHandler::getModel() const {
 
 BasicHandler::~BasicHandler() {
     getModel().handlers_.erase(&getEntity());
-    getModel().byId_.erase(getEntity().getId());
-    getModel().groupedEntities_.erase(getEntity());
 }
 
 std::vector<const Entity *> MovableHandler::look(Direction direction) {
@@ -177,48 +178,16 @@ std::vector<Entity *> MovableHandler::lookMutable(Direction direction) {
     return {buff.begin(), buff.end()};
 }
 
-void TankHandler::shoot() {
-    if (getModel().getTick() <= lastShootTick_ + RELOAD_TICKS) {
-        return;
-    }
-
-    lastShootTick_ = getModel().getTick();
-
-    auto &tank = dynamic_cast<Tank &>(getEntity());
-
-    static const std::unordered_map<Direction, int> DCOL = {
-        {Tanks::model::Direction::UP, getEntity().getWidth() / 2},
-        {Tanks::model::Direction::DOWN, getEntity().getWidth() / 2},
-        {Tanks::model::Direction::RIGHT, getEntity().getWidth()},
-        {Tanks::model::Direction::LEFT, -1}};
-
-    static const std::unordered_map<Direction, int> DROW = {
-        {Tanks::model::Direction::UP, -1},
-        {Tanks::model::Direction::DOWN, getEntity().getHeight()},
-        {Tanks::model::Direction::RIGHT, getEntity().getHeight() / 2},
-        {Tanks::model::Direction::LEFT, getEntity().getHeight() / 2}};
-
-    getModel().addEntity(std::make_unique<Projectile>(
-        getEntity().getLeft() + DCOL.at(tank.getDirection()),
-        getEntity().getTop() + DROW.at(tank.getDirection()),
-        tank.getDirection(), getModel(), getModel().getIncrId()));
+void MovableHandler::setPosition(int left, int top) {
+    restoreBackground();
+    auto &entity = dynamic_cast<MovableEntity &>(getEntity());
+    entity.setLeft(left);
+    entity.setTop(top);
+    setBackground();
 }
 
-TankHandler::TankHandler(GameModel &model, Tank &entity)
-    : MovableHandler(model, entity) {
-}
-
-void TankHandler::move(Direction dir, int speed) {
-    if (getModel().getTick() <= std::max(lastShootTick_, lastMoveTick_)) {
-        return;
-    }
-
-    lastMoveTick_ = getModel().getTick();
-    MovableHandler::move(dir, speed);
-}
-
-void TankHandler::move(Direction direction) {
-    move(direction, dynamic_cast<Tank &>(getEntity()).getSpeed());
+void MovableHandler::setDirection(Direction direction) {
+    dynamic_cast<MovableEntity &>(getEntity()).setDirection(direction);
 }
 
 ProjectileHandler::ProjectileHandler(GameModel &model, MovableEntity &entity)
@@ -255,7 +224,7 @@ void ProjectileHandler::destroyByBullet(Entity &other) {
     int top = other.getTop();
     getModel().eraseEntity(other);
     getModel().addEntity(
-        std::make_unique<Floor>(left, top, getModel().getIncrId()));
+        std::make_unique<Floor>(left, top, getModel().getIncrId(), getModel()));
 }
 
 bool ProjectileHandler::isBreakOnCreation() {
@@ -288,4 +257,16 @@ void ProjectileHandler::interactOnNextTick() {
     move(bullet.getDirection(), bullet.getSpeed());
 }
 
+BonusHandler::BonusHandler(GameModel &model, Bonus &entity)
+    : ForegroundHandler(model, entity) {
+}
+
+WalkOnWaterHandler::WalkOnWaterHandler(GameModel &model, WalkOnWater &entity)
+    : BonusHandler(model, entity) {
+}
+
+void WalkOnWaterHandler::apply(Tank &tank) {
+    tank.getAccessToHandler() = std::make_unique<TankMovableOnWaterHandler>(
+        getModel(), tank, getModel().getTick());
+}
 }  // namespace Tanks::model

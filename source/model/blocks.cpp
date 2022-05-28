@@ -1,9 +1,13 @@
 #include "model/blocks.h"
-#include <climits>
 #include "constants.h"
+#include "model/handler.h"
 
 namespace Tanks::model {
-Block::Block(int left, int top, int entityId) : Entity(left, top, entityId) {
+Block::Block(int left,
+             int top,
+             int entityId,
+             std::unique_ptr<BasicHandler> handler)
+    : Entity(left, top, entityId, std::move(handler)) {
 }
 
 int Block::getHeight() const {
@@ -26,7 +30,8 @@ int Brick::getStrength() const {
     return static_cast<int>(Strength::BRICK);
 }
 
-Brick::Brick(int left, int top, int entityId) : Block(left, top, entityId) {
+Brick::Brick(int left, int top, int entityId, GameModel &model)
+    : Block(left, top, entityId, std::make_unique<BasicHandler>(model, *this)) {
 }
 
 EntityType Steel::getType() const {
@@ -37,11 +42,17 @@ int Steel::getStrength() const {
     return static_cast<int>(Strength::STEEL);
 }
 
-Steel::Steel(int left, int top, int entityId) : Block(left, top, entityId) {
+Steel::Steel(int left, int top, int entityId, GameModel &model)
+    : Block(left, top, entityId, std::make_unique<BasicHandler>(model, *this)) {
 }
 
-LevelBorder::LevelBorder(int left, int top, EntityType type, int entityId)
-    : Block(left, top, entityId), type_(type) {
+LevelBorder::LevelBorder(int left,
+                         int top,
+                         EntityType type,
+                         int entityId,
+                         GameModel &model)
+    : Block(left, top, entityId, std::make_unique<BasicHandler>(model, *this)),
+      type_(type) {
 }
 
 EntityType LevelBorder::getType() const {
@@ -60,7 +71,8 @@ int Floor::getStrength() const {
     return static_cast<int>(Strength::FLOOR);
 }
 
-Floor::Floor(int left, int top, int entityId) : Block(left, top, entityId) {
+Floor::Floor(int left, int top, int entityId, GameModel &model)
+    : Block(left, top, entityId, std::make_unique<BasicHandler>(model, *this)) {
 }
 
 bool Floor::isTankPassable() const {
@@ -71,7 +83,8 @@ bool Floor::isBulletPassable() const {
     return true;
 }
 
-Water::Water(int left, int top, int entityId) : Block(left, top, entityId) {
+Water::Water(int left, int top, int entityId, GameModel &model)
+    : Block(left, top, entityId, std::make_unique<BasicHandler>(model, *this)) {
 }
 
 EntityType Water::getType() const {

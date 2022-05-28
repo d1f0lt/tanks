@@ -1,7 +1,6 @@
 #include "model/game_model.h"
 #include <cassert>
 #include <fstream>
-#include <iostream>
 #include <mutex>
 #include <optional>
 #include <thread>
@@ -38,6 +37,8 @@ void GameModel::eraseEntity(Entity &entity) {
         dynamic_cast<ForegroundHandler &>(getHandler(entity))
             .restoreBackground();
     }
+    groupedEntities_.erase(entity);
+    byId_.erase(entity.getId());
     entityHolder_.erase(entity);  // Other cleared in handler destructor
 }
 
@@ -69,27 +70,31 @@ void GameModel::loadLevel(int level) {
 
             switch (CHAR_TO_TYPE.at(str[col])) {
                 case (EntityType::BRICK):
-                    addEntity(std::make_unique<Brick>(
-                        realCol * TILE_SIZE, row * TILE_SIZE, getIncrId()));
+                    addEntity(std::make_unique<Brick>(realCol * TILE_SIZE,
+                                                      row * TILE_SIZE,
+                                                      getIncrId(), *this));
                     break;
                 case (EntityType::FLOOR):
-                    addEntity(std::make_unique<Floor>(
-                        realCol * TILE_SIZE, row * TILE_SIZE, getIncrId()));
+                    addEntity(std::make_unique<Floor>(realCol * TILE_SIZE,
+                                                      row * TILE_SIZE,
+                                                      getIncrId(), *this));
                     break;
                 case (EntityType::GRASS):
                     break;
                 case (EntityType::STEEL):
-                    addEntity(std::make_unique<Steel>(
-                        realCol * TILE_SIZE, row * TILE_SIZE, getIncrId()));
+                    addEntity(std::make_unique<Steel>(realCol * TILE_SIZE,
+                                                      row * TILE_SIZE,
+                                                      getIncrId(), *this));
                     break;
                 case (EntityType::WATER):
-                    addEntity(std::make_unique<Water>(
-                        realCol * TILE_SIZE, row * TILE_SIZE, getIncrId()));
+                    addEntity(std::make_unique<Water>(realCol * TILE_SIZE,
+                                                      row * TILE_SIZE,
+                                                      getIncrId(), *this));
                     break;
                 default:
                     addEntity(std::make_unique<LevelBorder>(
                         realCol * TILE_SIZE, row * TILE_SIZE,
-                        CHAR_TO_TYPE.at(str[col]), getIncrId()));
+                        CHAR_TO_TYPE.at(str[col]), getIncrId(), *this));
                     break;
             }
         }
@@ -111,7 +116,7 @@ std::optional<std::reference_wrapper<Entity>> GameModel::getById(int entityId) {
     return *byId_[entityId];
 }
 
-std::vector<const Entity *> GameModel::getAll(EntityType type) {
+std::vector<const Entity *> GameModel::getAll(EntityType type) const {
     auto vec = groupedEntities_.snapshotAll()[static_cast<unsigned>(type)];
     return {vec.begin(), vec.end()};
 }
@@ -120,7 +125,7 @@ int GameModel::getTick() const {
     return currentTick_;
 }
 
-std::vector<std::vector<const Entity *>> GameModel::getAll() {
+std::vector<std::vector<const Entity *>> GameModel::getAll() const {
     const auto &all = groupedEntities_.getAllByLink();
     std::vector<std::vector<const Entity *>> res;
     for (const auto &line : all) {

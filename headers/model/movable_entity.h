@@ -17,6 +17,7 @@ public:
 
     [[nodiscard]] Direction getDirection() const;
     [[nodiscard]] virtual int getSpeed() const = 0;
+    [[nodiscard]] std::vector<const Entity *> look(Direction direction);
 
 protected:
     virtual void setDirection(Direction direction);

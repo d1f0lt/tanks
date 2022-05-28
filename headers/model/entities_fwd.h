@@ -9,6 +9,8 @@ class Tank;
 class BotTank;
 class PlayableTank;
 class Projectile;
+class Bonus;
+class WalkOnWater;
 }  // namespace Tanks::model
 
 #endif  // TANKS_ENTITIES_FWD_H

@@ -14,6 +14,8 @@ public:
 
     void move(Direction direction, int speed);
 
+    void changeDirection(Direction direction);
+
 private:
     const int id_;
     tcp::socket &socket_;

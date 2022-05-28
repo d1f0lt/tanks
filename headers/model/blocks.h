@@ -3,6 +3,7 @@
 
 #include <climits>
 #include "entity.h"
+#include "model/game_model_fwd.h"
 
 namespace Tanks::model {
 enum class Strength {
@@ -15,7 +16,10 @@ enum class Strength {
 
 class Block : public Entity {
 public:
-    explicit Block(int left, int top, int entityId);
+    explicit Block(int left,
+                   int top,
+                   int entityId,
+                   std::unique_ptr<BasicHandler> handler);
 
     [[nodiscard]] int getHeight() const final;
     [[nodiscard]] int getWidth() const final;
@@ -25,7 +29,7 @@ public:
 
 class Floor final : public Block {
 public:
-    explicit Floor(int left, int top, int entityId);
+    explicit Floor(int left, int top, int entityId, GameModel &model);
 
     [[nodiscard]] EntityType getType() const override;
     [[nodiscard]] bool isTankPassable() const final;
@@ -35,7 +39,7 @@ public:
 
 class Water final : public Block {
 public:
-    explicit Water(int left, int top, int entityId);
+    explicit Water(int left, int top, int entityId, GameModel &model);
 
     [[nodiscard]] EntityType getType() const override;
     [[nodiscard]] bool isBulletPassable() const override;
@@ -44,7 +48,7 @@ public:
 
 class Brick final : public Block {
 public:
-    explicit Brick(int left, int top, int entityId);
+    explicit Brick(int left, int top, int entityId, GameModel &model);
 
     [[nodiscard]] EntityType getType() const final;
     [[nodiscard]] int getStrength() const final;
@@ -52,7 +56,7 @@ public:
 
 class Steel final : public Block {
 public:
-    explicit Steel(int left, int top, int entityId);
+    explicit Steel(int left, int top, int entityId, GameModel &model);
 
     [[nodiscard]] EntityType getType() const final;
     [[nodiscard]] int getStrength() const final;
@@ -60,7 +64,11 @@ public:
 
 class LevelBorder : public Block {
 public:
-    explicit LevelBorder(int left, int top, EntityType type, int entityId);
+    explicit LevelBorder(int left,
+                         int top,
+                         EntityType type,
+                         int entityId,
+                         GameModel &model);
 
     [[nodiscard]] EntityType getType() const final;
     [[nodiscard]] int getStrength() const final;
