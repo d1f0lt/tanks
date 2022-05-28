@@ -13,7 +13,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v3
-      - run: sudo apt-get update && sudo apt-get install clang-tidy-12 libsfml-dev
+      - run: sudo apt-get update && sudo apt-get install clang-tidy-12 libsfml-dev libboost1.71--all-dev
       - run: clang-tidy-12 --version
       - run: ls
       - run: clang-tidy-12 --config-file='./.clang-tidy' $(find . -path '*/CMakeFiles/*' -prune -or \( -iname '*.cpp' -and -not -iname '*tests.cpp' -or -iname '*.h' -and -not -iname 'doctest.h' \) -print) -- -Iheaders
@@ -64,7 +64,7 @@ jobs:
             packages:
     steps:
       - uses: actions/checkout@v3
-      - run: sudo apt-get update && sudo apt-get install cmake make libsfml-dev ninja-build ${{matrix.compiler.packages}} ${{matrix.sanitize.packages}}
+      - run: sudo apt-get update && sudo apt-get install cmake make libsfml-dev ninja-build ${{matrix.compiler.packages}} ${{matrix.sanitize.packages}} libboost1.71--all-dev
       - run: cmake --version
       - run: ${{matrix.compiler.command}} ${{matrix.compiler.version-flags}}
       - run: cmake . -DCMAKE_CXX_COMPILER="${{matrix.compiler.command}}" -DEXTRA_CXX_FLAGS="${{matrix.compiler.flags}} ${{matrix.sanitize.flags}}" ${{matrix.compiler.cmake-flags}} ${{matrix.sanitize.cmake-flags}} -GNinja

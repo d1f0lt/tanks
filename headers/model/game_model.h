@@ -44,7 +44,7 @@ public:
     [[nodiscard]] int getHeight() const;
     [[nodiscard]] int getWidth() const;
 
-    [[nodiscard]] std::vector<const Entity *> getAll(EntityType type)const;
+    [[nodiscard]] std::vector<const Entity *> getAll(EntityType type) const;
     [[nodiscard]] std::vector<std::vector<const Entity *>> getAll() const;
 
     [[nodiscard]] int getTick() const;
