@@ -23,8 +23,6 @@ public:
     Database &operator=(Database &&) = default;
     virtual ~Database();
 
-    void exec(const std::string &request);
-
     void createTable(const std::string &patternFilename);
     [[maybe_unused]] void dropTable(const std::string &tableName);
 
@@ -37,6 +35,7 @@ protected:
     sqlite3 *db = nullptr;         // NOLINT
     sqlite3_stmt *stmt = nullptr;  // NOLINT
 
+    void exec(const std::string &request);
     void connectToDatabase(const std::string &filename);
 };
 

@@ -221,6 +221,7 @@ TEST_CASE("Players database") {
     const std::string tableName = "players";
     const std::string path = "../.data/";
     PlayersDatabase db(path + "menu_test_");
+    db.connect();
     db.dropTable("players");
     db.dropTable("settings");
     db.dropTable("skills");
@@ -267,4 +268,5 @@ TEST_CASE("Players database") {
 
     correct = thirdData;
     check(third, correct);
+    db.disconnectFromDatabase();
 }

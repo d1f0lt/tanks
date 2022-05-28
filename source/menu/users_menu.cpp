@@ -2,9 +2,9 @@
 #include <cassert>
 #include <memory>
 #include "database.h"
+#include "menu/input_menu.h"
 #include "menu/main_menu.h"
 #include "menu/menu.h"
-#include "menu/input_menu.h"
 
 namespace Tanks::Menu {
 
@@ -73,7 +73,8 @@ Menu initMenu(PlayersDatabase &db, const std::string &imagesPath) {  // NOLINT
     return menu;
 }
 
-void insertNewUser(const std::string &username, PlayersDatabase &db) { // NOLINT
+void insertNewUser(const std::string &username,
+                   PlayersDatabase &db) {  // NOLINT
     if (username.size() >= 2) {
         try {
             db.insert(username);

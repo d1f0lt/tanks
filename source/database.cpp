@@ -78,7 +78,8 @@ void Database::dropTable(const std::string &tableName) {
 
 namespace Menu {
 
-PlayersDatabase::PlayersDatabase(const std::string &path) : filename(path + "players.dblite") {
+PlayersDatabase::PlayersDatabase(const std::string &path)
+    : filename(path + "players.dblite") {
     connect();
 #ifndef MENU_TEST
     createTable(path + "pattern_for_players.sql");
@@ -190,8 +191,7 @@ std::string convert(int64_t val) {
 }
 
 std::string playersAddRequest(PlayerGeneral &info) {
-    std::string req =
-        "INSERT INTO players (name,money) VALUES(";
+    std::string req = "INSERT INTO players (name,money) VALUES(";
     req += "'" + info.name + "'," + std::to_string(info.money) + ");";
     return req;
 }
