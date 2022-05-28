@@ -253,6 +253,19 @@ void Menu::flyAwayToLeft(sf::RenderWindow &window,
     animation(window, backgroundSprite, stepsAmount, -animationSpeed);
 }
 
+void Menu::flyAwayToLeft() {
+    assert(!items.empty());
+    float maxPositionX = 0;
+    for (const auto &item : items) {
+        auto pos = item->getPosition().x + item->getSize().x;
+        maxPositionX = std::max(pos, maxPositionX);
+    }
+    assert(maxPositionX > 0 && maxPositionX < WINDOW_WIDTH);
+    const int stepsAmount =
+        static_cast<int>(std::ceil(maxPositionX / animationSpeed));
+    moveItems(-static_cast<float>(stepsAmount * animationSpeed));
+}
+
 void Menu::flyOutFromRight(sf::RenderWindow &window,
                            const sf::Sprite &backgroundSprite) {
     assert(!items.empty());

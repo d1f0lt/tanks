@@ -67,7 +67,19 @@ Menu initMenu(PlayersDatabase &db, const std::string &imagesPath) {  // NOLINT
         items.emplace_back(std::move(picture));
     }
 
-    return Menu(menuWidth, title, items, buttons);
+    Menu menu(menuWidth, title, items, buttons);
+    menu.addIconToLeftLowerCorner(imagesPath + "exit.png", ButtonType::EXIT);
+
+    return menu;
+}
+
+void insertNewUser(const std::string &username, PlayersDatabase &db) { // NOLINT
+    if (username.size() >= 2) {
+        try {
+            db.insert(username);
+        } catch (const DatabaseError &err) {
+        }
+    }
 }
 
 }  // namespace
@@ -80,8 +92,6 @@ void showUsersMenu(sf::RenderWindow &window) {
 
     Menu menu(initMenu(db, imagesPath));
 
-    menu.addIconToLeftLowerCorner(imagesPath + "exit.png", ButtonType::EXIT);
-
     while (window.isOpen()) {
         const auto *const res = menu.showMenu(window, backgroundSprite);
         switch (res->getType()) {
@@ -91,15 +101,21 @@ void showUsersMenu(sf::RenderWindow &window) {
                     db.makeOnline(person.general.name);
                     menu.flyAwayToLeft(window, backgroundSprite);
                     showMainMenu(window, backgroundSprite);
-                    menu.flyOutFromLeft(window, backgroundSprite);
                     db.makeOffline(person.general.name);
+                    menu.flyOutFromLeft(window, backgroundSprite);
                 }
             } break;
             case ButtonType::NEW_USER: {
-                const std::string title = "INPUT NAME";
+                const static std::string title = "INPUT NAME";
 
                 menu.flyAwayToLeft(window, backgroundSprite);
                 auto ans = showInputMenu(window, backgroundSprite, title);
+                if (ans != std::nullopt) {
+                    insertNewUser(ans.value(), db);
+                    menu = initMenu(db, imagesPath);
+                    menu.flyAwayToLeft();
+                }
+
                 menu.flyOutFromLeft(window, backgroundSprite);
             } break;
             case ButtonType::EXIT:

@@ -16,6 +16,7 @@ public:
 
     sf::Vector2<float> getPosition() const final;
     sf::Vector2<float> getSize() const final;
+    std::string getContent() const;
 
     void setPosition(sf::Vector2<float> newPosition) final;
 
