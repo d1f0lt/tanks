@@ -237,6 +237,21 @@ void PlayersDatabase::insert(const std::string &name) {
     insert(info);
 }
 
+void PlayersDatabase::deleteByName(const std::string &username) {
+    std::string requestStart = "DELETE FROM ";
+    std::string requestEnd = " where name = '" + username + "';";
+    bool flag = isConnected();
+    if (!flag) {
+        connect();
+    }
+    exec(requestStart + "skills" + requestEnd);
+    exec(requestStart + "settings" + requestEnd);
+    exec(requestStart + "players" + requestEnd);
+    if (!flag) {
+        disconnectFromDatabase();
+    }
+}
+
 bool PlayersDatabase::isOnline(const std::string &username) {
     const std::string request =
         "SELECT online FROM players WHERE name = '" + username + "';";

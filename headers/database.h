@@ -75,6 +75,8 @@ public:
     void insert(PlayerInfo info);
     void insert(const std::string &name);
 
+    void deleteByName(const std::string &username);
+
     bool isOnline(const std::string &username);
     void makeOnline(const std::string &username);
     void makeOffline(const std::string &username);
