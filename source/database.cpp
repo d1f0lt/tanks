@@ -61,7 +61,14 @@ void Database::connectToDatabase(const std::string &filename) {
 }
 
 void Database::disconnectFromDatabase() {
-    sqlite3_close_v2(db);
+    if (db != nullptr) {
+        assert(sqlite3_close(db) == SQLITE_OK);
+        db = nullptr;
+    }
+}
+
+bool Database::isConnected() const {
+    return db != nullptr;
 }
 
 void Database::dropTable(const std::string &tableName) {
@@ -71,24 +78,31 @@ void Database::dropTable(const std::string &tableName) {
 
 namespace Menu {
 
-PlayersDatabase::PlayersDatabase(const std::string &path) {
-    connectToDatabase(path + "players.dblite");
+PlayersDatabase::PlayersDatabase(const std::string &path) : filename(path + "players.dblite") {
+    connect();
 #ifndef MENU_TEST
     createTable(path + "pattern_for_players.sql");
     createTable(path + "pattern_for_settings.sql");
     createTable(path + "pattern_for_skills.sql");
 #endif
+    disconnectFromDatabase();
 }
 
 PlayerInfo PlayersDatabase::getInfoByName(const std::string &username) {
+    connect();
     PlayerInfo res{getGeneralInfoByName(username),
                    getSkillsInfoByName(username),
                    getSettingsInfoByName(username)};
+    disconnectFromDatabase();
     return res;
 }
 
 PlayerGeneral PlayersDatabase::getGeneralInfoByName(
     const std::string &username) {
+    bool flag = isConnected();
+    if (!flag) {
+        connect();
+    }
     const std::string request =
         "SELECT name, money FROM players WHERE name = '" + username + "';";
     PlayerGeneral res;
@@ -96,6 +110,10 @@ PlayerGeneral PlayersDatabase::getGeneralInfoByName(
     sqlite3_prepare_v2(db, request.c_str(), -1, &stmt, nullptr);
     sqlite3_step(stmt);
     res.money = sqlite3_column_int64(stmt, 1);
+    sqlite3_finalize(stmt);
+    if (!flag) {
+        disconnectFromDatabase();
+    }
     return res;
 }
 
@@ -104,12 +122,20 @@ PlayerSkills PlayersDatabase::getSkillsInfoByName(const std::string &username) {
         "SELECT tank_speed, bullet_speed, reload_ticks FROM skills WHERE name "
         "= '" +
         username + "';";
+    bool flag = isConnected();
+    if (!flag) {
+        connect();
+    }
     PlayerSkills res;
     sqlite3_prepare_v2(db, request.c_str(), -1, &stmt, nullptr);
     sqlite3_step(stmt);
     res.tankSpeed = sqlite3_column_int(stmt, 0);
     res.bulletSpeed = sqlite3_column_int(stmt, 1);
     res.reloadTicks = sqlite3_column_int(stmt, 2);
+    sqlite3_finalize(stmt);
+    if (!flag) {
+        disconnectFromDatabase();
+    }
     return res;
 }
 
@@ -118,25 +144,41 @@ PlayerSettings PlayersDatabase::getSettingsInfoByName(
     const std::string request =
         "SELECT music_volume, sounds_volume FROM settings WHERE name = '" +
         username + "';";
+    bool flag = isConnected();
+    if (!flag) {
+        connect();
+    }
     PlayerSettings res;
     sqlite3_prepare_v2(db, request.c_str(), -1, &stmt, nullptr);
     sqlite3_step(stmt);
     res.musicVolume = sqlite3_column_int(stmt, 0);
     res.soundsVolume = sqlite3_column_int(stmt, 1);
+    sqlite3_finalize(stmt);
+    if (!flag) {
+        disconnectFromDatabase();
+    }
     return res;
 }
 
 std::vector<std::string> PlayersDatabase::getAllUsernames() {
     const static std::string request =
         "SELECT name FROM players ORDER BY registration_date;";
-    sqlite3_prepare_v2(db, request.c_str(), -1, &stmt, nullptr);
+    bool flag = isConnected();
+    if (!flag) {
+        connect();
+    }
     size_t cnt = getNumberOfRows("players");
     std::vector<std::string> res;
     res.reserve(cnt);
+    sqlite3_prepare_v2(db, request.c_str(), -1, &stmt, nullptr);
     for (size_t i = 0; i < cnt; ++i) {
         sqlite3_step(stmt);
         res.emplace_back(std::string(reinterpret_cast<const char *>(  // NOLINT
             sqlite3_column_text(stmt, 0))));
+    }
+    sqlite3_finalize(stmt);
+    if (!flag) {
+        disconnectFromDatabase();
     }
     return res;
 }
@@ -178,9 +220,16 @@ std::string settingsAddRequest(PlayerInfo &info) {
 }  // namespace
 
 void PlayersDatabase::insert(PlayerInfo info) {
+    bool flag = isConnected();
+    if (!flag) {
+        connect();
+    }
     exec(playersAddRequest(info.general));
     exec(skillsAddRequest(info));
     exec(settingsAddRequest(info));
+    if (!flag) {
+        disconnectFromDatabase();
+    }
 }
 
 void PlayersDatabase::insert(const std::string &name) {
@@ -191,21 +240,50 @@ void PlayersDatabase::insert(const std::string &name) {
 bool PlayersDatabase::checkOnline(const std::string &username) {
     const std::string request =
         "SELECT online FROM players WHERE name = '" + username + "';";
+    bool flag = isConnected();
+    if (!flag) {
+        connect();
+    }
     sqlite3_prepare_v2(db, request.c_str(), -1, &stmt, nullptr);
     sqlite3_step(stmt);
-    return static_cast<bool>(sqlite3_column_bytes(stmt, 0));
+    auto ans = static_cast<bool>(sqlite3_column_bytes(stmt, 0));
+    sqlite3_finalize(stmt);
+    if (!flag) {
+        disconnectFromDatabase();
+    }
+    return ans;
 }
 
 void PlayersDatabase::makeOnline(const std::string &username) {
     const std::string request =
         "UPDATE players SET online = 'TRUE' WHERE name = '" + username + "';";
+    bool flag = isConnected();
+    if (!flag) {
+        connect();
+    }
     exec(request);
+    if (!flag) {
+        disconnectFromDatabase();
+    }
 }
 
 void PlayersDatabase::makeOffline(const std::string &username) {
     const std::string request =
         "UPDATE players SET online = 'FALSE' WHERE name = '" + username + "';";
+    bool flag = isConnected();
+    if (!flag) {
+        connect();
+    }
     exec(request);
+    if (!flag) {
+        disconnectFromDatabase();
+    }
+}
+
+void PlayersDatabase::connect() {
+    if (db == nullptr) {
+        connectToDatabase(filename);
+    }
 }
 
 }  // namespace Menu

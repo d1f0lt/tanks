@@ -21,7 +21,7 @@ public:
     Database(Database &&) = default;
     Database &operator=(const Database &) = delete;
     Database &operator=(Database &&) = default;
-    ~Database();
+    virtual ~Database();
 
     void exec(const std::string &request);
 
@@ -31,6 +31,7 @@ public:
     [[nodiscard]] int getNumberOfRows(const std::string &tableName) const;
 
     void disconnectFromDatabase();
+    [[nodiscard]] bool isConnected() const;
 
 protected:
     sqlite3 *db = nullptr;         // NOLINT
@@ -67,6 +68,8 @@ struct PlayersDatabase : Database {
 public:
     PlayersDatabase(const std::string &path);
 
+    void connect();
+
     PlayerInfo getInfoByName(const std::string &username);
     std::vector<std::string> getAllUsernames();
 
@@ -78,6 +81,8 @@ public:
     void makeOffline(const std::string &username);
 
 private:
+    const std::string filename;
+
     PlayerGeneral getGeneralInfoByName(const std::string &username);
     PlayerSettings getSettingsInfoByName(const std::string &username);
     PlayerSkills getSkillsInfoByName(const std::string &username);
