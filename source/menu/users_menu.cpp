@@ -45,6 +45,7 @@ Menu initMenu(PlayersDatabase &db, const std::string &imagesPath) {  // NOLINT
     const static size_t buttonsHeight = 100;
     const static sf::Color btnStandardColor(0, 0, 0, 150);
     const static sf::Color btnHoverColor(66, 66, 66, 230);
+
     std::vector<ButtonWithType> buttons;
     std::vector<std::unique_ptr<MenuItem>> items;
     buttons.reserve(usernames.size());
@@ -68,6 +69,22 @@ Menu initMenu(PlayersDatabase &db, const std::string &imagesPath) {  // NOLINT
     }
 
     Menu menu(menuWidth, title, items, buttons);
+
+    std::vector<std::unique_ptr<MenuItem>> addingButtons;
+    addingButtons.reserve(usernames.size());
+    for (size_t i = 0; i < usernames.size(); ++i) {
+        auto item = std::make_unique<MenuPicture>(imagesPath + "trash.png",
+                                                  sf::Vector2<float>{0, 0});
+        addingButtons.emplace_back(std::move(item));
+    }
+    sf::Color addingButtonsStandardColor{0, 0, 0, 0};
+    sf::Color addingButtonsHoverColor{128, 128, 128, 128};
+
+    ButtonWithType info{ButtonType::DELETE,
+                        sf::Vector2<float>{buttonsHeight, buttonsHeight},
+                        addingButtonsStandardColor, addingButtonsHoverColor};
+    menu.addAddingButtons(1, std::move(addingButtons), info);
+
     menu.addIconToLeftLowerCorner(imagesPath + "exit.png", ButtonType::EXIT);
 
     return menu;
@@ -124,6 +141,16 @@ void showUsersMenu(sf::RenderWindow &window) {
             case ButtonType::EXIT:
                 window.close();
                 break;
+            case ButtonType::DELETE: {
+                const auto *item =
+                    dynamic_cast<const MenuAdditionalButton *>(res);
+                assert(item != nullptr);
+                std::string username =
+                    dynamic_cast<const MenuButton *>(item->getMainButton())
+                        ->getInscription();
+                db.deleteByName(username);
+                menu = initMenu(db, imagesPath);
+            } break;
             default:
                 assert(false);
         }
