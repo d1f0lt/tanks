@@ -58,6 +58,8 @@ add_executable(
         source/menu/levels_menu.cpp
         source/menu/textbox.cpp
         source/menu/input_menu.cpp
+        source/menu/upgrade_menu.cpp
+        source/menu/progress_bar.cpp
         source/game.cpp
         source/game_controller.cpp
         source/game_environment.cpp
