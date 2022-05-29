@@ -120,7 +120,7 @@ void showUsersMenu(sf::RenderWindow &window) {
                     db.makeOnline(person.general.name);
                     db.disconnectFromDatabase();
                     menu.flyAwayToLeft(window, backgroundSprite);
-                    showMainMenu(window, backgroundSprite);
+                    showMainMenu(window, backgroundSprite, person);
                     db.makeOffline(person.general.name);
                     menu.flyOutFromLeft(window, backgroundSprite);
                 }

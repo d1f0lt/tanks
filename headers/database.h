@@ -43,7 +43,7 @@ namespace Menu {
 
 struct PlayerGeneral {
     std::string name;
-    int64_t money{};
+    int64_t money = 100;
 };
 
 struct PlayerSettings {

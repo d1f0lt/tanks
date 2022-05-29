@@ -120,7 +120,22 @@ private:
     ButtonType type;
 };
 
-struct MenuButton : MenuItem {
+struct MenuRectangle : MenuItem {
+public:
+    MenuRectangle(Button &info, const sf::Vector2<float> &coordinates);
+
+    sf::Vector2<float> getSize() const override;
+    sf::Vector2<float> getPosition() const override;
+
+    void setPosition(sf::Vector2<float> newPosition) override;
+
+    void draw(sf::RenderWindow &window) const override;
+
+protected:
+    mutable sf::RectangleShape rectangle; // NOLINT
+};
+
+struct MenuButton : MenuRectangle {
 public:
     MenuButton(std::unique_ptr<MenuItem> &&content,
                const sf::Vector2<float> &coordinates,
@@ -144,7 +159,6 @@ protected:
 
 private:
     std::unique_ptr<MenuItem> content;
-    mutable sf::RectangleShape rectangle;  // we want draw to be a const
     ButtonWithType info;
 };
 
@@ -156,6 +170,11 @@ public:
     explicit MenuPicture(const sf::Image &image_,
                          const sf::Vector2<float> &coordinates);
 
+    explicit MenuPicture(const std::string &filename,
+                         size_t sizeOfOne,
+                         size_t count,
+                         const sf::Vector2<float> &coordinates); // for animation
+
     [[nodiscard]] sf::Vector2<float> getSize() const final;
     [[nodiscard]] sf::Vector2<float> getPosition() const final;
 
@@ -166,7 +185,9 @@ public:
 private:
     sf::Image image;
     sf::Texture texture;
-    sf::Sprite sprite;
+    std::vector<sf::Sprite> sprites;
+    mutable size_t curIndex = 0;
+    mutable sf::Clock timer;
 
     void initWithImage(const sf::Vector2<float> &coordinates);
 };

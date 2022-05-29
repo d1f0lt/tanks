@@ -5,7 +5,7 @@
 
 namespace Tanks::Menu {
 
-void showNewGameMenu(sf::RenderWindow &window, const sf::Sprite &background);
+void showNewGameMenu(sf::RenderWindow &window, const sf::Sprite &background, PlayerInfo &info);
 
 }
 

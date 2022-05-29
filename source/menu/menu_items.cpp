@@ -147,12 +147,32 @@ std::string MenuInscription::getContent() const {
     return static_cast<std::string>(text.getString());
 }
 
+MenuRectangle::MenuRectangle(Button &info, const sf::Vector2<float> &coordinates) : rectangle(info.getSize()) {
+    rectangle.setPosition(coordinates);
+    rectangle.setFillColor(info.getStandardColor());
+}
+
+sf::Vector2<float> MenuRectangle::getSize() const {
+    return rectangle.getSize();
+}
+
+sf::Vector2<float> MenuRectangle::getPosition() const {
+    return rectangle.getPosition();
+}
+
+void MenuRectangle::setPosition(sf::Vector2<float> newPosition) {
+    rectangle.setPosition(newPosition);
+}
+
+void MenuRectangle::draw(sf::RenderWindow &window) const {
+    window.draw(rectangle);
+}
+
 MenuButton::MenuButton(std::unique_ptr<MenuItem> &&content_,
                        const sf::Vector2<float> &coordinates,
                        ButtonWithType info_)
-    : MenuItem(coordinates),
+    : MenuRectangle(info_, coordinates),
       content(std::move(content_)),
-      rectangle(info_.getSize()),
       info(info_) {
     rectangle.setFillColor(info.getStandardColor());
     setPosition(coordinates);  // NOLINT
@@ -220,26 +240,46 @@ MenuPicture::MenuPicture(const sf::Image &image_,
     initWithImage(coordinates);
 }
 
+MenuPicture::MenuPicture(const std::string &filename,  size_t sizeOfOne, size_t count, const sf::Vector2<float> &coordinates) : MenuItem(coordinates) { // NOLINT
+    image.loadFromFile(filename);
+    texture.loadFromImage(image);
+    sprites.resize(count);
+    for (size_t i = 0; i < count; ++i) {
+        sprites[i].setTexture(texture);
+        sprites[i].setTextureRect(sf::IntRect{static_cast<int>(sizeOfOne * i), 0, static_cast<int>(sizeOfOne), static_cast<int>(sizeOfOne)});
+        sprites[i].setPosition(coordinates);
+    }
+}
+
 void MenuPicture::initWithImage(const sf::Vector2<float> &coordinates) {
     texture.loadFromImage(image);
-    sprite.setTexture(texture);
-    sprite.setPosition(coordinates);
+    sprites.resize(1);
+    sprites[0].setTexture(texture);
+    sprites[0].setPosition(coordinates);
 }
 
 sf::Vector2<float> MenuPicture::getPosition() const {
-    return sprite.getPosition();
+    assert(!sprites.empty());
+    return sprites[0].getPosition();
 }
 
 sf::Vector2<float> MenuPicture::getSize() const {
-    return static_cast<sf::Vector2<float>>(image.getSize());
+    assert(!sprites.empty());
+    return sf::Vector2<float>{sprites[0].getLocalBounds().width, sprites[0].getLocalBounds().height};
 }
 
 void MenuPicture::setPosition(sf::Vector2<float> newPosition) {
-    sprite.setPosition(newPosition);
+    for (auto &sprite : sprites) {
+        sprite.setPosition(newPosition);
+    }
 }
 
 void MenuPicture::draw(sf::RenderWindow &window) const {
-    window.draw(sprite);
+    window.draw(sprites[curIndex]);
+    if (timer.getElapsedTime().asMilliseconds() > 100) {
+        timer.restart();
+        curIndex = (curIndex + 1) % sprites.size();
+    }
 }
 
 MenuPictureWithDescription::MenuPictureWithDescription(
