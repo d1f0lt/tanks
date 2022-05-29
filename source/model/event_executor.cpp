@@ -23,13 +23,42 @@ void EventExecutor::execute(TankMove &event) const {
 }
 
 void EventExecutor::execute(SpawnTank &event) const {
-    int id = event.getTankId();
+    if (getModel().getById(event.getTankId())) {
+        return;
+    }
+
     switch (event.getType()) {
         case (EntityType::MEDIUM_TANK):
             getModel().addEntity(std::make_unique<MediumTank>(
                 event.getLeft(), event.getTop(), event.getTankId(),
-                TankHandlerCreator(getModel()), Direction::LEFT, event.getTankSpeed()));
+                TankHandlerCreator(getModel()), Direction::LEFT,
+                event.getTankSpeed()));
             break;
+        default:
+            assert(false);
     }
+}
+
+void EventExecutor::execute(BonusSpawn &event) const {
+}
+
+void EventExecutor::execute(TankShoot &event) const {
+    auto tank = getModel().getById(event.getTankId());
+    if (!tank) {
+        return;
+    }
+
+    dynamic_cast<TankHandler &>(getModel().getHandler(tank->get()))
+        .shoot(event.getDirection());
+}
+
+void EventExecutor::execute(SetPosition &event) const {
+    auto entity = getModel().getById(event.getId());
+    if (!entity) {
+        return;
+    }
+    auto &handler =
+        dynamic_cast<ForegroundHandler &>(getModel().getHandler(entity->get()));
+    handler.setPosition(event.getLeft(), event.getTop());
 }
 }  // namespace Tanks::model

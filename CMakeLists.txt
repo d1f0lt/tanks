@@ -12,7 +12,7 @@ SET(GCC_WARNINGS "-Wall -Wextra")
 #SET(SANITIZERS "-fsanitize=address,undefined,leak,vptr")
 #SET(SANITIZERS "-fsanitize=undefined,vptr,thread")
 
-SET(GCC_OPTIMIZE "-ggdb -g") # Latest is integer overflow protection
+#SET(GCC_OPTIMIZE "-ggdb -g") # Latest is integer overflow protection
 #SET(GCC_OPTIMIZE "-O2 -DNDEBUG") # RELEASE
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_WARNINGS} ${SANITIZERS} ${GCC_OPTIMIZE}")
 
@@ -37,7 +37,9 @@ add_executable(model_tests model_tests.cpp
         source/model/client_game_model.cpp
         source/model/spawners.cpp
         source/model/network_utils.cpp
-        source/model/bonus.cpp source/model/tank_handler.cpp headers/model/tank_handler.h)
+        source/model/bonus.cpp
+        source/model/tank_handler.cpp
+        )
 
 add_executable(
         menu_tests
@@ -69,7 +71,13 @@ add_executable(
         source/game_environment.cpp
         source/new_game_menu.cpp
         source/levels_menu.cpp
-        source/model/server_game_model.cpp headers/model/server_game_model.h source/model/playable_tank_handler.cpp headers/model/playable_tank_handler.h source/model/client_game_model.cpp headers/model/client_game_model.h source/model/spawners.cpp headers/model/spawners.h source/model/network_utils.cpp headers/model/network_utils.h source/model/bonus.cpp headers/model/bonus.h source/model/tank_handler.cpp headers/model/tank_handler.h)
+        source/model/server_game_model.cpp
+        source/model/playable_tank_handler.cpp
+        source/model/client_game_model.cpp
+        source/model/spawners.cpp
+        source/model/network_utils.cpp
+        source/model/bonus.cpp
+        source/model/tank_handler.cpp)
 
 
 target_link_libraries(model_tests sfml-graphics)

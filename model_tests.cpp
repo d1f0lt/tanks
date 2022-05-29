@@ -5,6 +5,7 @@
 #include <thread>
 #include "doctest.h"
 #include "model/client_game_model.h"
+#include "model/network_utils.h"
 #include "model/projectile.h"
 #include "model/server_game_model.h"
 #include "model/tank.h"
@@ -20,6 +21,7 @@ namespace {
 class DebugServer : public ServerModel {
 public:
     using GameModel::getHandler;
+    using ServerModel::addEvent;
 };
 }  // namespace
 
@@ -102,7 +104,7 @@ bool operator==(const Entity &a, const Entity &b) {
     return true;
 }
 
-TEST_CASE("Single move and checking background") {
+TEST_CASE("Single move and checking background. Online") {
     INIT_GAME();
     handler.setPosition(TILE_SIZE * 2, TILE_SIZE);
     auto &brick00 = serverModel.getByCoords(TILE_SIZE, TILE_SIZE);
@@ -129,7 +131,7 @@ TEST_CASE("Single move and checking background") {
     CHECK(&brick00 == &serverModel.getByCoords(TILE_SIZE, TILE_SIZE));
 }
 
-TEST_CASE("multiple moves") {
+TEST_CASE("multiple moves. Online") {
     INIT_GAME();
     handler.setPosition(TILE_SIZE, TILE_SIZE);
 
@@ -494,4 +496,30 @@ TEST_CASE("Respawn") {
     }
     auto tank2New = serverModel.getById(id2);
     CHECK(tank2New != std::nullopt);
+}
+
+void setPosition(DebugServer &server,
+                 ClientModel &clientModel,
+                 int id,
+                 int left,
+                 int top) {
+    server.addEvent(std::make_unique<SetPosition>(id, left, top));
+    server.nextTick();
+    clientModel.nextTick();
+}
+
+TEST_CASE("Online shoot") {
+    INIT_GAME();
+    setPosition(serverModel, clientModel, tank.getId(), TILE_SIZE * 2,
+                TILE_SIZE * 2);
+
+    auto user = clientModel.getHandler();
+    user.shoot(Direction::RIGHT);
+    serverModel.nextTick();
+    clientModel.nextTick();
+
+    CHECK(serverModel.getByCoords(TILE_SIZE * 3, TILE_SIZE * 2).getType() ==
+          EntityType::FLOOR);
+    CHECK(clientModel.getByCoords(TILE_SIZE * 3, TILE_SIZE * 2).getType() ==
+          EntityType::FLOOR);
 }

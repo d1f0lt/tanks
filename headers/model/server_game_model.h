@@ -24,6 +24,9 @@ class ServerModel : public GameModel {
 public:
     [[nodiscard]] int addPlayer(tcp::socket &socket, PlayerSkills skills = {});
 
+protected:
+    void addEvent(std::unique_ptr<Event> event);
+
 private:
     std::queue<std::unique_ptr<Event>> events_;
     std::unordered_map<int, tcp::socket &> playersSockets_;

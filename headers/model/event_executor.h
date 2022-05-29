@@ -13,8 +13,10 @@ private:
 
 public:
     void execute(TankMove &event) const;
-
     void execute(SpawnTank &event) const;
+    void execute(BonusSpawn &event) const;
+    void execute(TankShoot &event) const;
+    void execute(SetPosition &event) const;
 
 protected:
     [[nodiscard]] GameModel &getModel() const;

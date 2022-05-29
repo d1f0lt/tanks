@@ -29,7 +29,7 @@ void Spawner::action() {
     auto [left, top] = getFreeCoords();
     //    getModel().events_.push(std::make_unique<)
     getModel().events_.emplace(createEvent(left, top));
-    //    getModel().addEntity(createEntity(left, top));
+    //    getModel().addEntity(createEntity(left, top_));
 }
 
 int Spawner::getEntityId() const {

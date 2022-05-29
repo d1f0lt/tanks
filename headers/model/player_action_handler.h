@@ -1,9 +1,9 @@
-#ifndef TANKS_PLAYABLE_TANK_HANDLER_H
-#define TANKS_PLAYABLE_TANK_HANDLER_H
+#ifndef TANKS_PLAYER_ACTION_HANDLER_H
+#define TANKS_PLAYER_ACTION_HANDLER_H
 
 #include <boost/asio/ip/tcp.hpp>
 #include "model/handler.h"
-#include "model/playable_tank_handler_fwd.h"
+#include "model/player_action_handler_fwd.h"
 
 namespace Tanks::model {
 using boost::asio::ip::tcp;
@@ -23,4 +23,4 @@ private:
 
 }  // namespace Tanks::model
 
-#endif  // TANKS_PLAYABLE_TANK_HANDLER_H
+#endif  // TANKS_PLAYER_ACTION_HANDLER_H

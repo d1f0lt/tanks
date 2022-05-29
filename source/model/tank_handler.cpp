@@ -56,6 +56,11 @@ void TankHandler::move(Direction direction) {
     move(direction, dynamic_cast<Tank &>(getEntity()).getSpeed());
 }
 
+void TankHandler::shoot(Direction direction) {
+    setDirection(direction);
+    shoot();
+}
+
 void TankMovableOnWaterHandler::stopBonus() {
 }
 

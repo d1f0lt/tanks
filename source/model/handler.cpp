@@ -133,7 +133,7 @@ void MovableHandler::move(Direction direction, int speed) {
 
 std::vector<Entity *> MovableHandler::lookMutable(Direction direction) {
     auto &movableEntity = dynamic_cast<MovableEntity &>(getEntity());
-    // retuns square [left, right) x [down, top)
+    // retuns square [left, right) x [down, top_)
     int left = -1;
     int top = -1;
     int right = -1;
@@ -178,9 +178,9 @@ std::vector<Entity *> MovableHandler::lookMutable(Direction direction) {
     return {buff.begin(), buff.end()};
 }
 
-void MovableHandler::setPosition(int left, int top) {
+void ForegroundHandler::setPosition(int left, int top) {
     restoreBackground();
-    auto &entity = dynamic_cast<MovableEntity &>(getEntity());
+    auto &entity = dynamic_cast<ForegroundEntity &>(getEntity());
     entity.setLeft(left);
     entity.setTop(top);
     setBackground();

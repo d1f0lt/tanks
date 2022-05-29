@@ -67,7 +67,6 @@ protected:
 
     [[nodiscard]] std::shared_mutex &getMutex() const;
 
-
 private:
     GameMap map_;
     GroupedEntities groupedEntities_;

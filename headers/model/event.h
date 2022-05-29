@@ -11,7 +11,15 @@
 namespace Tanks::model {
 using boost::asio::ip::tcp;
 
-enum class EventType { TANK_MOVE = 1, SPAWN_TANK = 2 };
+enum class EventType {
+    TANK_MOVE = 1,
+    SPAWN_TANK = 2,
+    BONUS_SPAWN = 3,
+    SET_POSITION = 4,
+    TANK_SHOOT = 5
+};
+
+[[nodiscard]] std::unique_ptr<Event> readEvent(tcp::socket &socket);
 
 class Event {
 public:
@@ -27,10 +35,6 @@ public:
 
     void acceptExecutor(const EventExecutor &executor) final;
     void sendTo(tcp::socket &socket) override;
-    static void sendTo(tcp::socket &socket,
-                       int tankId,
-                       Direction direction,
-                       int speed);
 
     static std::unique_ptr<Event> readFrom(tcp::socket &socket);
 
@@ -57,15 +61,6 @@ public:
     void sendTo(tcp::socket &socket) override;
     void acceptExecutor(const EventExecutor &executor) override;
 
-    static void sendTo(boost::asio::ip::tcp::socket &socket,
-                       int tankId,
-                       int left,
-                       int top,
-                       EntityType entityType,
-                       int tankSpeed,
-                       int bulletSpeed,
-                       int reloadTicks);
-
     [[nodiscard]] static std::unique_ptr<Event> readFrom(tcp::socket &socket);
 
     [[nodiscard]] int getTankId() const;
@@ -87,21 +82,61 @@ private:
     const int reloadTicks_;
 };
 
-std::unique_ptr<Event> readEvent(tcp::socket &socket);
+class TankShoot : public Event {
+public:
+    TankShoot(const int tankId, const Direction direction);
 
-// class BonusSpawn : public Event {
-// public:
-//     void acceptExecutor() final;
-//
-//     static void sendTo();
-//     static std::unique_ptr<BonusSpawn> readFrom();
-//
-// private:
-//     int id_;
-//     int left_;
-//     int right_;
-//     EntityType type_;
-// };
+    void acceptExecutor(const EventExecutor &executor) override;
+
+    void sendTo(tcp::socket &socket) override;
+    [[nodiscard]] static std::unique_ptr<Event> readFrom(tcp::socket &socket);
+
+    [[nodiscard]] int getTankId() const;
+    [[nodiscard]] Direction getDirection() const;
+
+private:
+    const int tankId_;
+    const Direction direction_;
+};
+
+class BonusSpawn : public Event {
+public:
+    explicit BonusSpawn(int id, int left, int top, EntityType type);
+
+    void sendTo(tcp::socket &socket) override;
+    [[nodiscard]] static std::unique_ptr<Event> readFrom(tcp::socket &socket);
+
+    void acceptExecutor(const EventExecutor &executor) override;
+
+    [[nodiscard]] int getId() const;
+    [[nodiscard]] int getLeft() const;
+    [[nodiscard]] int getTop() const;
+    [[nodiscard]] EntityType getType() const;
+
+private:
+    const int id_;
+    const int left_;
+    const int top_;
+    const EntityType type_;
+};
+
+class SetPosition : public Event {
+public:
+    explicit SetPosition(int id, int left, int top);
+
+    void acceptExecutor(const EventExecutor &executor) override;
+    void sendTo(tcp::socket &socket) override;
+    [[nodiscard]] static std::unique_ptr<Event> readFrom(tcp::socket &socket);
+
+    [[nodiscard]] int getId() const;
+    [[nodiscard]] int getLeft() const;
+    [[nodiscard]] int getTop() const;
+
+private:
+    const int id_;
+    const int left_;
+    const int top_;
+};
 
 }  // namespace Tanks::model
 

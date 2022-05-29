@@ -40,6 +40,8 @@ public:
     [[nodiscard]] std::vector<std::vector<const Entity *>> snapshotBackground()
         const;
 
+    void setPosition(int left, int top);
+
 private:
     std::vector<std::vector<Entity *>> background_;
 };
@@ -51,8 +53,6 @@ public:
     [[nodiscard]] std::vector<const Entity *> look(Direction direction);
     virtual void move(Direction direction, int speed);
     void setDirection(Direction direction);
-
-    void setPosition(int left, int top);
 
 protected:
     [[nodiscard]] std::vector<Entity *> lookMutable(Direction direction);

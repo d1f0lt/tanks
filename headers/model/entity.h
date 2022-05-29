@@ -26,6 +26,7 @@ enum class EntityType {
 
 class Entity {
     friend WalkOnWaterHandler;
+    //    friend ForegroundHandler;
 
 public:
     explicit Entity(int left,

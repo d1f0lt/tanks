@@ -11,6 +11,7 @@ public:
     void move(Direction direction, int speed) override;
     void move(Direction direction);
     virtual void shoot();
+    void shoot(Direction direction);
 
 private:
     int lastMoveTick_ = -1;

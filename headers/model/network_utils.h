@@ -14,12 +14,8 @@ void sendInt(tcp::socket &socket, T a) {
     assert(res == sizeof(buff));
 }
 
-template <typename... Args>
-void sendMultipleInts(tcp::socket &socket, Args... args) {
-    (sendInt(socket, args), ...);
-}
-
 std::int32_t receiveInt(tcp::socket &socket);
+
 }  // namespace Tanks::model
 
 #endif  // TANKS_NETWORK_UTILS_H

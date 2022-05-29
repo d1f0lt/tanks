@@ -97,4 +97,8 @@ PlayerSkills ServerModel::getPlayerSkills(int id) const {
 void ServerModel::setPlayerSkills(int id, PlayerSkills skills) {
     players_.emplace(id, skills);
 }
+
+void ServerModel::addEvent(std::unique_ptr<Event> event) {
+    events_.emplace(std::move(event));
+}
 }  // namespace Tanks::model
