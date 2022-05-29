@@ -19,7 +19,7 @@ constexpr int DEFAULT_RELOAD_TICKS = 100;
 constexpr int BULLET_SIZE = 10;
 
 // menu
-constexpr int LEVELS_COUNT = 1;
+constexpr int LEVELS_COUNT = 3;
 constexpr int TEXT_MARGIN = 10;
 
 }  // namespace Tanks
