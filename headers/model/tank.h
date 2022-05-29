@@ -15,10 +15,9 @@ public:
                   int speed,
                   int reloadTicks);
 
-    [[nodiscard]] bool canPass(const Entity &other) const override;
     [[nodiscard]] int getSpeed() const final;
 
-    int getReloadTicks() const;
+    [[nodiscard]] int getReloadTicks() const;
 
 private:
     int speed_ = -1;

@@ -16,10 +16,6 @@ Tank::Tank(int left,
       reloadTicks_(reloadTicks) {
 }
 
-bool Tank::canPass(const Entity &other) const {
-    return other.isTankPassable();
-}
-
 int MediumTank::getWidth() const {
     return Tanks::TANK_SIZE;
 }

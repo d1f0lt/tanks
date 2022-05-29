@@ -80,6 +80,10 @@ void TankMovableOnWaterHandler::shoot() {
     stopBonus();
 }
 
+bool TankMovableOnWaterHandler::canStandOn(const Entity &other) const {
+    return (other.isTankPassable()) || (other.getType() == EntityType::WATER);
+}
+
 std::unique_ptr<TankHandler> TankHandlerCreator::createTankHandler(
     Tank &tank) const {
     return std::make_unique<TankHandler>(model_, tank);

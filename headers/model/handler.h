@@ -21,6 +21,8 @@ public:
 
     virtual ~BasicHandler();
 
+    [[nodiscard]] virtual bool canStandOn(const Entity &other) const;
+
 protected:
     [[nodiscard]] Entity &getEntity() const;
     [[nodiscard]] GameModel &getModel() const;
@@ -87,6 +89,8 @@ public:
 
     [[nodiscard]] bool isBreakOnCreation();
 
+    [[nodiscard]] bool canStandOn(const Entity &other) const override;
+
 protected:
     [[nodiscard]] bool breakIfBreakable();
     void destroyByBullet(Entity &other);
@@ -102,6 +106,7 @@ public:
 class WalkOnWaterHandler : public BonusHandler {
 public:
     explicit WalkOnWaterHandler(GameModel &model, WalkOnWater &entity);
+
     void apply(Tank &tank) override;
 };
 

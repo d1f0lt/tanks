@@ -27,6 +27,10 @@ BasicHandler::~BasicHandler() {
     getModel().handlers_.erase(&getEntity());
 }
 
+bool BasicHandler::canStandOn(const Entity &other) const {
+    return other.isTankPassable();
+}
+
 std::vector<const Entity *> MovableHandler::look(Direction direction) {
     auto res = lookMutable(direction);
     return {res.begin(), res.end()};
@@ -255,6 +259,10 @@ void ProjectileHandler::interactOnNextTick() {
 
     auto &bullet = dynamic_cast<Projectile &>(getEntity());
     move(bullet.getDirection(), bullet.getSpeed());
+}
+
+bool ProjectileHandler::canStandOn(const Entity &other) const {
+    return other.isBulletPassable();
 }
 
 BonusHandler::BonusHandler(GameModel &model, Bonus &entity)

@@ -1,4 +1,5 @@
 #include "model/event_executor.h"
+#include "model/bonus.h"
 #include "model/game_model.h"
 #include "model/tank.h"
 
@@ -40,6 +41,19 @@ void EventExecutor::execute(SpawnTank &event) const {
 }
 
 void EventExecutor::execute(BonusSpawn &event) const {
+    auto entity = getModel().getById(event.getId());
+    if (entity) {
+        return;
+    }
+    switch (event.getType()) {
+        case (EntityType::WALK_ON_WATER_BONUS):
+            getModel().addEntity(std::make_unique<WalkOnWater>(
+                event.getLeft(), event.getTop(), event.getId(), getModel()));
+            break;
+        default:
+            assert(false);
+            return;
+    }
 }
 
 void EventExecutor::execute(TankShoot &event) const {

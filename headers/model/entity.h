@@ -55,7 +55,7 @@ public:
 
     [[nodiscard]] virtual bool isTankPassable() const;
     [[nodiscard]] virtual bool isBulletPassable() const;
-    [[nodiscard]] virtual bool canPass(const Entity &other) const = 0;
+    [[nodiscard]] bool canPass(const Entity &other) const;
 
 protected:
     void setTop(int top);

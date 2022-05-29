@@ -75,4 +75,8 @@ std::unique_ptr<BasicHandler> &Entity::getAccessToHandler() {
     return handler_;
 }
 
+bool Entity::canPass(const Entity &other) const {
+    return getHandler().canStandOn(other);
+}
+
 }  // namespace Tanks::model

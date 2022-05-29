@@ -18,10 +18,6 @@ int Block::getWidth() const {
     return TILE_SIZE;
 }
 
-bool Block::canPass(const Entity &) const {
-    return false;
-}
-
 EntityType Brick::getType() const {
     return EntityType::BRICK;
 }

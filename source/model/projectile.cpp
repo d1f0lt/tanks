@@ -4,10 +4,6 @@
 
 namespace Tanks::model {
 
-bool Projectile::canPass(const Entity &other) const {
-    return other.isBulletPassable();
-}
-
 Projectile::Projectile(int left,
                        int top,
                        Direction direction,

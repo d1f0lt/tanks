@@ -14,7 +14,7 @@ public:
 
     [[nodiscard]] int getWidth() const override;
     [[nodiscard]] int getHeight() const override;
-    [[nodiscard]] bool canPass(const Entity &other) const override;
+    [[nodiscard]] int getStrength() const override;
 };
 
 class WalkOnWater : public Bonus {

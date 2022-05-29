@@ -12,7 +12,7 @@
 
 using namespace Tanks;
 using namespace Tanks::model;
-using namespace boost::asio::ip;
+using boost::asio::ip::tcp;
 
 const std::array<Tanks::Direction, 4> DIRECTIONS = {
     Direction::UP, Direction::DOWN, Direction::LEFT, Direction::RIGHT};

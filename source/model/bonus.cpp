@@ -12,12 +12,13 @@ Bonus::Bonus(int left,
 int Bonus::getWidth() const {
     return BONUS_SIZE;
 }
+
 int Bonus::getHeight() const {
     return BONUS_SIZE;
 }
 
-bool Bonus::canPass(const Entity &other) const {
-    return other.isTankPassable();
+int Bonus::getStrength() const {
+    return 0;
 }
 
 WalkOnWater::WalkOnWater(int left, int top, int entityId, GameModel &model)

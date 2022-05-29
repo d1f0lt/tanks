@@ -27,6 +27,8 @@ public:
     void move(Direction dir, int speed) override;
     void shoot() final;
 
+    bool canStandOn(const Entity &other) const override;
+
 private:
     const int beginLive_;
 
