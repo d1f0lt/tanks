@@ -18,16 +18,16 @@ void TankHandler::shoot() {
     auto &tank = dynamic_cast<Tank &>(getEntity());
 
     static const std::unordered_map<Direction, int> DCOL = {
-        {Tanks::model::Direction::UP, getEntity().getWidth() / 2},
-        {Tanks::model::Direction::DOWN, getEntity().getWidth() / 2},
-        {Tanks::model::Direction::RIGHT, getEntity().getWidth()},
-        {Tanks::model::Direction::LEFT, -1}};
+        {Direction::UP, getEntity().getWidth() / 2},
+        {Direction::DOWN, getEntity().getWidth() / 2},
+        {Direction::RIGHT, getEntity().getWidth()},
+        {Direction::LEFT, -1}};
 
     static const std::unordered_map<Direction, int> DROW = {
-        {Tanks::model::Direction::UP, -1},
-        {Tanks::model::Direction::DOWN, getEntity().getHeight()},
-        {Tanks::model::Direction::RIGHT, getEntity().getHeight() / 2},
-        {Tanks::model::Direction::LEFT, getEntity().getHeight() / 2}};
+        {Direction::UP, -1},
+        {Direction::DOWN, getEntity().getHeight()},
+        {Direction::RIGHT, getEntity().getHeight() / 2},
+        {Direction::LEFT, getEntity().getHeight() / 2}};
 
     auto projectile = std::make_unique<Projectile>(
         getEntity().getLeft() + DCOL.at(tank.getDirection()),

@@ -13,9 +13,9 @@ using namespace Tanks;
 using namespace Tanks::model;
 using namespace boost::asio::ip;
 
-const std::array<Tanks::model::Direction, 4> DIRECTIONS = {
-    Tanks::model::Direction::UP, Tanks::model::Direction::DOWN,
-    Tanks::model::Direction::LEFT, Tanks::model::Direction::RIGHT};
+const std::array<Tanks::Direction, 4> DIRECTIONS = {
+    Tanks::Direction::UP, Tanks::Direction::DOWN, Tanks::Direction::LEFT,
+    Tanks::Direction::RIGHT};
 
 namespace {
 class DebugServer : public ServerModel {
@@ -57,8 +57,9 @@ TEST_CASE("Game creation") {
     clientModel.loadLevel(1);                                        \
     clientModel.nextTick();
 
-[[nodiscard]] bool isSame(const Tank &a, const Tank &b) {
-}
+//[[nodiscard]] bool isSame(const Tank &a, const Tank &b) {
+//    return
+//}
 
 bool operator==(const Entity &a, const Entity &b) {
     if (a.getId() != b.getId()) {
@@ -138,7 +139,7 @@ TEST_CASE("Single move and checking background") {
 
     auto controller = clientModel.getHandler();
 
-    controller.move(Tanks::model::Direction::DOWN, tank.getSpeed());
+    controller.move(Direction::DOWN, tank.getSpeed());
 
     Tanks::model::Entity &ptr2 = serverModel.getByCoords(TILE_SIZE, TILE_SIZE);
     serverModel.nextTick();
@@ -152,11 +153,11 @@ TEST_CASE("multiple moves") {
     INIT_GAME();
 
     int speed = tank.getSpeed();
-    auto left = tank.look(Tanks::model::Direction::LEFT);
+    auto left = tank.look(Direction::LEFT);
     CHECK(left[0] == left.back());
     CHECK(left[0] == &serverModel.getByCoords(0, TILE_SIZE));
 
-    auto right = tank.look(Tanks::model::Direction::RIGHT);
+    auto right = tank.look(Direction::RIGHT);
     for (int row = tank.getTop(); row < tank.getTop() + tank.getHeight();
          row++) {
         for (int col = tank.getLeft() + tank.getWidth();
@@ -171,7 +172,7 @@ TEST_CASE("multiple moves") {
     auto controller = clientModel.getHandler();
     const int MOVES = 9;
     for (int i = 0; i < MOVES; i++) {
-        controller.move(Tanks::model::Direction::DOWN, speed);
+        controller.move(Direction::DOWN, speed);
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
         serverModel.nextTick();
         clientModel.nextTick();
@@ -183,7 +184,7 @@ TEST_CASE("multiple moves") {
     clientModel.nextTick();
 
     CHECK(tank.getTop() == TILE_SIZE + MOVES * tank.getSpeed());
-    right = tank.look(Tanks::model::Direction::RIGHT);
+    right = tank.look(Direction::RIGHT);
     CHECK(right.back()->getType() == Tanks::model::EntityType::FLOOR);
 }
 
@@ -193,10 +194,10 @@ TEST_CASE("Can't do 2 moves on 1 tick") {
 
     int left = tank.getLeft();
     int top = tank.getTop();
-    handler.move(Tanks::model::Direction::RIGHT);
+    handler.move(Direction::RIGHT);
     int left1 = tank.getLeft();
     int top1 = tank.getTop();
-    handler.move(Tanks::model::Direction::RIGHT);
+    handler.move(Direction::RIGHT);
     CHECK(left1 == tank.getLeft());
     CHECK(top1 == tank.getTop());
     serverModel.nextTick();
@@ -207,9 +208,9 @@ TEST_CASE("Can move and shoot on 1 tick") {
     INIT_GAME();
 
     int left = tank.getLeft(), top = tank.getTop();
-    handler.move(Tanks::model::Direction::RIGHT);
+    handler.move(Direction::RIGHT);
     int left1 = tank.getLeft(), top1 = tank.getTop();
-    handler.move(Tanks::model::Direction::RIGHT);
+    handler.move(Direction::RIGHT);
     CHECK(left1 == left + tank.getSpeed());
     CHECK(top1 == top);
     handler.shoot();
@@ -221,11 +222,11 @@ TEST_CASE("Can't shoot then move on 1 tick") {
     INIT_GAME();
     handler.setPosition(TILE_SIZE, TILE_SIZE);
     int left = tank.getLeft(), top = tank.getTop();
-    handler.move(Tanks::model::Direction::RIGHT, 0);
+    handler.move(Direction::RIGHT, 0);
     CHECK(serverModel.getTick() == 1);
     handler.shoot();
     CHECK(serverModel.getTick() == 1);
-    handler.move(Tanks::model::Direction::RIGHT);
+    handler.move(Direction::RIGHT);
     CHECK(left == tank.getLeft());
     CHECK(top == tank.getTop());
     serverModel.nextTick();
@@ -274,7 +275,7 @@ TEST_CASE("Look for grass") {
 TEST_CASE("Tank simple shoot") {
     INIT_GAME();
     handler.setPosition(TILE_SIZE, TILE_SIZE);
-    handler.move(Tanks::model::Direction::RIGHT, 0);
+    handler.move(Direction::RIGHT, 0);
     handler.shoot();
     auto &bullet = dynamic_cast<Projectile &>(
         serverModel.getByCoords(Tanks::TILE_SIZE + Tanks::TANK_SIZE,
@@ -293,7 +294,7 @@ TEST_CASE("Tank simple shoot") {
 TEST_CASE("Shoot, bullet die") {
     INIT_GAME();
     handler.setPosition(TILE_SIZE, TILE_SIZE);
-    handler.setDirection(Tanks::model::Direction::RIGHT);
+    handler.setDirection(Direction::RIGHT);
     handler.shoot();
     auto &bullet = dynamic_cast<Projectile &>(
         serverModel.getByCoords(Tanks::TILE_SIZE + Tanks::TANK_SIZE,
@@ -316,7 +317,7 @@ TEST_CASE("3 Bullets destroy 3 bricks") {
     INIT_GAME();
     handler.setPosition(TILE_SIZE, TILE_SIZE * 2);
 
-    handler.setDirection(Tanks::model::Direction::RIGHT);
+    handler.setDirection(Direction::RIGHT);
     constexpr std::array<std::pair<int, int>, 3> COORDS = {
         std::pair{TILE_SIZE * 3, TILE_SIZE * 2},
         {TILE_SIZE * 7, TILE_SIZE * 2},
@@ -347,7 +348,7 @@ TEST_CASE("Bullet fly above water") {
     INIT_GAME();
     handler.setPosition(TILE_SIZE * 4, TILE_SIZE * 15);
 
-    handler.setDirection(Tanks::model::Direction::RIGHT);
+    handler.setDirection(Direction::RIGHT);
     auto &brick = serverModel.getByCoords(TILE_SIZE * 19, TILE_SIZE * 15);
     CHECK(brick.getType() == EntityType::BRICK);
     auto &water = serverModel.getByCoords(TILE_SIZE * 15, TILE_SIZE * 15);
@@ -388,7 +389,7 @@ TEST_CASE("Bullet destroy on creation") {
     constexpr int TANK_LEFT = TILE_SIZE * 3;
     constexpr int TANK_TOP = TILE_SIZE * 1 + TILE_SIZE - TANK_SIZE;
     handler.setPosition(TANK_LEFT, TANK_TOP);
-    handler.setDirection(Tanks::model::Direction::DOWN);
+    handler.setDirection(Direction::DOWN);
 
     auto &brick = serverModel.getByCoords(TILE_SIZE * 3, TILE_SIZE * 2);
     CHECK(brick.getType() == EntityType::BRICK);
@@ -408,7 +409,7 @@ TEST_CASE("Shoot static tank") {
     handler.setPosition(TILE_SIZE * 2, TILE_SIZE);
     handler2.setPosition(TILE_SIZE * 3, TILE_SIZE);
 
-    handler.setDirection(Tanks::model::Direction::RIGHT);
+    handler.setDirection(Direction::RIGHT);
     handler.shoot();
     serverModel.nextTick();
     auto &floor = serverModel.getByCoords(TILE_SIZE * 3, TILE_SIZE);
@@ -422,9 +423,9 @@ TEST_CASE("tank move on bullet") {
     handler.setPosition(TILE_SIZE * 2, TILE_SIZE);
     handler2.setPosition(TILE_SIZE, TILE_SIZE);
 
-    handler.setDirection(Tanks::model::Direction::LEFT);
+    handler.setDirection(Direction::LEFT);
     handler.shoot();
-    handler2.move(Tanks::model::Direction::RIGHT);
+    handler2.move(Direction::RIGHT);
     auto &floor = serverModel.getByCoords(TILE_SIZE, TILE_SIZE);
     CHECK(floor.getType() == EntityType::FLOOR);
 }
@@ -433,7 +434,7 @@ TEST_CASE("Bullet destroy 2 blocks on creation") {
     INIT_GAME();
     handler.setPosition(TILE_SIZE * 10 + TILE_SIZE / 2, TILE_SIZE * 15);
 
-    handler.setDirection(Tanks::model::Direction::DOWN);
+    handler.setDirection(Direction::DOWN);
     auto &brick1 = serverModel.getByCoords(TILE_SIZE * 10, TILE_SIZE * 16);
     auto &brick2 = serverModel.getByCoords(TILE_SIZE * 11, TILE_SIZE * 16);
     CHECK(brick1.getType() == EntityType::BRICK);
@@ -459,7 +460,7 @@ TEST_CASE("Bullet destroy 2 blocks on nextTick") {
     CHECK(brick1.getType() == EntityType::BRICK);
     CHECK(brick2.getType() == EntityType::BRICK);
 
-    handler.setDirection(Tanks::model::Direction::DOWN);
+    handler.setDirection(Direction::DOWN);
     handler.shoot();
 
     serverModel.nextTick();
@@ -473,7 +474,7 @@ TEST_CASE("Bullet destroy 2 blocks on nextTick") {
 TEST_CASE("Bullet destroy 1 of blocks on creation, then shoot again") {
     INIT_GAME();
     handler.setPosition(TILE_SIZE * 10 + TILE_SIZE - TANK_SIZE, TILE_SIZE * 15);
-    handler.setDirection(Tanks::model::Direction::DOWN);
+    handler.setDirection(Direction::DOWN);
 
     auto &brick1 = serverModel.getByCoords(TILE_SIZE * 10, TILE_SIZE * 16);
     auto &brick2 = serverModel.getByCoords(TILE_SIZE * 11, TILE_SIZE * 16);

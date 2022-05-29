@@ -3,11 +3,10 @@
 
 #include <SFML/Graphics/Rect.hpp>
 #include <memory>
+#include "constants.h"
 #include "model/handler_fwd.h"
 
 namespace Tanks::model {
-enum class Direction { UP = 0, RIGHT = 1, DOWN = 2, LEFT = 3 };
-
 enum class EntityType {
     LEFT_UP_CORNER,
     RIGHT_UP_CORNER,

@@ -1,5 +1,6 @@
 #include "model/spawners.h"
 #include "model/game_model.h"
+#include "model/tank.h"
 
 namespace Tanks::model {
 Spawner::Spawner(GameModel &model, int entityId)
@@ -63,4 +64,10 @@ std::pair<int, int> Spawner::getFreeCoords() {
     return {left, top};
 }
 
+std::unique_ptr<Entity> MediumTankSpawner::createEntity(int left, int top) {
+    TankHandlerCreator handlerCreator(getModel());
+    return std::make_unique<MediumTank>(left, top, getEntityId(),
+                                        handlerCreator, Direction::LEFT,
+                                        DEFAULT_TANK_SPEED);
+}
 }  // namespace Tanks::model

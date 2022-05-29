@@ -30,6 +30,11 @@ private:
     [[nodiscard]] std::pair<int, int> getFreeCoords();
 };
 
+class MediumTankSpawner : public Spawner {
+protected:
+    std::unique_ptr<Entity> createEntity(int left, int top) override;
+};
+
 }  // namespace Tanks::model
 
 #endif  // TANKS_SPAWNERS_H
