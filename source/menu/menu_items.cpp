@@ -147,7 +147,9 @@ std::string MenuInscription::getContent() const {
     return static_cast<std::string>(text.getString());
 }
 
-MenuRectangle::MenuRectangle(Button &info, const sf::Vector2<float> &coordinates) : rectangle(info.getSize()) {
+MenuRectangle::MenuRectangle(Button &info,
+                             const sf::Vector2<float> &coordinates)
+    : rectangle(info.getSize()) {
     rectangle.setPosition(coordinates);
     rectangle.setFillColor(info.getStandardColor());
 }
@@ -244,13 +246,19 @@ MenuPicture::MenuPicture(const sf::Image &image_,
     initWithImage(coordinates);
 }
 
-MenuPicture::MenuPicture(const std::string &filename,  size_t sizeOfOne, size_t count, const sf::Vector2<float> &coordinates) : MenuItem(coordinates) { // NOLINT
+MenuPicture::MenuPicture(const std::string &filename,
+                         size_t sizeOfOne,
+                         size_t count,
+                         const sf::Vector2<float> &coordinates)
+    : MenuItem(coordinates) {  // NOLINT
     image.loadFromFile(filename);
     texture.loadFromImage(image);
     sprites.resize(count);
     for (size_t i = 0; i < count; ++i) {
         sprites[i].setTexture(texture);
-        sprites[i].setTextureRect(sf::IntRect{static_cast<int>(sizeOfOne * i), 0, static_cast<int>(sizeOfOne), static_cast<int>(sizeOfOne)});
+        sprites[i].setTextureRect(sf::IntRect{static_cast<int>(sizeOfOne * i),
+                                              0, static_cast<int>(sizeOfOne),
+                                              static_cast<int>(sizeOfOne)});
         sprites[i].setPosition(coordinates);
     }
 }
@@ -269,7 +277,8 @@ sf::Vector2<float> MenuPicture::getPosition() const {
 
 sf::Vector2<float> MenuPicture::getSize() const {
     assert(!sprites.empty());
-    return sf::Vector2<float>{sprites[0].getLocalBounds().width, sprites[0].getLocalBounds().height};
+    return sf::Vector2<float>{sprites[0].getLocalBounds().width,
+                              sprites[0].getLocalBounds().height};
 }
 
 void MenuPicture::setPosition(sf::Vector2<float> newPosition) {
@@ -339,12 +348,14 @@ MenuAdditionalButton::MenuAdditionalButton(const MenuItem *const mainButton_,
                                            int marginFromLeft,
                                            std::unique_ptr<MenuItem> &&content,
                                            ButtonWithType &info)
-    : MenuButton(std::move(content),
-                 sf::Vector2<float>{mainButton_->getPosition().x +
-                                        static_cast<float>(marginFromLeft) +
-                                        mainButton_->getSize().x,
-                                    mainButton_->getPosition().y + mainButton_->getSize().y - info.getSize().y},
-                 info),
+    : MenuButton(
+          std::move(content),
+          sf::Vector2<float>{mainButton_->getPosition().x +
+                                 static_cast<float>(marginFromLeft) +
+                                 mainButton_->getSize().x,
+                             mainButton_->getPosition().y +
+                                 mainButton_->getSize().y - info.getSize().y},
+          info),
       mainButton(mainButton_) {
 }
 

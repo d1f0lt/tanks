@@ -5,8 +5,8 @@
 #include <memory>
 #include <vector>
 #include "constants.h"
-#include "menu_items.h"
 #include "database.h"
+#include "menu_items.h"
 
 namespace Tanks {
 

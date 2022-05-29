@@ -134,7 +134,7 @@ public:
     void draw(sf::RenderWindow &window) const override;
 
 protected:
-    mutable sf::RectangleShape rectangle; // NOLINT
+    mutable sf::RectangleShape rectangle;  // NOLINT
 };
 
 struct MenuButton : MenuRectangle {
@@ -172,10 +172,11 @@ public:
     explicit MenuPicture(const sf::Image &image_,
                          const sf::Vector2<float> &coordinates);
 
-    explicit MenuPicture(const std::string &filename,
-                         size_t sizeOfOne,
-                         size_t count,
-                         const sf::Vector2<float> &coordinates); // for animation
+    explicit MenuPicture(
+        const std::string &filename,
+        size_t sizeOfOne,
+        size_t count,
+        const sf::Vector2<float> &coordinates);  // for animation
 
     [[nodiscard]] sf::Vector2<float> getSize() const final;
     [[nodiscard]] sf::Vector2<float> getPosition() const final;

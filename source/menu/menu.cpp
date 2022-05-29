@@ -219,12 +219,17 @@ void Menu::addAddingButtons(size_t start,
 
 void Menu::addPlayerInfo(PlayerGeneral &info) {
     const static size_t marginFromBackground = 20;
-    sf::Vector2<float> curCoordinates{marginFromBackground + items[0]->getPosition().x + items[0]->getSize().x, marginFromBackground};
+    sf::Vector2<float> curCoordinates{marginFromBackground +
+                                          items[0]->getPosition().x +
+                                          items[0]->getSize().x,
+                                      marginFromBackground};
     const static sf::Color defaultTextColor{255, 255, 255};
     const static size_t characterSize = 40;
 
-    InscriptionInfo usernameParameters{info.name, characterSize, defaultTextColor};
-    auto username = std::make_unique<MenuInscription>(usernameParameters, curCoordinates);
+    InscriptionInfo usernameParameters{info.name, characterSize,
+                                       defaultTextColor};
+    auto username =
+        std::make_unique<MenuInscription>(usernameParameters, curCoordinates);
     const static size_t marginFromUsername = 50;
     curCoordinates.x += username->getSize().x + marginFromUsername;
 
@@ -233,16 +238,23 @@ void Menu::addPlayerInfo(PlayerGeneral &info) {
     const static size_t sizeOfOne = 32;
     const static size_t imagesCount = 16;
 
-    auto coin = std::make_unique<MenuPicture>(coinFilename, sizeOfOne, imagesCount, curCoordinates);
+    auto coin = std::make_unique<MenuPicture>(coinFilename, sizeOfOne,
+                                              imagesCount, curCoordinates);
     curCoordinates.x += coin->getSize().x + marginFromCoin;
 
-    InscriptionInfo moneyParameters{std::to_string(info.money), characterSize, defaultTextColor};
-    auto money = std::make_unique<MenuInscription>(moneyParameters, curCoordinates);
+    InscriptionInfo moneyParameters{std::to_string(info.money), characterSize,
+                                    defaultTextColor};
+    auto money =
+        std::make_unique<MenuInscription>(moneyParameters, curCoordinates);
     curCoordinates = {items[0]->getPosition().x + items[0]->getSize().x, 0};
 
     const static sf::Color rectangleColor{0, 0, 0, 128};
-    float maxHeight = std::max(std::max(username->getSize().y, coin->getSize().y), money->getSize().y);
-    sf::Vector2<float> rectangleSize{2*marginFromBackground + username->getSize().x + marginFromUsername + coin->getSize().x + marginFromCoin + money->getSize().x, marginFromBackground*2 + maxHeight};
+    float maxHeight = std::max(
+        std::max(username->getSize().y, coin->getSize().y), money->getSize().y);
+    sf::Vector2<float> rectangleSize{
+        2 * marginFromBackground + username->getSize().x + marginFromUsername +
+            coin->getSize().x + marginFromCoin + money->getSize().x,
+        marginFromBackground * 2 + maxHeight};
     Button btnInfo(rectangleSize, rectangleColor, rectangleColor);
     auto background = std::make_unique<MenuRectangle>(btnInfo, curCoordinates);
 
