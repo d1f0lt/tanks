@@ -257,9 +257,8 @@ bool ProjectileHandler::isBreakOnCreation() {
         for (int col = bullet.getLeft();
              col < bullet.getLeft() + bullet.getWidth(); col++) {
             auto &other = getModel().getByCoords(col, row);
-            if (other.getStrength() != 0) {  // TODO .doInteract
-                dynamic_cast<ProjectileHandler &>(getModel().getHandler(bullet))
-                    .destroy(other);
+            if (other.getStrength() != 0) {
+                destroy(other);
                 survive = false;
             }
         }
