@@ -10,7 +10,7 @@ namespace Tanks::model {
 using boost::asio::ip::tcp;
 
 int ServerModel::addPlayer(tcp::socket &socket, PlayerSkills skills) {
-    int id = getIncrId();
+    int id = getDecrId();
     playersSockets_.emplace(id, socket);
     setPlayerSkills(id, skills);
 
@@ -59,9 +59,17 @@ void ServerModel::sendEventsToClients(
 }
 
 void ServerModel::executeAllEvents() {
-    acceptSpawners();
-
     std::queue<std::unique_ptr<Event>> eventsToSend;
+
+    for (const auto &spawner : spawners_) {
+        if (spawner->isSpawnNow()) {
+            auto event = spawner->createEvent();
+            executeEvent(*event);
+            eventsToSend.emplace(std::move(event));
+        }
+        spawner->nextTick();
+    }
+
     while (!events_.empty()) {
         auto event = std::move(events_.front());
         events_.pop();
@@ -70,23 +78,26 @@ void ServerModel::executeAllEvents() {
     }
 
     for (auto id : bots_) {
-        auto event = getEventByBot(id);
-        executeEvent(*event);
-        eventsToSend.emplace(std::move(event));
+        if (getById(id)) {
+            auto event = getEventByBot(id);
+            executeEvent(*event);
+            eventsToSend.emplace(std::move(event));
+        }
     }
 
     sendEventsToClients(std::move(eventsToSend));
 }
 
 std::unique_ptr<Event> ServerModel::getEventByBot(int botId) {
-    return std::make_unique<TankMove>(
-        botId, Direction::RIGHT,
-        dynamic_cast<Tank &>(getById(botId)->get()).getSpeed());
-}
-
-void ServerModel::acceptSpawners() {
-    for (const auto &spawner : spawners_) {
-        spawner->action();
+    int rnd = getRnd() % 20;
+    if (rnd >= 12) {
+        return std::make_unique<TankShoot>(
+            botId, dynamic_cast<Tank &>(getById(botId)->get()).getDirection());
+    } else {
+        auto directon = static_cast<Direction>(rnd % 4);
+        return std::make_unique<TankMove>(
+            botId, directon,
+            dynamic_cast<Tank &>(getById(botId)->get()).getSpeed());
     }
 }
 
@@ -101,4 +112,23 @@ void ServerModel::setPlayerSkills(int id, PlayerSkills skills) {
 void ServerModel::addEvent(std::unique_ptr<Event> event) {
     events_.emplace(std::move(event));
 }
+
+ServerModel::ServerModel(int level, int botsCount) {
+    loadLevel(level);
+    for (int i = 0; i < botsCount; i++) {
+        addBot();
+    }
+}
+
+void ServerModel::addBot() {
+    auto id = getDecrId();
+    bots_.emplace(id);
+    players_.emplace(id, PlayerSkills());
+    spawners_.emplace_back(std::make_unique<MediumTankSpawner>(*this, id));
+}
+
+DecrId ServerModel::getDecrId() {
+    return decrId--;
+}
+
 }  // namespace Tanks::model

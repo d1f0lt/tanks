@@ -31,6 +31,21 @@ bool BasicHandler::canStandOn(const Entity &other) const {
     return other.isTankPassable();
 }
 
+void BasicHandler::destroyByBullet() {
+    assert(getEntity().getStrength() != 0);
+    int left = getEntity().getLeft();
+    int top = getEntity().getTop();
+    int id = getEntity().getId();
+    auto &model = getModel();
+    model.wasDestroyedBlockThisTurn_ = true;
+    destroyEntity();
+    model.addEntity(std::make_unique<Floor>(left, top, id, model));
+}
+
+void BasicHandler::destroyEntity() {
+    getModel().eraseEntity(getEntity());
+}
+
 std::vector<const Entity *> MovableHandler::look(Direction direction) {
     auto res = lookMutable(direction);
     return {res.begin(), res.end()};
@@ -112,9 +127,9 @@ void MovableHandler::move(Direction direction, int speed) {
 
     if (!bullets.empty() && movable.dist(*bullets[0]) <= dist) {
         for (auto *entity : bullets) {
-            getModel().eraseEntity(*entity);
+            getModel().getHandler(*entity).destroyByBullet();
         }
-        getModel().eraseEntity(getEntity());
+        ForegroundHandler::destroyByBullet();
         return;
     }
 
@@ -190,6 +205,15 @@ void ForegroundHandler::setPosition(int left, int top) {
     setBackground();
 }
 
+void ForegroundHandler::destroyByBullet() {
+    destroyEntity();
+}
+
+void ForegroundHandler::destroyEntity() {
+    restoreBackground();
+    BasicHandler::destroyEntity();
+}
+
 void MovableHandler::setDirection(Direction direction) {
     dynamic_cast<MovableEntity &>(getEntity()).setDirection(direction);
 }
@@ -205,30 +229,22 @@ bool ProjectileHandler::breakIfBreakable() {
     });
 
     for (auto *entity : closest) {
-        destroyByBullet(*entity);
+        destroy(*entity);
     }
     if (!closest.empty()) {
-        getModel().eraseEntity(bullet);
+        destroyByBullet();
         return true;
     }
     return false;
 }
 
-void ProjectileHandler::destroyByBullet(Entity &other) {
+void ProjectileHandler::destroy(Entity &other) {
     if (other.getStrength() > getEntity().getStrength() ||
         other.getStrength() == 0) {
         return;
     }
 
-    if (dynamic_cast<Block *>(&other) == nullptr) {
-        getModel().eraseEntity(other);
-        return;
-    }
-    int left = other.getLeft();
-    int top = other.getTop();
-    getModel().eraseEntity(other);
-    getModel().addEntity(
-        std::make_unique<Floor>(left, top, getModel().getIncrId(), getModel()));
+    getModel().getHandler(other).destroyByBullet();
 }
 
 bool ProjectileHandler::isBreakOnCreation() {
@@ -240,10 +256,10 @@ bool ProjectileHandler::isBreakOnCreation() {
          row++) {
         for (int col = bullet.getLeft();
              col < bullet.getLeft() + bullet.getWidth(); col++) {
-            auto &entity = getModel().getByCoords(col, row);
-            if (entity.getStrength() != 0) {  // TODO .doInteract
+            auto &other = getModel().getByCoords(col, row);
+            if (other.getStrength() != 0) {  // TODO .doInteract
                 dynamic_cast<ProjectileHandler &>(getModel().getHandler(bullet))
-                    .destroyByBullet(entity);
+                    .destroy(other);
                 survive = false;
             }
         }

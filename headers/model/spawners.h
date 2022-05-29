@@ -14,24 +14,25 @@ public:
 
     void action();
 
+    [[nodiscard]] bool isSpawnNow();
+    void nextTick();
+
     [[nodiscard]] virtual int getTimeout() = 0;
     [[nodiscard]] int getEntityId() const;
     [[nodiscard]] int getWaitingTime() const;
     [[nodiscard]] ServerModel &getModel();
+    [[nodiscard]] virtual std::unique_ptr<Event> createEvent() = 0;
 
 protected:
     [[nodiscard]] virtual std::unique_ptr<Entity> createEntity(int left,
                                                                int top) = 0;
 
-    [[nodiscard]] virtual std::unique_ptr<Event> createEvent(int left,
-                                                             int top) = 0;
+    [[nodiscard]] std::pair<int, int> getFreeCoords();
 
 private:
     ServerModel &model_;
     const int entityId_;
-    int waitingTime_ = 1;
-
-    [[nodiscard]] std::pair<int, int> getFreeCoords();
+    int waitingTime_ = 0;
 };
 
 class MediumTankSpawner : public Spawner {
@@ -42,8 +43,7 @@ public:
 protected:
     [[nodiscard]] std::unique_ptr<Entity> createEntity(int left,
                                                        int top) override;
-    [[nodiscard]] std::unique_ptr<Event> createEvent(int left,
-                                                     int top) override;
+    [[nodiscard]] std::unique_ptr<Event> createEvent() override;
 };
 
 }  // namespace Tanks::model

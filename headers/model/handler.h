@@ -23,6 +23,9 @@ public:
 
     [[nodiscard]] virtual bool canStandOn(const Entity &other) const;
 
+    virtual void destroyByBullet();
+    virtual void destroyEntity();
+
 protected:
     [[nodiscard]] Entity &getEntity() const;
     [[nodiscard]] GameModel &getModel() const;
@@ -38,11 +41,13 @@ public:
 
     void setBackground();
     void restoreBackground();
-
+    void destroyEntity() override;
     [[nodiscard]] std::vector<std::vector<const Entity *>> snapshotBackground()
         const;
 
     void setPosition(int left, int top);
+
+    void destroyByBullet() override;
 
 private:
     std::vector<std::vector<Entity *>> background_;
@@ -93,7 +98,7 @@ public:
 
 protected:
     [[nodiscard]] bool breakIfBreakable();
-    void destroyByBullet(Entity &other);
+    void destroy(Entity &other);
 };
 
 class BonusHandler : public ForegroundHandler {

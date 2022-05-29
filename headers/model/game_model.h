@@ -48,6 +48,9 @@ public:
 
     [[nodiscard]] int getTick() const;
 
+    [[nodiscard]] bool wasShootThisTurn() const;
+    [[nodiscard]] bool wasDestroyedBlockThisTurn() const;
+
 protected:
     void addEntity(std::unique_ptr<Entity> entity);
     void eraseEntity(Entity &entity);
@@ -58,13 +61,11 @@ protected:
 
     [[nodiscard]] BasicHandler &getHandler(Entity &entity);
 
-    [[nodiscard]] const std::vector<std::vector<Entity *>> &getAllByLink();
-
-    [[nodiscard]] GameMap &getMap();
-
-    [[nodiscard]] int getIncrId();
+    [[nodiscard]] IncrId getIncrId();
     [[nodiscard]] int getRnd();
 
+    [[nodiscard]] GameMap &getMap();
+    [[nodiscard]] const std::vector<std::vector<Entity *>> &getAllByLink();
     [[nodiscard]] std::shared_mutex &getMutex() const;
 
 private:
@@ -73,9 +74,11 @@ private:
     std::unordered_map<int, Entity *> byId_;
     std::unordered_map<Entity *, BasicHandler *> handlers_;
     int currentTick_ = 0;
-    int currentId_ = 0;
+    IncrId currentId_{0};
     std::mt19937 rnd{42};
     EntityHolder entityHolder_;
+    bool wasShootThisTurn_ = false;
+    bool wasDestroyedBlockThisTurn_ = false;
     mutable std::shared_mutex sharedMutex_;
 };
 

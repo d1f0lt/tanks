@@ -8,7 +8,7 @@ Projectile::Projectile(int left,
                        int top,
                        Direction direction,
                        GameModel &model,
-                       int entityId)
+                       IncrId entityId)
     : MovableEntity(left,
                     top,
                     entityId,

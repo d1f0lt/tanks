@@ -22,6 +22,8 @@ class ServerModel : public GameModel {
     friend Spawner;
 
 public:
+    explicit ServerModel(int level = 1, int botsCount = 0);
+
     [[nodiscard]] int addPlayer(tcp::socket &socket, PlayerSkills skills = {});
 
 protected:
@@ -33,6 +35,7 @@ private:
     std::unordered_set<int> bots_;
     std::vector<std::unique_ptr<Spawner>> spawners_;
     std::unordered_map<int, PlayerSkills> players_;
+    DecrId decrId{-1};
 
     void receiveTurns(tcp::socket &client);
     void executeAllEvents() override;
@@ -42,8 +45,11 @@ private:
 
     void sendEventsToClients(std::queue<std::unique_ptr<Event>> events);
 
+    [[nodiscard]] DecrId getDecrId();
+
     [[nodiscard]] PlayerSkills getPlayerSkills(int id) const;
     void setPlayerSkills(int id, PlayerSkills skills);
+    void addBot();
 };
 }  // namespace Tanks::model
 

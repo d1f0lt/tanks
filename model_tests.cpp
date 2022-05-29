@@ -20,6 +20,10 @@ const std::array<Tanks::Direction, 4> DIRECTIONS = {
 namespace {
 class DebugServer : public ServerModel {
 public:
+    explicit DebugServer(int level = 1, int bots = 0)
+        : ServerModel(level, bots) {
+    }
+
     using GameModel::getHandler;
     using ServerModel::addEvent;
 };
@@ -50,7 +54,6 @@ TEST_CASE("Game creation") {
 
 #define INIT_GAME()                                                  \
     DebugServer serverModel;                                         \
-    serverModel.loadLevel(1);                                        \
     boost::asio::io_context io_context;                              \
     tcp::acceptor acceptor(io_context, tcp::endpoint(tcp::v4(), 0)); \
     ADD_PLAYER(serverModel, );                                       \
@@ -94,7 +97,10 @@ bool operator==(const Entity &a, const Entity &b) {
     auto all2 = model2.getAll();
     for (const auto &vec : all1) {
         for (const auto *ptr : vec) {
+            assert(ptr != nullptr);
             const auto &entity1 = *ptr;
+            auto e2 = model2.getById(entity1.getId());
+            assert(e2);
             auto &entity2 = model2.getById(entity1.getId())->get();
             if (entity1 != entity2) {
                 return false;
@@ -504,14 +510,15 @@ void setPosition(DebugServer &server,
                  int left,
                  int top) {
     server.addEvent(std::make_unique<SetPosition>(id, left, top));
-    server.nextTick();
-    clientModel.nextTick();
 }
 
 TEST_CASE("Online shoot") {
     INIT_GAME();
     setPosition(serverModel, clientModel, tank.getId(), TILE_SIZE * 2,
                 TILE_SIZE * 2);
+
+    serverModel.nextTick();
+    clientModel.nextTick();
 
     auto user = clientModel.getHandler();
     user.shoot(Direction::RIGHT);
@@ -522,4 +529,39 @@ TEST_CASE("Online shoot") {
           EntityType::FLOOR);
     CHECK(clientModel.getByCoords(TILE_SIZE * 3, TILE_SIZE * 2).getType() ==
           EntityType::FLOOR);
+}
+
+TEST_CASE("Online. Bullet destroy on creation") {
+    INIT_GAME();
+    constexpr int TANK_LEFT = TILE_SIZE * 3;
+    constexpr int TANK_TOP = TILE_SIZE * 1 + TILE_SIZE - TANK_SIZE;
+    setPosition(serverModel, clientModel, id, TANK_LEFT, TANK_TOP);
+
+    serverModel.nextTick();
+    clientModel.nextTick();
+
+    auto &brick = serverModel.getByCoords(TILE_SIZE * 3, TILE_SIZE * 2);
+    CHECK(brick.getType() == EntityType::BRICK);
+    CHECK(isSynced(serverModel, clientModel));
+
+    clientModel.getHandler().shoot(Direction::DOWN);
+
+    serverModel.nextTick();
+    clientModel.nextTick();
+
+    CHECK(clientModel.wasShootThisTurn());
+    CHECK(serverModel.wasShootThisTurn());
+
+    auto &floor = serverModel.getByCoords(TILE_SIZE * 3, TILE_SIZE * 2);
+    CHECK(floor.getType() == Tanks::model::EntityType::FLOOR);
+    CHECK(isSynced(serverModel, clientModel));
+    CHECK(serverModel.wasDestroyedBlockThisTurn());
+    CHECK(clientModel.wasDestroyedBlockThisTurn());
+}
+
+TEST_CASE("Bots stress") {
+    DebugServer serverModel(1, 40);
+    for (int i = 0; i < 10000; i++) {
+        serverModel.nextTick();
+    }
 }

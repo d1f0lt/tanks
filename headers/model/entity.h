@@ -24,6 +24,28 @@ enum class EntityType {
     WALK_ON_WATER_BONUS
 };
 
+struct IncrId {
+public:
+    explicit IncrId(int data);
+
+    [[nodiscard]] operator int() const;
+    [[nodiscard]] IncrId operator++(int);  // postfix
+
+private:
+    int data;
+};
+
+struct DecrId {
+public:
+    explicit DecrId(int data);
+
+    [[nodiscard]] operator int() const;
+    [[nodiscard]] DecrId operator--(int);  // postfix
+
+private:
+    int data;
+};
+
 class Entity {
     friend WalkOnWaterHandler;
     //    friend ForegroundHandler;

@@ -6,7 +6,7 @@
 namespace Tanks::model {
 Tank::Tank(int left,
            int top,
-           int entityId,
+           DecrId entityId,
            std::unique_ptr<TankHandler> handler,
            Direction direction,
            int speed,
@@ -22,7 +22,7 @@ int MediumTank::getWidth() const {
 
 MediumTank::MediumTank(int left,
                        int top,
-                       int entityId,
+                       DecrId entityId,
                        const TankHandlerCreator &handlerCreator,
                        Direction direction,
                        int speed)

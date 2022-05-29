@@ -86,7 +86,7 @@ EntityType SpawnTank::getType() const {
     return entityType_;
 }
 
-int SpawnTank::getTankId() const {
+DecrId SpawnTank::getTankId() const {
     return tankId_;
 }
 int SpawnTank::getLeft() const {
@@ -147,7 +147,7 @@ void BonusSpawn::acceptExecutor(const EventExecutor &executor) {
     executor.execute(*this);
 }
 
-int BonusSpawn::getId() const {
+DecrId BonusSpawn::getId() const {
     return id_;
 }
 

@@ -63,7 +63,7 @@ public:
 
     [[nodiscard]] static std::unique_ptr<Event> readFrom(tcp::socket &socket);
 
-    [[nodiscard]] int getTankId() const;
+    [[nodiscard]] DecrId getTankId() const;
     [[nodiscard]] int getLeft() const;
     [[nodiscard]] int getTop() const;
     [[nodiscard]] EntityType getType() const;
@@ -73,7 +73,7 @@ public:
     [[nodiscard]] int getReloadTicks() const;
 
 private:
-    const int tankId_;
+    const DecrId tankId_;
     const int left_;
     const int top_;
     const EntityType entityType_;
@@ -108,13 +108,13 @@ public:
 
     void acceptExecutor(const EventExecutor &executor) override;
 
-    [[nodiscard]] int getId() const;
+    [[nodiscard]] DecrId getId() const;
     [[nodiscard]] int getLeft() const;
     [[nodiscard]] int getTop() const;
     [[nodiscard]] EntityType getType() const;
 
 private:
-    const int id_;
+    const DecrId id_;
     const int left_;
     const int top_;
     const EntityType type_;

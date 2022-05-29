@@ -33,10 +33,6 @@ void GameModel::addEntity(std::unique_ptr<Entity> entity) {
 }
 
 void GameModel::eraseEntity(Entity &entity) {
-    if (dynamic_cast<ForegroundEntity *>(&entity) != nullptr) {
-        dynamic_cast<ForegroundHandler &>(getHandler(entity))
-            .restoreBackground();
-    }
     groupedEntities_.erase(entity);
     byId_.erase(entity.getId());
     entityHolder_.erase(entity);  // Other cleared in handler destructor
@@ -135,6 +131,8 @@ std::vector<std::vector<const Entity *>> GameModel::getAll() const {
 }
 
 void GameModel::nextTick() {
+    wasShootThisTurn_ = false;
+    wasDestroyedBlockThisTurn_ = false;
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
     std::unique_lock lock(getMutex());
     executeAllEvents();
@@ -154,10 +152,15 @@ void GameModel::executeEvent(Event &event) {
     event.acceptExecutor(EventExecutor(*this));
 }
 
+bool GameModel::wasShootThisTurn() const {
+    return wasShootThisTurn_;
+}
+
 void GameModel::moveBullets() {
-    for (auto *entity :
-         getAllByLink()[static_cast<unsigned>(EntityType::BULLET)]) {
-        auto *bullet = dynamic_cast<Projectile *>(entity);
+    auto type = static_cast<unsigned>(EntityType::BULLET);
+    const auto &all = getAllByLink()[type];
+    for (unsigned i = 0; i < all.size(); i++) {  // bullet can be destroyed
+        auto *bullet = dynamic_cast<Projectile *>(all[i]);
         assert(bullet != nullptr);
 
         dynamic_cast<ProjectileHandler &>(getHandler(*bullet))
@@ -165,7 +168,7 @@ void GameModel::moveBullets() {
     }
 }
 
-int GameModel::getIncrId() {
+IncrId GameModel::getIncrId() {
     return currentId_++;
 }
 
@@ -179,6 +182,10 @@ int GameModel::getRnd() {
 
 std::shared_mutex &GameModel::getMutex() const {
     return sharedMutex_;
+}
+
+bool GameModel::wasDestroyedBlockThisTurn() const {
+    return wasDestroyedBlockThisTurn_;
 }
 
 // TODO

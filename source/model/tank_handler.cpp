@@ -14,6 +14,7 @@ void TankHandler::shoot() {
         return;
     }
 
+    getModel().wasShootThisTurn_ = true;
     lastShootTick_ = getModel().getTick();
 
     static const std::unordered_map<Direction, int> DCOL = {

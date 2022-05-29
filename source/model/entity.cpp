@@ -1,4 +1,5 @@
 #include "model/entity.h"
+#include <cassert>
 #include <unordered_set>
 #include "model/handler.h"
 
@@ -79,4 +80,29 @@ bool Entity::canPass(const Entity &other) const {
     return getHandler().canStandOn(other);
 }
 
+IncrId::IncrId(const int data) : data(data) {
+    assert(data >= 0);
+}
+
+IncrId::operator int() const {
+    return data;
+}
+
+IncrId IncrId::operator++(int) {  // postfix
+    IncrId res(data++);
+    return res;
+}
+
+DecrId::DecrId(int data) : data(data) {
+    assert(data < 0);
+}
+
+DecrId::operator int() const {
+    return data;
+}
+
+DecrId DecrId::operator--(int) {  // postfix
+    DecrId res(data--);
+    return res;
+}
 }  // namespace Tanks::model

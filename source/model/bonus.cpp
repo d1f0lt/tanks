@@ -4,7 +4,7 @@
 namespace Tanks::model {
 Bonus::Bonus(int left,
              int top,
-             int entityId,
+             DecrId entityId,
              std::unique_ptr<BonusHandler> handler)
     : ForegroundEntity(left, top, entityId, std::move(handler)) {
 }
@@ -21,7 +21,7 @@ int Bonus::getStrength() const {
     return 0;
 }
 
-WalkOnWater::WalkOnWater(int left, int top, int entityId, GameModel &model)
+WalkOnWater::WalkOnWater(int left, int top, DecrId entityId, GameModel &model)
     : Bonus(left,
             top,
             entityId,

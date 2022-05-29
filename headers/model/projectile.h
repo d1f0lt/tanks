@@ -11,7 +11,7 @@ public:
                         int top,
                         Direction direction,
                         GameModel &model,
-                        int entityId);
+                        IncrId entityId);
 
     [[nodiscard]] EntityType getType() const override;
     [[nodiscard]] int getWidth() const override;

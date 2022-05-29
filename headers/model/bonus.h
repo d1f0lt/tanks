@@ -9,7 +9,7 @@ class Bonus : public ForegroundEntity {
 public:
     Bonus(int left,
           int top,
-          int entityId,
+          DecrId entityId,
           std::unique_ptr<BonusHandler> handler);
 
     [[nodiscard]] int getWidth() const override;
@@ -19,7 +19,7 @@ public:
 
 class WalkOnWater : public Bonus {
 public:
-    explicit WalkOnWater(int left, int top, int entityId, GameModel &model);
+    explicit WalkOnWater(int left, int top, DecrId entityId, GameModel &model);
 
     [[nodiscard]] EntityType getType() const override;
 };

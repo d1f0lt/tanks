@@ -9,7 +9,7 @@ class Tank : public MovableEntity {
 public:
     explicit Tank(int left,
                   int top,
-                  int entityId,
+                  DecrId entityId,
                   std::unique_ptr<TankHandler> handler,
                   Direction direction,
                   int speed,
@@ -28,7 +28,7 @@ class MediumTank : public Tank {
 public:
     explicit MediumTank(int left,
                         int top,
-                        int entityId,
+                        DecrId entityId,
                         const TankHandlerCreator &handlerCreator,
                         Direction direction,
                         int speed);
