@@ -17,13 +17,6 @@
 
 namespace Tanks::model {
 class Spawner;  // Todo spawner fwd
-struct PlayerSkillsTmp {
-    const int tankSpeed = DEFAULT_TANK_SPEED;
-    const int bulletSpeed = DEFAULT_BULLET_SPEED;
-    const int reloadTicks = DEFAULT_RELOAD_TICKS;
-};
-
-using PlayerSkills = PlayerSkillsTmp;
 
 class GameModel {
     friend EventExecutor;
@@ -61,7 +54,6 @@ protected:
 
     virtual void executeAllEvents() = 0;
     void executeEvent(Event &event);
-
     void moveBullets();
 
     [[nodiscard]] BasicHandler &getHandler(Entity &entity);
@@ -75,8 +67,6 @@ protected:
 
     [[nodiscard]] std::shared_mutex &getMutex() const;
 
-    // TODO
-    //  [[nodiscard]] PlayerSkillsTmp getPlayerSkills(int id);
 
 private:
     GameMap map_;
@@ -85,7 +75,6 @@ private:
     std::unordered_map<Entity *, BasicHandler *> handlers_;
     int currentTick_ = 0;
     int currentId_ = 0;
-    std::unordered_map<int, PlayerSkills> players_;
     std::mt19937 rnd{42};
     EntityHolder entityHolder_;
     mutable std::shared_mutex sharedMutex_;

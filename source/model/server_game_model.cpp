@@ -9,9 +9,10 @@
 namespace Tanks::model {
 using boost::asio::ip::tcp;
 
-int ServerModel::addPlayer(tcp::socket &socket) {
+int ServerModel::addPlayer(tcp::socket &socket, PlayerSkills skills) {
     int id = getIncrId();
     playersSockets_.emplace(id, socket);
+    setPlayerSkills(id, skills);
 
     spawners_.emplace_back(std::make_unique<MediumTankSpawner>(*this, id));
     //    events_.emplace(std::make_unique<SpawnTank>(id, TILE_SIZE, TILE_SIZE,
@@ -87,5 +88,13 @@ void ServerModel::acceptSpawners() {
     for (const auto &spawner : spawners_) {
         spawner->action();
     }
+}
+
+PlayerSkills ServerModel::getPlayerSkills(int id) const {
+    return players_.at(id);
+}
+
+void ServerModel::setPlayerSkills(int id, PlayerSkills skills) {
+    players_.emplace(id, skills);
 }
 }  // namespace Tanks::model

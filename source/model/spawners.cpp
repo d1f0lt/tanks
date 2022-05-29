@@ -80,8 +80,9 @@ int MediumTankSpawner::getTimeout() {
 }
 
 std::unique_ptr<Event> MediumTankSpawner::createEvent(int left, int top) {
-    return std::make_unique<SpawnTank>(getEntityId(), left, top,
-                                       EntityType::MEDIUM_TANK);
+    return std::make_unique<SpawnTank>(
+        getEntityId(), left, top, EntityType::MEDIUM_TANK, DEFAULT_TANK_SPEED,
+        DEFAULT_BULLET_SPEED, DEFAULT_RELOAD_TICKS);
 }
 MediumTankSpawner::MediumTankSpawner(ServerModel &model, int entityId)
     : Spawner(model, entityId) {

@@ -46,7 +46,14 @@ private:
 
 class SpawnTank : public Event {
 public:
-    SpawnTank(int tankId, int left, int top, EntityType entityType);
+    explicit SpawnTank(int tankId,
+                       int left,
+                       int top,
+                       EntityType entityType,
+                       int tankSpeed,
+                       int bulletSpeed,
+                       int reloadTicks);
+
     void sendTo(tcp::socket &socket) override;
     void acceptExecutor(const EventExecutor &executor) override;
 
@@ -54,7 +61,10 @@ public:
                        int tankId,
                        int left,
                        int top,
-                       EntityType entityType);
+                       EntityType entityType,
+                       int tankSpeed,
+                       int bulletSpeed,
+                       int reloadTicks);
 
     [[nodiscard]] static std::unique_ptr<Event> readFrom(tcp::socket &socket);
 
@@ -62,12 +72,19 @@ public:
     [[nodiscard]] int getLeft() const;
     [[nodiscard]] int getTop() const;
     [[nodiscard]] EntityType getType() const;
+    [[nodiscard]] EntityType getEntityType() const;
+    [[nodiscard]] int getTankSpeed() const;
+    [[nodiscard]] int getBulletSpeed() const;
+    [[nodiscard]] int getReloadTicks() const;
 
 private:
     const int tankId_;
     const int left_;
     const int top_;
     const EntityType entityType_;
+    const int tankSpeed_;
+    const int bulletSpeed_;
+    const int reloadTicks_;
 };
 
 std::unique_ptr<Event> readEvent(tcp::socket &socket);

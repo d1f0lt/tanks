@@ -7,11 +7,7 @@ void TankMove::sendTo(boost::asio::ip::tcp::socket &socket,
                       int tankId,
                       Direction direction,
                       int speed) {
-    sendInt(socket, EventType::TANK_MOVE);
-
-    sendInt(socket, tankId);
-    sendInt(socket, direction);
-    sendInt(socket, speed);
+    sendMultipleInts(socket, EventType::TANK_MOVE, tankId, direction, speed);
 }
 
 std::unique_ptr<Event> TankMove::readFrom(
@@ -66,7 +62,7 @@ std::unique_ptr<Event> readEvent(boost::asio::ip::tcp::socket &socket) {
 
 void SpawnTank::sendTo(boost::asio::ip::tcp::socket &socket) {
     static_assert(static_cast<std::int32_t>(EventType::SPAWN_TANK) == 2);
-    SpawnTank::sendTo(socket, tankId_, left_, top_, entityType_);
+    SpawnTank::sendTo(socket, tankId_, left_, top_, entityType_, 0, 0, 0);
 }
 
 void SpawnTank::acceptExecutor(const EventExecutor &executor) {
@@ -77,12 +73,12 @@ void SpawnTank::sendTo(boost::asio::ip::tcp::socket &socket,
                        int tankId,
                        int left,
                        int top,
-                       EntityType entityType) {
-    sendInt(socket, EventType::SPAWN_TANK);
-    sendInt(socket, tankId);
-    sendInt(socket, left);
-    sendInt(socket, top);
-    sendInt(socket, entityType);
+                       EntityType entityType,
+                       int tankSpeed,
+                       int bulletSpeed,
+                       int reloadTicks) {
+    sendMultipleInts(socket, EventType::SPAWN_TANK, tankId, left, top,
+                     entityType);
 }
 
 std::unique_ptr<Event> SpawnTank::readFrom(tcp::socket &socket) {
@@ -90,14 +86,12 @@ std::unique_ptr<Event> SpawnTank::readFrom(tcp::socket &socket) {
     auto left = receiveInt(socket);
     auto top = receiveInt(socket);
     auto type = static_cast<EntityType>(receiveInt(socket));
-    return std::make_unique<SpawnTank>(tankId, left, top, type);
+    return std::make_unique<SpawnTank>(tankId, left, top, type,
+                                       DEFAULT_TANK_SPEED, DEFAULT_BULLET_SPEED,
+                                       DEFAULT_RELOAD_TICKS);
 }
 EntityType SpawnTank::getType() const {
     return entityType_;
-}
-
-SpawnTank::SpawnTank(int tankId, int left, int top, EntityType entityType)
-    : tankId_(tankId), left_(left), top_(top), entityType_(entityType) {
 }
 
 int SpawnTank::getTankId() const {
@@ -109,6 +103,34 @@ int SpawnTank::getLeft() const {
 
 int SpawnTank::getTop() const {
     return top_;
+}
+
+SpawnTank::SpawnTank(int tankId,
+                     int left,
+                     int top,
+                     EntityType entityType,
+                     int tankSpeed,
+                     int bulletSpeed,
+                     int reloadTicks)
+    : tankId_(tankId),
+      left_(left),
+      top_(top),
+      entityType_(entityType),
+      tankSpeed_(tankSpeed),
+      bulletSpeed_(bulletSpeed),
+      reloadTicks_(reloadTicks) {
+}
+EntityType SpawnTank::getEntityType() const {
+    return entityType_;
+}
+int SpawnTank::getTankSpeed() const {
+    return tankSpeed_;
+}
+int SpawnTank::getBulletSpeed() const {
+    return bulletSpeed_;
+}
+int SpawnTank::getReloadTicks() const {
+    return reloadTicks_;
 }
 
 }  // namespace Tanks::model

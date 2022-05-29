@@ -23,12 +23,12 @@ void EventExecutor::execute(TankMove &event) const {
 }
 
 void EventExecutor::execute(SpawnTank &event) const {
+    int id = event.getTankId();
     switch (event.getType()) {
         case (EntityType::MEDIUM_TANK):
             getModel().addEntity(std::make_unique<MediumTank>(
                 event.getLeft(), event.getTop(), event.getTankId(),
-                TankHandlerCreator(getModel()), Direction::LEFT,
-                DEFAULT_TANK_SPEED));
+                TankHandlerCreator(getModel()), Direction::LEFT, event.getTankSpeed()));
             break;
     }
 }

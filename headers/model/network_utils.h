@@ -5,15 +5,21 @@
 
 namespace Tanks::model {
 using boost::asio::buffer;
+using boost::asio::ip::tcp;
 template <typename T>
-void sendInt(boost::asio::ip::tcp::socket &socket, T a) {
+void sendInt(tcp::socket &socket, T a) {
     auto buff = static_cast<std::int32_t>(a);
     auto res = socket.write_some(
         buffer(reinterpret_cast<const char *>(&buff), sizeof(buff)));
     assert(res == sizeof(buff));
 }
 
-std::int32_t receiveInt(boost::asio::ip::tcp::socket &socket);
+template <typename... Args>
+void sendMultipleInts(tcp::socket &socket, Args... args) {
+    (sendInt(socket, args), ...);
+}
+
+std::int32_t receiveInt(tcp::socket &socket);
 }  // namespace Tanks::model
 
 #endif  // TANKS_NETWORK_UTILS_H
