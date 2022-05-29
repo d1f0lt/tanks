@@ -77,8 +77,8 @@ Menu initMenu(PlayersDatabase &db, const std::string &imagesPath) {  // NOLINT
                                                   sf::Vector2<float>{0, 0});
         addingButtons.emplace_back(std::move(item));
     }
-    sf::Color addingButtonsStandardColor{0, 0, 0, 0};
-    sf::Color addingButtonsHoverColor{128, 128, 128, 128};
+    const static sf::Color addingButtonsStandardColor{0, 0, 0, 0};
+    const static sf::Color addingButtonsHoverColor{128, 128, 128, 128};
 
     ButtonWithType info{ButtonType::DELETE,
                         sf::Vector2<float>{buttonsHeight, buttonsHeight},
@@ -121,7 +121,10 @@ void showUsersMenu(sf::RenderWindow &window) {
                     db.disconnectFromDatabase();
                     menu.flyAwayToLeft(window, backgroundSprite);
                     showMainMenu(window, backgroundSprite, person);
+                    db.connect();
+                    db.updateInfo(person);
                     db.makeOffline(person.general.name);
+                    db.disconnectFromDatabase();
                     menu.flyOutFromLeft(window, backgroundSprite);
                 }
             } break;
