@@ -18,8 +18,7 @@ enum class EntityType {
     BRICK,
     STEEL,
     WATER,
-    PLAYABLE_TANK,
-    BOT_TANK,
+    MEDIUM_TANK,
     BULLET,
     GRASS,
     WALK_ON_WATER_BONUS

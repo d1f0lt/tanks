@@ -17,9 +17,6 @@ public:
     [[nodiscard]] bool canPass(const Entity &other) const override;
     [[nodiscard]] int getSpeed() const final;
 
-protected:
-    void shoot();
-
 private:
     int speed_ = -1;
 };

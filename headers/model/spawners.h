@@ -3,12 +3,13 @@
 
 #include <memory>
 #include "model/entity.h"
+#include "model/event_fwd.h"
 #include "model/game_model_fwd.h"
 
 namespace Tanks::model {
 class Spawner {
 public:
-    explicit Spawner(GameModel &model, int entityId);
+    explicit Spawner(ServerModel &model, int entityId);
     virtual ~Spawner() = default;
 
     void action();
@@ -16,14 +17,17 @@ public:
     [[nodiscard]] virtual int getTimeout() = 0;
     [[nodiscard]] int getEntityId() const;
     [[nodiscard]] int getWaitingTime() const;
+    [[nodiscard]] ServerModel &getModel();
 
 protected:
     [[nodiscard]] virtual std::unique_ptr<Entity> createEntity(int left,
                                                                int top) = 0;
-    [[nodiscard]] GameModel &getModel();
+
+    [[nodiscard]] virtual std::unique_ptr<Event> createEvent(int left,
+                                                             int top) = 0;
 
 private:
-    GameModel &model_;
+    ServerModel &model_;
     const int entityId_;
     int waitingTime_ = 1;
 
@@ -31,8 +35,15 @@ private:
 };
 
 class MediumTankSpawner : public Spawner {
+public:
+    int getTimeout() override;
+    explicit MediumTankSpawner(ServerModel &model, int entityId);
+
 protected:
     std::unique_ptr<Entity> createEntity(int left, int top) override;
+
+protected:
+    std::unique_ptr<Event> createEvent(int left, int top) override;
 };
 
 }  // namespace Tanks::model

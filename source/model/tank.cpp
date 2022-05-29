@@ -18,10 +18,6 @@ bool Tank::canPass(const Entity &other) const {
     return other.isTankPassable();
 }
 
-void Tank::shoot() {
-    dynamic_cast<TankHandler &>(getHandler()).shoot();
-}
-
 int MediumTank::getWidth() const {
     return Tanks::TANK_SIZE;
 }
@@ -49,7 +45,7 @@ int MediumTank::getStrength() const {
 }
 
 EntityType MediumTank::getType() const {
-    return EntityType::PLAYABLE_TANK;
+    return EntityType::MEDIUM_TANK;
 }
 
 int Tank::getSpeed() const {

@@ -14,4 +14,8 @@ void PlayerActionsHandler::changeDirection(Direction direction) {
     move(direction, 0);
 }
 
+void PlayerActionsHandler::shoot(Direction direction) {
+    return;  // TODO
+}
+
 }  // namespace Tanks::model

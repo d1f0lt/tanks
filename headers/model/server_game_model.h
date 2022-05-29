@@ -5,22 +5,26 @@
 #include <shared_mutex>
 #include <unordered_set>
 #include "model/game_model.h"
+#include "model/spawners.h"
 
 namespace Tanks::model {
 using boost::asio::ip::tcp;
 
 class ServerModel : public GameModel {
+    friend Spawner;
+
 public:
-    [[nodiscard]] int addPlayer(boost::asio::ip::tcp::socket &socket);
+    [[nodiscard]] int addPlayer(tcp::socket &socket);
 
 private:
     std::queue<std::unique_ptr<Event>> events_;
-    std::unordered_map<int, tcp::socket &> players_;
+    std::unordered_map<int, tcp::socket &> playersSockets_;
     std::unordered_set<int> bots_;
-    std::shared_mutex sharedMuxtex;
+    std::vector<std::unique_ptr<Spawner>> spawners_;
 
     void receiveTurns(tcp::socket &client);
     void executeAllEvents() override;
+    void acceptSpawners();
 
     [[nodiscard]] std::unique_ptr<Event> getEventByBot(int botId);
 

@@ -17,10 +17,10 @@
 
 namespace Tanks::model {
 class Spawner;  // Todo spawner fwd
+//struct PlayerSkills;
 
 class GameModel {
     friend EventExecutor;
-    friend Spawner;
 
     friend BasicHandler;
     friend ForegroundHandler;
@@ -69,6 +69,9 @@ protected:
 
     [[nodiscard]] std::shared_mutex &getMutex() const;
 
+    // TODO
+    //  [[nodiscard]] PlayerSkills getPlayerSkills(int id);
+
 private:
     GameMap map_;
     GroupedEntities groupedEntities_;
@@ -76,6 +79,7 @@ private:
     std::unordered_map<Entity *, BasicHandler *> handlers_;
     int currentTick_ = 0;
     int currentId_ = 0;
+//    std::unordered_map<int, PlayerSkills> players_;
     std::mt19937 rnd{42};
     EntityHolder entityHolder_;
     mutable std::shared_mutex sharedMutex_;

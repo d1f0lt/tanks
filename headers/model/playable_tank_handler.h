@@ -13,8 +13,8 @@ public:
     explicit PlayerActionsHandler(int id, tcp::socket &socket);
 
     void move(Direction direction, int speed);
-
     void changeDirection(Direction direction);
+    void shoot(Direction direction);
 
 private:
     const int id_;

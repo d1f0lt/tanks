@@ -3,6 +3,7 @@
 #include "model/event.h"
 #include "model/network_utils.h"
 #include "model/projectile.h"
+#include "model/spawners.h"
 #include "model/tank.h"
 
 namespace Tanks::model {
@@ -10,10 +11,11 @@ using boost::asio::ip::tcp;
 
 int ServerModel::addPlayer(tcp::socket &socket) {
     int id = getIncrId();
-    players_.emplace(id, socket);
+    playersSockets_.emplace(id, socket);
 
-    events_.emplace(
-        std::make_unique<SpawnTank>(id, TILE_SIZE, TILE_SIZE, Direction::LEFT));
+    spawners_.emplace_back(std::make_unique<MediumTankSpawner>(*this, id));
+    //    events_.emplace(std::make_unique<SpawnTank>(id, TILE_SIZE, TILE_SIZE,
+    //                                                EntityType::MEDIUM_TANK));
     std::thread([&]() { receiveTurns(socket); }).detach();
     return id;
 }
@@ -42,20 +44,22 @@ void ServerModel::receiveTurns(tcp::socket &client) {
 
 void ServerModel::sendEventsToClients(
     std::queue<std::unique_ptr<Event>> events) {
-    for (auto &[id, socket] : players_) {
+    for (auto &[id, socket] : playersSockets_) {
         sendInt(socket, events.size());
     }
 
     while (!events.empty()) {
         auto event = std::move(events.front());
         events.pop();
-        for (auto &[id, socket] : players_) {
+        for (auto &[id, socket] : playersSockets_) {
             event->sendTo(socket);
         }
     }
 }
 
 void ServerModel::executeAllEvents() {
+    acceptSpawners();
+
     std::queue<std::unique_ptr<Event>> eventsToSend;
     while (!events_.empty()) {
         auto event = std::move(events_.front());
@@ -69,6 +73,7 @@ void ServerModel::executeAllEvents() {
         executeEvent(*event);
         eventsToSend.emplace(std::move(event));
     }
+
     sendEventsToClients(std::move(eventsToSend));
 }
 
@@ -76,5 +81,11 @@ std::unique_ptr<Event> ServerModel::getEventByBot(int botId) {
     return std::make_unique<TankMove>(
         botId, Direction::RIGHT,
         dynamic_cast<Tank &>(getById(botId)->get()).getSpeed());
+}
+
+void ServerModel::acceptSpawners() {
+    for (const auto &spawner : spawners_) {
+        spawner->action();
+    }
 }
 }  // namespace Tanks::model

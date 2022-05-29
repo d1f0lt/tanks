@@ -66,7 +66,7 @@ std::unique_ptr<Event> readEvent(boost::asio::ip::tcp::socket &socket) {
 
 void SpawnTank::sendTo(boost::asio::ip::tcp::socket &socket) {
     static_assert(static_cast<std::int32_t>(EventType::SPAWN_TANK) == 2);
-    SpawnTank::sendTo(socket, tankId_, left_, top_, direction_);
+    SpawnTank::sendTo(socket, tankId_, left_, top_, entityType_);
 }
 
 void SpawnTank::acceptExecutor(const EventExecutor &executor) {
@@ -77,25 +77,29 @@ void SpawnTank::sendTo(boost::asio::ip::tcp::socket &socket,
                        int tankId,
                        int left,
                        int top,
-                       Direction direction) {
+                       EntityType entityType) {
     sendInt(socket, EventType::SPAWN_TANK);
     sendInt(socket, tankId);
     sendInt(socket, left);
     sendInt(socket, top);
-    sendInt(socket, direction);
+    sendInt(socket, entityType);
 }
 
 std::unique_ptr<Event> SpawnTank::readFrom(tcp::socket &socket) {
     auto tankId = receiveInt(socket);
     auto left = receiveInt(socket);
     auto top = receiveInt(socket);
-    auto direction = static_cast<Direction>(receiveInt(socket));
-    return std::make_unique<SpawnTank>(tankId, left, top, direction);
+    auto type = static_cast<EntityType>(receiveInt(socket));
+    return std::make_unique<SpawnTank>(tankId, left, top, type);
+}
+EntityType SpawnTank::getType() const {
+    return entityType_;
 }
 
-SpawnTank::SpawnTank(int tankId, int left, int top, Direction direction)
-    : tankId_(tankId), left_(left), top_(top), direction_(direction) {
+SpawnTank::SpawnTank(int tankId, int left, int top, EntityType entityType)
+    : tankId_(tankId), left_(left), top_(top), entityType_(entityType) {
 }
+
 int SpawnTank::getTankId() const {
     return tankId_;
 }
@@ -105,10 +109,6 @@ int SpawnTank::getLeft() const {
 
 int SpawnTank::getTop() const {
     return top_;
-}
-
-Direction SpawnTank::getDirection() const {
-    return direction_;
 }
 
 }  // namespace Tanks::model

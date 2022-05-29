@@ -1,13 +1,14 @@
 #include "model/spawners.h"
-#include "model/game_model.h"
+#include "model/event.h"
+#include "model/server_game_model.h"
 #include "model/tank.h"
 
 namespace Tanks::model {
-Spawner::Spawner(GameModel &model, int entityId)
+Spawner::Spawner(ServerModel &model, int entityId)
     : model_(model), entityId_(entityId) {
 }
 
-GameModel &Spawner::getModel() {
+ServerModel &Spawner::getModel() {
     return model_;
 }
 
@@ -26,7 +27,9 @@ void Spawner::action() {
 
     assert(waitingTime_ == 0);
     auto [left, top] = getFreeCoords();
-    getModel().addEntity(createEntity(left, top));
+    //    getModel().events_.push(std::make_unique<)
+    getModel().events_.emplace(createEvent(left, top));
+    //    getModel().addEntity(createEntity(left, top));
 }
 
 int Spawner::getEntityId() const {
@@ -66,8 +69,20 @@ std::pair<int, int> Spawner::getFreeCoords() {
 
 std::unique_ptr<Entity> MediumTankSpawner::createEntity(int left, int top) {
     TankHandlerCreator handlerCreator(getModel());
+    // TODO get PlayerInfo
     return std::make_unique<MediumTank>(left, top, getEntityId(),
                                         handlerCreator, Direction::LEFT,
                                         DEFAULT_TANK_SPEED);
+}
+int MediumTankSpawner::getTimeout() {
+    return 10;
+}
+
+std::unique_ptr<Event> MediumTankSpawner::createEvent(int left, int top) {
+    return std::make_unique<SpawnTank>(getEntityId(), left, top,
+                                       EntityType::MEDIUM_TANK);
+}
+MediumTankSpawner::MediumTankSpawner(ServerModel &model, int entityId)
+    : Spawner(model, entityId) {
 }
 }  // namespace Tanks::model

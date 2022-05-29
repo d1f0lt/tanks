@@ -46,29 +46,28 @@ private:
 
 class SpawnTank : public Event {
 public:
-    explicit SpawnTank(int tankId, int left, int top, Direction direction);
-
+    SpawnTank(int tankId, int left, int top, EntityType entityType);
     void sendTo(tcp::socket &socket) override;
     void acceptExecutor(const EventExecutor &executor) override;
 
-    static void sendTo(tcp::socket &socket,
+    static void sendTo(boost::asio::ip::tcp::socket &socket,
                        int tankId,
                        int left,
                        int top,
-                       Direction direction);
+                       EntityType entityType);
 
     [[nodiscard]] static std::unique_ptr<Event> readFrom(tcp::socket &socket);
 
     [[nodiscard]] int getTankId() const;
     [[nodiscard]] int getLeft() const;
     [[nodiscard]] int getTop() const;
-    [[nodiscard]] Direction getDirection() const;
+    [[nodiscard]] EntityType getType() const;
 
 private:
     const int tankId_;
     const int left_;
     const int top_;
-    const Direction direction_;
+    const EntityType entityType_;
 };
 
 std::unique_ptr<Event> readEvent(tcp::socket &socket);

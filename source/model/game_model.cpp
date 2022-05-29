@@ -174,11 +174,16 @@ GameMap &GameModel::getMap() {
 }
 
 int GameModel::getRnd() {
-    return static_cast<int>(rnd());
+    return std::abs(static_cast<int>(rnd()));
 }
 
 std::shared_mutex &GameModel::getMutex() const {
     return sharedMutex_;
 }
+
+// TODO
+// PlayerSkills GameModel::getPlayerSkills(int id) {
+//    return playersSockets_[id];
+//}
 
 }  // namespace Tanks::model

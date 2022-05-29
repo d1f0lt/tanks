@@ -14,8 +14,7 @@ using namespace Tanks::model;
 using namespace boost::asio::ip;
 
 const std::array<Tanks::Direction, 4> DIRECTIONS = {
-    Tanks::Direction::UP, Tanks::Direction::DOWN, Tanks::Direction::LEFT,
-    Tanks::Direction::RIGHT};
+    Direction::UP, Direction::DOWN, Direction::LEFT, Direction::RIGHT};
 
 namespace {
 class DebugServer : public ServerModel {
@@ -104,29 +103,10 @@ bool operator==(const Entity &a, const Entity &b) {
 }
 
 TEST_CASE("Single move and checking background") {
-    Tanks::model::ServerModel serverModel;
-    serverModel.loadLevel(1);
-    Tanks::model::Entity *brick00 =
-        &serverModel.getByCoords(TILE_SIZE, TILE_SIZE);
-
-    boost::asio::io_context io_context;
-    tcp::acceptor acceptor(io_context, tcp::endpoint(tcp::v4(), 0));
-    tcp::socket server(io_context);
-    auto connection = std::thread([&]() { server = acceptor.accept(); });
-
-    tcp::socket client(io_context);
-    boost::asio::connect(
-        client, tcp::resolver(io_context).resolve(acceptor.local_endpoint()));
-    connection.join();
-
-    int id = serverModel.addPlayer(server);
-
-    ClientModel clientModel(id, std::move(client));
-    clientModel.loadLevel(1);
-
-    serverModel.nextTick();
-    clientModel.nextTick();
-    auto &tank = dynamic_cast<Tank &>(serverModel.getById(id)->get());
+    INIT_GAME();
+    handler.setPosition(TILE_SIZE * 2, TILE_SIZE);
+    auto &brick00 = serverModel.getByCoords(TILE_SIZE, TILE_SIZE);
+    handler.setPosition(TILE_SIZE, TILE_SIZE);
 
     CHECK(tank.getLeft() == TILE_SIZE);
     CHECK(tank.getTop() == TILE_SIZE);
@@ -146,11 +126,12 @@ TEST_CASE("Single move and checking background") {
     clientModel.nextTick();
 
     CHECK(tank.getTop() == TILE_SIZE + tank.getSpeed());
-    CHECK(brick00 == &serverModel.getByCoords(TILE_SIZE, TILE_SIZE));
+    CHECK(&brick00 == &serverModel.getByCoords(TILE_SIZE, TILE_SIZE));
 }
 
 TEST_CASE("multiple moves") {
     INIT_GAME();
+    handler.setPosition(TILE_SIZE, TILE_SIZE);
 
     int speed = tank.getSpeed();
     auto left = tank.look(Direction::LEFT);
@@ -176,7 +157,6 @@ TEST_CASE("multiple moves") {
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
         serverModel.nextTick();
         clientModel.nextTick();
-        CHECK(isSynced(serverModel, clientModel));
         CHECK(tank.getTop() == TILE_SIZE + (i + 1) * tank.getSpeed());
     }
 
@@ -491,4 +471,27 @@ TEST_CASE("Bullet destroy 1 of blocks on creation, then shoot again") {
     serverModel.nextTick();
     handler.shoot();
     serverModel.nextTick();
+}
+
+TEST_CASE("Respawn") {
+    INIT_GAME();
+    ADD_PLAYER(serverModel, 2);
+
+    handler.setPosition(TILE_SIZE * 2, TILE_SIZE);
+    auto &tank1 = tank;
+    handler.setPosition(TILE_SIZE * 2, TILE_SIZE);
+    handler2.setPosition(TILE_SIZE * 3, TILE_SIZE);
+
+    handler.setDirection(Direction::RIGHT);
+    handler.shoot();
+    serverModel.nextTick();
+    auto &floor = serverModel.getByCoords(TILE_SIZE * 3, TILE_SIZE);
+    CHECK(floor.getType() == EntityType::FLOOR);
+    for (int i = 0; i < 10; i++) {
+        auto tank2 = serverModel.getById(id2);
+        CHECK(tank2 == std::nullopt);
+        serverModel.nextTick();
+    }
+    auto tank2New = serverModel.getById(id2);
+    CHECK(tank2New != std::nullopt);
 }
