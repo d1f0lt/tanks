@@ -36,14 +36,14 @@ private:
 
 class MediumTankSpawner : public Spawner {
 public:
-    int getTimeout() override;
+    [[nodiscard]] int getTimeout() override;
     explicit MediumTankSpawner(ServerModel &model, int entityId);
 
 protected:
-    std::unique_ptr<Entity> createEntity(int left, int top) override;
-
-protected:
-    std::unique_ptr<Event> createEvent(int left, int top) override;
+    [[nodiscard]] std::unique_ptr<Entity> createEntity(int left,
+                                                       int top) override;
+    [[nodiscard]] std::unique_ptr<Event> createEvent(int left,
+                                                     int top) override;
 };
 
 }  // namespace Tanks::model

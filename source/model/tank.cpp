@@ -9,9 +9,11 @@ Tank::Tank(int left,
            int entityId,
            std::unique_ptr<TankHandler> handler,
            Direction direction,
-           int speed)
+           int speed,
+           int reloadTicks)
     : MovableEntity(left, top, entityId, std::move(handler), direction),
-      speed_(speed) {
+      speed_(speed),
+      reloadTicks_(reloadTicks) {
 }
 
 bool Tank::canPass(const Entity &other) const {
@@ -33,7 +35,8 @@ MediumTank::MediumTank(int left,
            entityId,
            handlerCreator.createTankHandler(*this),
            direction,
-           speed) {
+           speed,
+           DEFAULT_RELOAD_TICKS) {
 }
 
 int MediumTank::getHeight() const {
@@ -50,5 +53,9 @@ EntityType MediumTank::getType() const {
 
 int Tank::getSpeed() const {
     return speed_;
+}
+
+int Tank::getReloadTicks() const {
+    return reloadTicks_;
 }
 }  // namespace Tanks::model

@@ -9,13 +9,12 @@ TankHandler::TankHandler(GameModel &model, Tank &entity)
 }
 
 void TankHandler::shoot() {
-    if (getModel().getTick() <= lastShootTick_ + RELOAD_TICKS) {
+    auto &tank = dynamic_cast<Tank &>(getEntity());
+    if (getModel().getTick() <= lastShootTick_ + tank.getReloadTicks()) {
         return;
     }
 
     lastShootTick_ = getModel().getTick();
-
-    auto &tank = dynamic_cast<Tank &>(getEntity());
 
     static const std::unordered_map<Direction, int> DCOL = {
         {Direction::UP, getEntity().getWidth() / 2},

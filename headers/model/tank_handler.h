@@ -14,7 +14,7 @@ public:
 
 private:
     int lastMoveTick_ = -1;
-    int lastShootTick_ = -RELOAD_TICKS - 1;
+    int lastShootTick_ = -DEFAULT_RELOAD_TICKS - 1;
 };
 
 class TankMovableOnWaterHandler : public TankHandler {

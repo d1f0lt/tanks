@@ -309,8 +309,8 @@ TEST_CASE("3 Bullets destroy 3 bricks") {
                                     tank.getTop() + tank.getHeight() / 2));
 
         auto &brick = serverModel.getByCoords(x, y);
-        int t = bullet.dist(brick) / BULLET_SPEED +
-                (bullet.dist(brick) % BULLET_SPEED != 0);
+        int t = bullet.dist(brick) / DEFAULT_BULLET_SPEED +
+                (bullet.dist(brick) % DEFAULT_BULLET_SPEED != 0);
         for (int i = 0; i < t; i++) {
             auto &brickNow = serverModel.getByCoords(x, y);
             CHECK(&brick == &brickNow);
@@ -318,7 +318,7 @@ TEST_CASE("3 Bullets destroy 3 bricks") {
         }
         auto &floor = serverModel.getByCoords(x, y);
         CHECK(floor.getType() == Tanks::model::EntityType::FLOOR);
-        for (int i = 0; i < RELOAD_TICKS; i++) {
+        for (int i = 0; i < DEFAULT_RELOAD_TICKS; i++) {
             serverModel.nextTick();
         }
     }
@@ -338,8 +338,8 @@ TEST_CASE("Bullet fly above water") {
         serverModel.getByCoords(tank.getLeft() + tank.getWidth(),
                                 tank.getTop() + tank.getHeight() / 2));
 
-    int tWater = bullet.dist(water) / BULLET_SPEED +
-                 (bullet.dist(water) % BULLET_SPEED != 0);
+    int tWater = bullet.dist(water) / DEFAULT_BULLET_SPEED +
+                 (bullet.dist(water) % DEFAULT_BULLET_SPEED != 0);
     for (int i = 0; i < tWater; i++) {
         auto &waterNow = serverModel.getByCoords(
             TILE_SIZE * 15, TILE_SIZE * 15 + tank.getHeight() / 2);
@@ -347,8 +347,8 @@ TEST_CASE("Bullet fly above water") {
         serverModel.nextTick();
     }
 
-    int tBrick = bullet.dist(brick) / BULLET_SPEED +
-                 (bullet.dist(brick) % BULLET_SPEED != 0);
+    int tBrick = bullet.dist(brick) / DEFAULT_BULLET_SPEED +
+                 (bullet.dist(brick) % DEFAULT_BULLET_SPEED != 0);
     for (int i = 0; i < tBrick; i++) {
         auto &brickNow =
             serverModel.getByCoords(TILE_SIZE * 19, TILE_SIZE * 15);
@@ -487,7 +487,7 @@ TEST_CASE("Respawn") {
     serverModel.nextTick();
     auto &floor = serverModel.getByCoords(TILE_SIZE * 3, TILE_SIZE);
     CHECK(floor.getType() == EntityType::FLOOR);
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < DEFAULT_RESPAWN_TIME; i++) {
         auto tank2 = serverModel.getById(id2);
         CHECK(tank2 == std::nullopt);
         serverModel.nextTick();

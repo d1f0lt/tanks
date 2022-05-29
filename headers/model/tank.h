@@ -12,13 +12,17 @@ public:
                   int entityId,
                   std::unique_ptr<TankHandler> handler,
                   Direction direction,
-                  int speed);
+                  int speed,
+                  int reloadTicks);
 
     [[nodiscard]] bool canPass(const Entity &other) const override;
     [[nodiscard]] int getSpeed() const final;
 
+    int getReloadTicks() const;
+
 private:
     int speed_ = -1;
+    const int reloadTicks_;
 };
 
 class MediumTank : public Tank {

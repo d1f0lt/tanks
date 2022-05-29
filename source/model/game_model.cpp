@@ -182,7 +182,7 @@ std::shared_mutex &GameModel::getMutex() const {
 }
 
 // TODO
-// PlayerSkills GameModel::getPlayerSkills(int id) {
+// PlayerSkillsTmp GameModel::getPlayerSkills(int id) {
 //    return playersSockets_[id];
 //}
 

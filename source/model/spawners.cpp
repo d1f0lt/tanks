@@ -74,8 +74,9 @@ std::unique_ptr<Entity> MediumTankSpawner::createEntity(int left, int top) {
                                         handlerCreator, Direction::LEFT,
                                         DEFAULT_TANK_SPEED);
 }
+
 int MediumTankSpawner::getTimeout() {
-    return 10;
+    return DEFAULT_RESPAWN_TIME;
 }
 
 std::unique_ptr<Event> MediumTankSpawner::createEvent(int left, int top) {
