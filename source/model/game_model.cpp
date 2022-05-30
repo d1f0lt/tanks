@@ -136,7 +136,7 @@ void GameModel::nextTick() {
     wasShootThisTurn_ = false;
     wasDestroyedBlockThisTurn_ = false;
     //    std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    std::unique_lock lock(getMutex());
+    //    std::unique_lock lock(getMutex());
     executeAllEvents();
     moveBullets();
     currentTick_++;

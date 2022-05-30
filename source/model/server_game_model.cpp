@@ -30,7 +30,7 @@ void ServerModel::receiveTurns(tcp::socket &client) {
             if (!event) {
                 continue;
             }
-            std::shared_lock lock(getMutex());
+            //            std::shared_lock lock(getMutex());
             addEvent(std::move(event));
         }
     } catch (boost::system::system_error &e) {
