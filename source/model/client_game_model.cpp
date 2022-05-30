@@ -1,6 +1,7 @@
 #include "model/client_game_model.h"
 #include <thread>
 #include "model/network_utils.h"
+#include "model/tank.h"
 #ifndef NDEBUG
 #include <fstream>
 #include <iostream>
@@ -71,6 +72,14 @@ void ClientModel::executeAllEvents() {
 ClientModel::~ClientModel() noexcept {
     socket_.close();
     receiver.join();
+}
+
+std::optional<std::reference_wrapper<Tank>> ClientModel::tank() {
+    auto entity = getById(playerId_);
+    if (!entity) {
+        return std::nullopt;
+    }
+    return dynamic_cast<Tank &>(entity->get());
 }
 
 }  // namespace Tanks::model

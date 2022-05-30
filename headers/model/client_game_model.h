@@ -17,9 +17,10 @@ public:
 
     [[nodiscard]] PlayerActionsHandler getHandler();
 
+    [[nodiscard]] std::optional<std::reference_wrapper<Tank>> tank();
+
 protected:
     void receiveEvents();
-
     void executeAllEvents() override;
 
     void addEvent(std::unique_ptr<Event> event);

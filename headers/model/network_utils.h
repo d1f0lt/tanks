@@ -2,6 +2,7 @@
 #define TANKS_NETWORK_UTILS_H
 
 #include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/write.hpp>
 
 namespace Tanks::model {
 using boost::asio::buffer;
@@ -9,9 +10,10 @@ using boost::asio::ip::tcp;
 template <typename T>
 void sendInt(tcp::socket &socket, T a) {
     auto buff = static_cast<std::int32_t>(a);
-    auto res = socket.write_some(
-        buffer(reinterpret_cast<const char *>(&buff), sizeof(buff)));
-    assert(res == sizeof(buff));
+
+    boost::asio::write(
+        socket, buffer(reinterpret_cast<const char *>(&buff), sizeof(buff)),
+        boost::asio::transfer_exactly(sizeof(buff)));
 }
 
 std::int32_t receiveInt(tcp::socket &socket);

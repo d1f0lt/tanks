@@ -16,9 +16,9 @@ SET(GCC_WARNINGS "-Wall -Wextra ")
 #SET(SANITIZERS "-fsanitize=undefined")
 #SET(SANITIZERS "-fsanitize=undefined,leak,vptr")
 #SET(SANITIZERS "-fsanitize=undefined,leak")
-SET(SANITIZERS "-fsanitize=undefined,vptr,thread")
+#SET(SANITIZERS "-fsanitize=undefined,vptr,thread")
 
-SET(GCC_OPTIMIZE "-ggdb -g3 ") # Latest is integer overflow protection
+#SET(GCC_OPTIMIZE "-ggdb -g3 ") # Latest is integer overflow protection
 #SET(GCC_OPTIMIZE " -O2 -DNDEBUG -mtune=native -ftree-vectorize") # RELEASE
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_WARNINGS} ${SANITIZERS} ${GCC_OPTIMIZE}")
 

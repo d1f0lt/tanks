@@ -26,7 +26,7 @@ public:
     virtual ~Event() = default;
 
     virtual void acceptExecutor(const EventExecutor &executor) = 0;
-    virtual void sendTo(tcp::socket &socket) = 0;
+    virtual void sendTo(tcp::socket &socket) const = 0;
 };
 
 class TankMove : public Event {
@@ -34,7 +34,7 @@ public:
     explicit TankMove(int tankId, Direction direction, int speed);
 
     void acceptExecutor(const EventExecutor &executor) final;
-    void sendTo(tcp::socket &socket) override;
+    void sendTo(tcp::socket &socket) const override;
 
     static std::unique_ptr<Event> readFrom(tcp::socket &socket);
 
@@ -58,7 +58,7 @@ public:
                        int bulletSpeed,
                        int reloadTicks);
 
-    void sendTo(tcp::socket &socket) override;
+    void sendTo(tcp::socket &socket) const override;
     void acceptExecutor(const EventExecutor &executor) override;
 
     [[nodiscard]] static std::unique_ptr<Event> readFrom(tcp::socket &socket);
@@ -88,7 +88,7 @@ public:
 
     void acceptExecutor(const EventExecutor &executor) override;
 
-    void sendTo(tcp::socket &socket) override;
+    void sendTo(tcp::socket &socket) const override;
     [[nodiscard]] static std::unique_ptr<Event> readFrom(tcp::socket &socket);
 
     [[nodiscard]] int getTankId() const;
@@ -103,7 +103,7 @@ class BonusSpawn : public Event {
 public:
     explicit BonusSpawn(int id, int left, int top, EntityType type);
 
-    void sendTo(tcp::socket &socket) override;
+    void sendTo(tcp::socket &socket) const override;
     [[nodiscard]] static std::unique_ptr<Event> readFrom(tcp::socket &socket);
 
     void acceptExecutor(const EventExecutor &executor) override;
@@ -125,7 +125,7 @@ public:
     explicit SetPosition(int id, int left, int top);
 
     void acceptExecutor(const EventExecutor &executor) override;
-    void sendTo(tcp::socket &socket) override;
+    void sendTo(tcp::socket &socket) const override;
     [[nodiscard]] static std::unique_ptr<Event> readFrom(tcp::socket &socket);
 
     [[nodiscard]] int getId() const;

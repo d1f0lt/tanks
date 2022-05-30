@@ -46,15 +46,41 @@ void ServerModel::sendEventsToClients(
     //    std::cout << "s " << getTick() << ' ' << events.size() << std::endl;
 
 #endif
+    static auto sendAllTo =
+        [](tcp::socket &socket,
+           const std::vector<std::unique_ptr<Event>> &events) {
+            try {
+                sendInt(socket, events.size());
+            } catch (boost::system::system_error &e) {
+                auto res = e.what();
+            }
+            try {
+                for (const auto &event : events) {
+                    event->sendTo(socket);
+                }
+            } catch (boost::system::system_error &e) {
+                auto res = e.what();
+            }
+        };
+
     for (auto &[id, socket] : playersSockets_) {
-        sendInt(socket, events.size());
+        sendAllTo(socket, events);
     }
 
-    for (auto &event : events) {
-        for (auto &[id, socket] : playersSockets_) {
-            event->sendTo(socket);
-        }
-    }
+    //    std::unordered_set<int> disconnectedUsers;
+    //    for (auto &[id, socket] : playersSockets_) {
+    //        try {
+    //            sendInt(socket, events.size());
+    //        } catch (boost::system::system_error &e) {
+    //            disconnectedUsers.emplace(id);
+    //        }
+    //    }
+    //
+    //    for (auto &event : events) {
+    //        for (auto &[id, socket] : playersSockets_) {
+    //            event->sendTo(socket);
+    //        }
+    //    }
 }
 
 void ServerModel::executeAllEvents() {
@@ -142,7 +168,7 @@ void ServerModel::addEvent(std::unique_ptr<Event> event) {
 }
 
 ServerModel::~ServerModel() {
-    finishGame();
+    //    finishGame();
 }
 
 void ServerModel::finishGame() {

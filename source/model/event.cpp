@@ -3,9 +3,6 @@
 #include "model/network_utils.h"
 
 namespace Tanks::model {
-namespace {
-}  // namespace
-
 std::unique_ptr<Event> TankMove::readFrom(
     boost::asio::ip::tcp::socket &socket) {
     auto [tankId, direction, speed] =
@@ -34,7 +31,7 @@ int TankMove::getSpeed() const {
     return speed_;
 }
 
-void TankMove::sendTo(boost::asio::ip::tcp::socket &socket) {
+void TankMove::sendTo(boost::asio::ip::tcp::socket &socket) const {
     sendMultipleInts(socket, EventType::TANK_MOVE, id_, direction_, speed_);
 }
 
@@ -58,7 +55,7 @@ std::unique_ptr<Event> readEvent(boost::asio::ip::tcp::socket &socket) {
     return readers.at(type)(socket);
 }
 
-void SpawnTank::sendTo(boost::asio::ip::tcp::socket &socket) {
+void SpawnTank::sendTo(boost::asio::ip::tcp::socket &socket) const {
     sendMultipleInts(socket, EventType::SPAWN_TANK, tankId_, left_, top_,
                      entityType_, tankSpeed_, bulletSpeed_, reloadTicks_);
 }
@@ -124,7 +121,7 @@ BonusSpawn::BonusSpawn(int id, int left, int top, EntityType type)
     : id_(id), left_(left), top_(top), type_(type) {
 }
 
-void BonusSpawn::sendTo(tcp::socket &socket) {
+void BonusSpawn::sendTo(tcp::socket &socket) const {
     sendMultipleInts(socket, EventType::BONUS_SPAWN, id_, left_, top_, type_);
 }
 
@@ -158,7 +155,7 @@ void TankShoot::acceptExecutor(const EventExecutor &executor) {
     executor.execute(*this);
 }
 
-void TankShoot::sendTo(tcp::socket &socket) {
+void TankShoot::sendTo(tcp::socket &socket) const {
     sendMultipleInts(socket, EventType::TANK_SHOOT, tankId_, direction_);
 }
 
@@ -195,7 +192,7 @@ void SetPosition::acceptExecutor(const EventExecutor &executor) {
     executor.execute(*this);
 }
 
-void SetPosition::sendTo(tcp::socket &socket) {
+void SetPosition::sendTo(tcp::socket &socket) const {
     sendMultipleInts(socket, EventType::SET_POSITION, id_, left_, top_);
 }
 
