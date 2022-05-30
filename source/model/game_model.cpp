@@ -1,8 +1,10 @@
 #include "model/game_model.h"
 #include <cassert>
 #include <fstream>
+#include <iostream>
 #include <mutex>
 #include <optional>
+#include <string>
 #include <thread>
 #include <unordered_map>
 #include "model/blocks.h"
@@ -133,7 +135,7 @@ std::vector<std::vector<const Entity *>> GameModel::getAll() const {
 void GameModel::nextTick() {
     wasShootThisTurn_ = false;
     wasDestroyedBlockThisTurn_ = false;
-    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    //    std::this_thread::sleep_for(std::chrono::milliseconds(1));
     std::unique_lock lock(getMutex());
     executeAllEvents();
     moveBullets();

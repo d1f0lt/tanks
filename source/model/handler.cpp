@@ -52,13 +52,17 @@ std::vector<const Entity *> MovableHandler::look(Direction direction) {
 }
 
 void ForegroundHandler::restoreBackground() {
-    std::unordered_set<Entity *> restored;
+    std::unordered_set<int> restored;
     for (auto &row : background_) {
-        for (auto *entity : row) {
-            if (restored.count(entity) != 0) {
+        for (int id : row) {
+            if (restored.count(id) != 0) {
                 continue;
             }
-            restored.insert(entity);
+            auto entity = getModel().getById(id);
+            if (!entity) {
+                continue;
+            }
+            restored.insert(id);
             getModel().getMap().insert(*entity);
         }
         row.clear();
@@ -67,9 +71,8 @@ void ForegroundHandler::restoreBackground() {
 
 void ForegroundHandler::setBackground() {
     if (background_.empty()) {
-        background_.resize(
-            getEntity().getHeight(),
-            std::vector<Entity *>(getEntity().getWidth(), nullptr));
+        background_.resize(getEntity().getHeight(),
+                           std::vector<int>(getEntity().getWidth(), 0));
     }
 
     auto &entity = getEntity();
@@ -82,7 +85,7 @@ void ForegroundHandler::setBackground() {
         background_[row - top].resize(width);
         for (int col = entity.getLeft(); col < left + width; col++) {
             background_[row - top][col - left] =
-                &getModel().getByCoords(col, row);
+                getModel().getByCoords(col, row).getId();
         }
     }
     getModel().map_.insert(entity);
@@ -92,9 +95,8 @@ ForegroundHandler::ForegroundHandler(GameModel &model, ForegroundEntity &entity)
     : BasicHandler(model, entity) {
 }
 
-std::vector<std::vector<const Entity *>> ForegroundHandler::snapshotBackground()
-    const {
-    std::vector<std::vector<const Entity *>> vec;
+std::vector<std::vector<int>> ForegroundHandler::snapshotBackground() const {
+    std::vector<std::vector<int>> vec;
     vec.reserve(getEntity().getHeight());
     for (const auto &line : background_) {
         vec.emplace_back(line.begin(), line.end());

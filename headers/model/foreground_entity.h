@@ -18,8 +18,7 @@ public:
 
     [[nodiscard]] std::vector<const Entity *> look(Direction direction) const;
 
-    [[nodiscard]] std::vector<std::vector<const Entity *>> snapshotBackground()
-        const;
+    [[nodiscard]] std::vector<std::vector<int>> snapshotBackground() const;
 };
 
 }  // namespace Tanks::model

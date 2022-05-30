@@ -2,18 +2,24 @@ cmake_minimum_required(VERSION 3.16)
 project(tanks)
 
 set(CMAKE_CXX_STANDARD 17)
+#set(CMAKE_CXX_COMPILER "/usr/bin/clang")
+#set(CMAKE_C_COMPILER "/usr/bin/clang")
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin/)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/headers/)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/)
 message("CMake runtime output directory: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
 
-SET(GCC_WARNINGS "-Wall -Wextra")
+SET(GCC_WARNINGS "-Wall -Wextra ")
 #SET(SANITIZERS "-fsanitize=address,undefined,leak,vptr")
-#SET(SANITIZERS "-fsanitize=undefined,vptr,thread")
+#SET(SANITIZERS "-fsanitize=undefined")
+#SET(SANITIZERS "-fsanitize=undefined,leak,vptr")
+#SET(SANITIZERS "-fsanitize=undefined,leak")
+SET(SANITIZERS "-fsanitize=undefined,vptr,thread")
 
-#SET(GCC_OPTIMIZE "-ggdb -g") # Latest is integer overflow protection
-#SET(GCC_OPTIMIZE "-O2 -DNDEBUG") # RELEASE
+SET(GCC_OPTIMIZE "-ggdb -g3 ") # Latest is integer overflow protection
+#SET(GCC_OPTIMIZE " -O2 -DNDEBUG -mtune=native -ftree-vectorize") # RELEASE
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_WARNINGS} ${SANITIZERS} ${GCC_OPTIMIZE}")
 
 find_package(SFML 2.5 COMPONENTS graphics audio REQUIRED)
@@ -49,7 +55,7 @@ add_executable(
         source/menu_controller.cpp
 )
 
-SET(COMPILER_FLAGS_FOR_MENU_TEST "-D MENU_TEST")
+SET(COMPILER_FLAGS_FOR_MENU_TEST "-D MENU_TEST ")
 target_compile_options(menu_tests PRIVATE ${COMPILER_FLAGS_FOR_MENU_TEST})
 
 add_executable(

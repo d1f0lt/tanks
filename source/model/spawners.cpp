@@ -1,4 +1,5 @@
 #include "model/spawners.h"
+#include "model/bonus.h"
 #include "model/event.h"
 #include "model/server_game_model.h"
 #include "model/tank.h"
@@ -82,5 +83,26 @@ std::unique_ptr<Event> MediumTankSpawner::createEvent() {
 }
 MediumTankSpawner::MediumTankSpawner(ServerModel &model, int entityId)
     : Spawner(model, entityId) {
+}
+
+BonusSpawner::BonusSpawner(ServerModel &model, DecrId entityId, EntityType type)
+    : Spawner(model, entityId), type_(type) {
+}
+int BonusSpawner::getTimeout() {
+    return 0;
+}
+std::unique_ptr<Event> BonusSpawner::createEvent() {
+    auto [left, top] = getFreeCoords();
+    return std::make_unique<BonusSpawn>(getEntityId(), left, top, type_);
+}
+
+std::unique_ptr<Entity> BonusSpawner::createEntity(int left, int top) {
+    switch (type_) {
+        case (EntityType::WALK_ON_WATER_BONUS):
+            return std::make_unique<WalkOnWater>(
+                left, top, DecrId(getEntityId()), getModel());
+        default:
+            assert(false);
+    }
 }
 }  // namespace Tanks::model

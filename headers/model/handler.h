@@ -42,15 +42,14 @@ public:
     void setBackground();
     void restoreBackground();
     void destroyEntity() override;
-    [[nodiscard]] std::vector<std::vector<const Entity *>> snapshotBackground()
-        const;
+    [[nodiscard]] std::vector<std::vector<int>> snapshotBackground() const;
 
     void setPosition(int left, int top);
 
     void destroyByBullet() override;
 
 private:
-    std::vector<std::vector<Entity *>> background_;
+    std::vector<std::vector<int>> background_;
 };
 
 class MovableHandler : public ForegroundHandler {

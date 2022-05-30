@@ -14,8 +14,7 @@ std::vector<const Entity *> ForegroundEntity::look(Direction direction) const {
     return dynamic_cast<MovableHandler &>(getHandler()).look(direction);
 }
 
-std::vector<std::vector<const Entity *>> ForegroundEntity::snapshotBackground()
-    const {
+std::vector<std::vector<int>> ForegroundEntity::snapshotBackground() const {
     return dynamic_cast<ForegroundHandler &>(getHandler()).snapshotBackground();
 }
 

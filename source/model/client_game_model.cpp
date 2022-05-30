@@ -1,27 +1,76 @@
 #include "model/client_game_model.h"
+#include <thread>
 #include "model/network_utils.h"
+#ifndef NDEBUG
+#include <fstream>
+#include <iostream>
+#endif
 
 namespace Tanks::model {
 ClientModel::ClientModel(int playerId, tcp::socket socket)
-    : playerId_(playerId), socket_(std::move(socket)) {
-}
+    : playerId_(playerId),
+      socket_(std::move(socket)),
+      receiver([&]() { receiveEvents(); }){
+          //    std::thread([&]() { receiveEvents(); }).detach();
+      };
 
 PlayerActionsHandler ClientModel::getHandler() {
     return PlayerActionsHandler(playerId_, socket_);
 }
 
-void ClientModel::executeAllEvents() {
+// TODO: no copypast
+void ClientModel::addEvent(std::unique_ptr<Event> event) {
+    events_.Produce(std::move(event));
+}
+
+void ClientModel::receiveEvents() {
     try {
-        auto count = receiveInt(socket_);
-        for (int i = 0; i < count; i++) {
-            auto event = readEvent(socket_);
-            executeEvent(*event);
+        while (true) {
+            int count = receiveInt(socket_);
+            if (count == -1) {
+                return;
+            }
+            {
+                int countCopy = count;
+                tickSize_.Produce(std::move(countCopy));
+            }
+            for (int i = 0; i < count; i++) {
+                events_.Produce(readEvent(socket_));
+            }
+#ifndef NDEBUG
+            static std::fstream log;
+            log.open("log_client.txt");
+            log << count << std::endl;
+            log.close();
+#endif
         }
     } catch (boost::system::system_error &e) {
-        if (std::string(e.what()) == "read: End of file [asio.misc:2]") {
-            return;
-        }
-        throw e;
+        return;
+    } catch (std::system_error &e) {
+#ifndef NDEBUG
+        static std::fstream log("log_client.txt");
+        log << getTick() << ' ' << e.what() << std::endl;
+#endif
+        return;
     }
 }
+
+void ClientModel::executeAllEvents() {
+    std::unique_ptr<Event> event;
+    int cnt = -1;
+    if (!tickSize_.ConsumeSync(cnt)) {
+        assert(false);
+    }
+    for (; cnt > 0; cnt--) {
+        bool res = events_.ConsumeSync(event);
+        assert(res);
+        executeEvent(*event);
+    }
+}
+
+ClientModel::~ClientModel() noexcept {
+    socket_.close();
+    receiver.join();
+}
+
 }  // namespace Tanks::model

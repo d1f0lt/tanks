@@ -20,15 +20,22 @@ const std::array<Tanks::Direction, 4> DIRECTIONS = {
 namespace {
 class DebugServer : public ServerModel {
 public:
-    explicit DebugServer(int level = 1, int bots = 0)
-        : ServerModel(level, bots) {
+    explicit DebugServer(int level = 1, int bots = 0, int bonuses = 0)
+        : ServerModel(level, bots, bonuses) {
     }
 
     using GameModel::getHandler;
     using ServerModel::addEvent;
 };
-}  // namespace
 
+void setPosition(DebugServer &server,
+                 ClientModel &clientModel,
+                 int id,
+                 int left,
+                 int top) {
+    server.addEvent(std::make_unique<SetPosition>(id, left, top));
+}
+}  // namespace
 TEST_CASE("Game creation") {
     Tanks::model::ServerModel model;
     model.loadLevel(1);
@@ -37,52 +44,62 @@ TEST_CASE("Game creation") {
     CHECK(brick00.getType() == EntityType::FLOOR);
 }
 
-#define ADD_PLAYER(model, i)                                           \
-    tcp::socket server##i(io_context);                                 \
-    auto connection##i =                                               \
-        std::thread([&]() { server##i = acceptor.accept(); });         \
-                                                                       \
-    tcp::socket client##i(io_context);                                 \
-    boost::asio::connect(                                              \
-        client##i,                                                     \
-        tcp::resolver(io_context).resolve(acceptor.local_endpoint())); \
-    connection##i.join();                                              \
-    auto id##i = model.addPlayer(server);                              \
-    model.nextTick();                                                  \
-    auto &tank##i = dynamic_cast<Tank &>(model.getById(id##i)->get()); \
-    auto &handler##i = dynamic_cast<TankHandler &>(model.getHandler(tank##i));
+#define ADD_PLAYER(model, i)                                   \
+    boost::asio::io_context context_client##i;                 \
+    tcp::socket server##i(context_client##i);                  \
+    auto connection##i =                                       \
+        std::thread([&]() { server##i = acceptor.accept(); }); \
+                                                               \
+    tcp::socket client##i(context_client##i);                  \
+    client##i.connect(acceptor.local_endpoint());              \
+    connection##i.join();                                      \
+    auto id##i = serverModel.addPlayer(server##i);             \
+    ClientModel clientModel##i(id##i, std::move(client##i));
+
+#define GET_PLAYER_CONTORS(i)                                                \
+    auto &tank##i = dynamic_cast<Tank &>(serverModel.getById(id##i)->get()); \
+    auto &handler##i =                                                       \
+        dynamic_cast<TankHandler &>(serverModel.getHandler(tank##i));
 
 #define INIT_GAME()                                                  \
     DebugServer serverModel;                                         \
     boost::asio::io_context io_context;                              \
     tcp::acceptor acceptor(io_context, tcp::endpoint(tcp::v4(), 0)); \
     ADD_PLAYER(serverModel, );                                       \
-    ClientModel clientModel(id, std::move(client));                  \
+    serverModel.nextTick();                                          \
+    GET_PLAYER_CONTORS()                                             \
     clientModel.loadLevel(1);                                        \
     clientModel.nextTick();
 
-//[[nodiscard]] bool isSame(const Tank &a, const Tank &b) {
-//    return
-//}
+#define INIT_GAME_FULL(level, bots, bonuses)       \
+    DebugServer serverModel(level, bots, bonuses); \
+    boost::asio::io_context io_context;            \
+    tcp::acceptor acceptor(io_context, tcp::endpoint(tcp::v4(), 0));
 
 bool operator==(const Entity &a, const Entity &b) {
     if (a.getId() != b.getId()) {
+        CHECK(false);
         return false;
     }
     if (a.getType() != b.getType()) {
+        CHECK(false);
         return false;
     }
     if (a.getTop() != b.getTop() || a.getLeft() != b.getLeft()) {
+        CHECK(false);
         return false;
     }
     if (a.getHeight() != b.getHeight() || a.getWidth() != b.getWidth()) {
+        CHECK(false);
         return false;
     }
     if (a.getStrength() != b.getStrength()) {
+        CHECK(false);
         return false;
     }
     if (a.isTankPassable() != b.isTankPassable() ||
         a.isBulletPassable() != b.isBulletPassable()) {
+        CHECK(false);
         return false;
     }
     return true;
@@ -92,69 +109,74 @@ bool operator==(const Entity &a, const Entity &b) {
     return !(a == b);
 }
 
-[[nodiscard]] static bool isSynced(GameModel &model1, GameModel &model2) {
-    auto all1 = model1.getAll();
-    auto all2 = model2.getAll();
+[[nodiscard]] inline static int differences(GameModel &serverModel,
+                                            GameModel &clientModel) {
+    if (serverModel.getTick() != clientModel.getTick()) {
+        CHECK(serverModel.getTick() == clientModel.getTick());
+        SIGTRAP;
+        return false;
+    }
+    auto all1 = serverModel.getAll();
+    auto all2 = clientModel.getAll();
+    int res = 0;
     for (const auto &vec : all1) {
         for (const auto *ptr : vec) {
-            assert(ptr != nullptr);
+            if (ptr == nullptr) {
+                CHECK(ptr != nullptr);
+                res++;
+                continue;
+            }
             const auto &entity1 = *ptr;
-            auto e2 = model2.getById(entity1.getId());
-            assert(e2);
-            auto &entity2 = model2.getById(entity1.getId())->get();
+            auto e2 = clientModel.getById(entity1.getId());
+            if (!e2) {
+                CHECK(e2);
+                res++;
+                continue;
+            }
+            auto &entity2 = clientModel.getById(entity1.getId())->get();
             if (entity1 != entity2) {
-                return false;
+                CHECK(false);
+                res++;
             }
         }
     }
-    return true;
+    return res;
 }
 
 TEST_CASE("Single move and checking background. Online") {
     INIT_GAME();
-    handler.setPosition(TILE_SIZE * 2, TILE_SIZE);
+    CHECK(differences(serverModel, clientModel) == 0);
+    setPosition(serverModel, clientModel, id, TILE_SIZE, TILE_SIZE);
+    serverModel.nextTick();
+    clientModel.nextTick();
+    CHECK(differences(serverModel, clientModel) == 0);
+    //    handler.setPosition(TILE_SIZE * 2, TILE_SIZE);
     auto &brick00 = serverModel.getByCoords(TILE_SIZE, TILE_SIZE);
-    handler.setPosition(TILE_SIZE, TILE_SIZE);
+    //    handler.setPosition(TILE_SIZE, TILE_SIZE);
 
     CHECK(tank.getLeft() == TILE_SIZE);
     CHECK(tank.getTop() == TILE_SIZE);
-
-    for (const auto &row : tank.snapshotBackground()) {
-        for (const auto *entity : row) {
-            CHECK(entity != nullptr);
-        }
-    }
 
     auto controller = clientModel.getHandler();
 
     controller.move(Direction::DOWN, tank.getSpeed());
 
     Tanks::model::Entity &ptr2 = serverModel.getByCoords(TILE_SIZE, TILE_SIZE);
+    std::this_thread::sleep_for(std::chrono::milliseconds(5));
     serverModel.nextTick();
     clientModel.nextTick();
 
+    CHECK(differences(serverModel, clientModel) == 0);
     CHECK(tank.getTop() == TILE_SIZE + tank.getSpeed());
-    CHECK(&brick00 == &serverModel.getByCoords(TILE_SIZE, TILE_SIZE));
+    serverModel.finishGame();
 }
 
 TEST_CASE("multiple moves. Online") {
     INIT_GAME();
-    handler.setPosition(TILE_SIZE, TILE_SIZE);
+    CHECK(differences(serverModel, clientModel) == 0);
+    setPosition(serverModel, clientModel, id, TILE_SIZE, TILE_SIZE);
 
     int speed = tank.getSpeed();
-    auto left = tank.look(Direction::LEFT);
-    CHECK(left[0] == left.back());
-    CHECK(left[0] == &serverModel.getByCoords(0, TILE_SIZE));
-
-    auto right = tank.look(Direction::RIGHT);
-    for (int row = tank.getTop(); row < tank.getTop() + tank.getHeight();
-         row++) {
-        for (int col = tank.getLeft() + tank.getWidth();
-             col < tank.getLeft() + tank.getWidth() + tank.getSpeed(); col++) {
-            CHECK(std::find(right.begin(), right.end(),
-                            &serverModel.getByCoords(col, row)) != right.end());
-        }
-    }
 
     // [0,48) : Tank
     // [0,56) : Block
@@ -162,18 +184,16 @@ TEST_CASE("multiple moves. Online") {
     const int MOVES = 9;
     for (int i = 0; i < MOVES; i++) {
         controller.move(Direction::DOWN, speed);
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
         serverModel.nextTick();
         clientModel.nextTick();
-        CHECK(tank.getTop() == TILE_SIZE + (i + 1) * tank.getSpeed());
+        CHECK(differences(serverModel, clientModel) == 0);
     }
 
     serverModel.nextTick();
     clientModel.nextTick();
 
-    CHECK(tank.getTop() == TILE_SIZE + MOVES * tank.getSpeed());
-    right = tank.look(Direction::RIGHT);
-    CHECK(right.back()->getType() == Tanks::model::EntityType::FLOOR);
+    CHECK(differences(serverModel, clientModel) == 0);
+    serverModel.finishGame();
 }
 
 TEST_CASE("Can't do 2 moves on 1 tick") {
@@ -191,6 +211,7 @@ TEST_CASE("Can't do 2 moves on 1 tick") {
     serverModel.nextTick();
     CHECK(left1 == tank.getLeft());
     CHECK(top1 == tank.getTop());
+    serverModel.finishGame();
 }
 TEST_CASE("Can move and shoot on 1 tick") {
     INIT_GAME();
@@ -204,6 +225,7 @@ TEST_CASE("Can move and shoot on 1 tick") {
     handler.shoot();
     CHECK(left1 == left + tank.getSpeed());
     CHECK(top1 == top);
+    serverModel.finishGame();
 }
 
 TEST_CASE("Can't shoot then move on 1 tick") {
@@ -219,6 +241,7 @@ TEST_CASE("Can't shoot then move on 1 tick") {
     CHECK(top == tank.getTop());
     serverModel.nextTick();
     CHECK(serverModel.getTick() == 2);
+    serverModel.finishGame();
 }
 
 TEST_CASE("Block check") {
@@ -246,6 +269,7 @@ TEST_CASE("Block check") {
             }
         }
     }
+    serverModel.finishGame();
 }
 
 TEST_CASE("Look for grass") {
@@ -258,6 +282,7 @@ TEST_CASE("Look for grass") {
             CHECK(col->getType() == Tanks::model::EntityType::FLOOR);
         }
     }
+    serverModel.finishGame();
 }
 
 TEST_CASE("Tank simple shoot") {
@@ -277,6 +302,7 @@ TEST_CASE("Tank simple shoot") {
     serverModel.nextTick();
     CHECK(bullet.getTop() == Tanks::TILE_SIZE + Tanks::TANK_SIZE / 2);
     CHECK(bullet.getLeft() == TILE_SIZE + TANK_SIZE + bullet.getSpeed());
+    serverModel.finishGame();
 }
 
 TEST_CASE("Shoot, bullet die") {
@@ -299,6 +325,7 @@ TEST_CASE("Shoot, bullet die") {
     for (int i = 0; i < 50; i++) {
         serverModel.nextTick();
     }
+    serverModel.finishGame();
 }
 
 TEST_CASE("3 Bullets destroy 3 bricks") {
@@ -330,6 +357,7 @@ TEST_CASE("3 Bullets destroy 3 bricks") {
             serverModel.nextTick();
         }
     }
+    serverModel.finishGame();
 }
 
 TEST_CASE("Bullet fly above water") {
@@ -370,6 +398,7 @@ TEST_CASE("Bullet fly above water") {
 
     auto &floor = serverModel.getByCoords(TILE_SIZE * 19, TILE_SIZE * 15);
     CHECK(floor.getType() == Tanks::model::EntityType::FLOOR);
+    serverModel.finishGame();
 }
 
 TEST_CASE("Bullet destroy on creation") {
@@ -386,12 +415,25 @@ TEST_CASE("Bullet destroy on creation") {
 
     auto &floor = serverModel.getByCoords(TILE_SIZE * 3, TILE_SIZE * 2);
     CHECK(floor.getType() == Tanks::model::EntityType::FLOOR);
+    serverModel.finishGame();
 }
 
-TEST_CASE("Shoot static tank") {
-    INIT_GAME();
-    ADD_PLAYER(serverModel, 2);
+#define INIT_GAME_TWO_PLAYERS() \
+    INIT_GAME_FULL(1, 0, 0);    \
+                                \
+    ADD_PLAYER(serverModel, 2); \
+    ADD_PLAYER(serverModel, );  \
+    clientModel.loadLevel(1);   \
+    serverModel.nextTick();     \
+    clientModel.nextTick();     \
+    GET_PLAYER_CONTORS();       \
+    GET_PLAYER_CONTORS(2);
 
+TEST_CASE("Shoot static tank") {
+    INIT_GAME_TWO_PLAYERS();
+
+    int ok = differences(serverModel, clientModel);
+    CHECK(ok == 0);
     handler.setPosition(TILE_SIZE * 2, TILE_SIZE);
     auto &tank1 = tank;
     handler.setPosition(TILE_SIZE * 2, TILE_SIZE);
@@ -402,11 +444,11 @@ TEST_CASE("Shoot static tank") {
     serverModel.nextTick();
     auto &floor = serverModel.getByCoords(TILE_SIZE * 3, TILE_SIZE);
     CHECK(floor.getType() == EntityType::FLOOR);
+    serverModel.finishGame();
 }
 
 TEST_CASE("tank move on bullet") {
-    INIT_GAME();
-    ADD_PLAYER(serverModel, 2);
+    INIT_GAME_TWO_PLAYERS();
 
     handler.setPosition(TILE_SIZE * 2, TILE_SIZE);
     handler2.setPosition(TILE_SIZE, TILE_SIZE);
@@ -416,6 +458,7 @@ TEST_CASE("tank move on bullet") {
     handler2.move(Direction::RIGHT);
     auto &floor = serverModel.getByCoords(TILE_SIZE, TILE_SIZE);
     CHECK(floor.getType() == EntityType::FLOOR);
+    serverModel.finishGame();
 }
 
 TEST_CASE("Bullet destroy 2 blocks on creation") {
@@ -436,6 +479,7 @@ TEST_CASE("Bullet destroy 2 blocks on creation") {
     auto &floor2 = serverModel.getByCoords(TILE_SIZE * 11, TILE_SIZE * 16);
     CHECK(floor1.getType() == EntityType::FLOOR);
     CHECK(floor2.getType() == EntityType::FLOOR);
+    serverModel.finishGame();
 }
 
 TEST_CASE("Bullet destroy 2 blocks on nextTick") {
@@ -457,6 +501,7 @@ TEST_CASE("Bullet destroy 2 blocks on nextTick") {
     auto &floor2 = serverModel.getByCoords(TILE_SIZE * 11, TILE_SIZE * 16);
     CHECK(floor1.getType() == EntityType::FLOOR);
     CHECK(floor2.getType() == EntityType::FLOOR);
+    serverModel.finishGame();
 }
 
 TEST_CASE("Bullet destroy 1 of blocks on creation, then shoot again") {
@@ -479,11 +524,11 @@ TEST_CASE("Bullet destroy 1 of blocks on creation, then shoot again") {
     serverModel.nextTick();
     handler.shoot();
     serverModel.nextTick();
+    serverModel.finishGame();
 }
 
 TEST_CASE("Respawn") {
-    INIT_GAME();
-    ADD_PLAYER(serverModel, 2);
+    INIT_GAME_TWO_PLAYERS();
 
     handler.setPosition(TILE_SIZE * 2, TILE_SIZE);
     auto &tank1 = tank;
@@ -502,14 +547,7 @@ TEST_CASE("Respawn") {
     }
     auto tank2New = serverModel.getById(id2);
     CHECK(tank2New != std::nullopt);
-}
-
-void setPosition(DebugServer &server,
-                 ClientModel &clientModel,
-                 int id,
-                 int left,
-                 int top) {
-    server.addEvent(std::make_unique<SetPosition>(id, left, top));
+    serverModel.finishGame();
 }
 
 TEST_CASE("Online shoot") {
@@ -522,6 +560,7 @@ TEST_CASE("Online shoot") {
 
     auto user = clientModel.getHandler();
     user.shoot(Direction::RIGHT);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
     serverModel.nextTick();
     clientModel.nextTick();
 
@@ -529,10 +568,12 @@ TEST_CASE("Online shoot") {
           EntityType::FLOOR);
     CHECK(clientModel.getByCoords(TILE_SIZE * 3, TILE_SIZE * 2).getType() ==
           EntityType::FLOOR);
+    serverModel.finishGame();
 }
 
 TEST_CASE("Online. Bullet destroy on creation") {
     INIT_GAME();
+    CHECK(differences(serverModel, clientModel) == 0);
     constexpr int TANK_LEFT = TILE_SIZE * 3;
     constexpr int TANK_TOP = TILE_SIZE * 1 + TILE_SIZE - TANK_SIZE;
     setPosition(serverModel, clientModel, id, TANK_LEFT, TANK_TOP);
@@ -542,9 +583,10 @@ TEST_CASE("Online. Bullet destroy on creation") {
 
     auto &brick = serverModel.getByCoords(TILE_SIZE * 3, TILE_SIZE * 2);
     CHECK(brick.getType() == EntityType::BRICK);
-    CHECK(isSynced(serverModel, clientModel));
+    CHECK(differences(serverModel, clientModel) == 0);
 
     clientModel.getHandler().shoot(Direction::DOWN);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
     serverModel.nextTick();
     clientModel.nextTick();
@@ -554,14 +596,74 @@ TEST_CASE("Online. Bullet destroy on creation") {
 
     auto &floor = serverModel.getByCoords(TILE_SIZE * 3, TILE_SIZE * 2);
     CHECK(floor.getType() == Tanks::model::EntityType::FLOOR);
-    CHECK(isSynced(serverModel, clientModel));
+    CHECK(differences(serverModel, clientModel) == 0);
     CHECK(serverModel.wasDestroyedBlockThisTurn());
     CHECK(clientModel.wasDestroyedBlockThisTurn());
+    serverModel.finishGame();
 }
 
-TEST_CASE("Bots stress") {
-    DebugServer serverModel(1, 40);
+TEST_CASE("Bonus") {
+    INIT_GAME_FULL(1, 0, 1);
+    ADD_PLAYER(serverModel, );
+    clientModel.loadLevel(1);
+    CHECK(differences(serverModel, clientModel) == 0);
+    serverModel.nextTick();
+    clientModel.nextTick();
+    bool res = differences(serverModel, clientModel) == 0;
+    CHECK(res);
+    GET_PLAYER_CONTORS();
+    auto user = clientModel.getHandler();
+    constexpr int LEFT = 10 * TILE_SIZE - BONUS_SIZE;
+    constexpr int TOP = 8 * TILE_SIZE;
+    setPosition(serverModel, clientModel, id, LEFT, TOP);
+    int bonusId =
+        serverModel.getAll(EntityType::WALK_ON_WATER_BONUS)[0]->getId();
+    setPosition(serverModel, clientModel, bonusId, LEFT + BONUS_SIZE, TOP);
+    serverModel.nextTick();
+    clientModel.nextTick();
+    user.move(Direction::RIGHT, tank.getSpeed());
+    std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    serverModel.nextTick();
+    clientModel.nextTick();
+    CHECK(tank.getLeft() == LEFT + tank.getSpeed());
+    CHECK(differences(serverModel, clientModel) == 0);
+
+    user.move(Direction::RIGHT, BONUS_SIZE);
+    std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    serverModel.nextTick();
+    clientModel.nextTick();
+    CHECK(differences(serverModel, clientModel) == 0);
+    CHECK(tank.getLeft() == LEFT + tank.getSpeed() + BONUS_SIZE);
+
+    user.move(Direction::RIGHT, tank.getSpeed());
+    std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    serverModel.nextTick();
+    clientModel.nextTick();
+    CHECK(differences(serverModel, clientModel) == 0);
+    serverModel.finishGame();
+}
+
+/*
+
+TEST_CASE("Bots, bonuses stress") {
+    INIT_GAME_FULL(1, 40, 10);
+    ADD_PLAYER(serverModel, );
+    clientModel.loadLevel(1);
+    serverModel.nextTick();
+    clientModel.nextTick();
+    CHECK(serverModel.getTick() == clientModel.getTick());
+    CHECK(differences(serverModel, clientModel) == 0);
+
+    int bonuseHere = 0;
     for (int i = 0; i < 10000; i++) {
         serverModel.nextTick();
+        clientModel.nextTick();
+        CHECK(differences(serverModel, clientModel) == 0);
+        if (!serverModel.getAll(EntityType::WALK_ON_WATER_BONUS).empty()) {
+            bonuseHere++;
+        }
     }
+    CHECK(bonuseHere != 0);
+    serverModel.finishGame();
 }
+*/

@@ -6,6 +6,11 @@
 #include "model/spawners.h"
 #include "model/tank.h"
 
+#ifndef NDEBUG
+#include <fstream>
+#include <iostream>
+#endif
+
 namespace Tanks::model {
 using boost::asio::ip::tcp;
 
@@ -13,10 +18,7 @@ int ServerModel::addPlayer(tcp::socket &socket, PlayerSkills skills) {
     int id = getDecrId();
     playersSockets_.emplace(id, socket);
     setPlayerSkills(id, skills);
-
     spawners_.emplace_back(std::make_unique<MediumTankSpawner>(*this, id));
-    //    events_.emplace(std::make_unique<SpawnTank>(id, TILE_SIZE, TILE_SIZE,
-    //                                                EntityType::MEDIUM_TANK));
     std::thread([&]() { receiveTurns(socket); }).detach();
     return id;
 }
@@ -29,29 +31,26 @@ void ServerModel::receiveTurns(tcp::socket &client) {
                 continue;
             }
             std::shared_lock lock(getMutex());
-            events_.emplace(std::move(event));
+            addEvent(std::move(event));
         }
     } catch (boost::system::system_error &e) {
-        std::string msg(e.what());
-        if (msg == "read: Bad file descriptor [system:9]" ||
-            msg == "read: Connection reset by peer [system:104]" ||
-            msg == "read: End of file [asio.misc:2]" ||
-            msg == "write_some: Bad file descriptor [system:9]") {
-            return;  // Connection was closed
-        }
-        throw e;
+        return;
     }
 }
 
 void ServerModel::sendEventsToClients(
-    std::queue<std::unique_ptr<Event>> events) {
+    std::vector<std::unique_ptr<Event>> &events) {
+#ifndef NDEBUG
+    static std::fstream log("log_server.txt");
+    log << events.size() << std::endl;
+    //    std::cout << "s " << getTick() << ' ' << events.size() << std::endl;
+
+#endif
     for (auto &[id, socket] : playersSockets_) {
         sendInt(socket, events.size());
     }
 
-    while (!events.empty()) {
-        auto event = std::move(events.front());
-        events.pop();
+    for (auto &event : events) {
         for (auto &[id, socket] : playersSockets_) {
             event->sendTo(socket);
         }
@@ -59,33 +58,40 @@ void ServerModel::sendEventsToClients(
 }
 
 void ServerModel::executeAllEvents() {
-    std::queue<std::unique_ptr<Event>> eventsToSend;
+    std::vector<std::unique_ptr<Event>> eventsToSend;
+    eventsToSend.reserve(bots_.size() + players_.size());
 
     for (const auto &spawner : spawners_) {
         if (spawner->isSpawnNow()) {
             auto event = spawner->createEvent();
+            assert(event != nullptr);
             executeEvent(*event);
-            eventsToSend.emplace(std::move(event));
+            eventsToSend.emplace_back(std::move(event));
         }
         spawner->nextTick();
     }
 
-    while (!events_.empty()) {
-        auto event = std::move(events_.front());
-        events_.pop();
+    int size = events_.Size();
+
+    for (; size > 0; --size) {
+        std::unique_ptr<Event> event;
+        if (!events_.Consume(event)) {
+            assert(false);
+            throw 123;
+        }
         executeEvent(*event);
-        eventsToSend.emplace(std::move(event));
+        eventsToSend.emplace_back(std::move(event));
     }
 
     for (auto id : bots_) {
         if (getById(id)) {
             auto event = getEventByBot(id);
             executeEvent(*event);
-            eventsToSend.emplace(std::move(event));
+            eventsToSend.emplace_back(std::move(event));
         }
     }
 
-    sendEventsToClients(std::move(eventsToSend));
+    sendEventsToClients(eventsToSend);
 }
 
 std::unique_ptr<Event> ServerModel::getEventByBot(int botId) {
@@ -109,14 +115,14 @@ void ServerModel::setPlayerSkills(int id, PlayerSkills skills) {
     players_.emplace(id, skills);
 }
 
-void ServerModel::addEvent(std::unique_ptr<Event> event) {
-    events_.emplace(std::move(event));
-}
-
-ServerModel::ServerModel(int level, int botsCount) {
+ServerModel::ServerModel(int level, int botsCount, int bonuses) {
     loadLevel(level);
     for (int i = 0; i < botsCount; i++) {
         addBot();
+    }
+    for (int i = 0; i < bonuses; i++) {
+        spawners_.emplace_back(std::make_unique<BonusSpawner>(
+            *this, getDecrId(), EntityType::WALK_ON_WATER_BONUS));
     }
 }
 
@@ -129,6 +135,21 @@ void ServerModel::addBot() {
 
 DecrId ServerModel::getDecrId() {
     return decrId--;
+}
+
+void ServerModel::addEvent(std::unique_ptr<Event> event) {
+    events_.Produce(std::move(event));
+}
+
+ServerModel::~ServerModel() {
+    finishGame();
+}
+
+void ServerModel::finishGame() {
+    for (auto &[id, socket] : playersSockets_) {
+        sendInt(socket, -1);
+    }
+    playersSockets_.clear();
 }
 
 }  // namespace Tanks::model

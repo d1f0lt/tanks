@@ -12,8 +12,6 @@ public:
     explicit Spawner(ServerModel &model, int entityId);
     virtual ~Spawner() = default;
 
-    void action();
-
     [[nodiscard]] bool isSpawnNow();
     void nextTick();
 
@@ -44,6 +42,21 @@ protected:
     [[nodiscard]] std::unique_ptr<Entity> createEntity(int left,
                                                        int top) override;
     [[nodiscard]] std::unique_ptr<Event> createEvent() override;
+};
+
+class BonusSpawner : public Spawner {
+public:
+    explicit BonusSpawner(ServerModel &model, DecrId entityId, EntityType type);
+
+    [[nodiscard]] int getTimeout() override;
+    [[nodiscard]] std::unique_ptr<Event> createEvent() override;
+
+protected:
+    [[nodiscard]] std::unique_ptr<Entity> createEntity(int left,
+                                                       int top) override;
+
+private:
+    const EntityType type_;
 };
 
 }  // namespace Tanks::model
