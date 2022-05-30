@@ -16,6 +16,15 @@ void sendInt(tcp::socket &socket, T a) {
 
 std::int32_t receiveInt(tcp::socket &socket);
 
+template <typename... Args>
+void sendMultipleInts(tcp::socket &socket, Args... args) {
+    (sendInt(socket, args), ...);
+}
+
+template <typename... Args>
+[[nodiscard]] std::tuple<Args...> receiveMultipleInts(tcp::socket &socket) {
+    return {static_cast<Args>(receiveInt(socket))...};
+}
 }  // namespace Tanks::model
 
 #endif  // TANKS_NETWORK_UTILS_H

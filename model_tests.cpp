@@ -143,8 +143,54 @@ bool operator==(const Entity &a, const Entity &b) {
     return res;
 }
 
-TEST_CASE("Single move and checking background. Online") {
-    INIT_GAME();
+TEST_CASE("Network functions") {
+    boost::asio::io_context server_context, client_context;
+    tcp::acceptor acceptor(server_context, tcp::endpoint(tcp::v4(), 0));
+    tcp::socket server(server_context), client(client_context);
+    std::thread connect([&]() { server = acceptor.accept(); });
+    client.connect(acceptor.local_endpoint());
+    connect.join();
+    constexpr int A_1 = 10;
+    SUBCASE("send first") {
+        sendInt(server, A_1);
+        sendMultipleInts(client, 1, 2, 3, 4, 125);
+
+        CHECK(receiveMultipleInts<int, int, int, int, int>(server) ==
+              std::tuple{1, 2, 3, 4, 125});
+
+        CHECK(receiveInt(client) == A_1);
+    }
+
+    SUBCASE("receive first") {
+        std::thread send([&]() {
+            //            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            sendInt(server, A_1);
+            sendMultipleInts(client, 1, 2, 3, 4, 125);
+        });
+        std::thread receive([&]() {
+            CHECK(receiveMultipleInts<int, int, int, int, int>(server) ==
+                  std::tuple{1, 2, 3, 4, 125});
+
+            CHECK(receiveInt(client) == A_1);
+        });
+        receive.join();
+        send.join();
+    }
+}
+
+TEST_CASE("Single move. Online") {
+    //    INIT_GAME();
+
+    DebugServer serverModel;
+    boost::asio::io_context io_context;
+    tcp::acceptor acceptor(io_context, tcp::endpoint(tcp::v4(), 0));
+    ADD_PLAYER(serverModel, );
+    clientModel.loadLevel(1);
+    CHECK(differences(serverModel, clientModel) == 0);
+    serverModel.nextTick();
+    GET_PLAYER_CONTORS()
+    clientModel.nextTick();
+
     CHECK(differences(serverModel, clientModel) == 0);
     setPosition(serverModel, clientModel, id, TILE_SIZE, TILE_SIZE);
     serverModel.nextTick();
@@ -667,3 +713,75 @@ TEST_CASE("Bots, bonuses stress") {
     serverModel.finishGame();
 }
 */
+
+/*
+
+TEST_CASE("10 users") {
+    INIT_GAME_FULL(1, 30, 10);
+    constexpr int CLIENTS = 1;
+
+    //    std::mt19937 rnd(
+    //        std::chrono::steady_clock::now().time_since_epoch().count());
+    std::mt19937 rnd{0};
+    std::thread([&]() {
+        std::vector<tcp::socket> serverSockets;
+        serverSockets.reserve(100);
+        while (true) {
+            try {
+                tcp::socket server = acceptor.accept();
+                serverSockets.emplace_back(std::move(server));
+                int id = serverModel.addPlayer(serverSockets.back());
+                sendInt(serverSockets.back(), id);
+            } catch (boost::system::system_error &e) {
+                return;
+            }
+        }
+    }).detach();
+    std::mutex vec_mutex;
+    std::vector<std::reference_wrapper<ClientModel>> vec;
+    for (int i = 0; i < CLIENTS; i++) {
+        std::thread([&]() {
+            boost::asio::io_context context;
+            tcp::socket client(context);
+            client.connect(acceptor.local_endpoint());
+            int id = receiveInt(client);
+            ClientModel clientModel(id, std::move(client));
+            clientModel.loadLevel(1);
+            clientModel.nextTick();
+            std::unique_lock lock(vec_mutex);
+            vec.push_back(clientModel);
+            lock.unlock();
+            try {
+                while (true) {
+                    auto tank = clientModel.tank();
+                    if (!tank) {
+                        continue;
+                    }
+                    int todo = (std::abs(static_cast<int>(rnd()))) % 12;
+                    if (todo >= 12) {
+                        clientModel.getHandler().shoot(
+                            tank->get().getDirection());
+                    } else {
+                        auto directon = static_cast<Direction>(todo % 4);
+                        return std::make_unique<TankMove>(
+                            id, directon, tank->get().getSpeed());
+                    }
+                    clientModel.nextTick();
+                }
+            } catch (...) {
+                int adsf = 10;
+            }
+        }).detach();
+    }
+    std::this_thread::sleep_for(std::chrono::seconds(5));
+    for (int i = 0; i < 10; i++) {
+        serverModel.nextTick();
+        for (auto &mod : vec) {
+            CHECK(differences(serverModel, mod) == 0);
+        }
+    }
+    CHECK(true);
+    serverModel.finishGame();
+}
+
+ */
