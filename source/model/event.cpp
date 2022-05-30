@@ -4,15 +4,6 @@
 
 namespace Tanks::model {
 namespace {
-template <typename... Args>
-void sendMultipleInts(tcp::socket &socket, Args... args) {
-    (sendInt(socket, args), ...);
-}
-
-template <typename... Args>
-[[nodiscard]] std::tuple<Args...> receiveMultipleInts(tcp::socket &socket) {
-    return {static_cast<Args>(receiveInt(socket))...};
-}
 }  // namespace
 
 std::unique_ptr<Event> TankMove::readFrom(
@@ -48,8 +39,8 @@ void TankMove::sendTo(boost::asio::ip::tcp::socket &socket) {
 }
 
 std::unique_ptr<Event> readEvent(boost::asio::ip::tcp::socket &socket) {
-    static const std::unordered_map<EventType,
-                                    std::unique_ptr<Event> (*)(tcp::socket &)>
+    const std::unordered_map<EventType,
+                             std::unique_ptr<Event> (*)(tcp::socket &)>
         readers = []() {
             std::unordered_map<EventType,
                                std::unique_ptr<Event> (*)(tcp::socket &)>
