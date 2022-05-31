@@ -35,9 +35,10 @@ void GameModel::addEntity(std::unique_ptr<Entity> entity) {
 }
 
 void GameModel::eraseEntity(Entity &entity) {
+    handlers_.erase(&entity);
     groupedEntities_.erase(entity);
     byId_.erase(entity.getId());
-    entityHolder_.erase(entity);  // Other cleared in handler destructor
+    entityHolder_.erase(entity);
 }
 
 void GameModel::loadLevel(int level) {

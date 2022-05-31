@@ -49,7 +49,8 @@ public:
     void destroyByBullet() override;
 
 private:
-    std::vector<std::vector<int>> background_;
+    [[nodiscard]] std::vector<std::vector<int>> &getBackground();
+    [[nodiscard]] const std::vector<std::vector<int>> &getBackground() const;
 };
 
 class MovableHandler : public ForegroundHandler {
@@ -61,6 +62,8 @@ public:
     void setDirection(Direction direction);
 
 protected:
+    bool moveOnly(Direction direction, int speed);
+
     [[nodiscard]] std::vector<Entity *> lookMutable(Direction direction);
 
     template <typename T>

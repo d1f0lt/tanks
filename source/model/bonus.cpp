@@ -21,6 +21,18 @@ int Bonus::getStrength() const {
     return 0;
 }
 
+void Bonus::apply(Tank &tank) {
+    dynamic_cast<BonusHandler &>(getHandler()).apply(tank);
+}
+
+bool Bonus::isTankPassable() const {
+    return true;
+}
+
+bool Bonus::isBulletPassable() const {
+    return true;
+}
+
 WalkOnWater::WalkOnWater(int left, int top, DecrId entityId, GameModel &model)
     : Bonus(left,
             top,
@@ -31,4 +43,5 @@ WalkOnWater::WalkOnWater(int left, int top, DecrId entityId, GameModel &model)
 EntityType WalkOnWater::getType() const {
     return EntityType::WALK_ON_WATER_BONUS;
 }
+
 }  // namespace Tanks::model

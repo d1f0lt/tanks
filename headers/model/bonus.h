@@ -15,6 +15,10 @@ public:
     [[nodiscard]] int getWidth() const override;
     [[nodiscard]] int getHeight() const override;
     [[nodiscard]] int getStrength() const override;
+    [[nodiscard]] bool isTankPassable() const override;
+    [[nodiscard]] bool isBulletPassable() const override;
+
+    void apply(Tank &tank);
 };
 
 class WalkOnWater : public Bonus {

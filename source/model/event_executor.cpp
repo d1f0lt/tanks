@@ -15,11 +15,12 @@ GameModel &EventExecutor::getModel() const {
 bool EventExecutor::execute(TankMove &event) const {
     auto &model = getModel();
     auto tank = model.getById(event.getId());
-    if (!tank) {
+    if (tank == std::nullopt) {
         return false;
     }
-
-    dynamic_cast<TankHandler &>(model.getHandler(*tank))
+    assert(getModel().byId_.count(event.getId()));
+    assert(tank != std::nullopt);
+    dynamic_cast<TankHandler &>(model.getHandler(tank->get()))
         .move(event.getDirection(), event.getSpeed());
     return true;
 }

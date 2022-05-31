@@ -1,4 +1,5 @@
 #include "model/tank_handler.h"
+#include "model/bonus.h"
 #include "model/game_model.h"
 #include "model/projectile.h"
 #include "model/tank.h"
@@ -50,7 +51,25 @@ void TankHandler::move(Direction direction, int speed) {
     }
 
     lastMoveTick_ = getModel().getTick();
-    MovableHandler::move(direction, speed);
+    restoreBackground();
+    if (!MovableHandler::moveOnly(direction, speed)) {
+        return;
+    }
+    setBackground();
+    auto background = snapshotBackground();
+    for (const auto &row : background) {
+        for (int entityId : row) {
+            auto entity = getModel().getById(entityId);
+            if (!entity) {
+                continue;
+            }
+            Bonus *bonus;
+            if (bonus = dynamic_cast<Bonus *>(&entity->get()); !bonus) {
+                continue;
+            }
+            bonus->apply(dynamic_cast<Tank &>(getEntity()));
+        }
+    }
 }
 
 void TankHandler::move(Direction direction) {

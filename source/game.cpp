@@ -40,16 +40,16 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
     const std::string levelFilename("../levels/level" + std::to_string(level) +
                                     ".csv");
 
-    Server server(levelFilename, 20, 0);
+    Server server(levelFilename, 4, 2);
 
     boost::asio::io_context ioContext;
-    tcp::socket s(ioContext);
+    tcp::socket clientSocket(ioContext);
     auto endpoint = server.getEndpoint();
-    s.connect(endpoint);
-    int playerId = model::receiveInt(s);
+    clientSocket.connect(endpoint);
+    int playerId = model::receiveInt(clientSocket);
     assert(playerId < 0);
 
-    model::ClientModel model(playerId, std::move(s));
+    model::ClientModel model(playerId, std::move(clientSocket));
     model.loadLevel(levelFilename);
 
     View::TankSpriteHolder greenTankView(imagesPath + "tanks/green_tank.png");
@@ -115,10 +115,6 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
             greenTankView.draw(window,
                                dynamic_cast<const model::Tank &>(*tank));
         }
-        //        if (player.tank()) {
-        //            auto &playerTank = player.tank()->get();
-        //            greenTankView.draw(window, playerTank);
-        //        }
 
         const auto &bullets = model.getAll(model::EntityType::BULLET);
         bulletsView.draw(window, bullets);

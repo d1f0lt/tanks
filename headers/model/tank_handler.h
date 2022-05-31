@@ -13,6 +13,9 @@ public:
     virtual void shoot();
     void shoot(Direction direction);
 
+protected:
+    void tryApplyBonus();
+
 private:
     int lastMoveTick_ = -1;
     int lastShootTick_ = -DEFAULT_RELOAD_TICKS - 1;
@@ -27,7 +30,7 @@ public:
     void move(Direction dir, int speed) override;
     void shoot() final;
 
-    bool canStandOn(const Entity &other) const override;
+    [[nodiscard]] bool canStandOn(const Entity &other) const override;
 
 private:
     const int beginLive_;
