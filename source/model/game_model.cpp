@@ -41,9 +41,10 @@ void GameModel::eraseEntity(Entity &entity) {
 }
 
 void GameModel::loadLevel(int level) {
-    const std::string currentLevel =
-        "../levels/level" + std::to_string(level) + ".csv";
+    loadLevel("../levels/level" + std::to_string(level) + ".csv");
+}
 
+void GameModel::loadLevel(const std::string &filename) {
     const static std::unordered_map<char, EntityType> CHAR_TO_TYPE = {
         {'=', EntityType::HORIZONTAL_BORDER},
         {'|', EntityType::VERTICAL_BORDER},
@@ -56,7 +57,7 @@ void GameModel::loadLevel(int level) {
         {'{', EntityType::LEFT_DOWN_CORNER},
         {'}', EntityType::RIGHT_DOWN_CORNER}};
 
-    std::ifstream file(currentLevel);
+    std::ifstream file(filename);
 
     assert(file.is_open() && "Unable to open map texture file");
     std::string str;

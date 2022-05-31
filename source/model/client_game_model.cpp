@@ -16,7 +16,7 @@ ClientModel::ClientModel(int playerId, tcp::socket socket)
       };
 
 PlayerActionsHandler ClientModel::getHandler() {
-    return PlayerActionsHandler(playerId_, socket_);
+    return PlayerActionsHandler(playerId_, *this, socket_);
 }
 
 // TODO: no copypast
@@ -59,13 +59,16 @@ void ClientModel::receiveEvents() {
 void ClientModel::executeAllEvents() {
     std::unique_ptr<Event> event;
     int cnt = -1;
+    int ticks = std::max(1, static_cast<int>(tickSize_.Size()));
     if (!tickSize_.ConsumeSync(cnt)) {
         assert(false);
     }
-    for (; cnt > 0; cnt--) {
-        bool res = events_.ConsumeSync(event);
-        assert(res);
-        executeEvent(*event);
+    for (; ticks > 0; ticks--) {
+        for (; cnt > 0; cnt--) {
+            bool res = events_.ConsumeSync(event);
+            assert(res);
+            executeEvent(*event);
+        }
     }
 }
 

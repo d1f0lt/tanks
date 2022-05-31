@@ -10,8 +10,8 @@ message("CMake runtime output directory: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
 SET(GCC_WARNINGS "-Wall -Wextra")
 #SET(SANITIZERS "-fsanitize=address,undefined,leak,vptr")
-#SET(GCC_OPTIMIZE "-Og -g -ftrapv") # Latest is integer overflow protection
-#SET(GCC_OPTIMIZE "-O2 -DNDEBUG") # RELEASE
+#SET(GCC_OPTIMIZE "-ggdb -g -ftrapv") # Latest is integer overflow protection
+#SET(GCC_OPTIMIZE "-O2 -DNDEBUG -mtune=native") # RELEASE
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_WARNINGS} ${SANITIZERS} ${GCC_OPTIMIZE}")
 
 find_package(SFML 2.5 COMPONENTS graphics audio REQUIRED)
@@ -88,7 +88,7 @@ add_executable(
         source/model/network_utils.cpp
         source/model/bonus.cpp
         source/model/tank_handler.cpp
-)
+        source/server.cpp source/server.h)
 
 target_link_libraries(model_tests sfml-graphics)
 target_link_libraries(menu_tests sfml-graphics)

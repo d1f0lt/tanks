@@ -7,7 +7,9 @@ inline constexpr int WINDOW_WIDTH = 1920;
 inline constexpr int WINDOW_HEIGHT = 1080;
 
 // game
+namespace model {
 enum class Direction { LEFT, RIGHT, DOWN, UP };
+}
 inline constexpr int TILE_SIZE = 56;  // ONE_TILE_WIDTH = ONE_TILE_HEIGHT = 56
 inline constexpr int MARGIN_TOP = 8;  // = MARGIN_DOWN
 inline constexpr int MARGIN_LEFT = 288;  // = MARGIN_RIGHT     for centralize

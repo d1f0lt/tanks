@@ -165,7 +165,7 @@ int TankShoot::getTankId() const {
 Direction TankShoot::getDirection() const {
     return direction_;
 }
-TankShoot::TankShoot(const int tankId, const Direction direction)
+TankShoot::TankShoot(int tankId, Direction direction)
     : tankId_(tankId), direction_(direction) {
 }
 std::unique_ptr<Event> TankShoot::readFrom(tcp::socket &socket) {

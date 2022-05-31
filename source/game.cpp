@@ -1,31 +1,34 @@
+#include <boost/asio.hpp>
 #include <cassert>
 #include <chrono>
 #include <thread>
 #include "game_controller.h"
 #include "game_environment.h"
 #include "menu/menu_controller.h"
+#include "model/client_game_model.h"
 #include "model/game_model.h"
+#include "model/network_utils.h"
+#include "model/player_action_handler.h"
+#include "model/server_game_model.h"
 #include "pause.h"
+#include "server.h"
 #include "view/bullets_view.h"
 #include "view/game_view.h"
 #include "view/tank_view.h"
 
 namespace Tanks {
+using boost::asio::ip::tcp;
 
 namespace {
-
-model::PlayableTank &getPlayerTank(
-    std::optional<std::reference_wrapper<model::Entity>> &player) {
-    return dynamic_cast<model::PlayableTank &>(player.value().get());
-}
-
-void makeAction(std::optional<std::reference_wrapper<model::Entity>> &player) {
-    if (player.has_value()) {
-        auto &playerTank = getPlayerTank(player);
-        GameController::makeShot(playerTank);
-        GameController::makeMove(playerTank);
+void makeAction(model::PlayerActionsHandler &player) {
+    if (player.tank()) {
+        GameController::makeShot(player);
+        GameController::makeMove(player);
     }
 }
+
+// std::pair<std::thread, boost::asio::ip::tcp::endpoint> initServer() {
+// }
 
 }  // namespace
 
@@ -34,15 +37,20 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
     sf::RenderWindow &window,
     int level) {
     static const std::string imagesPath = "../images/";
-    const sf::Vector2<int> tankStartCoordinates = {
-        TILE_SIZE * 6 + (TILE_SIZE - TANK_SIZE) / 2,
-        TILE_SIZE * (MAP_HEIGHT - 2) + (TILE_SIZE - TANK_SIZE)};
+    const std::string levelFilename("../levels/level" + std::to_string(level) +
+                                    ".csv");
 
-    model::GameModel model;
-    model.loadLevel(level);
-    const auto playerId =
-        model.spawnPlayableTank(tankStartCoordinates.x, tankStartCoordinates.y)
-            .getId();
+    Server server(levelFilename, 20, 0);
+
+    boost::asio::io_context ioContext;
+    tcp::socket s(ioContext);
+    auto endpoint = server.getEndpoint();
+    s.connect(endpoint);
+    int playerId = model::receiveInt(s);
+    assert(playerId < 0);
+
+    model::ClientModel model(playerId, std::move(s));
+    model.loadLevel(levelFilename);
 
     View::TankSpriteHolder greenTankView(imagesPath + "tanks/green_tank.png");
 
@@ -54,6 +62,8 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
 
     Pause pause;
 
+    std::thread serverThread = server.start();
+
     while (window.isOpen()) {
         // catch event
         sf::Event event{};
@@ -64,7 +74,7 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
         }
         pause.checkPause(event);
 
-        auto player = model.getById(playerId);
+        auto player = model.getHandler();
 
         if (!pause.isPause()) {
             if (auto signal = MenuController::control(environment.getMenu(),
@@ -74,7 +84,6 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
                 pause.makePause();
             } else {
                 model.nextTick();
-                player = model.getById(playerId);
                 makeAction(player);
             }
         } else {
@@ -101,10 +110,15 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
 
         mapView.draw(window, model);
 
-        if (player.has_value()) {
-            auto &playerTank = getPlayerTank(player);
-            greenTankView.draw(window, playerTank);
+        const auto &tanks = model.getAll(model::EntityType::MEDIUM_TANK);
+        for (const auto *tank : tanks) {
+            greenTankView.draw(window,
+                               dynamic_cast<const model::Tank &>(*tank));
         }
+        //        if (player.tank()) {
+        //            auto &playerTank = player.tank()->get();
+        //            greenTankView.draw(window, playerTank);
+        //        }
 
         const auto &bullets = model.getAll(model::EntityType::BULLET);
         bulletsView.draw(window, bullets);

@@ -153,6 +153,17 @@ ServerModel::ServerModel(int level, int botsCount, int bonuses) {
     }
 }
 
+ServerModel::ServerModel(const std::string &level, int botsCount, int bonuses) {
+    loadLevel(level);
+    for (int i = 0; i < botsCount; i++) {
+        addBot();
+    }
+    for (int i = 0; i < bonuses; i++) {
+        spawners_.emplace_back(std::make_unique<BonusSpawner>(
+            *this, getDecrId(), EntityType::WALK_ON_WATER_BONUS));
+    }
+}
+
 void ServerModel::addBot() {
     auto id = getDecrId();
     bots_.emplace(id);

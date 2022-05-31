@@ -84,7 +84,7 @@ private:
 
 class TankShoot : public Event {
 public:
-    TankShoot(const int tankId, const Direction direction);
+    explicit TankShoot(int tankId, Direction direction);
 
     bool acceptExecutor(const EventExecutor &executor) override;
 

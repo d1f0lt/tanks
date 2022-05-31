@@ -39,6 +39,7 @@ public:
     void nextTick();
 
     void loadLevel(int level);
+    void loadLevel(const std::string &filename);
 
     [[nodiscard]] int getHeight() const;
     [[nodiscard]] int getWidth() const;
