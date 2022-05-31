@@ -91,7 +91,7 @@ private:
     [[nodiscard]] std::unique_ptr<BasicHandler> &getAccessToHandler();
 
     int left_ = -1, top_ = -1;
-    const int id_ = -1;
+    const int id_;
     std::unique_ptr<BasicHandler> handler_;
 };
 }  // namespace Tanks::model

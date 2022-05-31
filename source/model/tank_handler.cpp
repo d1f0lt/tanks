@@ -55,7 +55,6 @@ bool TankHandler::move(Direction direction, int speed) {
     if (!MovableHandler::moveOnly(direction, speed)) {
         return false;
     }
-    setBackground();
     applyBonusesInBackground();
     return true;
 }
@@ -70,15 +69,14 @@ void TankHandler::shoot(Direction direction) {
 }
 
 void TankHandler::applyBonusesInBackground() {
-    auto &background = getBackground();
+    assert(getBackground().empty());
+    auto background = underTank();
     auto &model = getModel();
     auto &tank = dynamic_cast<Tank &>(getEntity());
     std::vector<Bonus *> bonuses;
     for (unsigned i = 0; i < background.size(); i++) {
         auto entity = model.getById(background[i]);
         if (!entity) {
-            std::swap(background[i], background.back());
-            background.pop_back();
             continue;
         }
         Bonus *bonus = nullptr;
@@ -88,12 +86,14 @@ void TankHandler::applyBonusesInBackground() {
         bonuses.emplace_back(bonus);
     }
     if (bonuses.empty()) {
+        setBackground();
         return;
     }
-    restoreBackground();
+
     for (auto *bonus : bonuses) {
         bonus->apply(tank);
     }
+    dynamic_cast<TankHandler *>(getActualHandler(tank))->setBackground();
 }
 
 void TankMovableOnWaterHandler::stopBonus() {

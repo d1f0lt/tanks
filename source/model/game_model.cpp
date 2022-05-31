@@ -23,7 +23,10 @@ void GameModel::addEntity(std::unique_ptr<Entity> entity) {
         }
     }
 
-    if (auto *in_foreground = dynamic_cast<ForegroundEntity *>(entity.get())) {
+    if (auto *tankHandler = dynamic_cast<TankHandler *>(&getHandler(*entity))) {
+        tankHandler->applyBonusesInBackground();
+    } else if (auto *in_foreground =
+                   dynamic_cast<ForegroundEntity *>(entity.get())) {
         dynamic_cast<ForegroundHandler &>(*handlers_[in_foreground])
             .setBackground();
     }
@@ -35,6 +38,7 @@ void GameModel::addEntity(std::unique_ptr<Entity> entity) {
 }
 
 void GameModel::eraseEntity(Entity &entity) {
+    assert(map_.checkRemoved(entity));
     handlers_.erase(&entity);
     groupedEntities_.erase(entity);
     byId_.erase(entity.getId());
@@ -167,6 +171,7 @@ void GameModel::moveBullets() {
     for (unsigned i = 0; i < all.size(); i++) {  // bullet can be destroyed
         auto *bullet = dynamic_cast<Projectile *>(all[i]);
         assert(bullet != nullptr);
+        assert(getById(bullet->getId()));
 
         dynamic_cast<ProjectileHandler &>(getHandler(*bullet))
             .interactOnNextTick();

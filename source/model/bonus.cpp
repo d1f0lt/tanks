@@ -18,7 +18,7 @@ int Bonus::getHeight() const {
 }
 
 int Bonus::getStrength() const {
-    return 0;
+    return 1;
 }
 
 void Bonus::apply(Tank &tank) {

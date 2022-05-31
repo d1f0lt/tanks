@@ -31,19 +31,16 @@ bool BasicHandler::canStandOn(const Entity &other) const {
     return other.isTankPassable();
 }
 
-void BasicHandler::destroyByBullet() {
+void BasicHandler::destroyEntity() {
     assert(getEntity().getStrength() != 0);
     int left = getEntity().getLeft();
     int top = getEntity().getTop();
     int id = getEntity().getId();
     auto &model = getModel();
     model.wasDestroyedBlockThisTurn_ = true;
-    destroyEntity();
-    model.addEntity(std::make_unique<Floor>(left, top, id, model));
-}
-
-void BasicHandler::destroyEntity() {
+    getModel().map_.erase(getEntity());
     getModel().eraseEntity(getEntity());
+    model.addEntity(std::make_unique<Floor>(left, top, id, model));
 }
 
 BasicHandler *BasicHandler::getActualHandler(Entity &entity) {
@@ -61,12 +58,16 @@ std::vector<int> ForegroundHandler::restoreBackground() {
         if (!entity) {
             continue;
         }
-        getModel().getMap().insert(*entity);
+        getModel().getMap().exchange(&(entity->get()), &getEntity());
     }
     return std::move(getBackground());
 }
 
 void ForegroundHandler::setBackground() {
+    if (!getBackground().empty()) {
+        restoreBackground();
+    }
+    assert(getBackground().empty());
     std::unordered_set<int> setted;
     auto &background = getBackground();
     auto &entity = getEntity();
@@ -77,6 +78,9 @@ void ForegroundHandler::setBackground() {
     for (int row = entity.getTop(); row < top + height; row++) {
         for (int col = entity.getLeft(); col < left + width; col++) {
             auto id = getModel().getByCoords(col, row).getId();
+            assert(canStandOn(getModel().getById(id)->get()));
+            assert(id >= 0 ||
+                   dynamic_cast<ProjectileHandler *>(this) != nullptr);
             if (setted.find(id) != setted.end()) {
                 continue;
             }
@@ -170,13 +174,9 @@ void ForegroundHandler::setPosition(int left, int top) {
     setBackground();
 }
 
-void ForegroundHandler::destroyByBullet() {
-    destroyEntity();
-}
-
 void ForegroundHandler::destroyEntity() {
     restoreBackground();
-    BasicHandler::destroyEntity();
+    getModel().eraseEntity(getEntity());
 }
 
 std::vector<int> &ForegroundHandler::getBackground() {
@@ -185,6 +185,26 @@ std::vector<int> &ForegroundHandler::getBackground() {
 
 const std::vector<int> &ForegroundHandler::getBackground() const {
     return dynamic_cast<ForegroundEntity &>(getEntity()).background_;
+}
+
+std::vector<int> ForegroundHandler::underTank() {
+    std::unordered_set<int> setted;
+    auto &entity = getEntity();
+    int top = entity.getTop();
+    int left = entity.getLeft();
+    int height = entity.getHeight();
+    int width = entity.getWidth();
+    for (int row = entity.getTop(); row < top + height; row++) {
+        for (int col = entity.getLeft(); col < left + width; col++) {
+            auto id = getModel().getByCoords(col, row).getId();
+            assert(canStandOn(getModel().getById(id)->get()));
+            if (setted.find(id) != setted.end()) {
+                continue;
+            }
+            setted.insert(id);
+        }
+    }
+    return {setted.begin(), setted.end()};
 }
 
 void MovableHandler::setDirection(Direction direction) {
@@ -210,9 +230,9 @@ bool MovableHandler::moveOnly(Direction direction, int speed) {
 
     if (!bullets.empty() && movable.dist(*bullets[0]) <= dist) {
         for (auto *entity : bullets) {
-            getModel().getHandler(*entity).destroyByBullet();
+            getModel().getHandler(*entity).destroyEntity();
         }
-        ForegroundHandler::destroyByBullet();
+        ForegroundHandler::destroyEntity();
         return false;
     }
 
@@ -247,7 +267,7 @@ bool ProjectileHandler::breakIfBreakable() {
         destroy(*entity);
     }
     if (!closest.empty()) {
-        destroyByBullet();
+        ForegroundHandler::destroyEntity();
         return true;
     }
     return false;
@@ -259,7 +279,7 @@ void ProjectileHandler::destroy(Entity &other) {
         return;
     }
 
-    getModel().getHandler(other).destroyByBullet();
+    getModel().getHandler(other).destroyEntity();
 }
 
 bool ProjectileHandler::isBreakOnCreation() {
@@ -298,6 +318,9 @@ bool ProjectileHandler::canStandOn(const Entity &other) const {
 BonusHandler::BonusHandler(GameModel &model, Bonus &entity)
     : ForegroundHandler(model, entity) {
 }
+bool BonusHandler::canStandOn(const Entity &other) const {
+    return other.isTankPassable() && (!dynamic_cast<const Bonus *>(&other));
+}
 
 WalkOnWaterHandler::WalkOnWaterHandler(GameModel &model, WalkOnWater &entity)
     : BonusHandler(model, entity) {
@@ -307,8 +330,8 @@ void WalkOnWaterHandler::apply(Tank &tank) {
     tank.getAccessToHandler().reset();
     tank.getAccessToHandler() = std::make_unique<TankMovableOnWaterHandler>(
         getModel(), tank, getModel().getTick());
-    dynamic_cast<ForegroundHandler &>(*tank.getAccessToHandler())
-        .setBackground();
+    //    dynamic_cast<ForegroundHandler &>(*tank.getAccessToHandler())
+    //        .setBackground();
     ForegroundHandler::destroyEntity();
 }
 }  // namespace Tanks::model

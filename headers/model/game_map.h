@@ -17,8 +17,9 @@ public:
     [[nodiscard]] Entity &getEntityByCoords(int col, int row) const;
 
     void insert(Entity &entity);
+    void exchange(Entity *give, const Entity *remove);
     void erase(Entity &entity);
-    void eraseByCoords(int col, int row);
+    [[nodiscard]] bool checkRemoved(Entity &entity);
 
 private:
     std::vector<std::vector<Entity *>> map_;

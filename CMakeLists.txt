@@ -11,8 +11,11 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
 SET(GCC_WARNINGS "-Wall -Wextra -pthread")
-#SET(SANITIZERS "-fsanitize=address,undefined,leak,vptr")
-#SET(GCC_OPTIMIZE "-ggdb -g -ftrapv") # Latest is integer overflow protection
+#SET(SANITIZERS "-fsanitize=address,undefined,leak,vptr,enum,null,shift,vla-bound")
+#SET(SANITIZERS "-fsanitize=address,undefined,leak,vptr,enum,null,shift,vla-bound")
+#SET(GCC_OPTIMIZE "-ggdb -g3 -ftrapv -D_GLIBCXX_DEBUG") # Latest is integer overflow protection
+#SET(GCC_OPTIMIZE "-ggdb -g ")# Latest is integer overflow protection
+#SET(GCC_OPTIMIZE "-O2 -g0 -mtune=native") # RELEASE
 #SET(GCC_OPTIMIZE "-O2 -DNDEBUG -mtune=native") # RELEASE
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_WARNINGS} ${SANITIZERS} ${GCC_OPTIMIZE}")
 

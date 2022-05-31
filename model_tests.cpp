@@ -409,6 +409,9 @@ TEST_CASE("Bullet fly above water") {
     INIT_GAME();
     handler.setPosition(TILE_SIZE * 4, TILE_SIZE * 15);
 
+    CHECK(serverModel.getWidth() == MAP_WIDTH * TILE_SIZE);
+    CHECK(serverModel.getHeight() == MAP_HEIGHT * TILE_SIZE);
+
     handler.setDirection(Direction::RIGHT);
     auto &brick = serverModel.getByCoords(TILE_SIZE * 19, TILE_SIZE * 15);
     CHECK(brick.getType() == EntityType::BRICK);
@@ -430,10 +433,11 @@ TEST_CASE("Bullet fly above water") {
 
     int tBrick = bullet.dist(brick) / DEFAULT_BULLET_SPEED +
                  (bullet.dist(brick) % DEFAULT_BULLET_SPEED != 0);
+    int brickId = brick.getId();
     for (int i = 0; i < tBrick; i++) {
         auto &brickNow =
             serverModel.getByCoords(TILE_SIZE * 19, TILE_SIZE * 15);
-        CHECK(&brick == &brickNow);
+        CHECK(serverModel.getById(brickId));
         serverModel.nextTick();
     }
 
@@ -473,6 +477,21 @@ TEST_CASE("Bullet destroy on creation") {
     clientModel.nextTick();     \
     GET_PLAYER_CONTORS();       \
     GET_PLAYER_CONTORS(2);
+
+TEST_CASE("Tank move on ") {
+    INIT_GAME_TWO_PLAYERS();
+    handler.setPosition(TILE_SIZE, TILE_SIZE);
+    handler2.setPosition(TILE_SIZE + TANK_SIZE, TILE_SIZE);
+    CHECK(serverModel.getByCoords(TILE_SIZE, TILE_SIZE).getType() ==
+          EntityType::MEDIUM_TANK);
+    handler.move(Tanks::model::Direction::RIGHT);
+    auto &nowTank = serverModel.getByCoords(TILE_SIZE, TILE_SIZE);
+    CHECK(dynamic_cast<Tank *>(&nowTank));
+    auto &ttank = dynamic_cast<Tank &>(nowTank);
+    CHECK(ttank.getLeft() == TILE_SIZE);
+    CHECK(ttank.getTop() == TILE_SIZE);
+    serverModel.finishGame();
+}
 
 TEST_CASE("Shoot static tank") {
     INIT_GAME_TWO_PLAYERS();
@@ -650,41 +669,37 @@ TEST_CASE("Online. Bullet destroy on creation") {
 TEST_CASE("Bonus") {
     INIT_GAME_FULL(1, 0, 1);
     ADD_PLAYER(serverModel, );
-    clientModel.loadLevel(1);
-    CHECK(differences(serverModel, clientModel) == 0);
     serverModel.nextTick();
-    clientModel.nextTick();
-    bool res = differences(serverModel, clientModel) == 0;
-    CHECK(res);
     GET_PLAYER_CONTORS();
     auto user = clientModel.getHandler();
-    constexpr int LEFT = 10 * TILE_SIZE - BONUS_SIZE;
+    constexpr int LEFT = 10 * TILE_SIZE - TANK_SIZE;
     constexpr int TOP = 8 * TILE_SIZE;
-    setPosition(serverModel, clientModel, id, LEFT, TOP);
+    auto &entity = serverModel.getByCoords(LEFT, TOP);
+    handler.setPosition(LEFT, TOP);
     int bonusId =
         serverModel.getAll(EntityType::WALK_ON_WATER_BONUS)[0]->getId();
-    setPosition(serverModel, clientModel, bonusId, LEFT + BONUS_SIZE, TOP);
+    dynamic_cast<ForegroundHandler &>(
+        serverModel.getHandler(serverModel.getById(bonusId)->get()))
+        .setPosition(LEFT + TANK_SIZE, TOP);
+    //    setPosition(serverModel, clientModel, id, LEFT, TOP);
+    //    setPosition(serverModel, clientModel, bonusId, LEFT + TANK_SIZE, TOP);
     serverModel.nextTick();
-    clientModel.nextTick();
-    user.move(Direction::RIGHT, tank.getSpeed());
-    std::this_thread::sleep_for(std::chrono::milliseconds(5));
-    serverModel.nextTick();
-    clientModel.nextTick();
-    CHECK(tank.getLeft() == LEFT + tank.getSpeed());
-    CHECK(differences(serverModel, clientModel) == 0);
+    //    clientModel.nextTick();
+    decltype(auto) safeHandler = [&]() -> TankHandler & {
+        auto e = serverModel.getById(id);
+        auto &h = serverModel.getHandler(e->get());
+        return dynamic_cast<TankHandler &>(h);
+    };
 
-    user.move(Direction::RIGHT, BONUS_SIZE);
-    std::this_thread::sleep_for(std::chrono::milliseconds(5));
-    serverModel.nextTick();
-    clientModel.nextTick();
-    CHECK(differences(serverModel, clientModel) == 0);
-    CHECK(tank.getLeft() == LEFT + tank.getSpeed() + BONUS_SIZE);
+    for (int i = 0; i <= 20; i++) {
+        safeHandler().move(Direction::RIGHT);
+        //        user.move(Direction::RIGHT);
+        //        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        serverModel.nextTick();
+        //        clientModel.nextTick();
+        CHECK(tank.getLeft() == LEFT + (i + 1) * tank.getSpeed());
+    }
 
-    user.move(Direction::RIGHT, tank.getSpeed());
-    std::this_thread::sleep_for(std::chrono::milliseconds(5));
-    serverModel.nextTick();
-    clientModel.nextTick();
-    CHECK(differences(serverModel, clientModel) == 0);
     serverModel.finishGame();
 }
 
@@ -698,10 +713,17 @@ TEST_CASE("Bots, bonuses stress") {
     CHECK(differences(serverModel, clientModel) == 0);
 
     int bonuseHere = 0;
-    for (int i = 0; i < 10000; i++) {
+    int errorTick = 65;
+    for (int i = 0; i < errorTick; i++) {
         serverModel.nextTick();
         clientModel.nextTick();
         CHECK(differences(serverModel, clientModel) == 0);
+    }
+    for (int i = errorTick; i < 10000; i++) {
+        serverModel.nextTick();
+        clientModel.nextTick();
+        CHECK(differences(serverModel, clientModel) == 0);
+        //        std::cout << serverModel.getTick() << std::endl;
         if (!serverModel.getAll(EntityType::WALK_ON_WATER_BONUS).empty()) {
             bonuseHere++;
         }

@@ -24,7 +24,6 @@ public:
 
     [[nodiscard]] virtual bool canStandOn(const Entity &other) const;
 
-    virtual void destroyByBullet();
     virtual void destroyEntity();
 
 protected:
@@ -49,10 +48,9 @@ public:
 
     void setPosition(int left, int top);
 
-    void destroyByBullet() override;
-
 protected:
     [[nodiscard]] std::vector<int> &getBackground();
+    [[nodiscard]] std::vector<int> underTank();
 
 private:
     [[nodiscard]] const std::vector<int> &getBackground() const;
@@ -75,7 +73,8 @@ protected:
     std::vector<Entity *> nearest(Direction direction, T cond) {
         int minDist = INT_MAX;
         std::vector<Entity *> res;
-        for (auto *entity : lookMutable(direction)) {
+        auto lk = lookMutable(direction);
+        for (auto *entity : lk) {
             if (cond(entity)) {
                 if (getEntity().dist(*entity) <= minDist) {
                     if (int dist = getEntity().dist(*entity); dist < minDist) {
@@ -84,9 +83,7 @@ protected:
                     } else {
                         res.emplace_back(entity);
                     }
-                } else {
-                    break;  // TODO check it
-                }
+                }  // elements in look are unsorted, can't else break
             }
         }
         return res;
@@ -113,6 +110,7 @@ public:
     explicit BonusHandler(GameModel &model, Bonus &entity);
 
     virtual void apply(Tank &tank) = 0;
+    bool canStandOn(const Entity &other) const override;
 };
 
 class WalkOnWaterHandler : public BonusHandler {
