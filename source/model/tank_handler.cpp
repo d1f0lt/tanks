@@ -55,19 +55,25 @@ void TankHandler::move(Direction direction, int speed) {
     if (!MovableHandler::moveOnly(direction, speed)) {
         return;
     }
+
+    auto &model = getModel();
+
     setBackground();
     auto background = snapshotBackground();
+    restoreBackground();
+    auto &tank = dynamic_cast<Tank &>(getEntity());
     for (const auto &row : background) {
         for (int entityId : row) {
-            auto entity = getModel().getById(entityId);
+            auto entity = model.getById(entityId);
             if (!entity) {
                 continue;
             }
             if (Bonus *bonus = dynamic_cast<Bonus *>(&entity->get())) {
-                bonus->apply(dynamic_cast<Tank &>(getEntity()));
+                bonus->apply(tank);
             }
         }
     }
+    setBackground();
 }
 
 void TankHandler::move(Direction direction) {

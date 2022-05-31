@@ -1,4 +1,3 @@
-#include <boost/asio.hpp>
 #include <cassert>
 #include <chrono>
 #include <thread>
@@ -6,10 +5,8 @@
 #include "game_environment.h"
 #include "menu/menu_controller.h"
 #include "model/client_game_model.h"
-#include "model/game_model.h"
 #include "model/network_utils.h"
 #include "model/player_action_handler.h"
-#include "model/server_game_model.h"
 #include "pause.h"
 #include "server.h"
 #include "view/bullets_view.h"
@@ -26,10 +23,6 @@ void makeAction(model::PlayerActionsHandler &player) {
         GameController::makeMove(player);
     }
 }
-
-// std::pair<std::thread, boost::asio::ip::tcp::endpoint> initServer() {
-// }
-
 }  // namespace
 
 std::optional<Menu::ButtonType>
