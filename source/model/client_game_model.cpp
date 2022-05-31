@@ -44,7 +44,7 @@ void ClientModel::receiveEvents() {
         }
     } catch (boost::system::system_error &) {
         return;
-    } catch (std::system_error &) {
+    } catch (std::system_error &e) {
 #ifndef NDEBUG
         static std::fstream log("log_client.txt");
         log << getTick() << ' ' << e.what() << std::endl;
