@@ -732,6 +732,31 @@ TEST_CASE("Bots, bonuses stress") {
     serverModel.finishGame();
 }
 
+TEST_CASE("BIG Bots, bonuses stress") {
+    INIT_GAME_FULL(1, 100, 100);
+    ADD_PLAYER(serverModel, );
+    //    clientModel.loadLevel(1);
+    serverModel.nextTick();
+    //    clientModel.nextTick();
+    //    CHECK(serverModel.getTick() == clientModel.getTick());
+    //    CHECK(differences(serverModel, clientModel) == 0);
+
+    int bonuseHere = 0;
+    int errorTick = 1266;
+    // 1266
+    for (int i = 0; i < errorTick; i++) {
+        serverModel.nextTick();
+        //        std::cout << serverModel.getTick() << std::endl;
+        //        if
+        //        (!serverModel.getAll(EntityType::WALK_ON_WATER_BONUS).empty())
+        //        {
+        //            bonuseHere++;
+        //        }
+    }
+    serverModel.nextTick();
+    serverModel.finishGame();
+}
+
 TEST_CASE("10 users 30 bots 10 bonuses, check correction") {
     INIT_GAME_FULL(1, 30, 10);
     constexpr int CLIENTS = 10;
