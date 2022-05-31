@@ -150,8 +150,8 @@ const std::vector<std::vector<Entity *>> &GameModel::getAllByLink() {
     return groupedEntities_.getAllByLink();
 }
 
-void GameModel::executeEvent(Event &event) {
-    event.acceptExecutor(EventExecutor(*this));
+bool GameModel::executeEvent(Event &event) {
+    return event.acceptExecutor(EventExecutor(*this));
 }
 
 bool GameModel::wasShootThisTurn() const {

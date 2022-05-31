@@ -493,7 +493,7 @@ TEST_CASE("Shoot static tank") {
     serverModel.finishGame();
 }
 
-TEST_CASE("tank move on bullet") {
+TEST_CASE("TankMoveOnBullet") {
     INIT_GAME_TWO_PLAYERS();
 
     handler.setPosition(TILE_SIZE * 2, TILE_SIZE);
@@ -507,7 +507,7 @@ TEST_CASE("tank move on bullet") {
     serverModel.finishGame();
 }
 
-TEST_CASE("Bullet destroy 2 blocks on creation") {
+TEST_CASE("BulletDestroy2BlocksOnCreation") {
     INIT_GAME();
     handler.setPosition(TILE_SIZE * 10 + TILE_SIZE / 2, TILE_SIZE * 15);
 
@@ -796,7 +796,7 @@ TEST_CASE("10 users 30 bots 10 bonuses, check correction") {
     std::cout << "sleeps: " << sleeps;
 }
 
-TEST_CASE("4 users 4 bots 2 bonuses, check correction") {
+TEST_CASE("Real") {
     INIT_GAME_FULL(1, 4, 2);
     constexpr int CLIENTS = 4;
     constexpr int TICKS = 1e3;
@@ -903,6 +903,11 @@ TEST_CASE("4 users 4 bots 2 bonuses, don't check correction") {
     }).detach();
     std::mutex vec_mutex;
     std::vector<std::reference_wrapper<ClientModel>> vec;
+    static auto timeNow = []() {
+        return std::chrono::milliseconds(
+            std::chrono::steady_clock::now().time_since_epoch().count());
+    };
+
     vec.reserve(CLIENTS);
     for (int i = 0; i < CLIENTS; i++) {
         std::thread([&]() -> void {
@@ -946,12 +951,16 @@ TEST_CASE("4 users 4 bots 2 bonuses, don't check correction") {
     for (int i = 0; i < TICKS; i++) {
         try {
             serverModel.nextTick();
+            std::this_thread::sleep_for(std::chrono::milliseconds(15));
         } catch (boost::system::system_error &e) {
             std::cerr << e.what() << std::endl;
         }
     }
     for (auto &mod : vec) {
+        auto tick = mod.get().getTick();
+        CHECK(tick >= 990);
         std::cout << mod.get().getTick() << ' ';
+        std::cout.flush();
     }
     std::cout << std::endl;
     serverModel.finishGame();

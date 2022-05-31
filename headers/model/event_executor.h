@@ -12,11 +12,11 @@ private:
     explicit EventExecutor(GameModel &model);
 
 public:
-    void execute(TankMove &event) const;
-    void execute(SpawnTank &event) const;
-    void execute(BonusSpawn &event) const;
-    void execute(TankShoot &event) const;
-    void execute(SetPosition &event) const;
+    [[nodiscard]] bool execute(TankMove &event) const;
+    [[nodiscard]] bool execute(SpawnTank &event) const;
+    [[nodiscard]] bool execute(BonusSpawn &event) const;
+    [[nodiscard]] bool execute(TankShoot &event) const;
+    [[nodiscard]] bool execute(SetPosition &event) const;
 
 protected:
     [[nodiscard]] GameModel &getModel() const;

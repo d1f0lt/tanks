@@ -15,8 +15,8 @@ TankMove::TankMove(int tankId, Direction direction, int speed)
     : id_(tankId), direction_(direction), speed_(speed) {
 }
 
-void TankMove::acceptExecutor(const EventExecutor &executor) {
-    executor.execute(*this);
+bool TankMove::acceptExecutor(const EventExecutor &executor) {
+    return executor.execute(*this);
 }
 
 int TankMove::getId() const {
@@ -49,7 +49,6 @@ std::unique_ptr<Event> readEvent(boost::asio::ip::tcp::socket &socket) {
             tmp[EventType::TANK_SHOOT] = TankShoot::readFrom;
             return tmp;
         }();
-
     auto type = static_cast<EventType>(receiveInt(socket));
     assert(static_cast<unsigned>(type) != 0);
     return readers.at(type)(socket);
@@ -60,8 +59,8 @@ void SpawnTank::sendTo(boost::asio::ip::tcp::socket &socket) const {
                      entityType_, tankSpeed_, bulletSpeed_, reloadTicks_);
 }
 
-void SpawnTank::acceptExecutor(const EventExecutor &executor) {
-    executor.execute(*this);
+bool SpawnTank::acceptExecutor(const EventExecutor &executor) {
+    return executor.execute(*this);
 }
 
 std::unique_ptr<Event> SpawnTank::readFrom(tcp::socket &socket) {
@@ -131,8 +130,8 @@ std::unique_ptr<Event> BonusSpawn::readFrom(tcp::socket &socket) {
     return std::make_unique<BonusSpawn>(id, left, top, type);
 }
 
-void BonusSpawn::acceptExecutor(const EventExecutor &executor) {
-    executor.execute(*this);
+bool BonusSpawn::acceptExecutor(const EventExecutor &executor) {
+    return executor.execute(*this);
 }
 
 DecrId BonusSpawn::getId() const {
@@ -151,8 +150,8 @@ EntityType BonusSpawn::getType() const {
     return type_;
 }
 
-void TankShoot::acceptExecutor(const EventExecutor &executor) {
-    executor.execute(*this);
+bool TankShoot::acceptExecutor(const EventExecutor &executor) {
+    return executor.execute(*this);
 }
 
 void TankShoot::sendTo(tcp::socket &socket) const {
@@ -188,8 +187,8 @@ int SetPosition::getTop() const {
     return top_;
 }
 
-void SetPosition::acceptExecutor(const EventExecutor &executor) {
-    executor.execute(*this);
+bool SetPosition::acceptExecutor(const EventExecutor &executor) {
+    return executor.execute(*this);
 }
 
 void SetPosition::sendTo(tcp::socket &socket) const {

@@ -52,14 +52,12 @@ void ServerModel::sendEventsToClients(
             try {
                 sendInt(socket, events.size());
             } catch (boost::system::system_error &e) {
-                auto res = e.what();
             }
             try {
                 for (const auto &event : events) {
                     event->sendTo(socket);
                 }
             } catch (boost::system::system_error &e) {
-                auto res = e.what();
             }
         };
 
@@ -91,8 +89,9 @@ void ServerModel::executeAllEvents() {
         if (spawner->isSpawnNow()) {
             auto event = spawner->createEvent();
             assert(event != nullptr);
-            executeEvent(*event);
-            eventsToSend.emplace_back(std::move(event));
+            if (executeEvent(*event)) {
+                eventsToSend.emplace_back(std::move(event));
+            }
         }
         spawner->nextTick();
     }
@@ -105,15 +104,17 @@ void ServerModel::executeAllEvents() {
             assert(false);
             throw 123;
         }
-        executeEvent(*event);
-        eventsToSend.emplace_back(std::move(event));
+        if (executeEvent(*event)) {
+            eventsToSend.emplace_back(std::move(event));
+        }
     }
 
     for (auto id : bots_) {
         if (getById(id)) {
             auto event = getEventByBot(id);
-            executeEvent(*event);
-            eventsToSend.emplace_back(std::move(event));
+            if (executeEvent(*event)) {
+                eventsToSend.emplace_back(std::move(event));
+            }
         }
     }
 

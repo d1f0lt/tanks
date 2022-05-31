@@ -10,7 +10,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/headers/)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/)
 message("CMake runtime output directory: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
-
 SET(GCC_WARNINGS "-Wall -Wextra ")
 #SET(SANITIZERS "-fsanitize=address,undefined,leak,vptr")
 #SET(SANITIZERS "-fsanitize=undefined")
@@ -18,8 +17,8 @@ SET(GCC_WARNINGS "-Wall -Wextra ")
 #SET(SANITIZERS "-fsanitize=undefined,leak")
 #SET(SANITIZERS "-fsanitize=undefined,vptr,thread")
 
-#SET(GCC_OPTIMIZE "-g") # Latest is integer overflow protection
-#SET(GCC_OPTIMIZE " -O2 -DNDEBUG -mtune=native -ftree-vectorize") # RELEASE
+#SET(GCC_OPTIMIZE "-ggdb -g") # Latest is integer overflow protection
+#SET(GCC_OPTIMIZE "-O3 -DNDEBUG -mtune=native -ftree-vectorize") # RELEASE
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_WARNINGS} ${SANITIZERS} ${GCC_OPTIMIZE}")
 
 find_package(SFML 2.5 COMPONENTS graphics audio REQUIRED)

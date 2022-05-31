@@ -12,20 +12,21 @@ GameModel &EventExecutor::getModel() const {
     return model_;
 }
 
-void EventExecutor::execute(TankMove &event) const {
+bool EventExecutor::execute(TankMove &event) const {
     auto &model = getModel();
     auto tank = model.getById(event.getId());
     if (!tank) {
-        return;
+        return false;
     }
 
     dynamic_cast<TankHandler &>(model.getHandler(*tank))
         .move(event.getDirection(), event.getSpeed());
+    return true;
 }
 
-void EventExecutor::execute(SpawnTank &event) const {
+bool EventExecutor::execute(SpawnTank &event) const {
     if (getModel().getById(event.getTankId())) {
-        return;
+        return false;
     }
 
     switch (event.getType()) {
@@ -37,13 +38,15 @@ void EventExecutor::execute(SpawnTank &event) const {
             break;
         default:
             assert(false);
+            return false;
     }
+    return true;
 }
 
-void EventExecutor::execute(BonusSpawn &event) const {
+bool EventExecutor::execute(BonusSpawn &event) const {
     auto entity = getModel().getById(event.getId());
     if (entity) {
-        return;
+        return false;
     }
     switch (event.getType()) {
         case (EntityType::WALK_ON_WATER_BONUS):
@@ -52,27 +55,30 @@ void EventExecutor::execute(BonusSpawn &event) const {
             break;
         default:
             assert(false);
-            return;
+            return false;
     }
+    return true;
 }
 
-void EventExecutor::execute(TankShoot &event) const {
+bool EventExecutor::execute(TankShoot &event) const {
     auto tank = getModel().getById(event.getTankId());
     if (!tank) {
-        return;
+        return false;
     }
 
     dynamic_cast<TankHandler &>(getModel().getHandler(tank->get()))
         .shoot(event.getDirection());
+    return true;
 }
 
-void EventExecutor::execute(SetPosition &event) const {
+bool EventExecutor::execute(SetPosition &event) const {
     auto entity = getModel().getById(event.getId());
     if (!entity) {
-        return;
+        return false;
     }
     auto &handler =
         dynamic_cast<ForegroundHandler &>(getModel().getHandler(entity->get()));
     handler.setPosition(event.getLeft(), event.getTop());
+    return true;
 }
 }  // namespace Tanks::model

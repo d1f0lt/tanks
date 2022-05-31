@@ -25,7 +25,7 @@ class Event {
 public:
     virtual ~Event() = default;
 
-    virtual void acceptExecutor(const EventExecutor &executor) = 0;
+    virtual bool acceptExecutor(const EventExecutor &executor) = 0;
     virtual void sendTo(tcp::socket &socket) const = 0;
 };
 
@@ -33,7 +33,7 @@ class TankMove : public Event {
 public:
     explicit TankMove(int tankId, Direction direction, int speed);
 
-    void acceptExecutor(const EventExecutor &executor) final;
+    bool acceptExecutor(const EventExecutor &executor) final;
     void sendTo(tcp::socket &socket) const override;
 
     static std::unique_ptr<Event> readFrom(tcp::socket &socket);
@@ -59,7 +59,7 @@ public:
                        int reloadTicks);
 
     void sendTo(tcp::socket &socket) const override;
-    void acceptExecutor(const EventExecutor &executor) override;
+    bool acceptExecutor(const EventExecutor &executor) override;
 
     [[nodiscard]] static std::unique_ptr<Event> readFrom(tcp::socket &socket);
 
@@ -86,7 +86,7 @@ class TankShoot : public Event {
 public:
     TankShoot(const int tankId, const Direction direction);
 
-    void acceptExecutor(const EventExecutor &executor) override;
+    bool acceptExecutor(const EventExecutor &executor) override;
 
     void sendTo(tcp::socket &socket) const override;
     [[nodiscard]] static std::unique_ptr<Event> readFrom(tcp::socket &socket);
@@ -106,7 +106,7 @@ public:
     void sendTo(tcp::socket &socket) const override;
     [[nodiscard]] static std::unique_ptr<Event> readFrom(tcp::socket &socket);
 
-    void acceptExecutor(const EventExecutor &executor) override;
+    bool acceptExecutor(const EventExecutor &executor) override;
 
     [[nodiscard]] DecrId getId() const;
     [[nodiscard]] int getLeft() const;
@@ -124,7 +124,7 @@ class SetPosition : public Event {
 public:
     explicit SetPosition(int id, int left, int top);
 
-    void acceptExecutor(const EventExecutor &executor) override;
+    bool acceptExecutor(const EventExecutor &executor) override;
     void sendTo(tcp::socket &socket) const override;
     [[nodiscard]] static std::unique_ptr<Event> readFrom(tcp::socket &socket);
 
