@@ -30,13 +30,14 @@ struct Environment final {
 public:
     explicit Environment(const std::string &path);
 
-    void draw(sf::RenderWindow &window, Pause &pause) const;
+    void draw(sf::RenderWindow &window, bool isPause) const;
 
-    const Menu::Menu &getMenu() const;
+    [[nodiscard]] const Menu::Menu &getMenu() const;
 
 private:
     mutable Timer timer;
-    Menu::Menu menu;
+    Menu::Menu menu{};
+    sf::Sprite backgroundSprite;
 };
 
 }  // namespace Tanks

@@ -1,8 +1,7 @@
-#include "levels_menu.h"
+#include "menu/levels_menu.h"
 #include <cassert>
 #include "constants.h"
 #include "game.h"
-#include "menu_controller.h"
 
 namespace Tanks::Menu {
 
@@ -25,7 +24,7 @@ Menu initMenu(const std::string &imagesPath) {
     std::vector<InscriptionInfo> inscriptions;
     inscriptions.reserve(quantityElement);
     const static int characterSize = 32;
-    for (int i = 1; i <= quantityElement; ++i) {
+    for (size_t i = 1; i <= quantityElement; ++i) {
         inscriptions.emplace_back(
             InscriptionInfo{std::to_string(i), characterSize, textColor});
     }
@@ -49,12 +48,12 @@ ButtonType showLevelsMenu(sf::RenderWindow &window,
     menu.flyOutFromRight(window, backgroundSprite);
 
     while (window.isOpen()) {
-        const auto res = menu.showMenu(window, backgroundSprite);
+        const auto *res = menu.showMenu(window, backgroundSprite);
         switch (res->getType()) {
             case ButtonType::LEVEL: {
-                auto item =
+                const auto *item =
                     dynamic_cast<const MenuPictureWithDescription *>(res);
-                int level = std::stoi(item->getDescription());
+                size_t level = std::stoi(item->getDescription());
                 if (level > LEVELS_COUNT) {
                     continue;
                 }

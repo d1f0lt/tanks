@@ -1,8 +1,7 @@
-#include "new_game_menu.h"
+#include "menu/new_game_menu.h"
 #include <cassert>
 #include <thread>
-#include "levels_menu.h"
-#include "menu_controller.h"
+#include "menu/levels_menu.h"
 
 namespace Tanks::Menu {
 
@@ -51,7 +50,7 @@ void showNewGameMenu(sf::RenderWindow &window,
     menu.flyOutFromRight(window, backgroundSprite);
 
     while (window.isOpen()) {
-        const auto res = menu.showMenu(window, backgroundSprite);
+        const auto *const res = menu.showMenu(window, backgroundSprite);
         switch (res->getType()) {
             case ButtonType::SINGLE_PLAYER: {
                 menu.flyAwayToLeft(window, backgroundSprite);

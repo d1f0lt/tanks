@@ -54,8 +54,8 @@ public:
 #endif
 
 private:
-    std::vector<std::unique_ptr<MenuItem>> items;
-    constexpr static int animationSpeed = 3;
+    std::vector<std::unique_ptr<MenuItem>> items{};
+    constexpr static int animationSpeed = 4;
 
 #ifndef MENU_TEST
     [[nodiscard]] const std::vector<std::unique_ptr<MenuItem>> &getItems()
@@ -64,10 +64,10 @@ private:
 
     void animation(sf::RenderWindow &window,
                    const sf::Sprite &backgroundSprite,
-                   int stepsAmount,
+                   size_t stepsAmount,
                    float speed_);
 
-    void moveItems(float speed_);
+    void moveItems(float distance);
 
     friend struct Tanks::MenuController;
 };

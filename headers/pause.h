@@ -4,7 +4,7 @@
 #include <SFML/Graphics.hpp>
 #include <memory>
 #include <vector>
-#include "menu.h"
+#include "menu/menu.h"
 
 namespace Tanks {
 
@@ -20,7 +20,7 @@ public:
 
     void checkPause(const sf::Event &event);
 
-    const Menu::Menu &getMenu() const;
+    [[nodiscard]] const Menu::Menu &getMenu() const;
 
     void unpause();
 

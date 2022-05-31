@@ -3,7 +3,7 @@
 #include <memory>
 #include "constants.h"
 #include "doctest.h"
-#include "menu.h"
+#include "menu/menu.h"
 
 using namespace Tanks::Menu;
 

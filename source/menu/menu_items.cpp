@@ -1,5 +1,6 @@
-#include "menu_items.h"
+#include "menu/menu_items.h"
 #include <cassert>
+#include <unordered_map>
 #include "constants.h"
 
 namespace Tanks::Menu {
@@ -21,7 +22,7 @@ std::string convertButtonTypeToString(const ButtonType type) {
 }
 
 Button::Button(const sf::Vector2<float> &size_,
-               const sf::Color &standardColor_,
+               const sf::Color &standardColor_,  // NOLINT
                const sf::Color &hoverColor_)
     : standardColor(standardColor_), hoverColor(hoverColor_), size(size_) {
 }
@@ -132,7 +133,7 @@ void MenuInscription::setPosition(sf::Vector2<float> newPosition) {
 }
 
 std::string MenuInscription::getContent() const {
-    return std::string(text.getString());
+    return static_cast<std::string>(text.getString());
 }
 
 MenuButton::MenuButton(std::unique_ptr<MenuItem> &&content_,
@@ -140,8 +141,8 @@ MenuButton::MenuButton(std::unique_ptr<MenuItem> &&content_,
                        ButtonWithType info_)
     : MenuItem(coordinates),
       content(std::move(content_)),
-      info(info_),
-      rectangle(info_.getSize()) {
+      rectangle(info_.getSize()),
+      info(info_) {
     rectangle.setFillColor(info.getStandardColor());
     setPosition(coordinates);  // NOLINT
 }
@@ -175,6 +176,18 @@ void MenuButton::setPosition(sf::Vector2<float> newPosition) {
         {getPosition().x, getPosition().x + getSize().x});
     content->centralizeByHeight(
         {getPosition().y, getPosition().y + getSize().y});
+}
+
+MenuItem *MenuButton::getContent() const {
+    return content.get();
+}
+
+sf::RectangleShape &MenuButton::getRectangle() const {
+    return rectangle;
+}
+
+const ButtonWithType &MenuButton::getButtonInfo() const {
+    return info;
 }
 
 MenuPicture::MenuPicture(const std::string &filename,
@@ -212,8 +225,6 @@ void MenuPicture::draw(sf::RenderWindow &window) const {
     window.draw(sprite);
 }
 
-#define picture content
-
 MenuPictureWithDescription::MenuPictureWithDescription(
     std::unique_ptr<MenuPicture> &&picture_,
     std::unique_ptr<MenuInscription> &&description_,
@@ -223,32 +234,35 @@ MenuPictureWithDescription::MenuPictureWithDescription(
                  coordinates,
                  ButtonWithType(btnInfo, ButtonType::LEVEL)),
       description(std::move(description_)) {
+    const auto *picture = getContent();
     assert(picture->getSize().x >= description->getSize().x);
-    rectangle.setSize(sf::Vector2<float>(
+    getRectangle().setSize(sf::Vector2<float>(
         picture->getSize().x,
         picture->getSize().y + 2 * TEXT_MARGIN + description->getSize().y));
     setPosition(coordinates);
 }
 
 void MenuPictureWithDescription::draw(sf::RenderWindow &window) const {
-    window.draw(rectangle);
-    picture->draw(window);
+    window.draw(getRectangle());
+    getContent()->draw(window);
     description->draw(window);
-    rectangle.setFillColor(
-        info.getStandardColor());  // recover after possible hover;
+    getRectangle().setFillColor(
+        getButtonInfo().getStandardColor());  // recover after possible hover;
 }
 
 sf::Vector2<float> MenuPictureWithDescription::getSize() const {
-    return rectangle.getSize();
+    return getRectangle().getSize();
 }
 
 sf::Vector2<float> MenuPictureWithDescription::getPosition() const {
-    return rectangle.getPosition();
+    return getRectangle().getPosition();
 }
 
 void MenuPictureWithDescription::setPosition(sf::Vector2<float> newPosition) {
+    auto &rectangle = getRectangle();
+    auto *picture = getContent();
     rectangle.setPosition(newPosition);
-    picture->setPosition(getPosition());
+    getContent()->setPosition(getPosition());
     description->centralizeByHeight(
         {rectangle.getPosition().y + picture->getSize().y,
          rectangle.getPosition().y + rectangle.getSize().y});

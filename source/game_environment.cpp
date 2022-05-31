@@ -1,7 +1,7 @@
 #include "game_environment.h"
 #include <cassert>
 #include "constants.h"
-#include "menu_controller.h"
+#include "menu/menu.h"
 
 namespace Tanks {
 
@@ -9,8 +9,21 @@ namespace {
 
 std::string numberWithLeftZeros(int num, size_t numberLength) {
     std::string numStr(std::to_string(num));
-    assert(numStr.size() <= numberLength);
+    assert(numStr.size() <= static_cast<size_t>(numberLength));
     return std::string("0", numberLength - numStr.size()) + numStr;
+}
+
+sf::Sprite initBackground(const std::string &path) {
+    static const std::string backgroundImageFilename = path + "background.png";
+    sf::Image backgroundImage;
+    backgroundImage.loadFromFile(backgroundImageFilename);
+    static sf::Texture backgroundTexture;  // so that the texture isn't
+                                           // destroyed after the function exits
+    backgroundTexture.loadFromImage(backgroundImage);
+    sf::Sprite backgroundSprite;
+    backgroundSprite.setTexture(backgroundTexture);
+    backgroundSprite.setPosition(0, 0);
+    return backgroundSprite;
 }
 
 }  // namespace
@@ -70,12 +83,13 @@ void Timer::nextTick() {
 }
 
 Environment::Environment(const std::string &path)
-    : timer(path + "timer.png"), menu() {
+    : timer(path + "timer.png"), backgroundSprite(initBackground(path)) {
     menu.addIconToLeftUpCorner(path + "pause.png", Menu::ButtonType::PAUSE);
 }
 
-void Environment::draw(sf::RenderWindow &window, Pause &pause) const {
-    if (!pause.isPause()) {
+void Environment::draw(sf::RenderWindow &window, bool isPause) const {
+    window.draw(backgroundSprite);
+    if (!isPause) {
         timer.nextTick();
         menu.draw(window);
     } else {
@@ -87,4 +101,5 @@ void Environment::draw(sf::RenderWindow &window, Pause &pause) const {
 const Menu::Menu &Environment::getMenu() const {
     return menu;
 }
+
 }  // namespace Tanks

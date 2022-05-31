@@ -2,6 +2,7 @@
 #define MENU_ITEMS_H
 
 #include <SFML/Graphics.hpp>
+#include <memory>
 
 namespace Tanks::Menu {
 
@@ -41,24 +42,29 @@ public:
     void centralizeByHeight(
         const std::pair<float, float> &rectangleCoordinatesY);
 
+    MenuItem() = default;
+    MenuItem(const MenuItem &) = default;
+    MenuItem(MenuItem &&) = default;
+    MenuItem &operator=(const MenuItem &) = default;
+    MenuItem &operator=(MenuItem &&) = default;
     virtual ~MenuItem() = default;
 
 private:
     sf::Vector2<float>
-        standardCoordinates;  // for animation, if the MenuItem is contained
-                              // within another MenuItem, then the values may
-                              // most likely be incorrect
+        standardCoordinates{};  // for animation, if the MenuItem is contained
+                                // within another MenuItem, then the values may
+                                // most likely be incorrect
 };
 
 struct InscriptionInfo final {
-    const std::string inscription;
-    const size_t characterSize;
-    const sf::Color textColor;
+    const std::string inscription{};
+    const size_t characterSize{};
+    const sf::Color textColor{};
 };
 
 struct MenuInscription final : MenuItem {
 public:
-    explicit MenuInscription(const InscriptionInfo &info,
+    explicit MenuInscription(const InscriptionInfo &parameters,
                              const sf::Vector2<float> &coordinates);
 
     [[nodiscard]] sf::Vector2<float> getSize() const final;
@@ -80,13 +86,13 @@ public:
            const sf::Color &standardColor_,
            const sf::Color &hoverColor_);
 
+    [[nodiscard]] const sf::Vector2<float> &getSize() const;
     [[nodiscard]] const sf::Color &getStandardColor() const;
     [[nodiscard]] const sf::Color &getHoverColor() const;
-    [[nodiscard]] const sf::Vector2<float> &getSize() const;
 
     void setSize(const sf::Vector2<float> &newSize);
 
-protected:
+private:
     const sf::Color standardColor;
     const sf::Color hoverColor;
     sf::Vector2<float> size;
@@ -113,7 +119,7 @@ public:
                const sf::Vector2<float> &coordinates,
                ButtonWithType info);
 
-    ButtonType getType() const;
+    [[nodiscard]] ButtonType getType() const;
 
     void hover();
 
@@ -125,6 +131,11 @@ public:
     void draw(sf::RenderWindow &window) const override;
 
 protected:
+    [[nodiscard]] MenuItem *getContent() const;
+    [[nodiscard]] sf::RectangleShape &getRectangle() const;
+    [[nodiscard]] const ButtonWithType &getButtonInfo() const;
+
+private:
     std::unique_ptr<MenuItem> content;
     mutable sf::RectangleShape rectangle;  // we want draw to be a const
     ButtonWithType info;
