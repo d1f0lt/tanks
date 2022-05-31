@@ -2,14 +2,14 @@ name: github_ubuntu
 on: [ push ]
 jobs:
   clang-format:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     timeout-minutes: 1
     steps:
       - uses: actions/checkout@v3
       - run: clang-format-12 --version
       - run: for file in $(find . -iname '*.cpp' -or -iname '*.c' -or -iname '*.h' -and -not -iname 'doctest.h' ); do diff -u <(cat "$file") <(clang-format-12 "$file") || exit 1; done
   clang-tidy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v3
@@ -18,7 +18,7 @@ jobs:
       - run: ls
       - run: clang-tidy-12 --config-file='./.clang-tidy' $(find . -path '*/CMakeFiles/*' -prune -or \( -iname '*.cpp' -and -not -iname '*tests.cpp' -or -iname '*.h' -and -not -iname 'doctest.h' \) -print) -- -Iheaders
   cppcheck:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     timeout-minutes: 1
     steps:
       - uses: actions/checkout@v3
@@ -34,19 +34,19 @@ jobs:
           - command: g++-10
             version-flags: --version
             flags:
-            runs-on: ubuntu-latest
+            runs-on: ubuntu-20.04
             packages: g++-10 gcc-10
             target:
           - command: clang++-12
             version-flags: --version
             flags: -stdlib=libstdc++
             packages: clang-12
-            runs-on: ubuntu-latest
+            runs-on: ubuntu-20.04
             target:
           - command: clang++-12
             version-flags: --version
             flags: -stdlib=libc++
-            runs-on: ubuntu-latest
+            runs-on: ubuntu-20.04
             packages: clang-12 libc++-12-dev libc++abi-12-dev
             target: --target model_tests
         sanitize:
