@@ -48,6 +48,11 @@ public:
         return q.size();
     }
 
+    void Produce(const T &item) {
+        T buff = item;
+        Produce(std::move(buff));
+    }
+
     [[nodiscard]] bool Consume(T &item) {
         try {
             std::lock_guard<std::mutex> lock(mtx);

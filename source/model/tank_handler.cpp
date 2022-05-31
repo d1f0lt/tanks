@@ -63,11 +63,9 @@ void TankHandler::move(Direction direction, int speed) {
             if (!entity) {
                 continue;
             }
-            Bonus *bonus;
-            if (bonus = dynamic_cast<Bonus *>(&entity->get()); !bonus) {
-                continue;
+            if (Bonus *bonus = dynamic_cast<Bonus *>(&entity->get())) {
+                bonus->apply(dynamic_cast<Tank &>(getEntity()));
             }
-            bonus->apply(dynamic_cast<Tank &>(getEntity()));
         }
     }
 }

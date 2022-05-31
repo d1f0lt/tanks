@@ -31,10 +31,7 @@ void ClientModel::receiveEvents() {
             if (count == -1) {
                 return;
             }
-            {
-                int countCopy = count;
-                tickSize_.Produce(std::move(countCopy));
-            }
+            tickSize_.Produce(count);
             for (int i = 0; i < count; i++) {
                 events_.Produce(readEvent(socket_));
             }
@@ -45,9 +42,9 @@ void ClientModel::receiveEvents() {
             log.close();
 #endif
         }
-    } catch (boost::system::system_error &e) {
+    } catch (boost::system::system_error &) {
         return;
-    } catch (std::system_error &e) {
+    } catch (std::system_error &) {
 #ifndef NDEBUG
         static std::fstream log("log_client.txt");
         log << getTick() << ' ' << e.what() << std::endl;

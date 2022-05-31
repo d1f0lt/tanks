@@ -23,7 +23,6 @@ class ServerModel : public GameModel {
     friend Spawner;
 
 public:
-    virtual ~ServerModel();
     explicit ServerModel(int level = 1, int botsCount = 0, int bonuses = 0);
     explicit ServerModel(const std::string &level,
                          int botsCount = 0,

@@ -12,7 +12,7 @@ using boost::asio::ip::tcp;
 
 class ClientModel : public GameModel {
 public:
-    ~ClientModel() noexcept;
+    ~ClientModel() noexcept override;
     explicit ClientModel(int playerId, tcp::socket socket);
 
     [[nodiscard]] PlayerActionsHandler getHandler();

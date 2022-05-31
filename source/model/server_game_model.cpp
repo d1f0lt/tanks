@@ -96,7 +96,7 @@ void ServerModel::executeAllEvents() {
         spawner->nextTick();
     }
 
-    int size = events_.Size();
+    int size = static_cast<int>(events_.Size());
 
     for (; size > 0; --size) {
         std::unique_ptr<Event> event;
@@ -177,10 +177,6 @@ DecrId ServerModel::getDecrId() {
 
 void ServerModel::addEvent(std::unique_ptr<Event> event) {
     events_.Produce(std::move(event));
-}
-
-ServerModel::~ServerModel() {
-    //    finishGame();
 }
 
 void ServerModel::finishGame() {

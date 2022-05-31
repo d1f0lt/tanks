@@ -7,8 +7,10 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/headers/)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/)
 message("CMake runtime output directory: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
 
-SET(GCC_WARNINGS "-Wall -Wextra")
+SET(GCC_WARNINGS "-Wall -Wextra -pthread")
 #SET(SANITIZERS "-fsanitize=address,undefined,leak,vptr")
 #SET(GCC_OPTIMIZE "-ggdb -g -ftrapv") # Latest is integer overflow protection
 #SET(GCC_OPTIMIZE "-O2 -DNDEBUG -mtune=native") # RELEASE
@@ -93,3 +95,4 @@ add_executable(
 target_link_libraries(model_tests sfml-graphics)
 target_link_libraries(menu_tests sfml-graphics)
 target_link_libraries(tanks sfml-graphics)
+

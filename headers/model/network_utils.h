@@ -11,8 +11,8 @@ using boost::asio::ip::tcp;
 using transferIntType = std::int32_t;
 
 template <typename T>
-void sendInt(tcp::socket &socket, T a) {
-    auto buff = static_cast<transferIntType>(a);
+void sendInt(tcp::socket &socket, T value) {
+    auto buff = static_cast<transferIntType>(value);
 
     boost::asio::write(
         socket, buffer(reinterpret_cast<const char *>(&buff), sizeof(buff)),
