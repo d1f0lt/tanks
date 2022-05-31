@@ -1,3 +1,4 @@
+/*
 #ifndef TANKS_TANK_SPAWNER_H
 #define TANKS_TANK_SPAWNER_H
 
@@ -30,3 +31,4 @@ private:
 }  // namespace Tanks::model
 
 #endif  // TANKS_TANK_SPAWNER_H
+*/

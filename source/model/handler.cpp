@@ -46,48 +46,42 @@ void BasicHandler::destroyEntity() {
     getModel().eraseEntity(getEntity());
 }
 
+BasicHandler *BasicHandler::getActualHandler(Entity &entity) {
+    return &entity.getHandler();
+}
+
 std::vector<const Entity *> MovableHandler::look(Direction direction) {
     auto res = lookMutable(direction);
     return {res.begin(), res.end()};
 }
 
-void ForegroundHandler::restoreBackground() {
-    std::unordered_set<int> restored;
-    for (auto &row : getBackground()) {
-        for (int id : row) {
-            if (restored.count(id) != 0) {
-                continue;
-            }
-            auto entity = getModel().getById(id);
-            if (!entity) {
-                continue;
-            }
-            restored.insert(id);
-            getModel().getMap().insert(*entity);
+std::vector<int> ForegroundHandler::restoreBackground() {
+    for (int id : getBackground()) {
+        auto entity = getModel().getById(id);
+        if (!entity) {
+            continue;
         }
-        row.clear();
+        getModel().getMap().insert(*entity);
     }
+    return std::move(getBackground());
 }
 
 void ForegroundHandler::setBackground() {
+    std::unordered_set<int> setted;
     auto &background = getBackground();
-
-    if (background.empty()) {
-        background.resize(getEntity().getHeight(),
-                          std::vector<int>(getEntity().getWidth(), 0));
-    }
-
     auto &entity = getEntity();
-
     int top = entity.getTop();
     int left = entity.getLeft();
     int height = entity.getHeight();
     int width = entity.getWidth();
-    for (int row = entity.getTop(); row < entity.getTop() + height; row++) {
-        background[row - top].resize(width);
+    for (int row = entity.getTop(); row < top + height; row++) {
         for (int col = entity.getLeft(); col < left + width; col++) {
-            background[row - top][col - left] =
-                getModel().getByCoords(col, row).getId();
+            auto id = getModel().getByCoords(col, row).getId();
+            if (setted.find(id) != setted.end()) {
+                continue;
+            }
+            setted.insert(id);
+            background.emplace_back(id);
         }
     }
     getModel().map_.insert(entity);
@@ -97,27 +91,28 @@ ForegroundHandler::ForegroundHandler(GameModel &model, ForegroundEntity &entity)
     : BasicHandler(model, entity) {
 }
 
-std::vector<std::vector<int>> ForegroundHandler::snapshotBackground() const {
-    const auto &background = getBackground();
-
-    std::vector<std::vector<int>> vec;
-    vec.reserve(getEntity().getHeight());
-    for (const auto &line : background) {
-        vec.emplace_back(line.begin(), line.end());
-    }
-    return vec;
+std::vector<int> ForegroundHandler::snapshotBackground() const {
+    //    const auto &background = getBackground();
+    //
+    //    std::vector<std::vector<int>> vec;
+    //    vec.reserve(getEntity().getHeight());
+    //    for (const auto &line : background) {
+    //        vec.emplace_back(line.begin(), line.end());
+    //    }
+    return getBackground();
 }
 
 MovableHandler::MovableHandler(GameModel &model, MovableEntity &entity)
     : ForegroundHandler(model, entity) {
 }
 
-void MovableHandler::move(Direction direction, int speed) {
+bool MovableHandler::move(Direction direction, int speed) {
     restoreBackground();
     if (!moveOnly(direction, speed)) {
-        return;
+        return false;
     }
     setBackground();
+    return true;
 }
 
 std::vector<Entity *> MovableHandler::lookMutable(Direction direction) {
@@ -184,11 +179,11 @@ void ForegroundHandler::destroyEntity() {
     BasicHandler::destroyEntity();
 }
 
-std::vector<std::vector<int>> &ForegroundHandler::getBackground() {
+std::vector<int> &ForegroundHandler::getBackground() {
     return dynamic_cast<ForegroundEntity &>(getEntity()).background_;
 }
 
-const std::vector<std::vector<int>> &ForegroundHandler::getBackground() const {
+const std::vector<int> &ForegroundHandler::getBackground() const {
     return dynamic_cast<ForegroundEntity &>(getEntity()).background_;
 }
 
@@ -202,9 +197,8 @@ bool MovableHandler::moveOnly(Direction direction, int speed) {
     movable.setDirection(direction);
 
     int dist = speed;
-    auto block = nearest(direction, [&movable](const Entity *entity) {
-        return !movable.canPass(*entity);
-    });
+    auto block = nearest(
+        direction, [&](const Entity *entity) { return !canStandOn(*entity); });
 
     if (!block.empty()) {
         dist = std::min(dist, getEntity().dist(*block[0]) - 1);
@@ -313,6 +307,8 @@ void WalkOnWaterHandler::apply(Tank &tank) {
     tank.getAccessToHandler().reset();
     tank.getAccessToHandler() = std::make_unique<TankMovableOnWaterHandler>(
         getModel(), tank, getModel().getTick());
+    dynamic_cast<ForegroundHandler &>(*tank.getAccessToHandler())
+        .setBackground();
     ForegroundHandler::destroyEntity();
 }
 }  // namespace Tanks::model

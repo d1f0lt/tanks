@@ -3,6 +3,7 @@
 
 #include <climits>
 #include <memory>
+#include <unordered_set>
 #include <vector>
 #include "constants.h"
 #include "model/entities_fwd.h"
@@ -30,6 +31,8 @@ protected:
     [[nodiscard]] Entity &getEntity() const;
     [[nodiscard]] GameModel &getModel() const;
 
+    [[nodiscard]] static BasicHandler *getActualHandler(Entity &entity);
+
 private:
     GameModel &model_;
     Entity &entity_;
@@ -40,17 +43,19 @@ public:
     explicit ForegroundHandler(GameModel &model, ForegroundEntity &entity);
 
     void setBackground();
-    void restoreBackground();
+    std::vector<int> restoreBackground();
     void destroyEntity() override;
-    [[nodiscard]] std::vector<std::vector<int>> snapshotBackground() const;
+    [[nodiscard]] std::vector<int> snapshotBackground() const;
 
     void setPosition(int left, int top);
 
     void destroyByBullet() override;
 
+protected:
+    [[nodiscard]] std::vector<int> &getBackground();
+
 private:
-    [[nodiscard]] std::vector<std::vector<int>> &getBackground();
-    [[nodiscard]] const std::vector<std::vector<int>> &getBackground() const;
+    [[nodiscard]] const std::vector<int> &getBackground() const;
 };
 
 class MovableHandler : public ForegroundHandler {
@@ -58,11 +63,11 @@ public:
     explicit MovableHandler(GameModel &model, MovableEntity &entity);
 
     [[nodiscard]] std::vector<const Entity *> look(Direction direction);
-    virtual void move(Direction direction, int speed);
+    [[nodiscard]] virtual bool move(Direction direction, int speed);
     void setDirection(Direction direction);
 
 protected:
-    bool moveOnly(Direction direction, int speed);
+    [[nodiscard]] bool moveOnly(Direction direction, int speed);
 
     [[nodiscard]] std::vector<Entity *> lookMutable(Direction direction);
 

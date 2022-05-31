@@ -2,6 +2,7 @@
 #define TANKS_FOREGROUND_ENTITY_H
 
 #include <memory>
+#include <unordered_set>
 #include <vector>
 #include "entity.h"
 #include "model/handler_fwd.h"
@@ -18,10 +19,10 @@ public:
 
     [[nodiscard]] std::vector<const Entity *> look(Direction direction) const;
 
-    [[nodiscard]] std::vector<std::vector<int>> snapshotBackground() const;
+    [[nodiscard]] std::vector<int> snapshotBackground() const;
 
 private:
-    std::vector<std::vector<int>> background_;
+    std::vector<int> background_;
 };
 
 }  // namespace Tanks::model

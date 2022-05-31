@@ -8,13 +8,12 @@ class TankHandler : public MovableHandler {
 public:
     explicit TankHandler(GameModel &model, Tank &entity);
 
-    void move(Direction direction, int speed) override;
-    void move(Direction direction);
+    [[nodiscard]] bool move(Direction direction, int speed) override;
+    [[nodiscard]] bool move(Direction direction);
     virtual void shoot();
     void shoot(Direction direction);
 
-protected:
-    void tryApplyBonus();
+    void applyBonusesInBackground();
 
 private:
     int lastMoveTick_ = -1;
@@ -27,7 +26,7 @@ public:
                                        Tank &entity,
                                        int beginLive);
 
-    void move(Direction dir, int speed) override;
+    bool move(Direction dir, int speed) override;
     void shoot() final;
 
     [[nodiscard]] bool canStandOn(const Entity &other) const override;

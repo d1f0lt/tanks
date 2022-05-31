@@ -337,17 +337,16 @@ TEST_CASE("Tank simple shoot") {
     handler.move(Direction::RIGHT, 0);
     handler.shoot();
     auto &bullet = dynamic_cast<Projectile &>(
-        serverModel.getByCoords(Tanks::TILE_SIZE + Tanks::TANK_SIZE,
-                                Tanks::TILE_SIZE + Tanks::TANK_SIZE / 2));
+        const_cast<Entity &>(*serverModel.getAll(EntityType::BULLET)[0]));
 
     CHECK(bullet.getType() == Tanks::model::EntityType::BULLET);
-    CHECK(bullet.getTop() == Tanks::TILE_SIZE + Tanks::TANK_SIZE / 2);
-    CHECK(bullet.getLeft() == Tanks::TILE_SIZE + Tanks::TANK_SIZE);
+    CHECK(bullet.getTop() == Tanks::TILE_SIZE + Tanks::TANK_SIZE / 2 - 12);
+    CHECK(bullet.getLeft() == Tanks::TILE_SIZE + Tanks::TANK_SIZE + 4);
     CHECK(bullet.getDirection() == tank.getDirection());
 
     serverModel.nextTick();
-    CHECK(bullet.getTop() == Tanks::TILE_SIZE + Tanks::TANK_SIZE / 2);
-    CHECK(bullet.getLeft() == TILE_SIZE + TANK_SIZE + bullet.getSpeed());
+    CHECK(bullet.getTop() == Tanks::TILE_SIZE + Tanks::TANK_SIZE / 2 - 12);
+    CHECK(bullet.getLeft() == TILE_SIZE + TANK_SIZE + bullet.getSpeed() + 4);
     serverModel.finishGame();
 }
 
@@ -357,17 +356,17 @@ TEST_CASE("Shoot, bullet die") {
     handler.setDirection(Direction::RIGHT);
     handler.shoot();
     auto &bullet = dynamic_cast<Projectile &>(
-        serverModel.getByCoords(Tanks::TILE_SIZE + Tanks::TANK_SIZE,
-                                Tanks::TILE_SIZE + Tanks::TANK_SIZE / 2));
+        serverModel.getByCoords(Tanks::TILE_SIZE + Tanks::TANK_SIZE + 4,
+                                Tanks::TILE_SIZE + Tanks::TANK_SIZE / 2 - 12));
 
     CHECK(bullet.getType() == Tanks::model::EntityType::BULLET);
-    CHECK(bullet.getTop() == Tanks::TILE_SIZE + Tanks::TANK_SIZE / 2);
-    CHECK(bullet.getLeft() == Tanks::TILE_SIZE + Tanks::TANK_SIZE);
+    CHECK(bullet.getTop() == Tanks::TILE_SIZE + Tanks::TANK_SIZE / 2 - 12);
+    CHECK(bullet.getLeft() == Tanks::TILE_SIZE + Tanks::TANK_SIZE + 4);
     CHECK(bullet.getDirection() == tank.getDirection());
 
     serverModel.nextTick();
-    CHECK(bullet.getTop() == Tanks::TILE_SIZE + Tanks::TANK_SIZE / 2);
-    CHECK(bullet.getLeft() == TILE_SIZE + TANK_SIZE + bullet.getSpeed());
+    CHECK(bullet.getTop() == Tanks::TILE_SIZE + Tanks::TANK_SIZE / 2 - 12);
+    CHECK(bullet.getLeft() == TILE_SIZE + TANK_SIZE + bullet.getSpeed() + 4);
     for (int i = 0; i < 50; i++) {
         serverModel.nextTick();
     }
@@ -386,8 +385,8 @@ TEST_CASE("3 Bullets destroy 3 bricks") {
     for (auto [x, y] : COORDS) {
         handler.shoot();
         auto &bullet = dynamic_cast<Projectile &>(
-            serverModel.getByCoords(tank.getLeft() + tank.getWidth(),
-                                    tank.getTop() + tank.getHeight() / 2));
+            serverModel.getByCoords(tank.getLeft() + tank.getWidth() + 4,
+                                    tank.getTop() + tank.getHeight() / 2 - 12));
 
         auto &brick = serverModel.getByCoords(x, y);
         int t = bullet.dist(brick) / DEFAULT_BULLET_SPEED +
@@ -417,8 +416,8 @@ TEST_CASE("Bullet fly above water") {
     CHECK(water.getType() == Tanks::model::EntityType::WATER);
     handler.shoot();
     auto &bullet = dynamic_cast<Projectile &>(
-        serverModel.getByCoords(tank.getLeft() + tank.getWidth(),
-                                tank.getTop() + tank.getHeight() / 2));
+        serverModel.getByCoords(tank.getLeft() + tank.getWidth() + 4,
+                                tank.getTop() + tank.getHeight() / 2 - 12));
 
     int tWater = bullet.dist(water) / DEFAULT_BULLET_SPEED +
                  (bullet.dist(water) % DEFAULT_BULLET_SPEED != 0);
@@ -496,7 +495,7 @@ TEST_CASE("Shoot static tank") {
 TEST_CASE("TankMoveOnBullet") {
     INIT_GAME_TWO_PLAYERS();
 
-    handler.setPosition(TILE_SIZE * 2, TILE_SIZE);
+    handler.setPosition(TILE_SIZE * 2 + BULLET_SIZE, TILE_SIZE);
     handler2.setPosition(TILE_SIZE, TILE_SIZE);
 
     handler.setDirection(Direction::LEFT);

@@ -48,6 +48,7 @@ private:
 
 class Entity {
     friend WalkOnWaterHandler;
+    friend BasicHandler;
     //    friend ForegroundHandler;
 
 public:
@@ -77,7 +78,7 @@ public:
 
     [[nodiscard]] virtual bool isTankPassable() const;
     [[nodiscard]] virtual bool isBulletPassable() const;
-    [[nodiscard]] bool canPass(const Entity &other) const;
+    [[nodiscard]] bool canStandOn(const Entity &other) const;
 
 protected:
     void setTop(int top);

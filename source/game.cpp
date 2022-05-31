@@ -33,7 +33,7 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
     const std::string levelFilename("../levels/level" + std::to_string(level) +
                                     ".csv");
 
-    Server server(levelFilename, 4, 2);
+    Server server(levelFilename, 4, 100);
 
     boost::asio::io_context ioContext;
     tcp::socket clientSocket(ioContext);

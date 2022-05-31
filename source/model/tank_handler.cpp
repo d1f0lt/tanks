@@ -18,21 +18,21 @@ void TankHandler::shoot() {
     getModel().wasShootThisTurn_ = true;
     lastShootTick_ = getModel().getTick();
 
-    static const std::unordered_map<Direction, int> DCOL = {
-        {Direction::UP, getEntity().getWidth() / 2},
-        {Direction::DOWN, getEntity().getWidth() / 2},
-        {Direction::RIGHT, getEntity().getWidth()},
-        {Direction::LEFT, -1}};
+    static const std::unordered_map<Direction, int> DIFF_LEFT = {
+        {Direction::UP, getEntity().getWidth() / 2 - 5},
+        {Direction::DOWN, getEntity().getWidth() / 2 - 5},
+        {Direction::RIGHT, getEntity().getWidth() + 4},
+        {Direction::LEFT, -1 - 11}};
 
-    static const std::unordered_map<Direction, int> DROW = {
-        {Direction::UP, -1},
-        {Direction::DOWN, getEntity().getHeight()},
-        {Direction::RIGHT, getEntity().getHeight() / 2},
-        {Direction::LEFT, getEntity().getHeight() / 2}};
+    static const std::unordered_map<Direction, int> DIFF_TOP = {
+        {Direction::UP, -1 - 9},
+        {Direction::DOWN, getEntity().getHeight() + 3},
+        {Direction::RIGHT, getEntity().getHeight() / 2 - 12},
+        {Direction::LEFT, getEntity().getHeight() / 2 - 12}};
 
     auto projectile = std::make_unique<Projectile>(
-        getEntity().getLeft() + DCOL.at(tank.getDirection()),
-        getEntity().getTop() + DROW.at(tank.getDirection()),
+        getEntity().getLeft() + DIFF_LEFT.at(tank.getDirection()),
+        getEntity().getTop() + DIFF_TOP.at(tank.getDirection()),
         tank.getDirection(), getModel(), getModel().getIncrId());
 
     auto &handler =
@@ -45,44 +45,55 @@ void TankHandler::shoot() {
     getModel().addEntity(std::move(projectile));
 }
 
-void TankHandler::move(Direction direction, int speed) {
+bool TankHandler::move(Direction direction, int speed) {
     if (getModel().getTick() <= std::max(lastShootTick_, lastMoveTick_)) {
-        return;
+        return false;
     }
 
     lastMoveTick_ = getModel().getTick();
     restoreBackground();
     if (!MovableHandler::moveOnly(direction, speed)) {
-        return;
-    }
-
-    auto &model = getModel();
-
-    setBackground();
-    auto background = snapshotBackground();
-    restoreBackground();
-    auto &tank = dynamic_cast<Tank &>(getEntity());
-    for (const auto &row : background) {
-        for (int entityId : row) {
-            auto entity = model.getById(entityId);
-            if (!entity) {
-                continue;
-            }
-            if (Bonus *bonus = dynamic_cast<Bonus *>(&entity->get())) {
-                bonus->apply(tank);
-            }
-        }
+        return false;
     }
     setBackground();
+    applyBonusesInBackground();
+    return true;
 }
 
-void TankHandler::move(Direction direction) {
-    move(direction, dynamic_cast<Tank &>(getEntity()).getSpeed());
+bool TankHandler::move(Direction direction) {
+    return move(direction, dynamic_cast<Tank &>(getEntity()).getSpeed());
 }
 
 void TankHandler::shoot(Direction direction) {
     setDirection(direction);
     shoot();
+}
+
+void TankHandler::applyBonusesInBackground() {
+    auto &background = getBackground();
+    auto &model = getModel();
+    auto &tank = dynamic_cast<Tank &>(getEntity());
+    std::vector<Bonus *> bonuses;
+    for (unsigned i = 0; i < background.size(); i++) {
+        auto entity = model.getById(background[i]);
+        if (!entity) {
+            std::swap(background[i], background.back());
+            background.pop_back();
+            continue;
+        }
+        Bonus *bonus = nullptr;
+        if (bonus = dynamic_cast<Bonus *>(&entity->get()); bonus == nullptr) {
+            continue;
+        }
+        bonuses.emplace_back(bonus);
+    }
+    if (bonuses.empty()) {
+        return;
+    }
+    restoreBackground();
+    for (auto *bonus : bonuses) {
+        bonus->apply(tank);
+    }
 }
 
 void TankMovableOnWaterHandler::stopBonus() {
@@ -94,9 +105,16 @@ TankMovableOnWaterHandler::TankMovableOnWaterHandler(GameModel &model,
     : TankHandler(model, entity), beginLive_(beginLive) {
 }
 
-void TankMovableOnWaterHandler::move(Direction dir, int speed) {
-    TankHandler::move(dir, speed);
+bool TankMovableOnWaterHandler::move(Direction dir, int speed) {
+    auto &entity = getEntity();
+    if (!TankHandler::move(dir, speed)) {
+        return false;
+    }
+    if (getActualHandler(entity) != this) {
+        return true;
+    }
     stopBonus();
+    return true;
 }
 
 void TankMovableOnWaterHandler::shoot() {

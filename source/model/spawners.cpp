@@ -39,7 +39,7 @@ std::pair<int, int> Spawner::getFreeCoords() {
 
         for (int row = top; row < down && ok; row++) {
             for (int col = left; col < right && ok; col++) {
-                if (!entity->canPass(model_.getByCoords(col, row))) {
+                if (!entity->canStandOn(model_.getByCoords(col, row))) {
                     ok = false;
                 }
             }

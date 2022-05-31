@@ -8,13 +8,14 @@ ForegroundEntity::ForegroundEntity(int left,
                                    int entityId,
                                    std::unique_ptr<ForegroundHandler> handler)
     : Entity(left, top, entityId, std::move(handler)) {
+    background_.reserve(16);
 }
 
 std::vector<const Entity *> ForegroundEntity::look(Direction direction) const {
     return dynamic_cast<MovableHandler &>(getHandler()).look(direction);
 }
 
-std::vector<std::vector<int>> ForegroundEntity::snapshotBackground() const {
+std::vector<int> ForegroundEntity::snapshotBackground() const {
     return dynamic_cast<ForegroundHandler &>(getHandler()).snapshotBackground();
 }
 
