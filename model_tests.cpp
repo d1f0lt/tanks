@@ -177,6 +177,7 @@ TEST_CASE("Network functions") {
         send.join();
     }
 }
+/*
 
 TEST_CASE("Single move. Online") {
     //    INIT_GAME();
@@ -689,7 +690,6 @@ TEST_CASE("Bonus") {
     serverModel.finishGame();
 }
 
-/*
 
 TEST_CASE("Bots, bonuses stress") {
     INIT_GAME_FULL(1, 40, 10);
@@ -966,3 +966,4 @@ TEST_CASE("4 users 4 bots 2 bonuses, don't check correction") {
     serverModel.finishGame();
     std::cout << "sleeps: " << sleeps << std::endl;
 }
+
