@@ -68,6 +68,8 @@ add_executable(
         source/view/game_view.cpp
         source/view/tank_view.cpp
         source/view/bullets_view.cpp
+        source/sound/shoot_sound.cpp
+        source/sound/background_music.cpp
         source/model/blocks.cpp
         source/model/entity.cpp
         source/model/game_model.cpp
@@ -80,3 +82,5 @@ add_executable(
         source/model/movable_entity.cpp
         source/model/handler.cpp
 )
+
+target_link_libraries(tanks sfml-audio)
