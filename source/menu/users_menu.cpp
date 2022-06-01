@@ -4,6 +4,7 @@
 #include "database.h"
 #include "menu/main_menu.h"
 #include "menu/menu.h"
+#include "menu/input_menu.h"
 
 namespace Tanks::Menu {
 
@@ -94,8 +95,13 @@ void showUsersMenu(sf::RenderWindow &window) {
                     db.makeOffline(person.general.name);
                 }
             } break;
-            case ButtonType::NEW_USER:
-                break;
+            case ButtonType::NEW_USER: {
+                const std::string title = "INPUT NAME";
+
+                menu.flyAwayToLeft(window, backgroundSprite);
+                auto ans = showInputMenu(window, backgroundSprite, title);
+                menu.flyOutFromLeft(window, backgroundSprite);
+            } break;
             case ButtonType::EXIT:
                 window.close();
                 break;

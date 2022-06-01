@@ -71,11 +71,10 @@ public:
     std::vector<std::string> getAllUsernames();
 
     void insert(PlayerInfo info);
+    void insert(const std::string &name);
 
     bool checkOnline(const std::string &username);
-
     void makeOnline(const std::string &username);
-
     void makeOffline(const std::string &username);
 
 private:

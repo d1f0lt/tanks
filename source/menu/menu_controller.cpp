@@ -1,4 +1,5 @@
 #include "menu/menu_controller.h"
+#include "menu/textbox.h"
 
 namespace Tanks {
 
@@ -8,7 +9,7 @@ std::optional<Menu::MenuButton *> MenuController::control(
     const sf::Event &event) {
     for (const auto &menuItem : items) {
         auto *item = dynamic_cast<Menu::MenuButton *>(menuItem.get());
-        if (item == nullptr) {  // header
+        if (item == nullptr) {
             continue;
         }
         auto coordinates = static_cast<sf::Vector2<int>>(item->getPosition());
@@ -32,6 +33,25 @@ std::optional<Menu::MenuButton *> MenuController::control(
     const sf::Event &event) {
     const auto &items = menu.getItems();
     return control(items, window, event);
+}
+
+const static int ENTERED_KEY = 13;
+
+std::optional<std::string> MenuController::textEntered(const Menu::Menu &menu, sf::Event &event) {
+    for (const auto &menuItem : menu.getItems()) {
+        auto *item = dynamic_cast<Menu::TextBox *>(menuItem.get());
+        if (item == nullptr) {
+            continue;
+        }
+        auto charTyped = event.text.unicode; // NOLINT
+        if (charTyped == ENTERED_KEY) {
+            return item->content->getContent();
+        }
+        if (charTyped < 128) {
+            item->input(static_cast<char>(charTyped));
+        }
+    }
+    return std::nullopt;
 }
 
 }  // namespace Tanks

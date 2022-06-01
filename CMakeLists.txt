@@ -55,6 +55,8 @@ add_executable(
         source/menu/main_menu.cpp
         source/menu/new_game_menu.cpp
         source/menu/levels_menu.cpp
+        source/menu/textbox.cpp
+        source/menu/input_menu.cpp
         source/game.cpp
         source/game_controller.cpp
         source/game_environment.cpp

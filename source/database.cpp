@@ -183,6 +183,11 @@ void PlayersDatabase::insert(PlayerInfo info) {
     exec(settingsAddRequest(info));
 }
 
+void PlayersDatabase::insert(const std::string &name) {
+    PlayerInfo info{PlayerGeneral{name}};
+    insert(info);
+}
+
 bool PlayersDatabase::checkOnline(const std::string &username) {
     const std::string request =
         "SELECT online FROM players WHERE name = '" + username + "';";

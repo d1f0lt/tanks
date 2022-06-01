@@ -195,7 +195,7 @@ void Menu::addIconToLeftLowerCorner(const std::string &filename,
                                     ButtonType type) {
     sf::Image image;
     image.loadFromFile(filename);
-    const int margin = 5;
+    const static int margin = 5;
     sf::Vector2<float> coordinates(
         margin,
         static_cast<float>(WINDOW_HEIGHT - image.getSize().y - 3 * margin));
