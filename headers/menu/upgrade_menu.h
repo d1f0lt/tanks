@@ -5,7 +5,9 @@
 
 namespace Tanks::Menu {
 
-void showUpgradeMenu(sf::RenderWindow &window, const sf::Sprite &backgroundSprite, PlayerInfo &info);
+void showUpgradeMenu(sf::RenderWindow &window,
+                     const sf::Sprite &backgroundSprite,
+                     PlayerInfo &info);
 
 }
 

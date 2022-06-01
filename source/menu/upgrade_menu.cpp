@@ -1,7 +1,7 @@
 #include "menu/upgrade_menu.h"
 #include <cassert>
-#include "menu/progress_bar.h"
 #include <cmath>
+#include "menu/progress_bar.h"
 
 namespace Tanks::Menu {
 
@@ -134,7 +134,7 @@ void updateSkills(PlayerSkills &skills, const ProgressBar *progressBar) {
     }
 }
 
-}
+}  // namespace
 
 void showUpgradeMenu(sf::RenderWindow &window,
                      const sf::Sprite &backgroundSprite,
@@ -155,9 +155,11 @@ void showUpgradeMenu(sf::RenderWindow &window,
                 const auto *btn =
                     dynamic_cast<const MenuAdditionalButton *>(res);
                 assert(btn != nullptr);
-                const auto *progressBar = dynamic_cast<const ProgressBar*>(btn->getMainButton());
+                const auto *progressBar =
+                    dynamic_cast<const ProgressBar*>(btn->getMainButton());
                 assert(progressBar != nullptr);
-                if (progressBar->getCurrentProgress() == progressBar->getMaxProgress()) {
+                if (progressBar->getCurrentProgress() ==
+                    progressBar->getMaxProgress()) {
                     continue;
                 }
                 int price = getPrice(progressBar->getCurrentProgress());

@@ -22,11 +22,7 @@ private:
     sf::RectangleShape indicator;
 };
 
-enum class ProgressBarType {
-    TANK_SPEED,
-    BULLET_SPEED,
-    RELOAD_TICKS
-};
+enum class ProgressBarType {TANK_SPEED, BULLET_SPEED, RELOAD_TICKS };
 
 struct ProgressBar final : MenuItem {
 public:
@@ -48,7 +44,8 @@ public:
 
     [[maybe_unused]] void upgrade();
 
-    void addInfoToRightUpCorner(std::vector<std::unique_ptr<MenuItem>> &&newItems);
+    void addInfoToRightUpCorner(
+        std::vector<std::unique_ptr<MenuItem>> &&newItems);
 
     void draw(sf::RenderWindow &window) const final;
 
