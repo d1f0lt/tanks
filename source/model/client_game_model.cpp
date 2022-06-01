@@ -55,10 +55,10 @@ void ClientModel::executeAllEvents() {
     std::unique_ptr<Event> event;
     int cnt = -1;
     int ticks = std::max(1, static_cast<int>(tickSize_.Size()));
-    if (!tickSize_.ConsumeSync(cnt)) {
-        assert(false);
-    }
     for (; ticks > 0 && !getIsFinished(); ticks--) {
+        if (!tickSize_.ConsumeSync(cnt)) {
+            return;
+        }
         for (; cnt > 0; cnt--) {
             bool res = events_.ConsumeSync(event);
             assert(res);

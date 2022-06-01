@@ -14,19 +14,29 @@
 namespace Tanks::model {
 using boost::asio::ip::tcp;
 
-int ServerModel::addPlayer(tcp::socket &socket, PlayerSkills skills) {
+int ServerModel::addPlayer(
+    const std::shared_ptr<tcp::socket> &socket,
+    const std::shared_ptr<boost::asio::io_context> &context,
+    PlayerSkills skills) {
     int id = getDecrId();
-    playersSockets_.emplace(id, socket);
+    playersSockets_.emplace(id, *socket);
     setPlayerSkills(id, skills);
     spawners_.emplace_back(std::make_unique<MediumTankSpawner>(*this, id));
-    std::thread([&]() { receiveTurns(socket); }).detach();
+    std::thread([&]() { receiveTurns(socket, context); }).detach();
     return id;
 }
 
-void ServerModel::receiveTurns(tcp::socket &client) {
+void ServerModel::receiveTurns(
+    const std::shared_ptr<tcp::socket> &clientExt,
+    const std::shared_ptr<boost::asio::io_context> &contextExt) {
+    auto client = atomic_load(&clientExt);
+    auto context = atomic_load(&contextExt);
     try {
-        while (true) {
-            auto event = readEvent(client);
+        while (!getIsFinished()) {
+            auto event = readEvent(*client);
+            if (getIsFinished()) {
+                return;
+            }
             if (!event) {
                 continue;
             }

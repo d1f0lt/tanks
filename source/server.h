@@ -10,23 +10,25 @@ class Server {
 public:
     explicit Server(const std::string &levelFilename, int bots, int bonuses);
 
-    std::thread start();
+    //    std::thread start();
 
     void stop();
+    void start();
 
     [[nodiscard]] tcp::endpoint getEndpoint();
 
-private:
-    std::atomic<bool> isStarted = false;
-    std::atomic<bool> isStopped = false;
-    std::mutex mutex_;
-    std::vector<boost::asio::ip::tcp::socket> sockets_;
-    model::ServerModel model_;
-    boost::asio::io_context ioContext_;
-    tcp::acceptor acceptor_;
-    tcp::endpoint endpoint_;
+    void listenForNewPlayer();
+    [[nodiscard]] bool getIsStopped() const;
 
-    void listenForNewPlayers();
+    void nextTick();
+
+private:
+    std::unique_ptr<std::atomic<bool>> isStarted;
+    std::unique_ptr<std::atomic<bool>> isStopped;
+    std::vector<std::shared_ptr<boost::asio::ip::tcp::socket>> sockets_;
+    std::unique_ptr<model::ServerModel> model_;
+    std::shared_ptr<boost::asio::io_context> ioContext_;
+    tcp::acceptor acceptor_;
 
     void work();
 };

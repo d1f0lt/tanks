@@ -32,7 +32,10 @@ public:
                          int botsCount = 0,
                          int bonuses = 0);
 
-    [[nodiscard]] int addPlayer(tcp::socket &socket, PlayerSkills skills = {});
+    [[nodiscard]] int addPlayer(
+        const std::shared_ptr<tcp::socket> &socket,
+        const std::shared_ptr<boost::asio::io_context> &context,
+        PlayerSkills skills = {});
 
 protected:
     void addEvent(std::unique_ptr<Event> event);
@@ -47,7 +50,8 @@ private:
     std::unordered_map<int, PlayerSkills> players_;
     DecrId decrId{-1};
 
-    void receiveTurns(tcp::socket &client);
+    void receiveTurns(const std::shared_ptr<tcp::socket> &client,
+                      const std::shared_ptr<boost::asio::io_context> &context);
     void executeAllEvents() override;
 
     [[nodiscard]] std::unique_ptr<Event> getEventByBot(int botId);

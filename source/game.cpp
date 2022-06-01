@@ -7,6 +7,7 @@
 #include "model/client_game_model.h"
 #include "model/network_utils.h"
 #include "model/player_action_handler.h"
+#include "model/server_game_model.h"
 #include "pause.h"
 #include "server.h"
 #include "view/bullets_view.h"
@@ -23,31 +24,51 @@ void makeAction(model::PlayerActionsHandler &player) {
         GameController::makeMove(player);
     }
 }
-struct ThreadJoiner {
+struct ServerThreadJoiner {
 public:
-    explicit ThreadJoiner(std::thread &&thread,
-                          std::unique_ptr<Server> server,
-                          std::unique_ptr<model::ClientModel> client)
-        : thread_(std::move(thread)),
-          server_(std::move(server)),
-          client_(std::move(client)) {
+    explicit ServerThreadJoiner(std::thread &&thread, Server &server)
+        : thread_(std::move(thread)), server_(server) {
     }
 
-    [[nodiscard]] model::ClientModel &model() {
-        return *client_;
+    [[nodiscard]] Server &getServer() const {
+        return server_;
     }
 
-    ~ThreadJoiner() {
-        server_->stop();
+    ~ServerThreadJoiner() {
+        server_.stop();
         //        client_.finishGame();
         thread_.detach();
     }
 
 private:
     std::thread thread_;
-    std::unique_ptr<Server> server_;
-    std::unique_ptr<model::ClientModel> client_;
+    Server &server_;
 };
+
+void server(const std::string &filename,
+            int players,
+            int bots,
+            int bonuses,
+            std::condition_variable *&condvarOnClient,
+            std::atomic<Server *> &serverOnClient,
+            std::condition_variable &serverOnClientInitiallized) {
+    std::condition_variable cv;
+    condvarOnClient = &cv;
+    Server server(filename, bots, bonuses);
+    serverOnClient = &server;
+    serverOnClientInitiallized.notify_all();
+    for (int i = 0; i < players; i++) {
+        server.listenForNewPlayer();
+    }
+    std::mutex mutex;
+    std::unique_lock lock(mutex);
+    cv.wait(lock);
+    while (!server.getIsStopped()) {
+        server.nextTick();
+        std::this_thread::sleep_for(std::chrono::milliseconds(15));
+    }
+    // init servermodel
+}
 }  // namespace
 
 std::optional<Menu::ButtonType>
@@ -58,20 +79,39 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
     const std::string levelFilename("../levels/level" + std::to_string(level) +
                                     ".csv");
 
+    static_assert(std::is_move_constructible_v<Server>);
     constexpr int BOTS = 10;
     constexpr int BONUSES = 10;
-    auto server = std::make_unique<Server>(levelFilename, BOTS, BONUSES);
+    //    auto server = std::make_unique<Server>(levelFilename, BOTS, BONUSES);
 
+    std::condition_variable *startServer = nullptr;
+    std::atomic<Server *> serverPtr = nullptr;
+    std::condition_variable serverCreated;
+
+    auto serverThread = std::thread([&]() {
+        server(levelFilename, 1, BOTS, BONUSES, startServer, serverPtr,
+               serverCreated);
+    });
+    std::mutex mutex;
+    std::unique_lock lock(mutex);
+    serverCreated.wait(lock, [&]() { return serverPtr != nullptr; });
+
+    assert(startServer != nullptr);
     boost::asio::io_context ioContext;
     tcp::socket clientSocket(ioContext);
+    Server *server = serverPtr;
     auto endpoint = server->getEndpoint();
     clientSocket.connect(endpoint);
     int playerId = model::receiveInt(clientSocket);
     assert(playerId < 0);
+    ServerThreadJoiner joiner(std::move(serverThread), *server);
 
-    auto modelPtr =
-        std::make_unique<model::ClientModel>(playerId, std::move(clientSocket));
-    modelPtr->loadLevel(levelFilename);
+    //    auto modelPtr =
+    //        std::make_unique<model::ClientModel>(playerId,
+    //        std::move(clientSocket));
+    //    modelPtr->loadLevel(levelFilename);
+    model::ClientModel model(playerId, std::move(clientSocket));
+    model.loadLevel(levelFilename);
 
     View::TankSpriteHolder greenTankView(imagesPath + "tanks/green_tank.png");
 
@@ -83,12 +123,10 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
 
     Pause pause;
 
-    auto th = server->start();
+    //    auto serverThread = server->start();
+    startServer->notify_all();
 
-    ThreadJoiner serverThread(std::move(th), std::move(server),
-                              std::move(modelPtr));
-
-    auto &model = serverThread.model();
+    //    auto &model = serverPtr.model();
     while (window.isOpen()) {
         // catch event
         sf::Event event{};

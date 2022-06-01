@@ -7,47 +7,55 @@
 namespace Tanks {
 using boost::asio::ip::tcp;
 Server::Server(const std::string &levelFilename, int bots, int bonuses)
-    : model_(levelFilename, bots, bonuses),
-      acceptor_(ioContext_, tcp::endpoint(tcp::v4(), 0)),
-      endpoint_(acceptor_.local_endpoint()) {
-    sockets_.reserve(20);
-    //    acceptor_ = tcp::acceptor(ioContext_);
-    std::thread([&]() { listenForNewPlayers(); }).detach();
+    : isStarted(std::make_unique<std::atomic<bool>>(false)),
+      isStopped(std::make_unique<std::atomic<bool>>(false)),
+      model_(
+          std::make_unique<model::ServerModel>(levelFilename, bots, bonuses)),
+      ioContext_(std::make_shared<boost::asio::io_context>()),
+      acceptor_(*ioContext_, tcp::endpoint(tcp::v4(), 0)) {
 }
 
-std::thread Server::start() {
-    isStarted = true;
-    // TODO notify all
-    return std::thread([&]() { work(); });
-}
+// std::thread Server::start() {
+//  TODO notify all
+//    return std::thread([&]() { work(); });
+//}
 
 void Server::stop() {
-    isStopped = true;
-    //    model_.finishGame();
+    *isStopped = true;
 }
 
 tcp::endpoint Server::getEndpoint() {
-    return endpoint_;
+    return acceptor_.local_endpoint();
 }
 
-void Server::listenForNewPlayers() {
+void Server::listenForNewPlayer() {
     try {
-        while (!isStarted) {
-            // TODO get skills
-            sockets_.emplace_back(acceptor_.accept());
-            assert(sockets_.size() <= 20);
+        // TODO get skills
+        auto socket = std::make_shared<tcp::socket>(acceptor_.accept());
+        assert(socket != nullptr);
+        sockets_.emplace_back(std::move(socket));
+        assert(sockets_.size() <= 20);
 
-            int id = model_.addPlayer(sockets_.back(), {});
-            model::sendInt(sockets_.back(), id);
-        }
+        int id = model_->addPlayer(sockets_.back(), ioContext_, {});
+        model::sendInt(*(sockets_.back()), id);
     } catch (boost::system::system_error &) {
     }
 }
 
+void Server::start() {
+}
+
 void Server::work() {
     while (!isStopped) {
-        model_.nextTick();
+        model_->nextTick();
         std::this_thread::sleep_for(std::chrono::milliseconds(20));
     }
+}
+
+bool Server::getIsStopped() const {
+    return *isStopped;
+}
+void Server::nextTick() {
+    model_->nextTick();
 }
 }  // namespace Tanks
