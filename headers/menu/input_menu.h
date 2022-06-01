@@ -8,10 +8,9 @@
 namespace Tanks::Menu {
 
 std::optional<std::string> showInputMenu(sf::RenderWindow &window,
-                                         const sf::Sprite &background,
-                                         const std::string &title);
+                   const sf::Sprite &background,
+                   const std::string &title);
 
 }
 
 #endif
-

@@ -38,8 +38,8 @@ Menu initMenu(const std::string &titleText) {
 }
 
 std::optional<std::string> showInputMenu(sf::RenderWindow &window,
-                                         const sf::Sprite &background,
-                                         const std::string &title) {
+                   const sf::Sprite &background,
+                   const std::string &title) {
     const static std::string imagesPath = "../images/menu/";
 
     auto menu(initMenu(title));
