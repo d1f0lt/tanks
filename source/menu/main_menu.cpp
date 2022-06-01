@@ -9,7 +9,7 @@ namespace Tanks::Menu {
 
 namespace {
 
-Menu initMenu() {
+Menu initMenu(const std::string &imagesPath, PlayerGeneral &playersInfo) {
     const static sf::Color textColor{63, 87, 210};
     const static auto menuWidth = static_cast<size_t>(WINDOW_WIDTH / 3.4);
 
@@ -42,18 +42,23 @@ Menu initMenu() {
         inscriptions.emplace_back(std::move(item));
     }
 
-    return Menu(menuWidth, title, inscriptions, buttons);
+    Menu menu(menuWidth, title, inscriptions, buttons);
+
+    menu.addIconToLeftLowerCorner(imagesPath + "exit.png", ButtonType::EXIT);
+    menu.addIconToLeftUpCorner(imagesPath + "users.png", ButtonType::USERS);
+    menu.addPlayerInfo(playersInfo);
+
+    return menu;
 }
 
 }  // namespace
 
 void showMainMenu(sf::RenderWindow &window,
-                  const sf::Sprite &backgroundSprite) {
+                  const sf::Sprite &backgroundSprite,
+                  PlayerInfo &info) {
     const static std::string imagesPath = "../images/menu/";
 
-    Menu menu(initMenu());
-    menu.addIconToLeftLowerCorner(imagesPath + "exit.png", ButtonType::EXIT);
-    menu.addIconToLeftUpCorner(imagesPath + "users.png", ButtonType::USERS);
+    Menu menu(initMenu(imagesPath, info.general));
 
     menu.flyAwayToRight();
     menu.flyOutFromRight(window, backgroundSprite);
@@ -63,7 +68,7 @@ void showMainMenu(sf::RenderWindow &window,
         switch (res->getType()) {
             case ButtonType::NEW_GAME: {
                 menu.flyAwayToLeft(window, backgroundSprite);
-                showNewGameMenu(window, backgroundSprite);
+                showNewGameMenu(window, backgroundSprite, info);
                 menu.flyOutFromLeft(window, backgroundSprite);
             } break;
             case ButtonType::EXIT:

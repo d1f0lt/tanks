@@ -6,6 +6,7 @@
 #include <vector>
 #include "constants.h"
 #include "menu_items.h"
+#include "database.h"
 
 namespace Tanks {
 
@@ -39,6 +40,7 @@ public:
     void addAddingButtons(size_t start,
                           std::vector<std::unique_ptr<MenuItem>> &&elements,
                           ButtonWithType &info);
+    void addPlayerInfo(PlayerGeneral &info);
 
     // animations
     void flyOutFromLeft(sf::RenderWindow &window,

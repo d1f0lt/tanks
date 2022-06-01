@@ -45,7 +45,8 @@ Menu initMenu() {
 }  // namespace
 
 void showNewGameMenu(sf::RenderWindow &window,
-                     const sf::Sprite &backgroundSprite) {
+                     const sf::Sprite &backgroundSprite,
+                     PlayerInfo &info) {
     const static std::string imagesPath = "../images/menu/";
     Menu menu(initMenu());
     menu.addIconToLeftUpCorner(imagesPath + "return.png", ButtonType::RETURN);
@@ -58,7 +59,7 @@ void showNewGameMenu(sf::RenderWindow &window,
         switch (res->getType()) {
             case ButtonType::SINGLE_PLAYER: {
                 menu.flyAwayToLeft(window, backgroundSprite);
-                auto ans = showLevelsMenu(window, backgroundSprite);
+                auto ans = showLevelsMenu(window, backgroundSprite, info);
                 switch (ans) {
                     case ButtonType::RETURN:
                         menu.flyOutFromLeft(window, backgroundSprite);

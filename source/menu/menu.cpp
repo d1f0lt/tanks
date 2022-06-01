@@ -217,6 +217,45 @@ void Menu::addAddingButtons(size_t start,
     }
 }
 
+void Menu::addPlayerInfo(PlayerGeneral &info) {
+    const static size_t marginFromBackground = 20;
+    sf::Vector2<float> curCoordinates{marginFromBackground + items[0]->getPosition().x + items[0]->getSize().x, marginFromBackground};
+    const static sf::Color defaultTextColor{255, 255, 255};
+    const static size_t characterSize = 40;
+
+    InscriptionInfo usernameParameters{info.name, characterSize, defaultTextColor};
+    auto username = std::make_unique<MenuInscription>(usernameParameters, curCoordinates);
+    const static size_t marginFromUsername = 50;
+    curCoordinates.x += username->getSize().x + marginFromUsername;
+
+    const static std::string coinFilename = "../images/menu/coin.png";
+    const static size_t marginFromCoin = 10;
+    const static size_t sizeOfOne = 32;
+    const static size_t imagesCount = 16;
+
+    auto coin = std::make_unique<MenuPicture>(coinFilename, sizeOfOne, imagesCount, curCoordinates);
+    curCoordinates.x += coin->getSize().x + marginFromCoin;
+
+    InscriptionInfo moneyParameters{std::to_string(info.money), characterSize, defaultTextColor};
+    auto money = std::make_unique<MenuInscription>(moneyParameters, curCoordinates);
+    curCoordinates = {items[0]->getPosition().x + items[0]->getSize().x, 0};
+
+    const static sf::Color rectangleColor{0, 0, 0, 128};
+    float maxHeight = std::max(std::max(username->getSize().y, coin->getSize().y), money->getSize().y);
+    sf::Vector2<float> rectangleSize{2*marginFromBackground + username->getSize().x + marginFromUsername + coin->getSize().x + marginFromCoin + money->getSize().x, marginFromBackground*2 + maxHeight};
+    Button btnInfo(rectangleSize, rectangleColor, rectangleColor);
+    auto background = std::make_unique<MenuRectangle>(btnInfo, curCoordinates);
+
+    username->centralizeByHeight({0, background->getSize().y});
+    coin->centralizeByHeight({0, background->getSize().y});
+    money->centralizeByHeight({0, background->getSize().y});
+
+    addMenuItem(std::move(background));
+    addMenuItem(std::move(username));
+    addMenuItem(std::move(coin));
+    addMenuItem(std::move(money));
+}
+
 const std::vector<std::unique_ptr<MenuItem>> &Menu::getItems() const {
     return items;
 }

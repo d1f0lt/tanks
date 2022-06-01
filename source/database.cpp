@@ -237,6 +237,54 @@ void PlayersDatabase::insert(const std::string &name) {
     insert(info);
 }
 
+namespace {
+
+std::string requestEnd(const std::string &username) {
+    return " where name = '" + username + "';";
+}
+
+std::string playersUpdateRequest(PlayerGeneral &info) {
+    std::string request =
+        "UPDATE players SET money = " + std::to_string(info.money) +
+        requestEnd(info.name);
+    return request;
+}
+
+std::string skillsUpdateRequest(PlayerInfo &playerInfo) {
+    auto &info = playerInfo.skills;
+    std::string request =
+        "UPDATE skills SET tank_speed = " + std::to_string(info.tankSpeed) +
+        ", bullet_speed = " + std::to_string(info.bulletSpeed) +
+        ", reload_ticks = " + std::to_string(info.reloadTicks) +
+        requestEnd(playerInfo.general.name);
+    return request;
+}
+
+std::string settingsUpdateRequest(PlayerInfo &playerInfo) {
+    auto &info = playerInfo.settings;
+    std::string request =
+        "UPDATE settings SET music_volume = " +
+        std::to_string(info.musicVolume) +
+        ", sounds_volume = " + std::to_string(info.soundsVolume) +
+        requestEnd(playerInfo.general.name);
+    return request;
+}
+
+}  // namespace
+
+void PlayersDatabase::updateInfo(PlayerInfo &info) {
+    bool flag = isConnected();
+    if (!flag) {
+        connect();
+    }
+    exec(playersUpdateRequest(info.general));
+    exec(skillsUpdateRequest(info));
+    exec(settingsUpdateRequest(info));
+    if (!flag) {
+        disconnectFromDatabase();
+    }
+}
+
 void PlayersDatabase::deleteByName(const std::string &username) {
     std::string requestStart = "DELETE FROM ";
     std::string requestEnd = " where name = '" + username + "';";
