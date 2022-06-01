@@ -999,7 +999,7 @@ TEST_CASE("4 users 4 bots 2 bonuses, don't check correction") {
     }
     for (auto &mod : vec) {
         auto tick = mod.get().getTick();
-        CHECK(tick >= TICKS * 0.9);
+        CHECK(tick >= TICKS / 2);
         std::cout << mod.get().getTick() << ' ';
         std::cout.flush();
     }
@@ -1089,7 +1089,7 @@ TEST_CASE("4 users 4 bots 2 bonuses, don't check correction") {
     }
     for (auto &mod : vec) {
         auto tick = mod.get().getTick();
-        CHECK(tick >= 990);
+        CHECK(tick >= TICKS / 2);
         std::cout << mod.get().getTick() << ' ';
         std::cout.flush();
     }
