@@ -58,8 +58,9 @@ void GameMap::exchange(Entity *give, const Entity *remove) {
                 bool ok = map_[row][col] == give;
                 bool dyn =
                     dynamic_cast<ForegroundEntity *>(map_[row][col]) != nullptr;
-                bool weDyn = dynamic_cast<ForegroundEntity *>(give) != nullptr;
-                assert(ok || dyn || weDyn);
+                //                bool weDyn = dynamic_cast<ForegroundEntity
+                //                *>(give) != nullptr;
+                assert(ok || dyn);
             }
         }
     }

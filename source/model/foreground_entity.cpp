@@ -18,5 +18,8 @@ std::vector<const Entity *> ForegroundEntity::look(Direction direction) const {
 std::vector<int> ForegroundEntity::snapshotBackground() const {
     return dynamic_cast<ForegroundHandler &>(getHandler()).snapshotBackground();
 }
+// bool ForegroundEntity::isDieOnCreation() {
+//     return false
+// }
 
 }  // namespace Tanks::model

@@ -23,6 +23,7 @@ public:
     virtual ~BasicHandler();
 
     [[nodiscard]] virtual bool canStandOn(const Entity &other) const;
+    [[nodiscard]] bool initIfSurvive();
 
     virtual void destroyEntity();
 
@@ -31,6 +32,8 @@ protected:
     [[nodiscard]] GameModel &getModel() const;
 
     [[nodiscard]] static BasicHandler *getActualHandler(Entity &entity);
+    //    [[nodiscard]] virtual void initEntity();
+    //    [[nodiscard]] virtual bool isDieOnCreation();
 
 private:
     GameModel &model_;
@@ -54,6 +57,8 @@ protected:
 
 private:
     [[nodiscard]] const std::vector<int> &getBackground() const;
+
+    [[nodiscard]] bool isDieOnCreation();
 };
 
 class MovableHandler : public ForegroundHandler {

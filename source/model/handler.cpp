@@ -47,6 +47,21 @@ BasicHandler *BasicHandler::getActualHandler(Entity &entity) {
     return &entity.getHandler();
 }
 
+// bool BasicHandler::initIfSurvive() {
+//     if (isDieOnCreation()) {
+//         return false;
+//     }
+//     initEntity();
+//     return true;
+// }
+//
+// void BasicHandler::initEntity() {
+// }
+//
+// bool BasicHandler::isDieOnCreation() {
+//     return false;
+// }
+
 std::vector<const Entity *> MovableHandler::look(Direction direction) {
     auto res = lookMutable(direction);
     return {res.begin(), res.end()};
@@ -60,13 +75,17 @@ std::vector<int> ForegroundHandler::restoreBackground() {
         }
         getModel().getMap().exchange(&(entity->get()), &getEntity());
     }
-    return std::move(getBackground());
+    assert(getModel().getMap().checkRemoved(getEntity()));
+    auto bg = std::move(getBackground());
+    getBackground().clear();
+    return bg;
 }
 
 void ForegroundHandler::setBackground() {
-    if (!getBackground().empty()) {
-        restoreBackground();
-    }
+    assert(getBackground().empty());
+    //    if (!getBackground().empty()) {
+    //        restoreBackground();
+    //    }
     assert(getBackground().empty());
     std::unordered_set<int> setted;
     auto &background = getBackground();
@@ -79,8 +98,10 @@ void ForegroundHandler::setBackground() {
         for (int col = entity.getLeft(); col < left + width; col++) {
             auto id = getModel().getByCoords(col, row).getId();
             assert(canStandOn(getModel().getById(id)->get()));
-            assert(id >= 0 ||
-                   dynamic_cast<ProjectileHandler *>(this) != nullptr);
+            assert(id >= 0);
+            assert(getModel().getById(id));
+            assert(
+                !dynamic_cast<MovableEntity *>(&getModel().getById(id)->get()));
             if (setted.find(id) != setted.end()) {
                 continue;
             }
@@ -205,6 +226,22 @@ std::vector<int> ForegroundHandler::underTank() {
         }
     }
     return {setted.begin(), setted.end()};
+}
+
+bool ForegroundHandler::isDieOnCreation() {
+    auto bg = underTank();
+    std::vector<Projectile *> bullets;
+    for (auto id : bg) {
+        assert(getModel().getById(id));
+        if (auto *bullet =
+                dynamic_cast<Projectile *>(&getModel().getById(id)->get())) {
+            bullets.emplace_back(bullet);
+        }
+    }
+    for (auto *bullet : bullets) {
+        bullet->getHandler().destroyEntity();
+    }
+    return !bullets.empty();
 }
 
 void MovableHandler::setDirection(Direction direction) {
