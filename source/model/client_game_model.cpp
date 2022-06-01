@@ -10,10 +10,11 @@
 namespace Tanks::model {
 ClientModel::ClientModel(int playerId, tcp::socket socket)
     : playerId_(playerId),
-      socket_(std::move(socket)),
-      receiver([&]() { receiveEvents(); }){
-          //    std::thread([&]() { receiveEvents(); }).detach();
-      };
+      socket_(std::move(socket)) /*,
+       receiver_([&]() { receiveEvents(); }) */
+{
+    std::thread([&]() { receiveEvents(); }).detach();
+};
 
 PlayerActionsHandler ClientModel::getHandler() {
     return PlayerActionsHandler(playerId_, *this, socket_);
@@ -28,9 +29,6 @@ void ClientModel::receiveEvents() {
     try {
         while (true) {
             int count = receiveInt(socket_);
-            if (count == -1) {
-                return;
-            }
             tickSize_.Produce(count);
             for (int i = 0; i < count; i++) {
                 events_.Produce(readEvent(socket_));
@@ -60,18 +58,21 @@ void ClientModel::executeAllEvents() {
     if (!tickSize_.ConsumeSync(cnt)) {
         assert(false);
     }
-    for (; ticks > 0; ticks--) {
+    for (; ticks > 0 && !getIsFinished(); ticks--) {
         for (; cnt > 0; cnt--) {
             bool res = events_.ConsumeSync(event);
             assert(res);
             executeEvent(*event);
+            if (dynamic_cast<GameEnd *>(event.get())) {
+                return;
+            }
         }
     }
 }
 
 ClientModel::~ClientModel() noexcept {
-    socket_.close();
-    receiver.join();
+    //    socket_.close();
+    //        receiver_.join();
 }
 
 std::optional<std::reference_wrapper<Tank>> ClientModel::tank() {
@@ -80,6 +81,12 @@ std::optional<std::reference_wrapper<Tank>> ClientModel::tank() {
         return std::nullopt;
     }
     return dynamic_cast<Tank &>(entity->get());
+}
+
+void ClientModel::finishGame() {
+    socket_.close();
+    getIsFinished() = true;
+    //    receiver_.join();
 }
 
 }  // namespace Tanks::model

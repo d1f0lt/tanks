@@ -16,7 +16,8 @@ enum class EventType {
     SPAWN_TANK = 2,
     BONUS_SPAWN = 3,
     SET_POSITION = 4,
-    TANK_SHOOT = 5
+    TANK_SHOOT = 5,
+    GAME_END = 6,
 };
 
 [[nodiscard]] std::unique_ptr<Event> readEvent(tcp::socket &socket);
@@ -25,7 +26,7 @@ class Event {
 public:
     virtual ~Event() = default;
 
-    virtual bool acceptExecutor(const EventExecutor &executor) = 0;
+    virtual bool acceptExecutor(const EventVisitor &executor) = 0;
     virtual void sendTo(tcp::socket &socket) const = 0;
 };
 
@@ -33,7 +34,7 @@ class TankMove : public Event {
 public:
     explicit TankMove(int tankId, Direction direction, int speed);
 
-    bool acceptExecutor(const EventExecutor &executor) final;
+    bool acceptExecutor(const EventVisitor &executor) final;
     void sendTo(tcp::socket &socket) const override;
 
     static std::unique_ptr<Event> readFrom(tcp::socket &socket);
@@ -59,7 +60,7 @@ public:
                        int reloadTicks);
 
     void sendTo(tcp::socket &socket) const override;
-    bool acceptExecutor(const EventExecutor &executor) override;
+    bool acceptExecutor(const EventVisitor &executor) override;
 
     [[nodiscard]] static std::unique_ptr<Event> readFrom(tcp::socket &socket);
 
@@ -86,7 +87,7 @@ class TankShoot : public Event {
 public:
     explicit TankShoot(int tankId, Direction direction);
 
-    bool acceptExecutor(const EventExecutor &executor) override;
+    bool acceptExecutor(const EventVisitor &executor) override;
 
     void sendTo(tcp::socket &socket) const override;
     [[nodiscard]] static std::unique_ptr<Event> readFrom(tcp::socket &socket);
@@ -106,7 +107,7 @@ public:
     void sendTo(tcp::socket &socket) const override;
     [[nodiscard]] static std::unique_ptr<Event> readFrom(tcp::socket &socket);
 
-    bool acceptExecutor(const EventExecutor &executor) override;
+    bool acceptExecutor(const EventVisitor &executor) override;
 
     [[nodiscard]] DecrId getId() const;
     [[nodiscard]] int getLeft() const;
@@ -124,7 +125,7 @@ class SetPosition : public Event {
 public:
     explicit SetPosition(int id, int left, int top);
 
-    bool acceptExecutor(const EventExecutor &executor) override;
+    bool acceptExecutor(const EventVisitor &executor) override;
     void sendTo(tcp::socket &socket) const override;
     [[nodiscard]] static std::unique_ptr<Event> readFrom(tcp::socket &socket);
 
@@ -136,6 +137,21 @@ private:
     const int id_;
     const int left_;
     const int top_;
+};
+
+class GameEnd : public Event {
+public:
+    explicit GameEnd(int kills);
+
+    bool acceptExecutor(const EventVisitor &executor) override;
+
+    [[nodiscard]] static std::unique_ptr<Event> readFrom(tcp::socket &socket);
+    void sendTo(tcp::socket &socket) const override;
+
+    [[nodiscard]] int getKills() const;
+
+private:
+    const int kills_;
 };
 
 }  // namespace Tanks::model

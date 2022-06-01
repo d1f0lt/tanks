@@ -90,14 +90,25 @@ public:
     }
 
     void Finish() {
-        std::unique_lock<std::mutex> lock(mtx);
+        std::unique_lock lock(mtx);
+        Finish(lock);
+    }
 
+    void Finish(std::unique_lock<std::mutex> &lock) {
         finish_processing = true;
         cv.notify_all();
 
         sync_wait.wait(lock, [&]() { return sync_counter == 0; });
 
         finish_processing = false;
+    }
+
+    void Clean() {
+        std::unique_lock<std::mutex> lock(mtx);
+
+        Finish(lock);
+
+        q.clean();
     }
 };
 #endif  // TANKS_THREAD_SAFE_QUEUE_H

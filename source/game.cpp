@@ -23,6 +23,31 @@ void makeAction(model::PlayerActionsHandler &player) {
         GameController::makeMove(player);
     }
 }
+struct ThreadJoiner {
+public:
+    explicit ThreadJoiner(std::thread &&thread,
+                          std::unique_ptr<Server> server,
+                          std::unique_ptr<model::ClientModel> client)
+        : thread_(std::move(thread)),
+          server_(std::move(server)),
+          client_(std::move(client)) {
+    }
+
+    [[nodiscard]] model::ClientModel &model() {
+        return *client_;
+    }
+
+    ~ThreadJoiner() {
+        server_->stop();
+        //        client_.finishGame();
+        thread_.detach();
+    }
+
+private:
+    std::thread thread_;
+    std::unique_ptr<Server> server_;
+    std::unique_ptr<model::ClientModel> client_;
+};
 }  // namespace
 
 std::optional<Menu::ButtonType>
@@ -33,17 +58,20 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
     const std::string levelFilename("../levels/level" + std::to_string(level) +
                                     ".csv");
 
-    Server server(levelFilename, 100, 100);
+    constexpr int BOTS = 10;
+    constexpr int BONUSES = 10;
+    auto server = std::make_unique<Server>(levelFilename, BOTS, BONUSES);
 
     boost::asio::io_context ioContext;
     tcp::socket clientSocket(ioContext);
-    auto endpoint = server.getEndpoint();
+    auto endpoint = server->getEndpoint();
     clientSocket.connect(endpoint);
     int playerId = model::receiveInt(clientSocket);
     assert(playerId < 0);
 
-    model::ClientModel model(playerId, std::move(clientSocket));
-    model.loadLevel(levelFilename);
+    auto modelPtr =
+        std::make_unique<model::ClientModel>(playerId, std::move(clientSocket));
+    modelPtr->loadLevel(levelFilename);
 
     View::TankSpriteHolder greenTankView(imagesPath + "tanks/green_tank.png");
 
@@ -55,8 +83,12 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
 
     Pause pause;
 
-    std::thread serverThread = server.start();
+    auto th = server->start();
 
+    ThreadJoiner serverThread(std::move(th), std::move(server),
+                              std::move(modelPtr));
+
+    auto &model = serverThread.model();
     while (window.isOpen()) {
         // catch event
         sf::Event event{};

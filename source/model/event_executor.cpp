@@ -5,14 +5,14 @@
 
 namespace Tanks::model {
 
-EventExecutor::EventExecutor(GameModel &model) : model_(model) {
+EventVisitor::EventVisitor(GameModel &model) : model_(model) {
 }
 
-GameModel &EventExecutor::getModel() const {
+GameModel &EventVisitor::getModel() const {
     return model_;
 }
 
-bool EventExecutor::execute(TankMove &event) const {
+bool EventExecutor::visit(TankMove &event) const {
     auto &model = getModel();
     auto tank = model.getById(event.getId());
     if (tank == std::nullopt) {
@@ -25,7 +25,7 @@ bool EventExecutor::execute(TankMove &event) const {
     return true;
 }
 
-bool EventExecutor::execute(SpawnTank &event) const {
+bool EventExecutor::visit(SpawnTank &event) const {
     if (getModel().getById(event.getTankId())) {
         return false;
     }
@@ -44,7 +44,7 @@ bool EventExecutor::execute(SpawnTank &event) const {
     return true;
 }
 
-bool EventExecutor::execute(BonusSpawn &event) const {
+bool EventExecutor::visit(BonusSpawn &event) const {
     auto entity = getModel().getById(event.getId());
     if (entity) {
         return false;
@@ -61,7 +61,7 @@ bool EventExecutor::execute(BonusSpawn &event) const {
     return true;
 }
 
-bool EventExecutor::execute(TankShoot &event) const {
+bool EventExecutor::visit(TankShoot &event) const {
     auto tank = getModel().getById(event.getTankId());
     if (!tank) {
         return false;
@@ -72,7 +72,7 @@ bool EventExecutor::execute(TankShoot &event) const {
     return true;
 }
 
-bool EventExecutor::execute(SetPosition &event) const {
+bool EventExecutor::visit(SetPosition &event) const {
     auto entity = getModel().getById(event.getId());
     if (!entity) {
         return false;
@@ -81,5 +81,14 @@ bool EventExecutor::execute(SetPosition &event) const {
         dynamic_cast<ForegroundHandler &>(getModel().getHandler(entity->get()));
     handler.setPosition(event.getLeft(), event.getTop());
     return true;
+}
+
+bool EventExecutor::visit(GameEnd &event) const {
+    getModel().getIsFinished() = true;
+    getModel().finishGame();
+    return true;
+}
+
+EventExecutor::EventExecutor(GameModel &model) : EventVisitor(model) {
 }
 }  // namespace Tanks::model

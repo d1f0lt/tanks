@@ -22,7 +22,8 @@ std::thread Server::start() {
 }
 
 void Server::stop() {
-    isStopped = false;
+    isStopped = true;
+    //    model_.finishGame();
 }
 
 tcp::endpoint Server::getEndpoint() {

@@ -288,6 +288,7 @@ TEST_CASE("Can't shoot then move on 1 tick") {
     serverModel.nextTick();
     CHECK(serverModel.getTick() == 2);
     serverModel.finishGame();
+    clientModel.nextTick();
 }
 
 TEST_CASE("Block check") {
@@ -915,6 +916,94 @@ TEST_CASE("Real") {
 TEST_CASE("4 users 4 bots 2 bonuses, don't check correction") {
     INIT_GAME_FULL(1, 4, 2);
     constexpr int CLIENTS = 4;
+    constexpr int TICKS = 1e2;
+
+    //    std::mt19937 rnd(
+    //        std::chrono::steady_clock::now().time_since_epoch().count());
+    std::mt19937 rnd{0};
+    std::thread([&]() -> void {
+        std::vector<tcp::socket> serverSockets;
+        serverSockets.reserve(100);
+        while (true) {
+            try {
+                tcp::socket server = acceptor.accept();
+                serverSockets.emplace_back(std::move(server));
+                int id = serverModel.addPlayer(serverSockets.back());
+                sendInt(serverSockets.back(), id);
+            } catch (boost::system::system_error &e) {
+                return;
+            }
+        }
+    }).detach();
+    std::mutex vec_mutex;
+    std::vector<std::reference_wrapper<ClientModel>> vec;
+    static auto timeNow = []() {
+        return std::chrono::milliseconds(
+            std::chrono::steady_clock::now().time_since_epoch().count());
+    };
+
+    vec.reserve(CLIENTS);
+    for (int i = 0; i < CLIENTS; i++) {
+        std::thread([&]() -> void {
+            boost::asio::io_context context;
+            tcp::socket client(context);
+            client.connect(acceptor.local_endpoint());
+            int id = receiveInt(client);
+            ClientModel clientModel(id, std::move(client));
+            clientModel.loadLevel(1);
+            clientModel.nextTick();
+            std::unique_lock lock(vec_mutex);
+            vec.push_back(std::ref(clientModel));
+            lock.unlock();
+            try {
+                while (true) {
+                    auto tank = clientModel.tank();
+                    if (!tank) {
+                        clientModel.nextTick();
+                        continue;
+                    }
+                    int todo = (std::abs(static_cast<int>(rnd()))) % 12;
+                    if (todo >= 12) {
+                        clientModel.getHandler().shoot(
+                            tank->get().getDirection());
+                    } else {
+                        auto directon = static_cast<Direction>(todo % 4);
+                        clientModel.getHandler().move(
+                            directon, clientModel.tank()->get().getSpeed());
+                    }
+                    clientModel.nextTick();
+                }
+            } catch (boost::system::system_error &e) {
+                CHECK(false);
+                std::cerr << e.what() << std::endl;
+            }
+        }).detach();
+    }
+
+    std::this_thread::sleep_for(std::chrono::seconds(5));
+    int sleeps = 0;
+    for (int i = 0; i < TICKS; i++) {
+        try {
+            serverModel.nextTick();
+            std::this_thread::sleep_for(std::chrono::milliseconds(15));
+        } catch (boost::system::system_error &e) {
+            std::cerr << e.what() << std::endl;
+        }
+    }
+    for (auto &mod : vec) {
+        auto tick = mod.get().getTick();
+        CHECK(tick >= TICKS * 0.9);
+        std::cout << mod.get().getTick() << ' ';
+        std::cout.flush();
+    }
+    std::cout << std::endl;
+    serverModel.finishGame();
+    std::cout << "sleeps: " << sleeps << std::endl;
+}
+
+TEST_CASE("4 users 4 bots 2 bonuses, don't check correction") {
+    INIT_GAME_FULL(1, 4, 2);
+    constexpr int CLIENTS = 5;
     constexpr int TICKS = 1e3;
 
     //    std::mt19937 rnd(

@@ -23,14 +23,16 @@ class ServerModel : public GameModel {
     friend Spawner;
 
 public:
+    ~ServerModel() override;
+
+    void finishGame() final;
+
     explicit ServerModel(int level = 1, int botsCount = 0, int bonuses = 0);
     explicit ServerModel(const std::string &level,
                          int botsCount = 0,
                          int bonuses = 0);
 
     [[nodiscard]] int addPlayer(tcp::socket &socket, PlayerSkills skills = {});
-
-    void finishGame();
 
 protected:
     void addEvent(std::unique_ptr<Event> event);
@@ -55,6 +57,7 @@ private:
     [[nodiscard]] DecrId getDecrId();
 
     [[nodiscard]] PlayerSkills getPlayerSkills(int id) const;
+
     void setPlayerSkills(int id, PlayerSkills skills);
     void addBot();
 };

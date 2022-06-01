@@ -8,6 +8,7 @@ class SpawnTank;
 class BonusSpawn;
 class TankShoot;
 class SetPosition;
+class GameEnd;
 }  // namespace Tanks::model
 
 #endif  // TANKS_EVENT_FWD_H

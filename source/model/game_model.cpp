@@ -140,6 +140,9 @@ std::vector<std::vector<const Entity *>> GameModel::getAll() const {
 }
 
 void GameModel::nextTick() {
+    if (getIsFinished()) {
+        return;
+    }
     wasShootThisTurn_ = false;
     wasDestroyedBlockThisTurn_ = false;
     //    std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -191,11 +194,15 @@ int GameModel::getRnd() {
 }
 
 std::shared_mutex &GameModel::getMutex() const {
-    return sharedMutex_;
+    return *sharedMutex_;
 }
 
 bool GameModel::wasDestroyedBlockThisTurn() const {
     return wasDestroyedBlockThisTurn_;
+}
+
+bool &GameModel::getIsFinished() {
+    return isFinished_;
 }
 
 // TODO

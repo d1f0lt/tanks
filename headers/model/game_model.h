@@ -32,6 +32,8 @@ public:
     explicit GameModel() = default;
     virtual ~GameModel() = default;
 
+    virtual void finishGame() = 0;
+
     [[nodiscard]] Entity &getByCoords(int col, int row);
     [[nodiscard]] std::optional<std::reference_wrapper<Entity>> getById(
         int entityId);
@@ -68,6 +70,7 @@ protected:
     [[nodiscard]] GameMap &getMap();
     [[nodiscard]] const std::vector<std::vector<Entity *>> &getAllByLink();
     [[nodiscard]] std::shared_mutex &getMutex() const;
+    [[nodiscard]] bool &getIsFinished();
 
 private:
     GameMap map_;
@@ -80,7 +83,8 @@ private:
     EntityHolder entityHolder_;
     bool wasShootThisTurn_ = false;
     bool wasDestroyedBlockThisTurn_ = false;
-    mutable std::shared_mutex sharedMutex_;
+    bool isFinished_ = false;
+    mutable std::unique_ptr<std::shared_mutex> sharedMutex_;
 };
 
 }  // namespace Tanks::model

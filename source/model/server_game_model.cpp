@@ -180,10 +180,13 @@ void ServerModel::addEvent(std::unique_ptr<Event> event) {
 }
 
 void ServerModel::finishGame() {
-    for (auto &[id, socket] : playersSockets_) {
-        sendInt(socket, -1);
-    }
-    playersSockets_.clear();
+    //    events_.Produce(std::make_unique<GameEnd>(1));
+    //    events_.Produce(std::make_unique<GameEnd>(1));
+    //    playersSockets_.clear();
+}
+
+ServerModel::~ServerModel() {
+    //    finishGame();
 }
 
 }  // namespace Tanks::model

@@ -18,6 +18,7 @@ public:
     [[nodiscard]] PlayerActionsHandler getHandler();
 
     [[nodiscard]] std::optional<std::reference_wrapper<Tank>> tank();
+    void finishGame() override;
 
 protected:
     void receiveEvents();
@@ -28,7 +29,7 @@ protected:
 private:
     const int playerId_;
     tcp::socket socket_;
-    std::thread receiver;
+    //    std::thread receiver_;
 
     SafeQueue<std::unique_ptr<Event>> events_;
     SafeQueue<int> tickSize_;
