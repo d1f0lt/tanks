@@ -117,13 +117,6 @@ ForegroundHandler::ForegroundHandler(GameModel &model, ForegroundEntity &entity)
 }
 
 std::vector<int> ForegroundHandler::snapshotBackground() const {
-    //    const auto &background = getBackground();
-    //
-    //    std::vector<std::vector<int>> vec;
-    //    vec.reserve(getEntity().getHeight());
-    //    for (const auto &line : background) {
-    //        vec.emplace_back(line.begin(), line.end());
-    //    }
     return getBackground();
 }
 

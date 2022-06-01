@@ -323,7 +323,7 @@ TEST_CASE("Look for grass") {
     handler.setPosition(80, 80);
 
     for (auto dir : DIRECTIONS) {
-        for (auto &col : tank.look(dir)) {
+        for (const auto *col : tank.look(dir)) {
             CHECK(col != nullptr);
             CHECK(col->getType() == Tanks::model::EntityType::FLOOR);
         }
@@ -719,7 +719,7 @@ TEST_CASE("Bots, bonuses stress") {
         clientModel.nextTick();
         CHECK(differences(serverModel, clientModel) == 0);
     }
-    for (int i = errorTick; i < 10000; i++) {
+    for (int i = errorTick; i < 1000; i++) {
         serverModel.nextTick();
         clientModel.nextTick();
         CHECK(differences(serverModel, clientModel) == 0);
@@ -735,23 +735,13 @@ TEST_CASE("Bots, bonuses stress") {
 TEST_CASE("BIG Bots, bonuses stress") {
     INIT_GAME_FULL(1, 100, 100);
     ADD_PLAYER(serverModel, );
-    //    clientModel.loadLevel(1);
     serverModel.nextTick();
-    //    clientModel.nextTick();
-    //    CHECK(serverModel.getTick() == clientModel.getTick());
-    //    CHECK(differences(serverModel, clientModel) == 0);
 
     int bonuseHere = 0;
-    int errorTick = 1266;
+    constexpr int ERROR_TICK = 1e4;
     // 1266
-    for (int i = 0; i < errorTick; i++) {
+    for (int i = 0; i < ERROR_TICK; i++) {
         serverModel.nextTick();
-        //        std::cout << serverModel.getTick() << std::endl;
-        //        if
-        //        (!serverModel.getAll(EntityType::WALK_ON_WATER_BONUS).empty())
-        //        {
-        //            bonuseHere++;
-        //        }
     }
     serverModel.nextTick();
     serverModel.finishGame();
