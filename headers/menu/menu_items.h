@@ -20,7 +20,8 @@ enum class ButtonType {
     LEVEL,
     USER,
     NEW_USER,
-    USERS
+    USERS,
+    DELETE
 };
 
 std::string convertButtonTypeToString(ButtonType type);
@@ -189,6 +190,20 @@ public:
 private:
     std::unique_ptr<MenuInscription> description;
 };
+
+struct MenuAdditionalButton final : MenuButton {
+public:
+    MenuAdditionalButton(const MenuItem *mainButton_,
+                         int marginFromLeft,
+                         std::unique_ptr<MenuItem> &&content,
+                         ButtonWithType &info);
+
+    const MenuItem *getMainButton() const;
+
+private:
+    const MenuItem *const mainButton;
+};
+
 }  // namespace Tanks::Menu
 
 #endif

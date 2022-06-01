@@ -7,10 +7,16 @@ constexpr static int DELETE_KEY = 8;
 
 TextBox::TextBox(size_t limit_,
                  const InscriptionInfo &info,
-                 const sf::Vector2<float> &rectangleSize, // NOLINT
+                 const sf::Vector2<float> &rectangleSize,  // NOLINT
                  const sf::Vector2<float> &pos,
                  const sf::Color &rectangleColor)
-    : rectangle(rectangleSize), text(info.inscription), content(std::make_unique<MenuInscription>(InscriptionInfo{"user1", info.characterSize, info.textColor}, pos)),  limit(limit_), defaultColor(info.textColor) {
+    : rectangle(rectangleSize),
+      text(info.inscription),
+      content(std::make_unique<MenuInscription>(
+          InscriptionInfo{"user1", info.characterSize, info.textColor},
+          pos)),
+      limit(limit_),
+      defaultColor(info.textColor) {
     setPosition(pos);
     content->setStandardPosition(content->getPosition());
     rectangle.setFillColor(rectangleColor);
@@ -46,7 +52,7 @@ void TextBox::draw(sf::RenderWindow &window) const {
         content->setContent(text);
         content->setPosition(content->getStandardPosition());
     } else {
-        content->setContent(text + (text.size() == limit ? "" :  "_"));
+        content->setContent(text + (text.size() == limit ? "" : "_"));
         content->draw(window);
     }
 }

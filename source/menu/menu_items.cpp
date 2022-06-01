@@ -291,4 +291,21 @@ std::string MenuPictureWithDescription::getDescription() const {
     return description->getContent();
 }
 
+MenuAdditionalButton::MenuAdditionalButton(const MenuItem *const mainButton_,
+                                           int marginFromLeft,
+                                           std::unique_ptr<MenuItem> &&content,
+                                           ButtonWithType &info)
+    : MenuButton(std::move(content),
+                 sf::Vector2<float>{mainButton_->getPosition().x +
+                                        static_cast<float>(marginFromLeft) +
+                                        mainButton_->getSize().x,
+                                    mainButton_->getPosition().y},
+                 info),
+      mainButton(mainButton_) {
+}
+
+const MenuItem *MenuAdditionalButton::getMainButton() const {
+    return mainButton;
+}
+
 }  // namespace Tanks::Menu

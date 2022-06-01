@@ -202,6 +202,21 @@ void Menu::addIconToLeftLowerCorner(const std::string &filename,
     addMenuItem(initIcon(image, type, coordinates, 2 * margin));
 }
 
+void Menu::addAddingButtons(size_t start,
+                            std::vector<std::unique_ptr<MenuItem>> &&elements,
+                            ButtonWithType &info) {
+    const static int marginFromLeft = 10;
+    for (size_t i = start; i < start + elements.size(); ++i) {
+        auto content = std::move(elements[i - start]);
+        const auto *item = items[i].get();
+        sf::Vector2<float> size = info.getSize();
+        assert(content->getSize().x < size.x && content->getSize().y < size.y);
+        auto res = std::make_unique<MenuAdditionalButton>(
+            item, marginFromLeft, std::move(content), info);
+        addMenuItem(std::move(res));
+    }
+}
+
 const std::vector<std::unique_ptr<MenuItem>> &Menu::getItems() const {
     return items;
 }

@@ -1,9 +1,9 @@
 #include "menu/input_menu.h"
-#include "menu/menu.h"
-#include "constants.h"
-#include "menu/textbox.h"
-#include "menu/menu_controller.h"
 #include <cassert>
+#include "constants.h"
+#include "menu/menu.h"
+#include "menu/menu_controller.h"
+#include "menu/textbox.h"
 
 namespace Tanks::Menu {
 
@@ -16,14 +16,18 @@ Menu initMenu(const std::string &titleText) {
     const static float marginFromTitle = 80;
     const static size_t titleCharacterSize = 80;
     InscriptionInfo titleInfo{titleText, titleCharacterSize, textColor};
-    auto title = std::make_unique<MenuInscription>(titleInfo, sf::Vector2<float>{0, 0});
+    auto title =
+        std::make_unique<MenuInscription>(titleInfo, sf::Vector2<float>{0, 0});
 
     const static size_t textSize = 50;
 
     const auto menuWidth = title->getSize().x;
     const static sf::Vector2<float> textboxSize{menuWidth, 80};
 
-    sf::Vector2<float> curCoordinates{(WINDOW_WIDTH - textboxSize.x) / 2, (WINDOW_HEIGHT - title->getSize().y - marginFromTitle - textboxSize.y) / 2};
+    sf::Vector2<float> curCoordinates{
+        (WINDOW_WIDTH - textboxSize.x) / 2,
+        (WINDOW_HEIGHT - title->getSize().y - marginFromTitle - textboxSize.y) /
+            2};
     title->setPosition(curCoordinates);
     title->setStandardPosition(curCoordinates);
     curCoordinates.y += title->getSize().y + marginFromTitle;
@@ -31,15 +35,16 @@ Menu initMenu(const std::string &titleText) {
 
     InscriptionInfo info{"", textSize, textColor};
 
-    auto textbox = std::make_unique<TextBox>(limit, info, textboxSize, curCoordinates, sf::Color(0, 0, 0));
+    auto textbox = std::make_unique<TextBox>(
+        limit, info, textboxSize, curCoordinates, sf::Color(0, 0, 0));
     menu.addMenuItem(std::move(textbox));
 
     return menu;
 }
 
 std::optional<std::string> showInputMenu(sf::RenderWindow &window,
-                   const sf::Sprite &background,
-                   const std::string &title) {
+                                         const sf::Sprite &background,
+                                         const std::string &title) {
     const static std::string imagesPath = "../images/menu/";
 
     auto menu(initMenu(title));

@@ -36,6 +36,9 @@ public:
     void addMenuItem(std::unique_ptr<MenuItem> &&item);
     void addIconToLeftUpCorner(const std::string &filename, ButtonType type);
     void addIconToLeftLowerCorner(const std::string &filename, ButtonType type);
+    void addAddingButtons(size_t start,
+                          std::vector<std::unique_ptr<MenuItem>> &&elements,
+                          ButtonWithType &info);
 
     // animations
     void flyOutFromLeft(sf::RenderWindow &window,

@@ -37,13 +37,14 @@ std::optional<Menu::MenuButton *> MenuController::control(
 
 const static int ENTERED_KEY = 13;
 
-std::optional<std::string> MenuController::textEntered(const Menu::Menu &menu, sf::Event &event) {
+std::optional<std::string> MenuController::textEntered(const Menu::Menu &menu,
+                                                       sf::Event &event) {
     for (const auto &menuItem : menu.getItems()) {
         auto *item = dynamic_cast<Menu::TextBox *>(menuItem.get());
         if (item == nullptr) {
             continue;
         }
-        auto charTyped = event.text.unicode; // NOLINT
+        auto charTyped = event.text.unicode;  // NOLINT
         if (charTyped == ENTERED_KEY) {
             return item->getContent();
         }
