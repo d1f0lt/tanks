@@ -164,6 +164,10 @@ void MenuRectangle::setPosition(sf::Vector2<float> newPosition) {
     rectangle.setPosition(newPosition);
 }
 
+void MenuRectangle::setBorderColor(const sf::Color &color) {
+    rectangle.setOutlineColor(color);
+}
+
 void MenuRectangle::draw(sf::RenderWindow &window) const {
     window.draw(rectangle);
 }
@@ -339,7 +343,7 @@ MenuAdditionalButton::MenuAdditionalButton(const MenuItem *const mainButton_,
                  sf::Vector2<float>{mainButton_->getPosition().x +
                                         static_cast<float>(marginFromLeft) +
                                         mainButton_->getSize().x,
-                                    mainButton_->getPosition().y},
+                                    mainButton_->getPosition().y + mainButton_->getSize().y - info.getSize().y},
                  info),
       mainButton(mainButton_) {
 }

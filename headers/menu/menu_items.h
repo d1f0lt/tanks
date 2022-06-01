@@ -21,7 +21,8 @@ enum class ButtonType {
     USER,
     NEW_USER,
     USERS,
-    DELETE
+    DELETE,
+    IMPROVE
 };
 
 std::string convertButtonTypeToString(ButtonType type);
@@ -60,9 +61,9 @@ private:
 };
 
 struct InscriptionInfo final {
-    const std::string inscription{};
-    const size_t characterSize{};
-    const sf::Color textColor{};
+    std::string inscription{};
+    size_t characterSize{};
+    sf::Color textColor{};
 };
 
 struct MenuInscription final : MenuItem {
@@ -128,6 +129,7 @@ public:
     sf::Vector2<float> getPosition() const override;
 
     void setPosition(sf::Vector2<float> newPosition) override;
+    void setBorderColor(const sf::Color &color);
 
     void draw(sf::RenderWindow &window) const override;
 
