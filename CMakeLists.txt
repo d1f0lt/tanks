@@ -41,6 +41,7 @@ add_executable(
         source/menu/menu.cpp
         source/menu/menu_items.cpp
         source/menu/menu_controller.cpp
+        source/menu/textbox.cpp
 )
 
 target_compile_options(menu_tests PRIVATE ${COMPILER_FLAGS_FOR_MENU_TESTS})

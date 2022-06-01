@@ -42,6 +42,7 @@ public:
                         const sf::Sprite &backgroundSprite);
     void flyAwayToLeft(sf::RenderWindow &window,
                        const sf::Sprite &backgroundSprite);
+    void flyAwayToLeft();
     void flyOutFromRight(sf::RenderWindow &window,
                          const sf::Sprite &backgroundSprite);
     void flyAwayToRight(sf::RenderWindow &window,

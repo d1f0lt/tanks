@@ -24,6 +24,10 @@ sf::Vector2<float> TextBox::getPosition() const {
     return rectangle.getPosition();
 }
 
+std::string TextBox::getContent() const {
+    return text;
+}
+
 void TextBox::setPosition(sf::Vector2<float> newPosition) {
     const static int marginLeft = 35;
     rectangle.setPosition(newPosition);

@@ -45,7 +45,7 @@ std::optional<std::string> MenuController::textEntered(const Menu::Menu &menu, s
         }
         auto charTyped = event.text.unicode; // NOLINT
         if (charTyped == ENTERED_KEY) {
-            return item->content->getContent();
+            return item->getContent();
         }
         if (charTyped < 128) {
             item->input(static_cast<char>(charTyped));
