@@ -29,7 +29,7 @@ class GameModel {
     friend BonusHandler;
 
 public:
-    explicit GameModel() = default;
+    explicit GameModel();
     virtual ~GameModel() = default;
 
     virtual void finishGame() = 0;
@@ -70,7 +70,8 @@ protected:
     [[nodiscard]] GameMap &getMap();
     [[nodiscard]] const std::vector<std::vector<Entity *>> &getAllByLink();
     [[nodiscard]] std::shared_mutex &getMutex() const;
-    [[nodiscard]] bool &getIsFinished();
+    [[nodiscard]] bool isFinished() const;
+    void setFinished();
 
 private:
     GameMap map_;
@@ -83,7 +84,7 @@ private:
     EntityHolder entityHolder_;
     bool wasShootThisTurn_ = false;
     bool wasDestroyedBlockThisTurn_ = false;
-    bool isFinished_ = false;
+    std::shared_ptr<std::atomic<bool>> isFinished_;
     mutable std::unique_ptr<std::shared_mutex> sharedMutex_;
 };
 

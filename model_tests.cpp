@@ -12,6 +12,7 @@
 
 using namespace Tanks;
 using namespace Tanks::model;
+using boost::asio::io_context;
 using boost::asio::ip::tcp;
 
 const std::array<Tanks::model::Direction, 4> DIRECTIONS = {
@@ -35,6 +36,15 @@ void setPosition(DebugServer &server,
                  int top) {
     server.addEvent(std::make_unique<SetPosition>(id, left, top));
 }
+
+std::shared_ptr<io_context> newContext() {
+    return std::make_shared<io_context>();
+}
+
+std::shared_ptr<tcp::socket> newSocket(
+    const std::shared_ptr<io_context> &context) {
+    return std::make_shared<tcp::socket>(*context);
+}
 }  // namespace
 TEST_CASE("Game creation") {
     Tanks::model::ServerModel model;
@@ -44,37 +54,38 @@ TEST_CASE("Game creation") {
     CHECK(brick00.getType() == EntityType::FLOOR);
 }
 
-#define ADD_PLAYER(model, i)                                   \
-    boost::asio::io_context context_client##i;                 \
-    tcp::socket server##i(context_client##i);                  \
-    auto connection##i =                                       \
-        std::thread([&]() { server##i = acceptor.accept(); }); \
-                                                               \
-    tcp::socket client##i(context_client##i);                  \
-    client##i.connect(acceptor.local_endpoint());              \
-    connection##i.join();                                      \
-    auto id##i = serverModel.addPlayer(server##i);             \
-    ClientModel clientModel##i(id##i, std::move(client##i));
+#define ADD_PLAYER(model, i)                                          \
+    auto context_client##i = newContext();                            \
+    std::shared_ptr<tcp::socket> server##i;                           \
+    auto connection##i = std::thread([&]() {                          \
+        server##i = std::make_shared<tcp::socket>(acceptor.accept()); \
+    });                                                               \
+                                                                      \
+    auto client##i = newSocket(context_client##i);                    \
+    client##i->connect(acceptor.local_endpoint());                    \
+    connection##i.join();                                             \
+    auto id##i = serverModel.addPlayer(server##i, serverContext);     \
+    ClientModel clientModel##i(id##i, std::move(*client##i));
 
 #define GET_PLAYER_CONTORS(i)                                                \
     auto &tank##i = dynamic_cast<Tank &>(serverModel.getById(id##i)->get()); \
     auto &handler##i =                                                       \
         dynamic_cast<TankHandler &>(serverModel.getHandler(tank##i));
 
-#define INIT_GAME()                                                  \
-    DebugServer serverModel;                                         \
-    boost::asio::io_context io_context;                              \
-    tcp::acceptor acceptor(io_context, tcp::endpoint(tcp::v4(), 0)); \
-    ADD_PLAYER(serverModel, );                                       \
-    serverModel.nextTick();                                          \
-    GET_PLAYER_CONTORS()                                             \
-    clientModel.loadLevel(1);                                        \
+#define INIT_GAME()                                                      \
+    DebugServer serverModel;                                             \
+    auto serverContext = newContext();                                   \
+    tcp::acceptor acceptor(*serverContext, tcp::endpoint(tcp::v4(), 0)); \
+    ADD_PLAYER(serverModel, );                                           \
+    serverModel.nextTick();                                              \
+    GET_PLAYER_CONTORS()                                                 \
+    clientModel.loadLevel(1);                                            \
     clientModel.nextTick();
 
 #define INIT_GAME_FULL(level, bots, bonuses)       \
     DebugServer serverModel(level, bots, bonuses); \
-    boost::asio::io_context io_context;            \
-    tcp::acceptor acceptor(io_context, tcp::endpoint(tcp::v4(), 0));
+    auto serverContext = newContext();             \
+    tcp::acceptor acceptor(*serverContext, tcp::endpoint(tcp::v4(), 0));
 
 bool operator==(const Entity &a, const Entity &b) {
     if (a.getId() != b.getId()) {
@@ -179,17 +190,7 @@ TEST_CASE("Network functions") {
 }
 
 TEST_CASE("Single move. Online") {
-    //    INIT_GAME();
-
-    DebugServer serverModel;
-    boost::asio::io_context io_context;
-    tcp::acceptor acceptor(io_context, tcp::endpoint(tcp::v4(), 0));
-    ADD_PLAYER(serverModel, );
-    clientModel.loadLevel(1);
-    CHECK(differences(serverModel, clientModel) == 0);
-    serverModel.nextTick();
-    GET_PLAYER_CONTORS()
-    clientModel.nextTick();
+    INIT_GAME();
 
     CHECK(differences(serverModel, clientModel) == 0);
     setPosition(serverModel, clientModel, id, TILE_SIZE, TILE_SIZE);
@@ -757,14 +758,16 @@ TEST_CASE("10 users 30 bots 10 bonuses, check correction") {
     //        std::chrono::steady_clock::now().time_since_epoch().count());
     std::mt19937 rnd{0};
     std::thread([&]() -> void {
-        std::vector<tcp::socket> serverSockets;
+        std::vector<std::shared_ptr<tcp::socket>> serverSockets;
         serverSockets.reserve(100);
         while (true) {
             try {
                 tcp::socket server = acceptor.accept();
-                serverSockets.emplace_back(std::move(server));
-                int id = serverModel.addPlayer(serverSockets.back());
-                sendInt(serverSockets.back(), id);
+                serverSockets.emplace_back(
+                    std::make_shared<tcp::socket>(std::move(server)));
+                int id =
+                    serverModel.addPlayer(serverSockets.back(), serverContext);
+                sendInt(*serverSockets.back(), id);
             } catch (boost::system::system_error &e) {
                 return;
             }
@@ -839,14 +842,16 @@ TEST_CASE("Real") {
     //        std::chrono::steady_clock::now().time_since_epoch().count());
     std::mt19937 rnd{0};
     std::thread([&]() -> void {
-        std::vector<tcp::socket> serverSockets;
+        std::vector<std::shared_ptr<tcp::socket>> serverSockets;
         serverSockets.reserve(100);
         while (true) {
             try {
                 tcp::socket server = acceptor.accept();
-                serverSockets.emplace_back(std::move(server));
-                int id = serverModel.addPlayer(serverSockets.back());
-                sendInt(serverSockets.back(), id);
+                serverSockets.emplace_back(
+                    std::make_shared<tcp::socket>(std::move(server)));
+                int id =
+                    serverModel.addPlayer(serverSockets.back(), serverContext);
+                sendInt(*serverSockets.back(), id);
             } catch (boost::system::system_error &e) {
                 return;
             }
@@ -922,14 +927,16 @@ TEST_CASE("4 users 4 bots 2 bonuses, don't check correction") {
     //        std::chrono::steady_clock::now().time_since_epoch().count());
     std::mt19937 rnd{0};
     std::thread([&]() -> void {
-        std::vector<tcp::socket> serverSockets;
+        std::vector<std::shared_ptr<tcp::socket>> serverSockets;
         serverSockets.reserve(100);
         while (true) {
             try {
                 tcp::socket server = acceptor.accept();
-                serverSockets.emplace_back(std::move(server));
-                int id = serverModel.addPlayer(serverSockets.back());
-                sendInt(serverSockets.back(), id);
+                serverSockets.emplace_back(
+                    std::make_shared<tcp::socket>(std::move(server)));
+                int id =
+                    serverModel.addPlayer(serverSockets.back(), serverContext);
+                sendInt(*serverSockets.back(), id);
             } catch (boost::system::system_error &e) {
                 return;
             }
@@ -1010,14 +1017,16 @@ TEST_CASE("4 users 4 bots 2 bonuses, don't check correction") {
     //        std::chrono::steady_clock::now().time_since_epoch().count());
     std::mt19937 rnd{0};
     std::thread([&]() -> void {
-        std::vector<tcp::socket> serverSockets;
+        std::vector<std::shared_ptr<tcp::socket>> serverSockets;
         serverSockets.reserve(100);
         while (true) {
             try {
                 tcp::socket server = acceptor.accept();
-                serverSockets.emplace_back(std::move(server));
-                int id = serverModel.addPlayer(serverSockets.back());
-                sendInt(serverSockets.back(), id);
+                serverSockets.emplace_back(
+                    std::make_shared<tcp::socket>(std::move(server)));
+                int id =
+                    serverModel.addPlayer(serverSockets.back(), serverContext);
+                sendInt(*serverSockets.back(), id);
             } catch (boost::system::system_error &e) {
                 return;
             }

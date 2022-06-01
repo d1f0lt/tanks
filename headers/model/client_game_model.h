@@ -28,11 +28,11 @@ protected:
 
 private:
     const int playerId_;
-    tcp::socket socket_;
+    std::shared_ptr<tcp::socket> socket_;
     //    std::thread receiver_;
 
-    SafeQueue<std::unique_ptr<Event>> events_;
-    SafeQueue<int> tickSize_;
+    std::shared_ptr<SafeQueue<std::unique_ptr<Event>>> events_;
+    std::shared_ptr<SafeQueue<int>> tickSize_;
 };
 }  // namespace Tanks::model
 

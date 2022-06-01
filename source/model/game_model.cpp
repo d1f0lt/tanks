@@ -11,6 +11,10 @@
 #include "model/projectile.h"
 
 namespace Tanks::model {
+GameModel::GameModel()
+    : isFinished_(std::make_shared<std::atomic<bool>>(false)) {
+}
+
 Entity &GameModel::getByCoords(int col, int row) {
     return map_.getEntityByCoords(col, row);
 }
@@ -140,7 +144,7 @@ std::vector<std::vector<const Entity *>> GameModel::getAll() const {
 }
 
 void GameModel::nextTick() {
-    if (getIsFinished()) {
+    if (isFinished()) {
         return;
     }
     wasShootThisTurn_ = false;
@@ -200,9 +204,12 @@ std::shared_mutex &GameModel::getMutex() const {
 bool GameModel::wasDestroyedBlockThisTurn() const {
     return wasDestroyedBlockThisTurn_;
 }
+void GameModel::setFinished() {
+    *isFinished_ = true;
+}
 
-bool &GameModel::getIsFinished() {
-    return isFinished_;
+bool GameModel::isFinished() const {
+    return *isFinished_;
 }
 
 // TODO

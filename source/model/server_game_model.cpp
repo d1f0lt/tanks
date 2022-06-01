@@ -32,9 +32,9 @@ void ServerModel::receiveTurns(
     auto client = atomic_load(&clientExt);
     auto context = atomic_load(&contextExt);
     try {
-        while (!getIsFinished()) {
+        while (!isFinished()) {
             auto event = readEvent(*client);
-            if (getIsFinished()) {
+            if (isFinished()) {
                 return;
             }
             if (!event) {
@@ -190,6 +190,8 @@ void ServerModel::addEvent(std::unique_ptr<Event> event) {
 }
 
 void ServerModel::finishGame() {
+    events_.Produce(std::make_unique<GameEnd>(1));
+    setFinished();
     //    events_.Produce(std::make_unique<GameEnd>(1));
     //    events_.Produce(std::make_unique<GameEnd>(1));
     //    playersSockets_.clear();
