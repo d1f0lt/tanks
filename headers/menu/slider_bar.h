@@ -32,10 +32,10 @@ private:
     const size_t minVolume = 0;
     size_t curVolume = 50;
     std::unique_ptr<MenuInscription> title;
-    const static size_t axisWidth = 1000;
-    const static size_t axisHeight = 110;
-    const static size_t sliderWidth = 110;
-    const static size_t sliderHeight = 210;
+    const static size_t axisWidth = 600;
+    const static size_t axisHeight = 20;
+    const static size_t sliderWidth = 20;
+    const static size_t sliderHeight = 80;
     SliderBarType type;
 };
 
