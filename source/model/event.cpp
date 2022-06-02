@@ -35,6 +35,10 @@ void TankMove::sendTo(boost::asio::ip::tcp::socket &socket) const {
     sendMultipleInts(socket, EventType::TANK_MOVE, id_, direction_, speed_);
 }
 
+EventType TankMove::getType() const {
+    return EventType::TANK_MOVE;
+}
+
 std::unique_ptr<Event> readEvent(boost::asio::ip::tcp::socket &socket) {
     const std::unordered_map<EventType,
                              std::unique_ptr<Event> (*)(tcp::socket &)>
@@ -69,9 +73,6 @@ std::unique_ptr<Event> SpawnTank::readFrom(tcp::socket &socket) {
         receiveMultipleInts<int, int, int, EntityType, int, int, int>(socket);
     return std::make_unique<SpawnTank>(tankId, left, top, type, tankSpeed,
                                        bulletSpeed, reloadTicks);
-}
-EntityType SpawnTank::getType() const {
-    return entityType_;
 }
 
 DecrId SpawnTank::getTankId() const {
@@ -117,6 +118,10 @@ int SpawnTank::getReloadTicks() const {
     return reloadTicks_;
 }
 
+EventType SpawnTank::getType() const {
+    return EventType::SPAWN_TANK;
+}
+
 BonusSpawn::BonusSpawn(int id, int left, int top, EntityType type)
     : id_(id), left_(left), top_(top), type_(type) {
 }
@@ -147,8 +152,12 @@ int BonusSpawn::getTop() const {
     return top_;
 }
 
-EntityType BonusSpawn::getType() const {
+EntityType BonusSpawn::getEntityType() const {
     return type_;
+}
+
+EventType BonusSpawn::getType() const {
+    return EventType::BONUS_SPAWN;
 }
 
 bool TankShoot::acceptExecutor(const EventVisitor &executor) {
@@ -172,6 +181,10 @@ TankShoot::TankShoot(int tankId, Direction direction)
 std::unique_ptr<Event> TankShoot::readFrom(tcp::socket &socket) {
     auto [tankId, direction] = receiveMultipleInts<int, Direction>(socket);
     return std::make_unique<TankShoot>(tankId, direction);
+}
+
+EventType TankShoot::getType() const {
+    return EventType::TANK_SHOOT;
 }
 
 SetPosition::SetPosition(int id, int left, int top)
@@ -201,6 +214,10 @@ std::unique_ptr<Event> SetPosition::readFrom(tcp::socket &socket) {
     return std::make_unique<SetPosition>(id_, left_, top_);
 }
 
+EventType SetPosition::getType() const {
+    return EventType::SET_POSITION;
+}
+
 bool GameEnd::acceptExecutor(const EventVisitor &executor) {
     return true;
 }
@@ -219,5 +236,9 @@ std::unique_ptr<Event> GameEnd::readFrom(tcp::socket &socket) {
 }
 
 GameEnd::GameEnd(int kills) : kills_(kills) {
+}
+
+EventType GameEnd::getType() const {
+    return EventType::GAME_END;
 }
 }  // namespace Tanks::model

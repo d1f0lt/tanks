@@ -2,12 +2,13 @@
 #define TANKS_GAME_MODEL_H
 
 #include <chrono>
+#include <mutex>
 #include <optional>
 #include <queue>
 #include <random>
-#include <shared_mutex>
 #include <unordered_map>
-#include "entity_holder.h"
+//
+#include "model/entity_holder.h"
 #include "model/event.h"
 #include "model/event_executor.h"
 #include "model/game_map.h"
@@ -29,10 +30,14 @@ class GameModel {
     friend BonusHandler;
 
 public:
-    explicit GameModel();
+    explicit GameModel() = default;
     virtual ~GameModel() = default;
+    GameModel(GameModel &&) = delete;
+    GameModel(const GameModel &) = delete;
+    GameModel &operator=(const GameModel &) = delete;
+    GameModel &operator=(GameModel &&) = delete;
 
-    virtual void finishGame() = 0;
+    virtual void finishGame() noexcept = 0;
 
     [[nodiscard]] Entity &getByCoords(int col, int row);
     [[nodiscard]] std::optional<std::reference_wrapper<Entity>> getById(
@@ -69,8 +74,8 @@ protected:
 
     [[nodiscard]] GameMap &getMap();
     [[nodiscard]] const std::vector<std::vector<Entity *>> &getAllByLink();
-    [[nodiscard]] std::shared_mutex &getMutex() const;
-    [[nodiscard]] bool isFinished() const;
+    [[nodiscard]] std::mutex &getMutex() const;
+    [[nodiscard]] bool getIsFinished() const;
     void setFinished();
 
 private:
@@ -84,8 +89,8 @@ private:
     EntityHolder entityHolder_;
     bool wasShootThisTurn_ = false;
     bool wasDestroyedBlockThisTurn_ = false;
-    std::shared_ptr<std::atomic<bool>> isFinished_;
-    mutable std::unique_ptr<std::shared_mutex> sharedMutex_;
+    std::atomic<bool> isFinished_ = false;
+    mutable std::mutex modelMutex_;
 };
 
 }  // namespace Tanks::model

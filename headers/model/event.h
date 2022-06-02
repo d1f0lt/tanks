@@ -28,11 +28,14 @@ public:
 
     virtual bool acceptExecutor(const EventVisitor &executor) = 0;
     virtual void sendTo(tcp::socket &socket) const = 0;
+    [[nodiscard]] virtual EventType getType() const = 0;
 };
 
 class TankMove : public Event {
 public:
     explicit TankMove(int tankId, Direction direction, int speed);
+
+    [[nodiscard]] EventType getType() const override;
 
     bool acceptExecutor(const EventVisitor &executor) final;
     void sendTo(tcp::socket &socket) const override;
@@ -59,6 +62,8 @@ public:
                        int bulletSpeed,
                        int reloadTicks);
 
+    [[nodiscard]] EventType getType() const override;
+
     void sendTo(tcp::socket &socket) const override;
     bool acceptExecutor(const EventVisitor &executor) override;
 
@@ -67,7 +72,6 @@ public:
     [[nodiscard]] DecrId getTankId() const;
     [[nodiscard]] int getLeft() const;
     [[nodiscard]] int getTop() const;
-    [[nodiscard]] EntityType getType() const;
     [[nodiscard]] EntityType getEntityType() const;
     [[nodiscard]] int getTankSpeed() const;
     [[nodiscard]] int getBulletSpeed() const;
@@ -87,6 +91,8 @@ class TankShoot : public Event {
 public:
     explicit TankShoot(int tankId, Direction direction);
 
+    [[nodiscard]] EventType getType() const override;
+
     bool acceptExecutor(const EventVisitor &executor) override;
 
     void sendTo(tcp::socket &socket) const override;
@@ -104,6 +110,8 @@ class BonusSpawn : public Event {
 public:
     explicit BonusSpawn(int id, int left, int top, EntityType type);
 
+    [[nodiscard]] EventType getType() const override;
+
     void sendTo(tcp::socket &socket) const override;
     [[nodiscard]] static std::unique_ptr<Event> readFrom(tcp::socket &socket);
 
@@ -112,7 +120,7 @@ public:
     [[nodiscard]] DecrId getId() const;
     [[nodiscard]] int getLeft() const;
     [[nodiscard]] int getTop() const;
-    [[nodiscard]] EntityType getType() const;
+    [[nodiscard]] EntityType getEntityType() const;
 
 private:
     const DecrId id_;
@@ -124,6 +132,8 @@ private:
 class SetPosition : public Event {
 public:
     explicit SetPosition(int id, int left, int top);
+
+    [[nodiscard]] EventType getType() const override;
 
     bool acceptExecutor(const EventVisitor &executor) override;
     void sendTo(tcp::socket &socket) const override;
@@ -142,6 +152,8 @@ private:
 class GameEnd : public Event {
 public:
     explicit GameEnd(int kills);
+
+    [[nodiscard]] EventType getType() const override;
 
     bool acceptExecutor(const EventVisitor &executor) override;
 

@@ -25,10 +25,10 @@ public:
 private:
     std::unique_ptr<std::atomic<bool>> isStarted;
     std::unique_ptr<std::atomic<bool>> isStopped;
-    std::vector<std::shared_ptr<boost::asio::ip::tcp::socket>> sockets_;
-    std::unique_ptr<model::ServerModel> model_;
+    std::vector<tcp::socket> sockets_;
     std::shared_ptr<boost::asio::io_context> ioContext_;
     tcp::acceptor acceptor_;
+    std::unique_ptr<model::ServerModel> model_;
 
     void work();
 };

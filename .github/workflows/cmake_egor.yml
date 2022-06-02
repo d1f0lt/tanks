@@ -27,7 +27,7 @@ jobs:
       - run: cppcheck --language=c++ --check-config --check-library -Iheaders --enable=all -isystem -idoctest.h -imodel_tests.cpp --suppress=missingIncludeSystem --error-exitcode=1 --inline-suppr $(find . -iname '*.cpp')
   compile-run:
     runs-on: ${{ matrix.compiler.runs-on }}
-    timeout-minutes: 20
+    timeout-minutes: 60
     strategy:
       matrix:
         compiler:

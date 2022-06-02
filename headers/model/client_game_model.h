@@ -12,13 +12,13 @@ using boost::asio::ip::tcp;
 
 class ClientModel : public GameModel {
 public:
-    ~ClientModel() noexcept override;
     explicit ClientModel(int playerId, tcp::socket socket);
+    ~ClientModel() noexcept override;
 
     [[nodiscard]] PlayerActionsHandler getHandler();
 
     [[nodiscard]] std::optional<std::reference_wrapper<Tank>> tank();
-    void finishGame() override;
+    void finishGame() noexcept override;
 
 protected:
     void receiveEvents();
@@ -28,11 +28,11 @@ protected:
 
 private:
     const int playerId_;
-    std::shared_ptr<tcp::socket> socket_;
-    //    std::thread receiver_;
+    tcp::socket socket_;
 
-    std::shared_ptr<SafeQueue<std::unique_ptr<Event>>> events_;
-    std::shared_ptr<SafeQueue<int>> tickSize_;
+    SafeQueue<std::unique_ptr<Event>> events_;
+    SafeQueue<int> tickSize_;
+    std::thread receiver_;
 };
 }  // namespace Tanks::model
 

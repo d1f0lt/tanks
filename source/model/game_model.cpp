@@ -1,8 +1,5 @@
 #include "model/game_model.h"
 #include <cassert>
-#include <fstream>
-#include <iostream>
-#include <mutex>
 #include <optional>
 #include <string>
 #include <thread>
@@ -10,11 +7,14 @@
 #include "model/blocks.h"
 #include "model/projectile.h"
 
-namespace Tanks::model {
-GameModel::GameModel()
-    : isFinished_(std::make_shared<std::atomic<bool>>(false)) {
-}
+#ifndef NDEBUG
+#include <fstream>
+#include <iostream>
+#include "model/client_game_model.h"
+#include "model/server_game_model.h"
+#endif
 
+namespace Tanks::model {
 Entity &GameModel::getByCoords(int col, int row) {
     return map_.getEntityByCoords(col, row);
 }
@@ -144,13 +144,12 @@ std::vector<std::vector<const Entity *>> GameModel::getAll() const {
 }
 
 void GameModel::nextTick() {
-    if (isFinished()) {
+    if (getIsFinished()) {
         return;
     }
+    std::unique_lock lock(getMutex());
     wasShootThisTurn_ = false;
     wasDestroyedBlockThisTurn_ = false;
-    //    std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    //    std::unique_lock lock(getMutex());
     executeAllEvents();
     moveBullets();
     currentTick_++;
@@ -165,6 +164,20 @@ const std::vector<std::vector<Entity *>> &GameModel::getAllByLink() {
 }
 
 bool GameModel::executeEvent(Event &event) {
+#ifndef NDEBUG
+    {
+        const char *filename = nullptr;
+        if (dynamic_cast<ServerModel *>(this) != nullptr) {
+            filename = "server.log";
+        } else {
+            filename = "client.log";
+        }
+        std::ofstream of(filename, std::ios_base::app);
+        of << getTick() << ' ' << static_cast<int>(event.getType())
+           << std::endl;
+    }
+#endif
+
     return event.acceptExecutor(EventExecutor(*this));
 }
 
@@ -175,7 +188,7 @@ bool GameModel::wasShootThisTurn() const {
 void GameModel::moveBullets() {
     auto type = static_cast<unsigned>(EntityType::BULLET);
     const auto &all = getAllByLink()[type];
-    for (unsigned i = 0; i < all.size(); i++) {  // bullet can be destroyed
+    for (unsigned i = 0; i < all.size(); i++) {  // NOLINT iterator is unsafe
         auto *bullet = dynamic_cast<Projectile *>(all[i]);
         assert(bullet != nullptr);
         assert(getById(bullet->getId()));
@@ -197,19 +210,20 @@ int GameModel::getRnd() {
     return std::abs(static_cast<int>(rnd()));
 }
 
-std::shared_mutex &GameModel::getMutex() const {
-    return *sharedMutex_;
+std::mutex &GameModel::getMutex() const {
+    return modelMutex_;
 }
 
 bool GameModel::wasDestroyedBlockThisTurn() const {
     return wasDestroyedBlockThisTurn_;
 }
+
 void GameModel::setFinished() {
-    *isFinished_ = true;
+    isFinished_ = true;
 }
 
-bool GameModel::isFinished() const {
-    return *isFinished_;
+bool GameModel::getIsFinished() const {
+    return isFinished_;
 }
 
 // TODO

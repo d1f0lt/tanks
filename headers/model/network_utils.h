@@ -36,6 +36,8 @@ template <typename... Args>
 [[nodiscard]] std::tuple<Args...> receiveMultipleInts(tcp::socket &socket) {
     return {static_cast<Args>(receiveInt(socket))...};
 }
+
+void safeShutdown(tcp::socket &socket);
 }  // namespace Tanks::model
 
 #endif  // TANKS_NETWORK_UTILS_H

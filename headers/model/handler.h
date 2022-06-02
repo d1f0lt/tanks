@@ -23,7 +23,7 @@ public:
     virtual ~BasicHandler();
 
     [[nodiscard]] virtual bool canStandOn(const Entity &other) const;
-    [[nodiscard]] bool initIfSurvive();
+    //    [[nodiscard]] bool initIfSurvive();
 
     virtual void destroyEntity();
 

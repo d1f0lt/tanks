@@ -35,8 +35,9 @@ private:
 
 class MediumTankSpawner : public Spawner {
 public:
-    [[nodiscard]] int getTimeout() override;
     explicit MediumTankSpawner(ServerModel &model, int entityId);
+
+    [[nodiscard]] int getTimeout() override;
 
 protected:
     [[nodiscard]] std::unique_ptr<Entity> createEntity(int left,

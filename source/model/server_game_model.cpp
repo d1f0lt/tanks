@@ -14,33 +14,26 @@
 namespace Tanks::model {
 using boost::asio::ip::tcp;
 
-int ServerModel::addPlayer(
-    const std::shared_ptr<tcp::socket> &socket,
-    const std::shared_ptr<boost::asio::io_context> &context,
-    PlayerSkills skills) {
+int ServerModel::addPlayer(tcp::socket &socket, PlayerSkills skills) {
     int id = getDecrId();
-    playersSockets_.emplace(id, *socket);
+    //    playersSockets_.emplace(id, *socket);
     setPlayerSkills(id, skills);
     spawners_.emplace_back(std::make_unique<MediumTankSpawner>(*this, id));
-    std::thread([&]() { receiveTurns(socket, context); }).detach();
+    players_.emplace(
+        id, Player{socket, std::thread([&]() { receiveTurns(socket); })});
     return id;
 }
 
-void ServerModel::receiveTurns(
-    const std::shared_ptr<tcp::socket> &clientExt,
-    const std::shared_ptr<boost::asio::io_context> &contextExt) {
-    auto client = atomic_load(&clientExt);
-    auto context = atomic_load(&contextExt);
+void ServerModel::receiveTurns(tcp::socket &socket) {
     try {
-        while (!isFinished()) {
-            auto event = readEvent(*client);
-            if (isFinished()) {
+        while (!getIsFinished()) {
+            auto event = readEvent(socket);
+            if (getIsFinished()) {
                 return;
             }
             if (!event) {
                 continue;
             }
-            //            std::shared_lock lock(getMutex());
             addEvent(std::move(event));
         }
     } catch (boost::system::system_error &e) {
@@ -53,7 +46,8 @@ void ServerModel::sendEventsToClients(
 #ifndef NDEBUG
     static std::fstream log("log_server.txt");
     log << events.size() << std::endl;
-    //    std::cout << "s " << getTick() << ' ' << events.size() << std::endl;
+    //    std::cout << "s " << getTick() << ' ' << events.size() <<
+    //    std::endl;
 
 #endif
     static auto sendAllTo =
@@ -71,8 +65,8 @@ void ServerModel::sendEventsToClients(
             }
         };
 
-    for (auto &[id, socket] : playersSockets_) {
-        sendAllTo(socket, events);
+    for (auto &[id, player] : players_) {
+        sendAllTo(player.socket_, events);
     }
 
     //    std::unordered_set<int> disconnectedUsers;
@@ -93,7 +87,7 @@ void ServerModel::sendEventsToClients(
 
 void ServerModel::executeAllEvents() {
     std::vector<std::unique_ptr<Event>> eventsToSend;
-    eventsToSend.reserve(bots_.size() + players_.size());
+    eventsToSend.reserve(bots_.size() + tanksSkills_.size());
 
     for (const auto &spawner : spawners_) {
         if (spawner->isSpawnNow()) {
@@ -145,11 +139,11 @@ std::unique_ptr<Event> ServerModel::getEventByBot(int botId) {
 }
 
 PlayerSkills ServerModel::getPlayerSkills(int id) const {
-    return players_.at(id);
+    return tanksSkills_.at(id);
 }
 
 void ServerModel::setPlayerSkills(int id, PlayerSkills skills) {
-    players_.emplace(id, skills);
+    tanksSkills_.emplace(id, skills);
 }
 
 ServerModel::ServerModel(int level, int botsCount, int bonuses) {
@@ -177,7 +171,7 @@ ServerModel::ServerModel(const std::string &level, int botsCount, int bonuses) {
 void ServerModel::addBot() {
     auto id = getDecrId();
     bots_.emplace(id);
-    players_.emplace(id, PlayerSkills());
+    tanksSkills_.emplace(id, PlayerSkills());
     spawners_.emplace_back(std::make_unique<MediumTankSpawner>(*this, id));
 }
 
@@ -189,16 +183,23 @@ void ServerModel::addEvent(std::unique_ptr<Event> event) {
     events_.Produce(std::move(event));
 }
 
-void ServerModel::finishGame() {
-    events_.Produce(std::make_unique<GameEnd>(1));
+void ServerModel::finishGame() noexcept {
+    if (getIsFinished()) {
+        return;
+    }
     setFinished();
-    //    events_.Produce(std::make_unique<GameEnd>(1));
-    //    events_.Produce(std::make_unique<GameEnd>(1));
-    //    playersSockets_.clear();
+    std::unique_lock lock(getMutex());
+    std::vector<std::unique_ptr<Event>> vec;
+    vec.emplace_back(std::make_unique<GameEnd>(1));
+    sendEventsToClients(vec);
+    for (auto &[id, player] : players_) {
+        safeShutdown(player.socket_);
+        player.receiver_.join();
+    }
 }
 
 ServerModel::~ServerModel() {
-    //    finishGame();
+    finishGame();
 }
 
 }  // namespace Tanks::model

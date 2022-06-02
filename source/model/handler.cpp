@@ -211,7 +211,11 @@ std::vector<int> ForegroundHandler::underTank() {
     for (int row = entity.getTop(); row < top + height; row++) {
         for (int col = entity.getLeft(); col < left + width; col++) {
             auto id = getModel().getByCoords(col, row).getId();
-            assert(canStandOn(getModel().getById(id)->get()));
+            assert(getModel().getById(id));
+            auto &entity = getModel().getById(id)->get();
+            if (!canStandOn(entity)) {
+                assert(canStandOn(getModel().getById(id)->get()));
+            }
             if (setted.find(id) != setted.end()) {
                 continue;
             }

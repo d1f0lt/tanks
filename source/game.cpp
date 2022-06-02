@@ -37,7 +37,7 @@ public:
     ~ServerThreadJoiner() {
         server_.stop();
         //        client_.finishGame();
-        thread_.detach();
+        thread_.join();
     }
 
 private:

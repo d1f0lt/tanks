@@ -37,14 +37,10 @@ void setPosition(DebugServer &server,
     server.addEvent(std::make_unique<SetPosition>(id, left, top));
 }
 
-std::shared_ptr<io_context> newContext() {
-    return std::make_shared<io_context>();
+tcp::socket newSocket(io_context &context) {
+    return tcp::socket(context);
 }
 
-std::shared_ptr<tcp::socket> newSocket(
-    const std::shared_ptr<io_context> &context) {
-    return std::make_shared<tcp::socket>(*context);
-}
 }  // namespace
 TEST_CASE("Game creation") {
     Tanks::model::ServerModel model;
@@ -54,38 +50,37 @@ TEST_CASE("Game creation") {
     CHECK(brick00.getType() == EntityType::FLOOR);
 }
 
-#define ADD_PLAYER(model, i)                                          \
-    auto context_client##i = newContext();                            \
-    std::shared_ptr<tcp::socket> server##i;                           \
-    auto connection##i = std::thread([&]() {                          \
-        server##i = std::make_shared<tcp::socket>(acceptor.accept()); \
-    });                                                               \
-                                                                      \
-    auto client##i = newSocket(context_client##i);                    \
-    client##i->connect(acceptor.local_endpoint());                    \
-    connection##i.join();                                             \
-    auto id##i = serverModel.addPlayer(server##i, serverContext);     \
-    ClientModel clientModel##i(id##i, std::move(*client##i));
+#define ADD_PLAYER(model, i)                                   \
+    io_context context_client##i;                              \
+    tcp::socket server##i(serverContext);                      \
+    auto connection##i =                                       \
+        std::thread([&]() { server##i = acceptor.accept(); }); \
+                                                               \
+    auto client##i = newSocket(context_client##i);             \
+    client##i.connect(acceptor.local_endpoint());              \
+    connection##i.join();                                      \
+    auto id##i = serverModel.addPlayer(server##i);             \
+    ClientModel clientModel##i(id##i, std::move(client##i));
 
 #define GET_PLAYER_CONTORS(i)                                                \
     auto &tank##i = dynamic_cast<Tank &>(serverModel.getById(id##i)->get()); \
     auto &handler##i =                                                       \
         dynamic_cast<TankHandler &>(serverModel.getHandler(tank##i));
 
-#define INIT_GAME()                                                      \
-    DebugServer serverModel;                                             \
-    auto serverContext = newContext();                                   \
-    tcp::acceptor acceptor(*serverContext, tcp::endpoint(tcp::v4(), 0)); \
-    ADD_PLAYER(serverModel, );                                           \
-    serverModel.nextTick();                                              \
-    GET_PLAYER_CONTORS()                                                 \
-    clientModel.loadLevel(1);                                            \
+#define INIT_GAME()                                                     \
+    DebugServer serverModel;                                            \
+    io_context serverContext;                                           \
+    tcp::acceptor acceptor(serverContext, tcp::endpoint(tcp::v4(), 0)); \
+    ADD_PLAYER(serverModel, );                                          \
+    serverModel.nextTick();                                             \
+    GET_PLAYER_CONTORS()                                                \
+    clientModel.loadLevel(1);                                           \
     clientModel.nextTick();
 
 #define INIT_GAME_FULL(level, bots, bonuses)       \
     DebugServer serverModel(level, bots, bonuses); \
-    auto serverContext = newContext();             \
-    tcp::acceptor acceptor(*serverContext, tcp::endpoint(tcp::v4(), 0));
+    io_context serverContext;                      \
+    tcp::acceptor acceptor(serverContext, tcp::endpoint(tcp::v4(), 0));
 
 bool operator==(const Entity &a, const Entity &b) {
     if (a.getId() != b.getId()) {
@@ -215,7 +210,6 @@ TEST_CASE("Single move. Online") {
 
     CHECK(differences(serverModel, clientModel) == 0);
     CHECK(tank.getTop() == TILE_SIZE + tank.getSpeed());
-    serverModel.finishGame();
 }
 
 TEST_CASE("multiple moves. Online") {
@@ -240,7 +234,6 @@ TEST_CASE("multiple moves. Online") {
     clientModel.nextTick();
 
     CHECK(differences(serverModel, clientModel) == 0);
-    serverModel.finishGame();
 }
 
 TEST_CASE("Can't do 2 moves on 1 tick") {
@@ -715,13 +708,19 @@ TEST_CASE("Bots, bonuses stress") {
     CHECK(differences(serverModel, clientModel) == 0);
 
     int bonuseHere = 0;
-    int errorTick = 65;
+#ifdef MODEL_BIG_TESTS
+    constexpr int errorTick = 65;
+    constexpr int TICKS = 2e3;
+#else
+    constexpr int errorTick = 0;
+    constexpr int TICKS = 2e2;
+
     for (int i = 0; i < errorTick; i++) {
         serverModel.nextTick();
         clientModel.nextTick();
         CHECK(differences(serverModel, clientModel) == 0);
     }
-    for (int i = errorTick; i < 1000; i++) {
+    for (int i = errorTick; i < TICKS; i++) {
         serverModel.nextTick();
         clientModel.nextTick();
         CHECK(differences(serverModel, clientModel) == 0);
@@ -740,76 +739,92 @@ TEST_CASE("BIG Bots, bonuses stress") {
     serverModel.nextTick();
 
     int bonuseHere = 0;
-    constexpr int ERROR_TICK = 1e4;
+#ifdef MODEL_BIG_TESTS
+    constexpr int TICKS = 1e4;
+#else
+    constexpr int TICKS = 5e2;
+#endif
+
     // 1266
-    for (int i = 0; i < ERROR_TICK; i++) {
+    for (int i = 0; i < TICKS; i++) {
         serverModel.nextTick();
     }
     serverModel.nextTick();
     serverModel.finishGame();
 }
 
+void userReceiver(tcp::acceptor &acceptor, ServerModel &serverModel) {
+    std::vector<std::unique_ptr<tcp::socket> > serverSockets;
+    serverSockets.reserve(100);
+    while (true) {
+        try {
+            tcp::socket server = acceptor.accept();
+            serverSockets.emplace_back(
+                std::make_unique<tcp::socket>(std::move(server)));
+            int id = serverModel.addPlayer(*serverSockets.back(), {});
+            sendInt(*serverSockets.back(), id);
+        } catch (boost::system::system_error &e) {
+            return;
+        }
+    }
+};
+
+void userMover(tcp::acceptor &acceptor,
+               std::mutex &vec_mutex,
+               std::vector<std::reference_wrapper<ClientModel> > &vec,
+               std::mt19937 &rnd) {
+    boost::asio::io_context context;
+    tcp::socket client(context);
+    client.connect(acceptor.local_endpoint());
+    int id = receiveInt(client);
+    ClientModel clientModel(id, std::move(client));
+    clientModel.loadLevel(1);
+    clientModel.nextTick();
+    std::unique_lock lock(vec_mutex);
+    vec.push_back(std::ref(clientModel));
+    lock.unlock();
+    try {
+        while (true) {
+            auto tank = clientModel.tank();
+            if (!tank) {
+                clientModel.nextTick();
+                continue;
+            }
+            int todo = (std::abs(static_cast<int>(rnd()))) % 12;
+            if (todo >= 12) {
+                clientModel.getHandler().shoot(tank->get().getDirection());
+            } else {
+                auto directon = static_cast<Direction>(todo % 4);
+                clientModel.getHandler().move(
+                    directon, clientModel.tank()->get().getSpeed());
+            }
+            clientModel.nextTick();
+        }
+    } catch (boost::system::system_error &e) {
+        CHECK(false);
+        std::cerr << e.what() << std::endl;
+    }
+}
+
 TEST_CASE("10 users 30 bots 10 bonuses, check correction") {
     INIT_GAME_FULL(1, 30, 10);
     constexpr int CLIENTS = 10;
+#ifdef MODEL_BIG_TESTS
     constexpr int TICKS = 1e3;
+#else
+    constexpr int TICKS = 1e2;
+#endif
 
     //    std::mt19937 rnd(
     //        std::chrono::steady_clock::now().time_since_epoch().count());
     std::mt19937 rnd{0};
-    std::thread([&]() -> void {
-        std::vector<std::shared_ptr<tcp::socket>> serverSockets;
-        serverSockets.reserve(100);
-        while (true) {
-            try {
-                tcp::socket server = acceptor.accept();
-                serverSockets.emplace_back(
-                    std::make_shared<tcp::socket>(std::move(server)));
-                int id =
-                    serverModel.addPlayer(serverSockets.back(), serverContext);
-                sendInt(*serverSockets.back(), id);
-            } catch (boost::system::system_error &e) {
-                return;
-            }
-        }
-    }).detach();
+    std::thread([&]() { userReceiver(acceptor, serverModel); }).detach();
     std::mutex vec_mutex;
-    std::vector<std::reference_wrapper<ClientModel>> vec;
+    std::vector<std::reference_wrapper<ClientModel> > vec;
     vec.reserve(CLIENTS);
     for (int i = 0; i < CLIENTS; i++) {
-        std::thread([&]() -> void {
-            boost::asio::io_context context;
-            tcp::socket client(context);
-            client.connect(acceptor.local_endpoint());
-            int id = receiveInt(client);
-            ClientModel clientModel(id, std::move(client));
-            clientModel.loadLevel(1);
-            clientModel.nextTick();
-            std::unique_lock lock(vec_mutex);
-            vec.push_back(std::ref(clientModel));
-            lock.unlock();
-            try {
-                while (true) {
-                    auto tank = clientModel.tank();
-                    if (!tank) {
-                        clientModel.nextTick();
-                        continue;
-                    }
-                    int todo = (std::abs(static_cast<int>(rnd()))) % 12;
-                    if (todo >= 12) {
-                        clientModel.getHandler().shoot(
-                            tank->get().getDirection());
-                    } else {
-                        auto directon = static_cast<Direction>(todo % 4);
-                        clientModel.getHandler().move(
-                            directon, clientModel.tank()->get().getSpeed());
-                    }
-                    clientModel.nextTick();
-                }
-            } catch (boost::system::system_error &e) {
-                CHECK(false);
-                std::cerr << e.what() << std::endl;
-            }
+        std::thread([&]() {
+            userMover(acceptor, vec_mutex, vec, rnd);
         }).detach();
     }
     std::this_thread::sleep_for(std::chrono::seconds(5));
@@ -836,64 +851,22 @@ TEST_CASE("10 users 30 bots 10 bonuses, check correction") {
 TEST_CASE("Real") {
     INIT_GAME_FULL(1, 4, 2);
     constexpr int CLIENTS = 4;
+#ifdef MODEL_BIG_TESTS
     constexpr int TICKS = 1e3;
+#else
+    constexpr int TICKS = 1e2;
+#endif
 
     //    std::mt19937 rnd(
     //        std::chrono::steady_clock::now().time_since_epoch().count());
     std::mt19937 rnd{0};
-    std::thread([&]() -> void {
-        std::vector<std::shared_ptr<tcp::socket>> serverSockets;
-        serverSockets.reserve(100);
-        while (true) {
-            try {
-                tcp::socket server = acceptor.accept();
-                serverSockets.emplace_back(
-                    std::make_shared<tcp::socket>(std::move(server)));
-                int id =
-                    serverModel.addPlayer(serverSockets.back(), serverContext);
-                sendInt(*serverSockets.back(), id);
-            } catch (boost::system::system_error &e) {
-                return;
-            }
-        }
-    }).detach();
+    std::thread([&]() { userReceiver(acceptor, serverModel); }).detach();
     std::mutex vec_mutex;
-    std::vector<std::reference_wrapper<ClientModel>> vec;
+    std::vector<std::reference_wrapper<ClientModel> > vec;
     vec.reserve(CLIENTS);
     for (int i = 0; i < CLIENTS; i++) {
-        std::thread([&]() -> void {
-            boost::asio::io_context context;
-            tcp::socket client(context);
-            client.connect(acceptor.local_endpoint());
-            int id = receiveInt(client);
-            ClientModel clientModel(id, std::move(client));
-            clientModel.loadLevel(1);
-            clientModel.nextTick();
-            std::unique_lock lock(vec_mutex);
-            vec.push_back(std::ref(clientModel));
-            lock.unlock();
-            try {
-                while (true) {
-                    auto tank = clientModel.tank();
-                    if (!tank) {
-                        clientModel.nextTick();
-                        continue;
-                    }
-                    int todo = (std::abs(static_cast<int>(rnd()))) % 12;
-                    if (todo >= 12) {
-                        clientModel.getHandler().shoot(
-                            tank->get().getDirection());
-                    } else {
-                        auto directon = static_cast<Direction>(todo % 4);
-                        clientModel.getHandler().move(
-                            directon, clientModel.tank()->get().getSpeed());
-                    }
-                    clientModel.nextTick();
-                }
-            } catch (boost::system::system_error &e) {
-                CHECK(false);
-                std::cerr << e.what() << std::endl;
-            }
+        std::thread([&]() {
+            userMover(acceptor, vec_mutex, vec, rnd);
         }).detach();
     }
     std::this_thread::sleep_for(std::chrono::seconds(5));
@@ -926,24 +899,9 @@ TEST_CASE("4 users 4 bots 2 bonuses, don't check correction") {
     //    std::mt19937 rnd(
     //        std::chrono::steady_clock::now().time_since_epoch().count());
     std::mt19937 rnd{0};
-    std::thread([&]() -> void {
-        std::vector<std::shared_ptr<tcp::socket>> serverSockets;
-        serverSockets.reserve(100);
-        while (true) {
-            try {
-                tcp::socket server = acceptor.accept();
-                serverSockets.emplace_back(
-                    std::make_shared<tcp::socket>(std::move(server)));
-                int id =
-                    serverModel.addPlayer(serverSockets.back(), serverContext);
-                sendInt(*serverSockets.back(), id);
-            } catch (boost::system::system_error &e) {
-                return;
-            }
-        }
-    }).detach();
+    std::thread([&]() { userReceiver(acceptor, serverModel); }).detach();
     std::mutex vec_mutex;
-    std::vector<std::reference_wrapper<ClientModel>> vec;
+    std::vector<std::reference_wrapper<ClientModel> > vec;
     static auto timeNow = []() {
         return std::chrono::milliseconds(
             std::chrono::steady_clock::now().time_since_epoch().count());
@@ -951,39 +909,8 @@ TEST_CASE("4 users 4 bots 2 bonuses, don't check correction") {
 
     vec.reserve(CLIENTS);
     for (int i = 0; i < CLIENTS; i++) {
-        std::thread([&]() -> void {
-            boost::asio::io_context context;
-            tcp::socket client(context);
-            client.connect(acceptor.local_endpoint());
-            int id = receiveInt(client);
-            ClientModel clientModel(id, std::move(client));
-            clientModel.loadLevel(1);
-            clientModel.nextTick();
-            std::unique_lock lock(vec_mutex);
-            vec.push_back(std::ref(clientModel));
-            lock.unlock();
-            try {
-                while (true) {
-                    auto tank = clientModel.tank();
-                    if (!tank) {
-                        clientModel.nextTick();
-                        continue;
-                    }
-                    int todo = (std::abs(static_cast<int>(rnd()))) % 12;
-                    if (todo >= 12) {
-                        clientModel.getHandler().shoot(
-                            tank->get().getDirection());
-                    } else {
-                        auto directon = static_cast<Direction>(todo % 4);
-                        clientModel.getHandler().move(
-                            directon, clientModel.tank()->get().getSpeed());
-                    }
-                    clientModel.nextTick();
-                }
-            } catch (boost::system::system_error &e) {
-                CHECK(false);
-                std::cerr << e.what() << std::endl;
-            }
+        std::thread([&]() {
+            userMover(acceptor, vec_mutex, vec, rnd);
         }).detach();
     }
 
@@ -1011,29 +938,18 @@ TEST_CASE("4 users 4 bots 2 bonuses, don't check correction") {
 TEST_CASE("4 users 4 bots 2 bonuses, don't check correction") {
     INIT_GAME_FULL(1, 4, 2);
     constexpr int CLIENTS = 5;
+#ifdef MODEL_BIG_TESTS
     constexpr int TICKS = 1e3;
+#else
+    constexpr int TICKS = 1e2;
+#endif
 
     //    std::mt19937 rnd(
     //        std::chrono::steady_clock::now().time_since_epoch().count());
     std::mt19937 rnd{0};
-    std::thread([&]() -> void {
-        std::vector<std::shared_ptr<tcp::socket>> serverSockets;
-        serverSockets.reserve(100);
-        while (true) {
-            try {
-                tcp::socket server = acceptor.accept();
-                serverSockets.emplace_back(
-                    std::make_shared<tcp::socket>(std::move(server)));
-                int id =
-                    serverModel.addPlayer(serverSockets.back(), serverContext);
-                sendInt(*serverSockets.back(), id);
-            } catch (boost::system::system_error &e) {
-                return;
-            }
-        }
-    }).detach();
+    std::thread([&]() { userReceiver(acceptor, serverModel); }).detach();
     std::mutex vec_mutex;
-    std::vector<std::reference_wrapper<ClientModel>> vec;
+    std::vector<std::reference_wrapper<ClientModel> > vec;
     static auto timeNow = []() {
         return std::chrono::milliseconds(
             std::chrono::steady_clock::now().time_since_epoch().count());
@@ -1041,39 +957,8 @@ TEST_CASE("4 users 4 bots 2 bonuses, don't check correction") {
 
     vec.reserve(CLIENTS);
     for (int i = 0; i < CLIENTS; i++) {
-        std::thread([&]() -> void {
-            boost::asio::io_context context;
-            tcp::socket client(context);
-            client.connect(acceptor.local_endpoint());
-            int id = receiveInt(client);
-            ClientModel clientModel(id, std::move(client));
-            clientModel.loadLevel(1);
-            clientModel.nextTick();
-            std::unique_lock lock(vec_mutex);
-            vec.push_back(std::ref(clientModel));
-            lock.unlock();
-            try {
-                while (true) {
-                    auto tank = clientModel.tank();
-                    if (!tank) {
-                        clientModel.nextTick();
-                        continue;
-                    }
-                    int todo = (std::abs(static_cast<int>(rnd()))) % 12;
-                    if (todo >= 12) {
-                        clientModel.getHandler().shoot(
-                            tank->get().getDirection());
-                    } else {
-                        auto directon = static_cast<Direction>(todo % 4);
-                        clientModel.getHandler().move(
-                            directon, clientModel.tank()->get().getSpeed());
-                    }
-                    clientModel.nextTick();
-                }
-            } catch (boost::system::system_error &e) {
-                CHECK(false);
-                std::cerr << e.what() << std::endl;
-            }
+        std::thread([&]() {
+            userMover(acceptor, vec_mutex, vec, rnd);
         }).detach();
     }
 
@@ -1097,3 +982,5 @@ TEST_CASE("4 users 4 bots 2 bonuses, don't check correction") {
     serverModel.finishGame();
     std::cout << "sleeps: " << sleeps << std::endl;
 }
+
+#endif  // MODER_RUN_BIG_TESTS

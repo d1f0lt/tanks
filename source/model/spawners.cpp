@@ -88,9 +88,11 @@ MediumTankSpawner::MediumTankSpawner(ServerModel &model, int entityId)
 BonusSpawner::BonusSpawner(ServerModel &model, DecrId entityId, EntityType type)
     : Spawner(model, entityId), type_(type) {
 }
+
 int BonusSpawner::getTimeout() {
-    return 0;
+    return 10;
 }
+
 std::unique_ptr<Event> BonusSpawner::createEvent() {
     auto [left, top] = getFreeCoords();
     return std::make_unique<BonusSpawn>(getEntityId(), left, top, type_);

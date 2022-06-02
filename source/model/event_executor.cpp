@@ -30,7 +30,7 @@ bool EventExecutor::visit(SpawnTank &event) const {
         return false;
     }
 
-    switch (event.getType()) {
+    switch (event.getEntityType()) {
         case (EntityType::MEDIUM_TANK):
             getModel().addEntity(std::make_unique<MediumTank>(
                 event.getLeft(), event.getTop(), event.getTankId(),
@@ -49,7 +49,7 @@ bool EventExecutor::visit(BonusSpawn &event) const {
     if (entity) {
         return false;
     }
-    switch (event.getType()) {
+    switch (event.getEntityType()) {
         case (EntityType::WALK_ON_WATER_BONUS):
             getModel().addEntity(std::make_unique<WalkOnWater>(
                 event.getLeft(), event.getTop(), event.getId(), getModel()));
