@@ -17,6 +17,7 @@ constexpr int DEFAULT_TANK_SPEED = 2;
 constexpr int DEFAULT_BULLET_SPEED = 8;
 constexpr int DEFAULT_RELOAD_TICKS = 100;
 constexpr int BULLET_SIZE = 10;
+constexpr int MAX_VOLUME = 100;
 
 // menu
 constexpr int LEVELS_COUNT = 3;

@@ -88,7 +88,7 @@ void showMainMenu(sf::RenderWindow &window,
                 break;
             case ButtonType::SETTINGS:
                 menu.flyAwayToLeft(window, backgroundSprite);
-                showUpgradeMenu(window, backgroundSprite, info);
+                showSettingsMenu(window, backgroundSprite, info);
                 menu = initMenu(imagesPath, info.general);
                 menu.flyAwayToLeft();
                 menu.flyOutFromLeft(window, backgroundSprite);
