@@ -763,7 +763,7 @@ void userReceiver(tcp::acceptor &acceptor, ServerModel &serverModel) {
                 std::make_unique<tcp::socket>(std::move(server)));
             int id = serverModel.addPlayer(*serverSockets.back(), {});
             sendInt(*serverSockets.back(), id);
-        } catch (boost::system::system_error &e) {
+        } catch (boost::system::system_error &) {
             return;
         }
     }
@@ -800,9 +800,7 @@ void userMover(tcp::acceptor &acceptor,
             }
             clientModel.nextTick();
         }
-    } catch (boost::system::system_error &e) {
-        CHECK(false);
-        std::cerr << e.what() << std::endl;
+    } catch (boost::system::system_error &) {
     }
 }
 
