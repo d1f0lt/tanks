@@ -714,6 +714,7 @@ TEST_CASE("Bots, bonuses stress") {
 #else
     constexpr int errorTick = 0;
     constexpr int TICKS = 2e2;
+#endif
 
     for (int i = 0; i < errorTick; i++) {
         serverModel.nextTick();
@@ -981,4 +982,4 @@ TEST_CASE("4 users 4 bots 2 bonuses, don't check correction") {
     std::cout << "sleeps: " << sleeps << std::endl;
 }
 
-#endif  // MODER_RUN_BIG_TESTS
+//#endif  // MODER_RUN_BIG_TESTS
