@@ -1,5 +1,6 @@
 #include <cassert>
 #include <chrono>
+#include <iostream>
 #include <thread>
 #include "game_controller.h"
 #include "game_environment.h"
@@ -95,7 +96,7 @@ static void serverImp(const std::string &filename,
 std::unique_ptr<ServerHolder> createServer(const std::string levelFilename) {
     std::condition_variable *startServer = nullptr;
     std::unique_ptr<Server> serverPtr = nullptr;
-    std::condition_variable serverCreated;
+    std::condition_variable serverCreatedCv;
 
     constexpr int PLAYERS = 1;
     constexpr int BOTS = 10;
@@ -105,11 +106,11 @@ std::unique_ptr<ServerHolder> createServer(const std::string levelFilename) {
 
     auto serverThread = std::thread([&]() {
         serverImp(levelFilename, PLAYERS, BOTS, BONUSES, startServer,
-                  isServerCreated, serverPtr, serverCreated);
+                  isServerCreated, serverPtr, serverCreatedCv);
     });
     std::mutex mutex;
     std::unique_lock lock(mutex);
-    serverCreated.wait(lock, [&]() -> bool { return isServerCreated; });
+    serverCreatedCv.wait(lock, [&]() -> bool { return isServerCreated; });
 
     assert(startServer != nullptr);
     return std::make_unique<ServerHolder>(std::move(serverThread),
@@ -122,24 +123,31 @@ std::optional<Menu::ButtonType>
 startGame(  // NOLINT(readability-function-cognitive-complexity)
     sf::RenderWindow &window,
     int level,
-    std::optional<tcp::endpoint> endpoint) {
-    const bool isHost = (endpoint == std::nullopt);
+    std::optional<std::string> address) {
+    const bool isHost = (address == std::nullopt);
 
     static const std::string imagesPath = "../images/";
     const std::string levelFilename("../levels/level" + std::to_string(level) +
                                     ".csv");
 
     //    static_assert(std::is_move_constructible_v<Server>);
+    boost::asio::io_context ioContext;
+    boost::asio::ip::tcp::resolver resolver(ioContext);
+    tcp::socket clientSocket(ioContext);
+    tcp::endpoint endpoint;
 
     std::unique_ptr<ServerHolder> serverHolder = nullptr;
     if (isHost) {
         serverHolder = createServer(levelFilename);
         endpoint = serverHolder->getServer().getEndpoint();
+        clientSocket.connect(endpoint);
+    } else {
+        boost::asio::connect(clientSocket,
+                             tcp::resolver(ioContext).resolve(address.value()));
     }
 
-    boost::asio::io_context ioContext;
-    tcp::socket clientSocket(ioContext);
-    clientSocket.connect(endpoint.value());
+    //    tcp::socket clientSocket(ioContext);
+    //    clientSocket.connect(address.value());
 
     int playerId = model::receiveInt(clientSocket);
     assert(playerId < 0);
@@ -159,6 +167,7 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
 
     //    auto serverThread = server->start();
     if (isHost) {
+        std::cout << endpoint << '\n';
         serverHolder->startServer();
     }
     model.nextTick();

@@ -2,8 +2,8 @@
 #define GAME_H_
 
 #include <SFML/Graphics.hpp>
-#include <boost/asio/ip/tcp.hpp>
 #include <optional>
+#include <string>
 #include "menu/menu.h"
 
 namespace Tanks {
@@ -11,7 +11,7 @@ namespace Tanks {
 std::optional<Menu::ButtonType> startGame(
     sf::RenderWindow &window,
     int level = 1,
-    std::optional<boost::asio::ip::tcp::endpoint> endpoint = std::nullopt);
+    std::optional<std::string> address = std::nullopt);
 
 }
 
