@@ -1,6 +1,7 @@
 #include "menu/rating_menu.h"
 #include <cassert>
 #include <memory>
+#include <cmath>
 
 namespace Tanks::Menu {
 
@@ -10,6 +11,15 @@ void addItemToVector(std::vector<std::unique_ptr<MenuInscription>> &vec,
                      const InscriptionInfo &info) {
     vec.emplace_back(
         std::make_unique<MenuInscription>(info, sf::Vector2<float>{0, 0}));
+}
+
+std::string toString(double num) {
+    num = round(num * 1e2) / 1e2;
+    std::string res = std::to_string(num);
+    while (res.back() == '0') {
+        res.pop_back();
+    }
+    return res;
 }
 
 std::unique_ptr<OwningRectangle> initRectangle(const std::string &titleText,
@@ -37,7 +47,7 @@ std::unique_ptr<OwningRectangle> initRectangle(const std::string &titleText,
 
     info.inscription = "Rating:";
     addItemToVector(leftItems, info);
-    info.inscription = std::to_string((deathCount == 0 ? killsCount : killsCount / deathCount));
+    info.inscription = (deathCount == 0 ? std::to_string(killsCount) : toString(static_cast<double>(killsCount) / deathCount));
     addItemToVector(rightItems, info);
 
     static sf::Color backgroundColor{0, 0, 0, 192};
@@ -62,8 +72,8 @@ Menu initMenu(const std::string &imagesPath, PlayerInfo &playerInfo) {
                                       rating.singlePlayerKills,
                                       rating.singlePlayerDeath);
     auto multiplayer = initRectangle("Multiplayer", textColor,
-                                     rating.multiPlayerKills,
-                                     rating.multiPlayerDeath);
+                                     rating.multiplayerKills,
+                                     rating.multiplayerDeath);
 
     const static size_t marginBetweenStats = 200;
     sf::Vector2<float> curCoordinates{
