@@ -104,8 +104,8 @@ std::unique_ptr<ServerHolder> createServer(const std::string levelFilename) {
     std::atomic<bool> isServerCreated = false;
 
     auto serverThread = std::thread([&]() {
-        serverImp(levelFilename, 1, BOTS, BONUSES, startServer, isServerCreated,
-                  serverPtr, serverCreated);
+        serverImp(levelFilename, PLAYERS, BOTS, BONUSES, startServer,
+                  isServerCreated, serverPtr, serverCreated);
     });
     std::mutex mutex;
     std::unique_lock lock(mutex);
