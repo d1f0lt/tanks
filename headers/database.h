@@ -57,10 +57,18 @@ struct PlayerSkills {
     int reloadTicks = DEFAULT_RELOAD_TICKS;
 };
 
+struct PlayerRating {
+    int singlePlayerKills = 0;
+    int singlePlayerDeath = 0;
+    int multiPlayerKills = 0;
+    int multiPlayerDeath = 0;
+};
+
 struct PlayerInfo {
     PlayerGeneral general;
     PlayerSkills skills{};
     PlayerSettings settings{};
+    PlayerRating rating{};
 };
 
 struct PlayersDatabase : Database {
