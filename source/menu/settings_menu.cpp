@@ -60,19 +60,6 @@ Menu initMenu(PlayerInfo &info, const std::string &imagesPath) {
     return menu;
 }
 
-void updateVolume(PlayerSettings &settings, const SliderBar *sliderBar) {
-    switch (sliderBar->getType()) {
-        case SliderBarType::MUSIC:
-            settings.musicVolume = static_cast<int>(sliderBar->getCurrentVolume());
-            break;
-        case SliderBarType::SOUND:
-            settings.soundsVolume = static_cast<int>(sliderBar->getCurrentVolume());
-            break;
-        default:
-            assert(false);
-    }
-}
-
 }
 
 void showSettingsMenu(sf::RenderWindow &window,
@@ -85,41 +72,30 @@ void showSettingsMenu(sf::RenderWindow &window,
     menu.flyAwayToRight();
     menu.flyOutFromRight(window, backgroundSprite);
 
+
     while (window.isOpen()) {
-
-
-        const auto *const res = menu.showMenu(window, backgroundSprite);
-        switch (res->getType()) {
-            case ButtonType::RETURN:
-                return;
-            break;
-            default:
-                assert(false);
+        sf::Event event{};
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
+                window.close();
+            }
         }
+
+        Tanks::MenuController::sliderMove(menu, window, info.settings);
+
+        if (const auto res =
+                Tanks::MenuController::control(menu, window, event);
+            res != std::nullopt) {
+            assert(res.value()->getType() == ButtonType::RETURN);
+            menu.flyAwayToRight(window, backgroundSprite);
+            return;
+        }
+
+        window.clear();
+        window.draw(backgroundSprite);
+        menu.draw(window);
+        window.display();
     }
-//    while (window.isOpen()) {
-//        sf::Event event{};
-//        while (window.pollEvent(event)) {
-//            if (event.type == sf::Event::Closed) {
-//                window.close();
-//            } else {
-//                menu.musicVolume->logic();
-//            }
-//        }
-//
-//        if (const auto res =
-//                Tanks::MenuController::control(menu, window, event);
-//            res != std::nullopt) {
-//            assert(res.value()->getType() == ButtonType::RETURN);
-//            menu.flyAwayToRight(window, backgroundSprite);
-//            return std::nullopt;
-//        }
-//
-//        window.clear();
-//        window.draw(backgroundSprite);
-//        menu.draw(window);
-//        window.display();
-//    }
 }
 
 }  // namespace Tanks::Menu 

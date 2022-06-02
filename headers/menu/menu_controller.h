@@ -17,6 +17,8 @@ public:
                                                      const sf::Event &event);
     static std::optional<std::string> textEntered(const Menu::Menu &menu,
                                                   sf::Event &event);
+    static void sliderMove(const Menu::Menu &menu, sf::RenderWindow &window, Menu::PlayerSettings &settings);
+
 };
 
 }  // namespace Tanks
