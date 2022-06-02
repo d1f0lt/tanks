@@ -11,7 +11,6 @@ std::string convertButtonTypeToString(const ButtonType type) {
         {ButtonType::EXIT, "EXIT"},
         {ButtonType::RESUME, "RESUME"},
         {ButtonType::SETTINGS, "SETTINGS"},
-        {ButtonType::CREATE_MAP, "CREATE MAP"},
         {ButtonType::RATING, "RATING"},
         {ButtonType::PAUSE, "PAUSE"},
         {ButtonType::UPGRADE, "UPGRADE"},
@@ -107,12 +106,12 @@ MenuInscription::MenuInscription(const InscriptionInfo &parameters,
                                  const sf::Vector2<float> &coordinates)
     : MenuItem(coordinates) {
     font.loadFromFile("../fonts/base_bold.ttf");
-    text.setFillColor(parameters.textColor);
+    setTextColor(parameters.textColor);
     text.setFont(font);
     text.setCharacterSize(parameters.characterSize);
-    text.setString(parameters.inscription);
-    text.setPosition(coordinates);
-    text.setOrigin(text.getLocalBounds().left, text.getLocalBounds().top);
+    setContent(parameters.inscription);
+    updateOrigin();
+    setPosition(coordinates);
 }
 
 void MenuInscription::draw(sf::RenderWindow &window) const {
@@ -128,20 +127,58 @@ sf::Vector2<float> MenuInscription::getPosition() const {
     return text.getPosition();
 }
 
+void MenuInscription::updateOrigin() {
+    text.setOrigin(text.getLocalBounds().left, text.getLocalBounds().top);
+}
+
 void MenuInscription::setPosition(sf::Vector2<float> newPosition) {
-    text.setPosition(newPosition.x, newPosition.y);  // fix bugs
+    text.setPosition(newPosition.x, newPosition.y);
+}
+
+void MenuInscription::setContent(const std::string &newString) {
+    text.setString(newString);
+}
+
+void MenuInscription::setTextColor(const sf::Color &color) {
+    text.setFillColor(color);
 }
 
 std::string MenuInscription::getContent() const {
     return static_cast<std::string>(text.getString());
 }
 
+MenuRectangle::MenuRectangle(Button &info,
+                             const sf::Vector2<float> &coordinates)
+    : rectangle(info.getSize()) {
+    rectangle.setPosition(coordinates);
+    rectangle.setFillColor(info.getStandardColor());
+}
+
+sf::Vector2<float> MenuRectangle::getSize() const {
+    return rectangle.getSize();
+}
+
+sf::Vector2<float> MenuRectangle::getPosition() const {
+    return rectangle.getPosition();
+}
+
+void MenuRectangle::setPosition(sf::Vector2<float> newPosition) {
+    rectangle.setPosition(newPosition);
+}
+
+void MenuRectangle::setBorderColor(const sf::Color &color) {
+    rectangle.setOutlineColor(color);
+}
+
+void MenuRectangle::draw(sf::RenderWindow &window) const {
+    window.draw(rectangle);
+}
+
 MenuButton::MenuButton(std::unique_ptr<MenuItem> &&content_,
                        const sf::Vector2<float> &coordinates,
                        ButtonWithType info_)
-    : MenuItem(coordinates),
+    : MenuRectangle(info_, coordinates),
       content(std::move(content_)),
-      rectangle(info_.getSize()),
       info(info_) {
     rectangle.setFillColor(info.getStandardColor());
     setPosition(coordinates);  // NOLINT
@@ -154,12 +191,12 @@ void MenuButton::draw(sf::RenderWindow &window) const {
         info.getStandardColor());  // recover after possible hover;
 }
 
-ButtonType MenuButton::getType() const {
-    return info.getType();
-}
-
 void MenuButton::hover() {
     rectangle.setFillColor(info.getHoverColor());
+}
+
+ButtonType MenuButton::getType() const {
+    return info.getType();
 }
 
 sf::Vector2<float> MenuButton::getPosition() const {
@@ -168,6 +205,12 @@ sf::Vector2<float> MenuButton::getPosition() const {
 
 sf::Vector2<float> MenuButton::getSize() const {
     return rectangle.getSize();
+}
+
+std::string MenuButton::getInscription() const {
+    auto *inscription = dynamic_cast<MenuInscription *>(content.get());
+    assert(inscription != nullptr);
+    return inscription->getContent();
 }
 
 void MenuButton::setPosition(sf::Vector2<float> newPosition) {
@@ -203,26 +246,53 @@ MenuPicture::MenuPicture(const sf::Image &image_,
     initWithImage(coordinates);
 }
 
+MenuPicture::MenuPicture(const std::string &filename,
+                         size_t sizeOfOne,
+                         size_t count,
+                         const sf::Vector2<float> &coordinates)
+    : MenuItem(coordinates) {  // NOLINT
+    image.loadFromFile(filename);
+    texture.loadFromImage(image);
+    sprites.resize(count);
+    for (size_t i = 0; i < count; ++i) {
+        sprites[i].setTexture(texture);
+        sprites[i].setTextureRect(sf::IntRect{static_cast<int>(sizeOfOne * i),
+                                              0, static_cast<int>(sizeOfOne),
+                                              static_cast<int>(sizeOfOne)});
+        sprites[i].setPosition(coordinates);
+    }
+}
+
 void MenuPicture::initWithImage(const sf::Vector2<float> &coordinates) {
     texture.loadFromImage(image);
-    sprite.setTexture(texture);
-    sprite.setPosition(coordinates);
+    sprites.resize(1);
+    sprites[0].setTexture(texture);
+    sprites[0].setPosition(coordinates);
 }
 
 sf::Vector2<float> MenuPicture::getPosition() const {
-    return sprite.getPosition();
+    assert(!sprites.empty());
+    return sprites[0].getPosition();
 }
 
 sf::Vector2<float> MenuPicture::getSize() const {
-    return static_cast<sf::Vector2<float>>(image.getSize());
+    assert(!sprites.empty());
+    return sf::Vector2<float>{sprites[0].getLocalBounds().width,
+                              sprites[0].getLocalBounds().height};
 }
 
 void MenuPicture::setPosition(sf::Vector2<float> newPosition) {
-    sprite.setPosition(newPosition);
+    for (auto &sprite : sprites) {
+        sprite.setPosition(newPosition);
+    }
 }
 
 void MenuPicture::draw(sf::RenderWindow &window) const {
-    window.draw(sprite);
+    window.draw(sprites[curIndex]);
+    if (timer.getElapsedTime().asMilliseconds() > 100) {
+        timer.restart();
+        curIndex = (curIndex + 1) % sprites.size();
+    }
 }
 
 MenuPictureWithDescription::MenuPictureWithDescription(
@@ -272,6 +342,25 @@ void MenuPictureWithDescription::setPosition(sf::Vector2<float> newPosition) {
 
 std::string MenuPictureWithDescription::getDescription() const {
     return description->getContent();
+}
+
+MenuAdditionalButton::MenuAdditionalButton(const MenuItem *const mainButton_,
+                                           int marginFromLeft,
+                                           std::unique_ptr<MenuItem> &&content,
+                                           ButtonWithType &info)
+    : MenuButton(
+          std::move(content),
+          sf::Vector2<float>{mainButton_->getPosition().x +
+                                 static_cast<float>(marginFromLeft) +
+                                 mainButton_->getSize().x,
+                             mainButton_->getPosition().y +
+                                 mainButton_->getSize().y - info.getSize().y},
+          info),
+      mainButton(mainButton_) {
+}
+
+const MenuItem *MenuAdditionalButton::getMainButton() const {
+    return mainButton;
 }
 
 }  // namespace Tanks::Menu

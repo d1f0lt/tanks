@@ -11,9 +11,10 @@ namespace Tanks::Menu {
 
 Menu::Menu(size_t menuWidth,
            const InscriptionInfo &titleInfo,  // NOLINT
-           const InscriptionInfo &inscriptionsInfo,
-           const std::vector<ButtonWithType> &buttonsInfo) {
-    const size_t buttonsCount = buttonsInfo.size();
+           std::vector<std::unique_ptr<MenuItem>> &inscriptions,
+           const std::vector<ButtonWithType> &buttons) {
+    assert(inscriptions.size() == buttons.size());
+    const size_t buttonsCount = buttons.size();
     const static size_t marginBetweenButtons = 10;
     const static size_t marginFromTitle = marginBetweenButtons * 8;
     const size_t marginLeft = (WINDOW_WIDTH - menuWidth) / 2;
@@ -26,7 +27,7 @@ Menu::Menu(size_t menuWidth,
 
     const size_t menuHeight =
         static_cast<size_t>(title->getSize().y) + marginFromTitle +
-        buttonsCount * static_cast<size_t>(buttonsInfo[0].getSize().y) +
+        buttonsCount * static_cast<size_t>(buttons[0].getSize().y) +
         (buttonsCount - 1) * marginBetweenButtons;
     const size_t marginTop = (WINDOW_HEIGHT - menuHeight) / 2;
 
@@ -42,14 +43,9 @@ Menu::Menu(size_t menuWidth,
 
     // buttons
     for (size_t i = 0; i < buttonsCount; ++i) {
-        auto btnInfo = buttonsInfo[i];
-        InscriptionInfo inscriptionInfo{
-            convertButtonTypeToString(btnInfo.getType()),
-            inscriptionsInfo.characterSize, inscriptionsInfo.textColor};
-        auto content = std::make_unique<MenuInscription>(inscriptionInfo,
-                                                         currentCoordinates);
+        auto btnInfo = buttons[i];
         items.emplace_back(std::make_unique<MenuButton>(
-            std::move(content), currentCoordinates, btnInfo));
+            std::move(inscriptions[i]), currentCoordinates, btnInfo));
         currentCoordinates.y += static_cast<float>(items[i + 1]->getSize().y) +
                                 marginBetweenButtons;
     }
@@ -199,11 +195,77 @@ void Menu::addIconToLeftLowerCorner(const std::string &filename,
                                     ButtonType type) {
     sf::Image image;
     image.loadFromFile(filename);
-    const int margin = 5;
+    const static int margin = 5;
     sf::Vector2<float> coordinates(
         margin,
         static_cast<float>(WINDOW_HEIGHT - image.getSize().y - 3 * margin));
     addMenuItem(initIcon(image, type, coordinates, 2 * margin));
+}
+
+void Menu::addAddingButtons(size_t start,
+                            std::vector<std::unique_ptr<MenuItem>> &&elements,
+                            ButtonWithType &info) {
+    const static int marginFromLeft = 10;
+    for (size_t i = start; i < start + elements.size(); ++i) {
+        auto content = std::move(elements[i - start]);
+        const auto *item = items[i].get();
+        sf::Vector2<float> size = info.getSize();
+        assert(content->getSize().x < size.x && content->getSize().y < size.y);
+        auto res = std::make_unique<MenuAdditionalButton>(
+            item, marginFromLeft, std::move(content), info);
+        addMenuItem(std::move(res));
+    }
+}
+
+void Menu::addPlayerInfo(PlayerGeneral &info) {
+    const static size_t marginFromBackground = 20;
+    sf::Vector2<float> curCoordinates{marginFromBackground +
+                                          items[0]->getPosition().x +
+                                          items[0]->getSize().x,
+                                      marginFromBackground};
+    const static sf::Color defaultTextColor{255, 255, 255};
+    const static size_t characterSize = 40;
+
+    InscriptionInfo usernameParameters{info.name, characterSize,
+                                       defaultTextColor};
+    auto username =
+        std::make_unique<MenuInscription>(usernameParameters, curCoordinates);
+    const static size_t marginFromUsername = 50;
+    curCoordinates.x += username->getSize().x + marginFromUsername;
+
+    const static std::string coinFilename = "../images/menu/coin.png";
+    const static size_t marginFromCoin = 10;
+    const static size_t sizeOfOne = 32;
+    const static size_t imagesCount = 16;
+
+    auto coin =
+        std::make_unique<MenuPicture>(coinFilename, sizeOfOne, imagesCount, curCoordinates);
+    curCoordinates.x += coin->getSize().x + marginFromCoin;
+
+    InscriptionInfo moneyParameters{std::to_string(info.money), characterSize,
+                                    defaultTextColor};
+    auto money =
+        std::make_unique<MenuInscription>(moneyParameters, curCoordinates);
+    curCoordinates = {items[0]->getPosition().x + items[0]->getSize().x, 0};
+
+    const static sf::Color rectangleColor{0, 0, 0, 128};
+    float maxHeight = std::max(
+        std::max(username->getSize().y, coin->getSize().y), money->getSize().y);
+    sf::Vector2<float> rectangleSize{
+        2*marginFromBackground + username->getSize().x + marginFromUsername +
+            coin->getSize().x + marginFromCoin + money->getSize().x,
+        marginFromBackground*2 + maxHeight};
+    Button btnInfo(rectangleSize, rectangleColor, rectangleColor);
+    auto background = std::make_unique<MenuRectangle>(btnInfo, curCoordinates);
+
+    username->centralizeByHeight({0, background->getSize().y});
+    coin->centralizeByHeight({0, background->getSize().y});
+    money->centralizeByHeight({0, background->getSize().y});
+
+    addMenuItem(std::move(background));
+    addMenuItem(std::move(username));
+    addMenuItem(std::move(coin));
+    addMenuItem(std::move(money));
 }
 
 const std::vector<std::unique_ptr<MenuItem>> &Menu::getItems() const {
@@ -255,6 +317,19 @@ void Menu::flyAwayToLeft(sf::RenderWindow &window,
     const int stepsAmount =
         static_cast<int>(std::ceil(maxPositionX / animationSpeed));
     animation(window, backgroundSprite, stepsAmount, -animationSpeed);
+}
+
+void Menu::flyAwayToLeft() {
+    assert(!items.empty());
+    float maxPositionX = 0;
+    for (const auto &item : items) {
+        auto pos = item->getPosition().x + item->getSize().x;
+        maxPositionX = std::max(pos, maxPositionX);
+    }
+    assert(maxPositionX > 0 && maxPositionX < WINDOW_WIDTH);
+    const int stepsAmount =
+        static_cast<int>(std::ceil(maxPositionX / animationSpeed));
+    moveItems(-static_cast<float>(stepsAmount * animationSpeed));
 }
 
 void Menu::flyOutFromRight(sf::RenderWindow &window,

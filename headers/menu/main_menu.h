@@ -1,11 +1,13 @@
 #ifndef MAIN_MENU_H
 #define MAIN_MENU_H
 
-#include <SFML/Graphics.hpp>
+#include "menu.h"
 
 namespace Tanks::Menu {
 
-void showMainMenu(sf::RenderWindow &window);
+void showMainMenu(sf::RenderWindow &window,
+                  const sf::Sprite &backgroundSprite,
+                  PlayerInfo &info);
 
 }
 

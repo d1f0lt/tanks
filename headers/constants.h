@@ -5,6 +5,7 @@ namespace Tanks {
 // general
 inline constexpr int WINDOW_WIDTH = 1920;
 inline constexpr int WINDOW_HEIGHT = 1080;
+inline constexpr int MAX_VOLUME = 100;
 
 // game
 namespace model {

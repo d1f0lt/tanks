@@ -5,6 +5,7 @@
 #include <memory>
 #include <vector>
 #include "constants.h"
+#include "database.h"
 #include "menu_items.h"
 
 namespace Tanks {
@@ -19,7 +20,7 @@ public:
 
     explicit Menu(size_t menuWidth,
                   const InscriptionInfo &titleInfo,
-                  const InscriptionInfo &inscriptionsInfo,
+                  std::vector<std::unique_ptr<MenuItem>> &inscriptions,
                   const std::vector<ButtonWithType> &buttonsInfo);  // for most
 
     explicit Menu(size_t menuWidth,
@@ -36,12 +37,17 @@ public:
     void addMenuItem(std::unique_ptr<MenuItem> &&item);
     void addIconToLeftUpCorner(const std::string &filename, ButtonType type);
     void addIconToLeftLowerCorner(const std::string &filename, ButtonType type);
+    void addAddingButtons(size_t start,
+                          std::vector<std::unique_ptr<MenuItem>> &&elements,
+                          ButtonWithType &info);
+    void addPlayerInfo(PlayerGeneral &info);
 
     // animations
     void flyOutFromLeft(sf::RenderWindow &window,
                         const sf::Sprite &backgroundSprite);
     void flyAwayToLeft(sf::RenderWindow &window,
                        const sf::Sprite &backgroundSprite);
+    void flyAwayToLeft();
     void flyOutFromRight(sf::RenderWindow &window,
                          const sf::Sprite &backgroundSprite);
     void flyAwayToRight(sf::RenderWindow &window,

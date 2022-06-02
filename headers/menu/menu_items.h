@@ -10,7 +10,6 @@ enum class ButtonType {
     NEW_GAME,
     RESUME,
     SETTINGS,
-    CREATE_MAP,
     RATING,
     RETURN,
     EXIT,
@@ -18,7 +17,12 @@ enum class ButtonType {
     UPGRADE,
     SINGLE_PLAYER,
     MULTIPLAYER,
-    LEVEL
+    LEVEL,
+    USER,
+    NEW_USER,
+    USERS,
+    DELETE,
+    IMPROVE
 };
 
 std::string convertButtonTypeToString(ButtonType type);
@@ -57,9 +61,9 @@ private:
 };
 
 struct InscriptionInfo final {
-    const std::string inscription{};
-    const size_t characterSize{};
-    const sf::Color textColor{};
+    std::string inscription{};
+    size_t characterSize{};
+    sf::Color textColor{};
 };
 
 struct MenuInscription final : MenuItem {
@@ -72,12 +76,16 @@ public:
     [[nodiscard]] std::string getContent() const;
 
     void setPosition(sf::Vector2<float> newPosition) final;
+    void setContent(const std::string &newString);
+    void setTextColor(const sf::Color &color);
 
     void draw(sf::RenderWindow &window) const final;
 
 private:
     sf::Font font;
     sf::Text text;
+
+    void updateOrigin();
 };
 
 struct Button {
@@ -113,18 +121,34 @@ private:
     ButtonType type;
 };
 
-struct MenuButton : MenuItem {
+struct MenuRectangle : MenuItem {
+public:
+    MenuRectangle(Button &info, const sf::Vector2<float> &coordinates);
+
+    sf::Vector2<float> getSize() const override;
+    sf::Vector2<float> getPosition() const override;
+
+    void setPosition(sf::Vector2<float> newPosition) override;
+    void setBorderColor(const sf::Color &color);
+
+    void draw(sf::RenderWindow &window) const override;
+
+protected:
+    mutable sf::RectangleShape rectangle;  // NOLINT
+};
+
+struct MenuButton : MenuRectangle {
 public:
     MenuButton(std::unique_ptr<MenuItem> &&content,
                const sf::Vector2<float> &coordinates,
                ButtonWithType info);
 
-    [[nodiscard]] ButtonType getType() const;
-
     void hover();
 
+    [[nodiscard]] ButtonType getType() const;
     [[nodiscard]] sf::Vector2<float> getSize() const override;
     [[nodiscard]] sf::Vector2<float> getPosition() const override;
+    [[nodiscard]] std::string getInscription() const;
 
     void setPosition(sf::Vector2<float> newPosition) override;
 
@@ -137,7 +161,6 @@ protected:
 
 private:
     std::unique_ptr<MenuItem> content;
-    mutable sf::RectangleShape rectangle;  // we want draw to be a const
     ButtonWithType info;
 };
 
@@ -149,6 +172,12 @@ public:
     explicit MenuPicture(const sf::Image &image_,
                          const sf::Vector2<float> &coordinates);
 
+    explicit MenuPicture(
+        const std::string &filename,
+        size_t sizeOfOne,
+        size_t count,
+        const sf::Vector2<float> &coordinates);  // for animation
+
     [[nodiscard]] sf::Vector2<float> getSize() const final;
     [[nodiscard]] sf::Vector2<float> getPosition() const final;
 
@@ -159,7 +188,9 @@ public:
 private:
     sf::Image image;
     sf::Texture texture;
-    sf::Sprite sprite;
+    std::vector<sf::Sprite> sprites;
+    mutable size_t curIndex = 0;
+    mutable sf::Clock timer;
 
     void initWithImage(const sf::Vector2<float> &coordinates);
 };
@@ -183,6 +214,20 @@ public:
 private:
     std::unique_ptr<MenuInscription> description;
 };
+
+struct MenuAdditionalButton final : MenuButton {
+public:
+    MenuAdditionalButton(const MenuItem *mainButton_,
+                         int marginFromLeft,
+                         std::unique_ptr<MenuItem> &&content,
+                         ButtonWithType &info);
+
+    const MenuItem *getMainButton() const;
+
+private:
+    const MenuItem *const mainButton;
+};
+
 }  // namespace Tanks::Menu
 
 #endif
