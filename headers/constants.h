@@ -17,10 +17,10 @@ inline constexpr int MARGIN_LEFT = 288;  // = MARGIN_RIGHT     for centralize
 inline constexpr int MAP_HEIGHT = 19;    // number of vertical tiles
 inline constexpr int MAP_WIDTH = 24;     // number of horizontal tiles
 inline constexpr int TANK_SIZE = 48;     // TANK_WIDTH = TANK_HEIGHT = 48
-inline constexpr int DEFAULT_TANK_SPEED = 5;
-inline constexpr int DEFAULT_BULLET_SPEED = 10;
+inline constexpr int DEFAULT_TANK_SPEED = 2;
+inline constexpr int DEFAULT_BULLET_SPEED = 8;
 inline constexpr int BULLET_SIZE = 10;
-inline constexpr int DEFAULT_RELOAD_TICKS = 10;
+inline constexpr int DEFAULT_RELOAD_TICKS = 100;
 inline constexpr int BONUS_SIZE = 40;
 inline constexpr int DEFAULT_RESPAWN_TIME = 10;
 
