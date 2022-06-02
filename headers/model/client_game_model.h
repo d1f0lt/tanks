@@ -4,8 +4,8 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <thread>
 #include "model/game_model.h"
+#include "model/player_action_handler.h"
 #include "model/thread_safe_queue.h"
-#include "player_action_handler.h"
 
 namespace Tanks::model {
 using boost::asio::ip::tcp;

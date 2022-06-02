@@ -42,7 +42,7 @@ void ServerModel::receiveTurns(tcp::socket &socket) {
 }
 
 void ServerModel::sendEventsToClients(
-    std::vector<std::unique_ptr<Event>> &events) {
+    const std::vector<std::unique_ptr<Event>> &events) {
 #ifndef NDEBUG
     static std::fstream log("log_server.txt");
     log << events.size() << std::endl;
@@ -131,9 +131,9 @@ std::unique_ptr<Event> ServerModel::getEventByBot(int botId) {
         return std::make_unique<TankShoot>(
             botId, dynamic_cast<Tank &>(getById(botId)->get()).getDirection());
     } else {
-        auto directon = static_cast<Direction>(rnd % 4);
+        auto direction = static_cast<Direction>(rnd % 4);
         return std::make_unique<TankMove>(
-            botId, directon,
+            botId, direction,
             dynamic_cast<Tank &>(getById(botId)->get()).getSpeed());
     }
 }
@@ -188,7 +188,11 @@ void ServerModel::finishGame() noexcept {
         return;
     }
     setFinished();
-    std::unique_lock lock(getMutex());
+    //    std::mutex mutexLocal;
+    //    std::unique_lock lockLocal(mutexLocal);
+    std::unique_lock<std::mutex> modelLock(getMutex(), std::defer_lock);
+    getCondvar().wait(modelLock, [&]() { return modelLock.try_lock(); });
+    assert(modelLock);
     std::vector<std::unique_ptr<Event>> vec;
     vec.emplace_back(std::make_unique<GameEnd>(1));
     sendEventsToClients(vec);

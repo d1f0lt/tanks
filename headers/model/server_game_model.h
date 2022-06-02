@@ -54,7 +54,7 @@ private:
 
     [[nodiscard]] std::unique_ptr<Event> getEventByBot(int botId);
 
-    void sendEventsToClients(std::vector<std::unique_ptr<Event>> &events);
+    void sendEventsToClients(const std::vector<std::unique_ptr<Event>> &events);
 
     [[nodiscard]] DecrId getDecrId();
 

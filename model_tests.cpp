@@ -42,6 +42,7 @@ tcp::socket newSocket(io_context &context) {
 }
 
 }  // namespace
+
 TEST_CASE("Game creation") {
     Tanks::model::ServerModel model;
     model.loadLevel(1);
@@ -210,6 +211,9 @@ TEST_CASE("Single move. Online") {
 
     CHECK(differences(serverModel, clientModel) == 0);
     CHECK(tank.getTop() == TILE_SIZE + tank.getSpeed());
+
+    serverModel.finishGame();
+    // because clientModel own socket, but destruct earlier
 }
 
 TEST_CASE("multiple moves. Online") {
@@ -234,6 +238,8 @@ TEST_CASE("multiple moves. Online") {
     clientModel.nextTick();
 
     CHECK(differences(serverModel, clientModel) == 0);
+
+    serverModel.finishGame();
 }
 
 TEST_CASE("Can't do 2 moves on 1 tick") {
@@ -251,6 +257,7 @@ TEST_CASE("Can't do 2 moves on 1 tick") {
     serverModel.nextTick();
     CHECK(left1 == tank.getLeft());
     CHECK(top1 == tank.getTop());
+
     serverModel.finishGame();
 }
 TEST_CASE("Can move and shoot on 1 tick") {

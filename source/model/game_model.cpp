@@ -152,6 +152,7 @@ void GameModel::nextTick() {
     executeAllEvents();
     moveBullets();
     currentTick_++;
+    condvar_.notify_all();
 }
 
 BasicHandler &GameModel::getHandler(Entity &entity) {
@@ -223,6 +224,10 @@ void GameModel::setFinished() {
 
 bool GameModel::getIsFinished() const {
     return isFinished_;
+}
+
+std::condition_variable &GameModel::getCondvar() {
+    return condvar_;
 }
 
 // TODO

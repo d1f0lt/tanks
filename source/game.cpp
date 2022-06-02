@@ -24,6 +24,7 @@ void makeAction(model::PlayerActionsHandler &player) {
         GameController::makeMove(player);
     }
 }
+
 struct ServerThreadJoiner {
 public:
     explicit ServerThreadJoiner(std::thread &&thread, Server &server)

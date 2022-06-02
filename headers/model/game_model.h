@@ -2,12 +2,12 @@
 #define TANKS_GAME_MODEL_H
 
 #include <chrono>
+#include <condition_variable>
 #include <mutex>
 #include <optional>
 #include <queue>
 #include <random>
 #include <unordered_map>
-//
 #include "model/entity_holder.h"
 #include "model/event.h"
 #include "model/event_executor.h"
@@ -74,8 +74,12 @@ protected:
 
     [[nodiscard]] GameMap &getMap();
     [[nodiscard]] const std::vector<std::vector<Entity *>> &getAllByLink();
+
     [[nodiscard]] std::mutex &getMutex() const;
+    [[nodiscard]] std::condition_variable &getCondvar();
+
     [[nodiscard]] bool getIsFinished() const;
+
     void setFinished();
 
 private:
@@ -91,6 +95,7 @@ private:
     bool wasDestroyedBlockThisTurn_ = false;
     std::atomic<bool> isFinished_ = false;
     mutable std::mutex modelMutex_;
+    std::condition_variable condvar_;
 };
 
 }  // namespace Tanks::model
