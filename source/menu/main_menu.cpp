@@ -5,6 +5,7 @@
 #include "menu.h"
 #include "menu/new_game_menu.h"
 #include "menu/upgrade_menu.h"
+#include "menu/settings_menu.h"
 
 namespace Tanks::Menu {
 
@@ -79,6 +80,13 @@ void showMainMenu(sf::RenderWindow &window,
                 menu.flyAwayToRight(window, backgroundSprite);
                 return;
             case ButtonType::UPGRADE:
+                menu.flyAwayToLeft(window, backgroundSprite);
+                showUpgradeMenu(window, backgroundSprite, info);
+                menu = initMenu(imagesPath, info.general);
+                menu.flyAwayToLeft();
+                menu.flyOutFromLeft(window, backgroundSprite);
+                break;
+            case ButtonType::SETTINGS:
                 menu.flyAwayToLeft(window, backgroundSprite);
                 showUpgradeMenu(window, backgroundSprite, info);
                 menu = initMenu(imagesPath, info.general);
