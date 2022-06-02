@@ -854,6 +854,11 @@ TEST_CASE("10 users 30 bots 10 bonuses, check correction") {
     std::cout << "sleeps: " << sleeps;
 }
 
+[[maybe_unused]] static auto timeNow = []() {
+    return std::chrono::milliseconds(
+        std::chrono::steady_clock::now().time_since_epoch().count());
+};
+
 TEST_CASE("Real") {
     INIT_GAME_FULL(1, 4, 2);
     constexpr int CLIENTS = 4;
@@ -908,10 +913,6 @@ TEST_CASE("4 users 4 bots 2 bonuses, don't check correction") {
     std::thread([&]() { userReceiver(acceptor, serverModel); }).detach();
     std::mutex vec_mutex;
     std::vector<std::reference_wrapper<ClientModel> > vec;
-    static auto timeNow = []() {
-        return std::chrono::milliseconds(
-            std::chrono::steady_clock::now().time_since_epoch().count());
-    };
 
     vec.reserve(CLIENTS);
     for (int i = 0; i < CLIENTS; i++) {
@@ -956,10 +957,6 @@ TEST_CASE("4 users 4 bots 2 bonuses, don't check correction") {
     std::thread([&]() { userReceiver(acceptor, serverModel); }).detach();
     std::mutex vec_mutex;
     std::vector<std::reference_wrapper<ClientModel> > vec;
-    static auto timeNow = []() {
-        return std::chrono::milliseconds(
-            std::chrono::steady_clock::now().time_since_epoch().count());
-    };
 
     vec.reserve(CLIENTS);
     for (int i = 0; i < CLIENTS; i++) {

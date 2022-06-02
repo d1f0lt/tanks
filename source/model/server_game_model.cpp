@@ -93,9 +93,11 @@ void ServerModel::executeAllEvents() {
         if (spawner->isSpawnNow()) {
             auto event = spawner->createEvent();
             assert(event != nullptr);
-            if (executeEvent(*event)) {
-                eventsToSend.emplace_back(std::move(event));
-            }
+            executeEvent(*event);
+            eventsToSend.emplace_back(std::move(event));
+            //            if (executeEvent(*event)) {
+            //                eventsToSend.emplace_back(std::move(event));
+            //            }
         }
         spawner->nextTick();
     }
