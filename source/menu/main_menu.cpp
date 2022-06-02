@@ -8,6 +8,7 @@
 #include "menu/rating_menu.h"
 #include "menu/upgrade_menu.h"
 #include "sound/background_music.h"
+#include "menu/settings_menu.h"
 
 namespace Tanks::Menu {
 
@@ -66,9 +67,9 @@ void showMainMenu(sf::RenderWindow &window,
 
     menu.flyAwayToRight();
     
-    const static std::string soundsPath = "../sounds/";
-    Sound::BackgroundMusicHolder music(soundsPath + "background_music.ogg");
-    music.play(static_cast<float>(info.settings.musicVolume));
+//    const static std::string soundsPath = "../sounds/";
+//    Sound::BackgroundMusicHolder music(soundsPath + "background_music.ogg");
+//    music.play(static_cast<float>(info.settings.musicVolume));
 
     menu.flyOutFromRight(window, backgroundSprite);
 
@@ -93,12 +94,17 @@ void showMainMenu(sf::RenderWindow &window,
                 menu.flyAwayToLeft();
                 menu.flyOutFromLeft(window, backgroundSprite);
                 break;
+            case ButtonType::SETTINGS:
+                menu.flyAwayToLeft(window, backgroundSprite);
+                showSettingsMenu(window, backgroundSprite, info);
+                menu = initMenu(imagesPath, info.general);
+                menu.flyAwayToLeft();
+                menu.flyOutFromLeft(window, backgroundSprite);
+                break;
             case ButtonType::RATING:
                 menu.flyAwayToLeft(window, backgroundSprite);
                 showRatingMenu(window, backgroundSprite, info);
                 menu.flyOutFromLeft(window, backgroundSprite);
-                break;
-            case ButtonType::SETTINGS:
                 break;
             default:
                 assert(false);

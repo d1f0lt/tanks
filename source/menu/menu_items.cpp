@@ -165,7 +165,7 @@ void MenuRectangle::setPosition(sf::Vector2<float> newPosition) {
     rectangle.setPosition(newPosition);
 }
 
-void MenuRectangle::setBorderColor(const sf::Color &color) {
+[[maybe_unused]] void MenuRectangle::setBorderColor(const sf::Color &color) {
     rectangle.setOutlineColor(color);
 }
 
@@ -448,5 +448,4 @@ void OwningRectangle::drawItems(
         item->draw(window);
     }
 }
-
 }  // namespace Tanks::Menu

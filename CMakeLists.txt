@@ -61,6 +61,8 @@ add_executable(
         source/menu/upgrade_menu.cpp
         source/menu/progress_bar.cpp
         source/menu/rating_menu.cpp
+        source/menu/settings_menu.cpp
+        source/menu/slider_bar.cpp
         source/game.cpp
         source/game_controller.cpp
         source/game_environment.cpp

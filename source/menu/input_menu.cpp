@@ -81,5 +81,4 @@ std::optional<std::string> showInputMenu(sf::RenderWindow &window,
     }
     return std::nullopt;
 }
-
 }  // namespace Tanks::Menu

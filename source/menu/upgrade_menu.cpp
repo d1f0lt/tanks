@@ -174,5 +174,4 @@ void showUpgradeMenu(sf::RenderWindow &window,
         }
     }
 }
-
 }  // namespace Tanks::Menu
