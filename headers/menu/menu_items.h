@@ -250,8 +250,11 @@ private:
     float calcMaxRightItemWidth() const;
     float calcMaxLeftItemWidth() const;
 
-    static float calcMaxItemWidth(const std::vector<std::unique_ptr<MenuInscription>> &items);
-    static void drawItems(sf::RenderWindow &window, const std::vector<std::unique_ptr<MenuInscription>> &items);
+    static float calcMaxItemWidth(
+        const std::vector<std::unique_ptr<MenuInscription>> &items);
+    static void drawItems(
+        sf::RenderWindow &window,
+        const std::vector<std::unique_ptr<MenuInscription>> &items);
 };
 
 }  // namespace Tanks::Menu

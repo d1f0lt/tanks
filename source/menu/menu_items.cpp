@@ -176,7 +176,7 @@ void MenuRectangle::draw(sf::RenderWindow &window) const {
 MenuButton::MenuButton(std::unique_ptr<MenuItem> &&content_,
                        const sf::Vector2<float> &coordinates,
                        ButtonWithType info_)
-    : MenuRectangle(info_, coordinates), // NOLINT
+    : MenuRectangle(info_, coordinates),  // NOLINT
       content(std::move(content_)),
       info(info_) {
     rectangle.setFillColor(info.getStandardColor());
@@ -246,7 +246,7 @@ MenuPicture::MenuPicture(const sf::Image &image_,
 }
 
 MenuPicture::MenuPicture(const std::string &filename,
-                         size_t sizeOfOne, // NOLINT
+                         size_t sizeOfOne,  // NOLINT
                          size_t count,
                          const sf::Vector2<float> &coordinates)
     : MenuItem(coordinates) {
@@ -380,7 +380,9 @@ OwningRectangle::OwningRectangle(
         2 * padding +
         (rightItems.back()->getPosition().y + rightItems.back()->getSize().y) -
         title->getPosition().y;
-    float rectangleWidth = 2*padding + rightItems[0]->getPosition().x + rightItems[0]->getSize().x - leftItems[0]->getPosition().x;
+    float rectangleWidth = 2 * padding + rightItems[0]->getPosition().x +
+                           rightItems[0]->getSize().x -
+                           leftItems[0]->getPosition().x;
     rectangle.setSize(sf::Vector2<float>{rectangleWidth, rectangleHeight});
 }
 
@@ -405,9 +407,14 @@ void OwningRectangle::setPosition(sf::Vector2<float> newPosition) {
     float mxRightSize = calcMaxRightItemWidth();
     for (size_t i = 0; i < rightItems.size(); ++i) {
         auto &item = rightItems[i];
-        item->setPosition({leftItems[i]->getPosition().x + mxLeftSize + marginBetweenLeftAndRightItems + mxRightSize - item->getSize().x, leftItems[i]->getPosition().y});
+        item->setPosition({leftItems[i]->getPosition().x + mxLeftSize +
+                               marginBetweenLeftAndRightItems + mxRightSize -
+                               item->getSize().x,
+                           leftItems[i]->getPosition().y});
     }
-    title->centralizeByWidth({leftItems[0]->getPosition().x, rightItems[0]->getPosition().x + rightItems[0]->getSize().x});
+    title->centralizeByWidth(
+        {leftItems[0]->getPosition().x,
+         rightItems[0]->getPosition().x + rightItems[0]->getSize().x});
 }
 
 void OwningRectangle::draw(sf::RenderWindow &window) const {
@@ -434,7 +441,9 @@ float OwningRectangle::calcMaxItemWidth(
     return mxSize;
 }
 
-void OwningRectangle::drawItems(sf::RenderWindow &window, const std::vector<std::unique_ptr<MenuInscription>> &items) {
+void OwningRectangle::drawItems(
+    sf::RenderWindow &window,
+    const std::vector<std::unique_ptr<MenuInscription>> &items) {
     for (const auto &item : items) {
         item->draw(window);
     }

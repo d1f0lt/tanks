@@ -5,7 +5,9 @@
 
 namespace Tanks::Menu {
 
-void showRatingMenu(sf::RenderWindow &window, const sf::Sprite &backgroundSprite, PlayerInfo &info);
+void showRatingMenu(sf::RenderWindow &window,
+                    const sf::Sprite &backgroundSprite,
+                    PlayerInfo &info);
 
 }
 

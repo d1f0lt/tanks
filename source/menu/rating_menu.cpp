@@ -1,7 +1,7 @@
 #include "menu/rating_menu.h"
 #include <cassert>
-#include <memory>
 #include <cmath>
+#include <memory>
 
 namespace Tanks::Menu {
 
@@ -47,7 +47,10 @@ std::unique_ptr<OwningRectangle> initRectangle(const std::string &titleText,
 
     info.inscription = "Rating:";
     addItemToVector(leftItems, info);
-    info.inscription = (deathCount == 0 ? std::to_string(killsCount) : toString(static_cast<double>(killsCount) / deathCount));
+    info.inscription =
+        (deathCount == 0
+             ? std::to_string(killsCount)
+             : toString(static_cast<double>(killsCount) / deathCount));
     addItemToVector(rightItems, info);
 
     static sf::Color backgroundColor{0, 0, 0, 192};
@@ -68,17 +71,21 @@ Menu initMenu(const std::string &imagesPath, PlayerInfo &playerInfo) {
     auto title = std::make_unique<MenuInscription>(
         titleInfo, sf::Vector2<float>{100, 100});
 
-    auto singlePlayer = initRectangle("Single player", textColor,
-                                      rating.singlePlayerKills,
-                                      rating.singlePlayerDeath);
-    auto multiplayer = initRectangle("Multiplayer", textColor,
-                                     rating.multiplayerKills,
-                                     rating.multiplayerDeath);
+    auto singlePlayer =
+        initRectangle("Single player", textColor, rating.singlePlayerKills,
+                      rating.singlePlayerDeath);
+    auto multiplayer =
+        initRectangle("Multiplayer", textColor, rating.multiplayerKills,
+                      rating.multiplayerDeath);
 
     const static size_t marginBetweenStats = 200;
     sf::Vector2<float> curCoordinates{
         (WINDOW_WIDTH - singlePlayer->getSize().x - multiplayer->getSize().x -
-         marginBetweenStats)/2, (WINDOW_HEIGHT - title->getSize().y - marginFromTitle - singlePlayer->getSize().y) / 2};
+         marginBetweenStats) /
+            2,
+        (WINDOW_HEIGHT - title->getSize().y - marginFromTitle -
+         singlePlayer->getSize().y) /
+            2};
     title->setPosition(curCoordinates);
     curCoordinates.y += title->getSize().y + marginFromTitle;
     singlePlayer->setPosition(curCoordinates);
@@ -86,7 +93,9 @@ Menu initMenu(const std::string &imagesPath, PlayerInfo &playerInfo) {
     curCoordinates.x += singlePlayer->getSize().x + marginBetweenStats;
     multiplayer->setPosition(curCoordinates);
     multiplayer->setStandardPosition(curCoordinates);
-    title->centralizeByWidth({singlePlayer->getPosition().x, multiplayer->getPosition().x + multiplayer->getSize().x});
+    title->centralizeByWidth(
+        {singlePlayer->getPosition().x,
+         multiplayer->getPosition().x + multiplayer->getSize().x});
     title->setStandardPosition(title->getPosition());
 
     Menu menu;

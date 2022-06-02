@@ -5,7 +5,6 @@
 #include <vector>
 #include "model/entity.h"
 
-
 namespace Tanks::Sound {
 
 struct ShootSoundHolder final {
@@ -17,6 +16,6 @@ private:
     sf::SoundBuffer buffer;
     sf::Sound sound();
 };
-};
+};  // namespace Tanks::Sound
 
 #endif  // MOVING_TANK_SOUND_H

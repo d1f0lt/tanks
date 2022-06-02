@@ -1,12 +1,12 @@
 #include "menu/main_menu.h"
+#include <cassert>
 #include <memory>
 #include <string>
 #include "constants.h"
 #include "menu.h"
 #include "menu/new_game_menu.h"
-#include "menu/upgrade_menu.h"
 #include "menu/rating_menu.h"
-#include <cassert>
+#include "menu/upgrade_menu.h"
 
 namespace Tanks::Menu {
 

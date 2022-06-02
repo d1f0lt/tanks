@@ -1,6 +1,6 @@
-#include "sound/shoot_sound.h"
 #include <cassert>
 #include "constants.h"
+#include "sound/shoot_sound.h"
 
 namespace Tanks::Sound {
 
@@ -15,4 +15,4 @@ void BlockDestroySoundHolder::play(float volume_level) {
         sound.play();
     }
 }
-};
+};  // namespace Tanks::Sound
