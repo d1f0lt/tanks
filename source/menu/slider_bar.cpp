@@ -19,7 +19,7 @@ SliderBar::SliderBar(InscriptionInfo &titleInfo,
     slider.setFillColor(sf::Color::Yellow);
     axis.setPosition(coordinates_);
     axis.setSize(sf::Vector2f(axisWidth, axisHeight));
-    axis.setFillColor(sf::Color(63,63,63));
+    axis.setFillColor(sf::Color(230,0,230));
     setSliderVolume(curValue_);
 }
 
@@ -38,6 +38,10 @@ void SliderBar::setPosition(sf::Vector2<float> newPosition) {
 
 size_t SliderBar::getCurrentVolume() const {
     return curVolume;
+}
+
+sf::Vector2<float> SliderBar::getPosition() const {
+    return slider.getPosition();
 }
 
 size_t SliderBar::getMaxVolume() const {
@@ -64,13 +68,14 @@ void SliderBar::logic (sf::RenderWindow &window) {
         && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
             if (sf::Mouse::getPosition(window).x >= coordinates.x && sf::Mouse::getPosition(window).x <= coordinates.x + axisWidth) {
                 slider.setPosition(sf::Mouse::getPosition(window).x, coordinates.y);
-                curVolume = (minVolume+ ((slider.getPosition().x - coordinates.x) / axisWidth * (maxVolume - minVolume)));
+                float pos = slider.getPosition().x;
+                curVolume = (minVolume+ ((pos - coordinates.x) / axisWidth * (maxVolume - minVolume)));
             }
     }
 }
 
 void SliderBar::draw (sf::RenderWindow &window) const {
-    logic(window);
+//    logic(window);
     window.draw(axis);
     window.draw(slider);
 }

@@ -2,6 +2,7 @@
 #include <cassert>
 #include "menu/slider_bar.h"
 #include <cmath>
+#include <iostream>
 
 namespace Tanks::Menu {
 
@@ -41,14 +42,13 @@ Menu initMenu(PlayerInfo &info, const std::string &imagesPath) {
 
     title->setPosition(curCoordinates);
     title->centralizeByWidth(
-        {curCoordinates.x, curCoordinates.x + 50});
+        {curCoordinates.x, curCoordinates.x + 500});
     title->setStandardPosition(title->getPosition());
     curCoordinates.y += title->getSize().y + marginFromTitle;
     musicVolume->setPosition(curCoordinates);
 
     curCoordinates.y += musicVolume->getSize().y + marginFromSliderBar;
     soundVolume->setPosition(curCoordinates);
-
     Menu menu;
 
     menu.addMenuItem(std::move(title));
@@ -86,6 +86,7 @@ void showSettingsMenu(sf::RenderWindow &window,
     menu.flyOutFromRight(window, backgroundSprite);
 
     while (window.isOpen()) {
+
         const auto *const res = menu.showMenu(window, backgroundSprite);
         switch (res->getType()) {
             case ButtonType::RETURN:
