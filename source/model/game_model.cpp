@@ -1,5 +1,6 @@
 #include "model/game_model.h"
 #include <cassert>
+#include <fstream>
 #include <optional>
 #include <string>
 #include <thread>
@@ -8,8 +9,6 @@
 #include "model/projectile.h"
 
 #ifndef NDEBUG
-#include <fstream>
-#include <iostream>
 #include "model/client_game_model.h"
 #include "model/server_game_model.h"
 #endif
