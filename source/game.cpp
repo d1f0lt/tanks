@@ -25,92 +25,123 @@ void makeAction(model::PlayerActionsHandler &player) {
     }
 }
 
-struct ServerThreadJoiner {
+struct ServerHolder {
 public:
-    explicit ServerThreadJoiner(std::thread &&thread, Server &server)
-        : thread_(std::move(thread)), server_(server) {
+    explicit ServerHolder(std::thread &&thread,
+                          std::unique_ptr<Server> server,
+                          std::condition_variable *serverStart)
+        : thread_(std::move(thread)),
+          server_(std::move(server)),
+          serverStart_(serverStart) {
+        assert(server_ != nullptr);
+        assert(serverStart_ != nullptr);
+    }
+
+    ServerHolder(ServerHolder &&other) noexcept
+        : thread_(std::move(other.thread_)),
+          server_(std::move(other.server_)),
+          serverStart_(other.serverStart_) {
     }
 
     [[nodiscard]] Server &getServer() const {
-        return server_;
+        return *server_;
     }
 
-    ~ServerThreadJoiner() {
-        server_.stop();
+    void startServer() const {
+        server_->start();
+        serverStart_->notify_all();
+    }
+
+    ~ServerHolder() {
+        server_->stop();
         //        client_.finishGame();
         thread_.join();
     }
 
 private:
     std::thread thread_;
-    Server &server_;
+    std::unique_ptr<Server> server_ = nullptr;
+    std::condition_variable *serverStart_ = nullptr;
 };
 
-void server(const std::string &filename,
-            int players,
-            int bots,
-            int bonuses,
-            std::condition_variable *&condvarOnClient,
-            std::atomic<Server *> &serverOnClient,
-            std::condition_variable &serverOnClientInitiallized) {
+static void serverImp(const std::string &filename,
+                      int players,
+                      int bots,
+                      int bonuses,
+                      std::condition_variable *&condvarOnClient,
+                      std::atomic<bool> &isServerCreated,
+                      std::unique_ptr<Server> &serverOnClient,
+                      std::condition_variable &serverOnClientInitiallized) {
     std::condition_variable cv;
     condvarOnClient = &cv;
-    Server server(filename, bots, bonuses);
-    serverOnClient = &server;
+    auto serverTmp = std::make_unique<Server>(filename, bots, bonuses);
+    serverOnClient = std::move(serverTmp);
+    Server *server = serverOnClient.get();
+    isServerCreated = true;
     serverOnClientInitiallized.notify_all();
     for (int i = 0; i < players; i++) {
-        server.listenForNewPlayer();
+        server->listenForNewPlayer();
     }
     std::mutex mutex;
     std::unique_lock lock(mutex);
-    cv.wait(lock);
-    while (!server.getIsStopped()) {
-        server.nextTick();
+    cv.wait(lock, [&]() { return server->getIsStarted(); });
+    while (!server->getIsStopped()) {
+        server->nextTick();
         std::this_thread::sleep_for(std::chrono::milliseconds(15));
     }
     // init servermodel
 }
+
+std::unique_ptr<ServerHolder> createServer(const std::string levelFilename) {
+    std::condition_variable *startServer = nullptr;
+    std::unique_ptr<Server> serverPtr = nullptr;
+    std::condition_variable serverCreated;
+
+    constexpr int BOTS = 10;
+    constexpr int BONUSES = 10;
+    std::atomic<bool> isServerCreated = false;
+
+    auto serverThread = std::thread([&]() {
+        serverImp(levelFilename, 1, BOTS, BONUSES, startServer, isServerCreated,
+                  serverPtr, serverCreated);
+    });
+    std::mutex mutex;
+    std::unique_lock lock(mutex);
+    serverCreated.wait(lock, [&]() -> bool { return isServerCreated; });
+
+    assert(startServer != nullptr);
+    return std::make_unique<ServerHolder>(std::move(serverThread),
+                                          std::move(serverPtr), startServer);
+};
+
 }  // namespace
 
 std::optional<Menu::ButtonType>
 startGame(  // NOLINT(readability-function-cognitive-complexity)
     sf::RenderWindow &window,
-    int level) {
+    int level,
+    std::optional<tcp::endpoint> endpoint) {
+    const bool isHost = (endpoint == std::nullopt);
+
     static const std::string imagesPath = "../images/";
     const std::string levelFilename("../levels/level" + std::to_string(level) +
                                     ".csv");
 
-    static_assert(std::is_move_constructible_v<Server>);
-    constexpr int BOTS = 10;
-    constexpr int BONUSES = 10;
-    //    auto server = std::make_unique<Server>(levelFilename, BOTS, BONUSES);
+    //    static_assert(std::is_move_constructible_v<Server>);
 
-    std::condition_variable *startServer = nullptr;
-    std::atomic<Server *> serverPtr = nullptr;
-    std::condition_variable serverCreated;
+    std::unique_ptr<ServerHolder> serverHolder = nullptr;
+    if (isHost) {
+        serverHolder = createServer(levelFilename);
+        endpoint = serverHolder->getServer().getEndpoint();
+    }
 
-    auto serverThread = std::thread([&]() {
-        server(levelFilename, 1, BOTS, BONUSES, startServer, serverPtr,
-               serverCreated);
-    });
-    std::mutex mutex;
-    std::unique_lock lock(mutex);
-    serverCreated.wait(lock, [&]() { return serverPtr != nullptr; });
-
-    assert(startServer != nullptr);
     boost::asio::io_context ioContext;
     tcp::socket clientSocket(ioContext);
-    Server *server = serverPtr;
-    auto endpoint = server->getEndpoint();
-    clientSocket.connect(endpoint);
+    clientSocket.connect(endpoint.value());
+
     int playerId = model::receiveInt(clientSocket);
     assert(playerId < 0);
-    ServerThreadJoiner joiner(std::move(serverThread), *server);
 
-    //    auto modelPtr =
-    //        std::make_unique<model::ClientModel>(playerId,
-    //        std::move(clientSocket));
-    //    modelPtr->loadLevel(levelFilename);
     model::ClientModel model(playerId, std::move(clientSocket));
     model.loadLevel(levelFilename);
 
@@ -125,7 +156,10 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
     Pause pause;
 
     //    auto serverThread = server->start();
-    startServer->notify_all();
+    if (isHost) {
+        serverHolder->startServer();
+    }
+    model.nextTick();
 
     //    auto &model = serverPtr.model();
     while (window.isOpen()) {

@@ -7,10 +7,10 @@
 namespace Tanks {
 using boost::asio::ip::tcp;
 Server::Server(const std::string &levelFilename, int bots, int bonuses)
-    : isStarted(std::make_unique<std::atomic<bool>>(false)),
+    : /*isStarted(std::make_unique<std::atomic<bool>>(false)),
       isStopped(std::make_unique<std::atomic<bool>>(false)),
-      ioContext_(std::make_shared<boost::asio::io_context>()),
-      acceptor_(*ioContext_, tcp::endpoint(tcp::v4(), 0)),
+      ioContext_(std::make_shared<boost::asio::io_context>()),*/
+      acceptor_(ioContext_, tcp::endpoint(tcp::v4(), 0)),
       model_(
           std::make_unique<model::ServerModel>(levelFilename, bots, bonuses)) {
 }
@@ -21,7 +21,7 @@ Server::Server(const std::string &levelFilename, int bots, int bonuses)
 //}
 
 void Server::stop() {
-    *isStopped = true;
+    isStopped = true;
 }
 
 tcp::endpoint Server::getEndpoint() {
@@ -42,6 +42,7 @@ void Server::listenForNewPlayer() {
 }
 
 void Server::start() {
+    isStarted = true;
 }
 
 void Server::work() {
@@ -52,9 +53,13 @@ void Server::work() {
 }
 
 bool Server::getIsStopped() const {
-    return *isStopped;
+    return isStopped;
 }
 void Server::nextTick() {
     model_->nextTick();
+}
+
+bool Server::getIsStarted() const {
+    return isStarted;
 }
 }  // namespace Tanks

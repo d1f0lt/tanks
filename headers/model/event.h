@@ -8,6 +8,10 @@
 #include "model/entity.h"
 #include "model/event_executor.h"
 
+#ifdef MODEL_LOGS
+#include <fstream>
+#endif
+
 namespace Tanks::model {
 using boost::asio::ip::tcp;
 
@@ -166,6 +170,93 @@ private:
     const int kills_;
 };
 
+#ifdef MODEL_LOGS
+template <typename T>
+static void print(std::ofstream &file, T a) {
+    file << static_cast<int>(a) << ' ';
+}
+
+template <>
+inline void print<EventType>(std::ofstream &file, EventType type) {
+    switch (type) {
+        case EventType::TANK_MOVE:
+            file << "TANK_MOVE ";
+            break;
+        case EventType::SPAWN_TANK:
+            file << "TANK_SPAWN ";
+            break;
+        case EventType::BONUS_SPAWN:
+            file << "BONUS_SPAWN ";
+            break;
+        case EventType::SET_POSITION:
+            file << "SET_POSITION ";
+            break;
+        case EventType::TANK_SHOOT:
+            file << "TANK_SHOOT ";
+            break;
+        case EventType::GAME_END:
+            file << "GAME_END ";
+            break;
+    }
+}
+
+template <>
+inline void print<Direction>(std::ofstream &file, Direction direction) {
+    switch (direction) {
+        case Direction::LEFT:
+            file << "LEFT ";
+            break;
+        case Direction::RIGHT:
+            file << "RIGHT ";
+            break;
+        case Direction::DOWN:
+            file << "DOWN ";
+            break;
+        case Direction::UP:
+            file << "UP ";
+            break;
+    }
+}
+
+template <typename... Args>
+static void printManyInts(std::ofstream &file, Args... args) {
+    (print(file, args), ...);
+}
+
+inline void printEvent(const Event &event, std::ofstream &file) {
+    switch (event.getType()) {
+        case (EventType::TANK_MOVE): {
+            auto &move = dynamic_cast<const TankMove &>(event);
+            printManyInts(file, move.getType(), move.getId(),
+                          move.getDirection(), move.getSpeed());
+        } break;
+        case EventType::SPAWN_TANK: {
+            auto &spawn = dynamic_cast<const SpawnTank &>(event);
+            printManyInts(file, spawn.getType(), spawn.getTankId(),
+                          spawn.getEntityType(), spawn.getLeft(),
+                          spawn.getTop(), spawn.getReloadTicks(),
+                          spawn.getBulletSpeed(), spawn.getTankSpeed());
+        } break;
+        case EventType::BONUS_SPAWN: {
+            auto &bonus = dynamic_cast<const BonusSpawn &>(event);
+            printManyInts(file, bonus.getType(), bonus.getId(), bonus.getLeft(),
+                          bonus.getTop());
+        }
+
+        break;
+        case EventType::SET_POSITION: {
+            //            assert(false);
+        } break;
+        case EventType::TANK_SHOOT: {
+            auto &shoot = dynamic_cast<const TankShoot &>(event);
+            printManyInts(file, shoot.getType(), shoot.getTankId(),
+                          shoot.getDirection());
+        } break;
+        case EventType::GAME_END:
+            break;
+    }
+}
+#endif
 }  // namespace Tanks::model
 
 #endif  // TANKS_EVENT_H

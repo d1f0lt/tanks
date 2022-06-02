@@ -16,18 +16,19 @@ public:
     void start();
 
     [[nodiscard]] tcp::endpoint getEndpoint();
+    [[nodiscard]] bool getIsStopped() const;
+    [[nodiscard]] bool getIsStarted() const;
 
     void listenForNewPlayer();
-    [[nodiscard]] bool getIsStopped() const;
 
     void nextTick();
 
 private:
-    std::unique_ptr<std::atomic<bool>> isStarted;
-    std::unique_ptr<std::atomic<bool>> isStopped;
-    std::vector<tcp::socket> sockets_;
-    std::shared_ptr<boost::asio::io_context> ioContext_;
+    std::atomic<bool> isStarted = false;
+    std::atomic<bool> isStopped = false;
+    boost::asio::io_context ioContext_;
     tcp::acceptor acceptor_;
+    std::vector<tcp::socket> sockets_;
     std::unique_ptr<model::ServerModel> model_;
 
     void work();

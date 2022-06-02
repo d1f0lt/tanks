@@ -16,8 +16,10 @@ public:
                   int reloadTicks);
 
     [[nodiscard]] int getSpeed() const final;
-
     [[nodiscard]] int getReloadTicks() const;
+
+    [[nodiscard]] bool isShootingThisTick() const;
+    [[nodiscard]] bool hasBonus() const;
 
 private:
     int speed_ = -1;

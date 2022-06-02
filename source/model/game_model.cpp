@@ -230,6 +230,10 @@ std::condition_variable &GameModel::getCondvar() {
     return condvar_;
 }
 
+void GameModel::incrTick(int add) {
+    currentTick_ += add;
+}
+
 // TODO
 // PlayerSkillsTmp GameModel::getPlayerSkills(int id) {
 //    return playersSockets_[id];

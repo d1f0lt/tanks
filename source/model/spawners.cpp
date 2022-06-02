@@ -39,8 +39,12 @@ std::pair<int, int> Spawner::getFreeCoords() {
 
         for (int row = top; row < down && ok; row++) {
             for (int col = left; col < right && ok; col++) {
-                if (!entity->canStandOn(model_.getByCoords(col, row))) {
+                auto &other = model_.getByCoords(col, row);
+                assert(model_.getById(other.getId()));
+                if (!entity->canStandOn(other)) {
                     ok = false;
+                } else {
+                    assert(dynamic_cast<MovableEntity *>(&other) == nullptr);
                 }
             }
         }
@@ -81,6 +85,7 @@ std::unique_ptr<Event> MediumTankSpawner::createEvent() {
         getEntityId(), left, top, EntityType::MEDIUM_TANK, DEFAULT_TANK_SPEED,
         DEFAULT_BULLET_SPEED, DEFAULT_RELOAD_TICKS);
 }
+
 MediumTankSpawner::MediumTankSpawner(ServerModel &model, int entityId)
     : Spawner(model, entityId) {
 }

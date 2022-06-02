@@ -43,12 +43,13 @@ void ServerModel::receiveTurns(tcp::socket &socket) {
 
 void ServerModel::sendEventsToClients(
     const std::vector<std::unique_ptr<Event>> &events) {
-#ifndef NDEBUG
-    static std::fstream log("log_server.txt");
-    log << events.size() << std::endl;
-    //    std::cout << "s " << getTick() << ' ' << events.size() <<
-    //    std::endl;
-
+#ifdef MODEL_LOGS
+    std::ofstream file("serverEvents.txt", std::ios_base::app);
+    for (const auto &event : events) {
+        file << getTick() << ' ';
+        printEvent(*event, file);
+        file << std::endl;
+    }
 #endif
     static auto sendAllTo =
         [](tcp::socket &socket,

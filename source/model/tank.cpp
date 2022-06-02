@@ -54,4 +54,13 @@ int Tank::getSpeed() const {
 int Tank::getReloadTicks() const {
     return reloadTicks_;
 }
+
+bool Tank::isShootingThisTick() const {
+    return dynamic_cast<TankHandler &>(getHandler()).isShootingThisTick();
+}
+
+bool Tank::hasBonus() const {
+    return dynamic_cast<TankMovableOnWaterHandler *>(&getHandler()) != nullptr;
+    // TODO TankWithBonusHandler
+}
 }  // namespace Tanks::model

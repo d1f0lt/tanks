@@ -82,6 +82,8 @@ protected:
 
     void setFinished();
 
+    void incrTick(int add = 1);
+
 private:
     GameMap map_;
     GroupedEntities groupedEntities_;

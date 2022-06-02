@@ -53,19 +53,29 @@ void ClientModel::receiveEvents() {
 }
 
 void ClientModel::executeAllEvents() {
+#ifdef MODEL_LOGS
+    std::ofstream file("clientEvents.txt", std::ios_base::app);
+#endif
     std::unique_ptr<Event> event;
     int cnt = -1;
     int ticks = std::max(1, static_cast<int>(tickSize_.Size()));
-    for (; ticks > 0 && !getIsFinished(); ticks--) {
+    for (int i = 0; i < ticks && !getIsFinished(); i++) {
         if (!tickSize_.ConsumeSync(cnt)) {
             return;
         }
         for (; cnt > 0; cnt--) {
             bool res = events_.ConsumeSync(event);
             assert(res);
+#ifdef MODEL_LOGS
+            file << getTick() << ' ';
+            printEvent(*event, file);
+            file << std::endl;
+#endif
             executeEvent(*event);
         }
+        incrTick();
     }
+    incrTick(-1);
 }
 
 ClientModel::~ClientModel() noexcept {

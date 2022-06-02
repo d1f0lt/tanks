@@ -96,6 +96,10 @@ void TankHandler::applyBonusesInBackground() {
     dynamic_cast<TankHandler *>(getActualHandler(tank))->setBackground();
 }
 
+bool TankHandler::isShootingThisTick() const {
+    return getModel().getTick() == lastShootTick_;
+}
+
 void TankMovableOnWaterHandler::stopBonus() {
 }
 

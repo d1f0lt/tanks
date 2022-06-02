@@ -14,6 +14,7 @@ public:
     void shoot(Direction direction);
 
     void applyBonusesInBackground();
+    [[nodiscard]] bool isShootingThisTick() const;
 
 private:
     int lastMoveTick_ = -1;
