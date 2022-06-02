@@ -19,6 +19,7 @@ find_package(SFML 2.5 COMPONENTS graphics audio REQUIRED)
 find_package(SQLite3 REQUIRED)
 
 link_libraries(sfml-graphics)
+link_libraries(sfml-audio)
 link_libraries(sqlite3)
 
 add_executable(model_tests model_tests.cpp
@@ -81,4 +82,5 @@ add_executable(
         source/model/foreground_entity.cpp
         source/model/movable_entity.cpp
         source/model/handler.cpp
+        source/sound/background_music.cpp
 )

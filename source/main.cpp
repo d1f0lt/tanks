@@ -3,6 +3,7 @@
 #include "sound/background_music.h"
 
 int main() {
+    static const std::string musicPath = "../sounds/background_music.ogg";
     sf::RenderWindow window(
         sf::VideoMode(Tanks::WINDOW_WIDTH, Tanks::WINDOW_HEIGHT), "Just Tanks",
         sf::Style::Fullscreen);  // create window
