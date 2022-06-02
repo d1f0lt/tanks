@@ -1,5 +1,5 @@
-#ifndef UPGRADE_MENU_H
-#define UPGRADE_MENU_H
+#ifndef SETTINGS_MENU_H
+#define SETTINGS_MENU_H
 
 #include "menu.h"
 
