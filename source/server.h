@@ -10,8 +10,6 @@ class Server {
 public:
     explicit Server(const std::string &levelFilename, int bots, int bonuses);
 
-    //    std::thread start();
-
     void stop();
     void start();
 

@@ -97,8 +97,10 @@ std::unique_ptr<ServerHolder> createServer(const std::string levelFilename) {
     std::unique_ptr<Server> serverPtr = nullptr;
     std::condition_variable serverCreated;
 
+    constexpr int PLAYERS = 1;
     constexpr int BOTS = 10;
     constexpr int BONUSES = 10;
+
     std::atomic<bool> isServerCreated = false;
 
     auto serverThread = std::thread([&]() {
