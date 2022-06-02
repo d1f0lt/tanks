@@ -26,6 +26,7 @@ find_package(SFML 2.5 COMPONENTS graphics audio REQUIRED)
 find_package(SQLite3 REQUIRED)
 
 link_libraries(sfml-graphics)
+link_libraries(sfml-audio)
 link_libraries(sqlite3)
 
 add_executable(model_tests
@@ -81,6 +82,7 @@ add_executable(
         source/menu/progress_bar.cpp
         source/menu/settings_menu.cpp
         source/menu/slider_bar.cpp
+        source/sound/background_music.cpp
         source/game.cpp
         source/game_controller.cpp
         source/game_environment.cpp
@@ -89,7 +91,6 @@ add_executable(
         source/view/game_view.cpp
         source/view/tank_view.cpp
         source/view/bullets_view.cpp
-
         source/model/blocks.cpp
         source/model/entity.cpp
         source/model/game_model.cpp
@@ -110,9 +111,6 @@ add_executable(
         source/model/network_utils.cpp
         source/model/bonus.cpp
         source/model/tank_handler.cpp
-        source/server.cpp source/server.h)
-
-target_link_libraries(model_tests sfml-graphics)
-target_link_libraries(menu_tests sfml-graphics)
-target_link_libraries(tanks sfml-graphics)
-
+        source/server.cpp
+        source/server.h
+)

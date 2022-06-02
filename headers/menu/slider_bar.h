@@ -20,7 +20,6 @@ public:
     size_t getCurrentVolume() const;
     void setSliderVolume(size_t newValue);
     void setPosition(sf::Vector2<float> newPosition) final;
-    size_t getMaxVolume() const;
     SliderBarType getType() const;
     void logic(sf::RenderWindow &window);
     void draw(sf::RenderWindow &window) const final;

@@ -43,10 +43,6 @@ sf::Vector2<float> SliderBar::getPosition() const {
     return axis.getPosition();
 }
 
-size_t SliderBar::getMaxVolume() const {
-    return maxVolume;
-}
-
 SliderBarType SliderBar::getType() const {
     return type;
 }
