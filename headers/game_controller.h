@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "model/playable-tank.h"
+#include "database.h"
 
 namespace Tanks {
 
@@ -15,7 +16,7 @@ public:
     static void makeMove(model::PlayableTank &player,
                          model::Direction direction);
 
-    static void makeShot(model::PlayableTank &player);
+    static void makeShot(model::PlayableTank &player/*, Menu::PlayerSettings &settings*/);
 };
 
 }  // namespace Tanks

@@ -8,6 +8,7 @@
 namespace Tanks {
 
 std::optional<Menu::ButtonType> startGame(sf::RenderWindow &window,
+                                          Menu::PlayerInfo &info,
                                           int level = 1);
 
 }

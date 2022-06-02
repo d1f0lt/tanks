@@ -9,11 +9,8 @@ ShootSoundHolder::ShootSoundHolder(const std::string &filename) {
     sound.setBuffer(buffer);
 }
 
-void ShootSoundHolder::play(float volume_level,
-                            const std::vector<const model::Entity *> &bullets) {
-    for (const auto *item : bullets) {
-        sound.setVolume(volume_level);
-        sound.play();
-    }
+void ShootSoundHolder::play(float volume_level) {
+    sound.setVolume(volume_level);
+    sound.play();
 }
 };  // namespace Tanks::Sound

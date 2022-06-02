@@ -1,4 +1,5 @@
 #include "game_controller.h"
+#include "sound/shoot_sound.h"
 
 namespace Tanks {
 
@@ -33,7 +34,7 @@ void GameController::makeMove(model::PlayableTank &player) {
     }
 }
 
-void GameController::makeShot(model::PlayableTank &player) {
+void GameController::makeShot(model::PlayableTank &player/*, Menu::PlayerSettings &settings */) {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
         player.shoot();
     }

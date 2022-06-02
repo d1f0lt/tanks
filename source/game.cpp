@@ -19,10 +19,10 @@ model::PlayableTank &getPlayerTank(
     return dynamic_cast<model::PlayableTank &>(player.value().get());
 }
 
-void makeAction(std::optional<std::reference_wrapper<model::Entity>> &player) {
+void makeAction(std::optional<std::reference_wrapper<model::Entity>> &player, Menu::PlayerSettings &settings) {
     if (player.has_value()) {
         auto &playerTank = getPlayerTank(player);
-        GameController::makeShot(playerTank);
+        GameController::makeShot(playerTank/*, settings*/);
         GameController::makeMove(playerTank);
     }
 }
@@ -32,6 +32,7 @@ void makeAction(std::optional<std::reference_wrapper<model::Entity>> &player) {
 std::optional<Menu::ButtonType>
 startGame(  // NOLINT(readability-function-cognitive-complexity)
     sf::RenderWindow &window,
+    Menu::PlayerInfo &info,
     int level) {
     static const std::string imagesPath = "../images/";
     const sf::Vector2<int> tankStartCoordinates = {
@@ -75,7 +76,7 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
             } else {
                 model.nextTick();
                 player = model.getById(playerId);
-                makeAction(player);
+                makeAction(player, info.settings);
             }
         } else {
             if (auto signal =
