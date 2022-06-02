@@ -41,17 +41,13 @@ Menu initMenu(PlayerInfo &info, const std::string &imagesPath) {
 
     title->setPosition(curCoordinates);
     title->centralizeByWidth(
-        {curCoordinates.x, curCoordinates.x + tankSpeed->getSize().x});
+        {curCoordinates.x, curCoordinates.x + 50});
     title->setStandardPosition(title->getPosition());
     curCoordinates.y += title->getSize().y + marginFromTitle;
-    musicVolume->axis.setPosition(curCoordinates);
-    musicVolume->coordinates = curCoordinates;
-    musicVolume->setSliderVolume(settings.musicVolume);
+    musicVolume->setPosition(curCoordinates);
 
-    curCoordinates.y += musicVolume->sliderHeight() + marginFromProgressBar;
-    soundVolume->axis.setPosition(curCoordinates);
-    soundVolume->coordinates = curCoordinates;
-    soundVolume->setSliderVolume(settings.soundVolume);
+    curCoordinates.y += musicVolume->getSize().y + marginFromSliderBar;
+    soundVolume->setPosition(curCoordinates);
 
     Menu menu;
 
@@ -67,10 +63,10 @@ Menu initMenu(PlayerInfo &info, const std::string &imagesPath) {
 void updateVolume(PlayerSettings &settings, const SliderBar *sliderBar) {
     switch (sliderBar->getType()) {
         case SliderBarType::MUSIC:
-            settings.musicVolume = sliderBar->getCurrentVolume;
+            settings.musicVolume = static_cast<int>(sliderBar->getCurrentVolume());
             break;
         case SliderBarType::SOUND:
-            settings.soundsVolume = sliderBar->getCurrentVolume;
+            settings.soundsVolume = static_cast<int>(sliderBar->getCurrentVolume());
             break;
         default:
             assert(false);

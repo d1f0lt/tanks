@@ -133,4 +133,4 @@ void ProgressBar::draw(sf::RenderWindow &window) const {
     }
 }
 
-}  // namespace Tanks::Menu 
+}  // namespace Tanks::Menu
