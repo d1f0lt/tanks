@@ -128,6 +128,7 @@ void ServerModel::executeAllEvents() {
     sendEventsToClients(eventsToSend);
 }
 
+#ifdef EPILEPTIC_BOTS
 std::unique_ptr<Event> ServerModel::getEventByBot(int botId) {
     int rnd = getRnd() % 20;
     if (rnd >= 12) {
@@ -140,6 +141,23 @@ std::unique_ptr<Event> ServerModel::getEventByBot(int botId) {
             dynamic_cast<Tank &>(getById(botId)->get()).getSpeed());
     }
 }
+#else
+std::unique_ptr<Event> ServerModel::getEventByBot(int botId) {
+    int rnd = getRnd() % 80;
+    if (rnd >= 70) {
+        return std::make_unique<TankShoot>(
+            botId, dynamic_cast<Tank &>(getById(botId)->get()).getDirection());
+    } else if (rnd <= 3) {
+        auto direction = static_cast<Direction>(rnd % 4);
+        return std::make_unique<TankMove>(botId, direction, 0);
+    } else {
+        return std::make_unique<TankMove>(
+            botId, dynamic_cast<Tank &>(getById(botId)->get()).getDirection(),
+            dynamic_cast<Tank &>(getById(botId)->get()).getSpeed());
+    }
+}
+
+#endif
 
 PlayerSkills ServerModel::getPlayerSkills(int id) const {
     return tanksSkills_.at(id);

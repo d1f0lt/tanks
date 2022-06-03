@@ -11,7 +11,7 @@ namespace Tanks {
 std::optional<Menu::ButtonType> startGame(
     sf::RenderWindow &window,
     int level = 1,
-    std::optional<std::string> address = std::nullopt);
+    std::optional<std::pair<std::string, std::string>> address = std::nullopt);
 
 }
 

@@ -65,14 +65,14 @@ private:
     std::condition_variable *serverStart_ = nullptr;
 };
 
-static void serverImp(const std::string &filename,
-                      int players,
-                      int bots,
-                      int bonuses,
-                      std::condition_variable *&condvarOnClient,
-                      std::atomic<bool> &isServerCreated,
-                      std::unique_ptr<Server> &serverOnClient,
-                      std::condition_variable &serverOnClientInitiallized) {
+void serverImp(const std::string &filename,
+               int players,
+               int bots,
+               int bonuses,
+               std::condition_variable *&condvarOnClient,
+               std::atomic<bool> &isServerCreated,
+               std::unique_ptr<Server> &serverOnClient,
+               std::condition_variable &serverOnClientInitiallized) {
     std::condition_variable cv;
     condvarOnClient = &cv;
     auto serverTmp = std::make_unique<Server>(filename, bots, bonuses);
@@ -123,8 +123,9 @@ std::optional<Menu::ButtonType>
 startGame(  // NOLINT(readability-function-cognitive-complexity)
     sf::RenderWindow &window,
     int level,
-    std::optional<std::string> address) {
-    const bool isHost = (address == std::nullopt);
+    std::optional<std::pair<std::string, std::string>> addressPort) {
+    const bool isHost = (addressPort == std::nullopt);
+    //    addressPort = {"127.0.0.1", "12345"};
 
     static const std::string imagesPath = "../images/";
     const std::string levelFilename("../levels/level" + std::to_string(level) +
@@ -142,12 +143,13 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
         endpoint = serverHolder->getServer().getEndpoint();
         clientSocket.connect(endpoint);
     } else {
-        boost::asio::connect(clientSocket,
-                             tcp::resolver(ioContext).resolve(address.value()));
+        boost::asio::connect(clientSocket, tcp::resolver(ioContext).resolve(
+                                               addressPort.value().first,
+                                               addressPort.value().second));
     }
 
     //    tcp::socket clientSocket(ioContext);
-    //    clientSocket.connect(address.value());
+    //    clientSocket.connect(addressPort.value());
 
     int playerId = model::receiveInt(clientSocket);
     assert(playerId < 0);
