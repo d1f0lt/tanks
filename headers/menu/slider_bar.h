@@ -5,8 +5,7 @@
 
 namespace Tanks::Menu {
 
-enum class SliderBarType {SOUND, MUSIC };
-
+enum class SliderBarType { SOUND, MUSIC };
 
 struct SliderBar final : MenuItem {
 public:
@@ -23,6 +22,7 @@ public:
     SliderBarType getType() const;
     void logic(sf::RenderWindow &window);
     void draw(sf::RenderWindow &window) const final;
+
 private:
     sf::RectangleShape slider;
     sf::RectangleShape axis;

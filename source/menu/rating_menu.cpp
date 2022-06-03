@@ -132,5 +132,4 @@ void showRatingMenu(sf::RenderWindow &window,
         }
     }
 }
-
 }  // namespace Tanks::Menu

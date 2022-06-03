@@ -16,6 +16,6 @@ private:
     sf::SoundBuffer buffer;
     sf::Sound sound;
 };
-}
+}  // namespace Tanks::Sound
 
 #endif  // TANK_DESTROY_SOUND_H

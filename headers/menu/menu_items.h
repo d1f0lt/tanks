@@ -129,7 +129,6 @@ public:
     sf::Vector2<float> getPosition() const override;
 
     void setPosition(sf::Vector2<float> newPosition) override;
-
     [[maybe_unused]] void setBorderColor(const sf::Color &color);
 
     void draw(sf::RenderWindow &window) const override;

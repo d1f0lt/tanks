@@ -15,6 +15,6 @@ struct BackgroundMusicHolder final {
 private:
     sf::Music music;
 };
-}
+}  // namespace Tanks::Sound
 
 #endif  // BACKGROUND_MUSIC_H

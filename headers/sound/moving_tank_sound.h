@@ -15,6 +15,6 @@ struct ShootSoundHolder final {
 private:
     sf::Music music;
 };
-}
+}  // namespace Tanks::Sound
 
 #endif  // MOVING_TANK_SOUND_H

@@ -122,7 +122,7 @@ std::unique_ptr<ServerHolder> createServer(const std::string levelFilename) {
 std::optional<Menu::ButtonType>
 startGame(  // NOLINT(readability-function-cognitive-complexity)
     sf::RenderWindow &window,
-    Menu::PlayerInfo &info, // NOLINT
+    Menu::PlayerInfo &info,  // NOLINT
     int level,
     std::optional<std::string> address) {
     const bool isHost = (address == std::nullopt);

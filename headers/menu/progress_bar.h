@@ -22,7 +22,7 @@ private:
     sf::RectangleShape indicator;
 };
 
-enum class ProgressBarType {TANK_SPEED, BULLET_SPEED, RELOAD_TICKS };
+enum class ProgressBarType { TANK_SPEED, BULLET_SPEED, RELOAD_TICKS };
 
 struct ProgressBar final : MenuItem {
 public:

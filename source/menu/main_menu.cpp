@@ -6,9 +6,9 @@
 #include "menu.h"
 #include "menu/new_game_menu.h"
 #include "menu/rating_menu.h"
+#include "menu/settings_menu.h"
 #include "menu/upgrade_menu.h"
 #include "sound/background_music.h"
-#include "menu/settings_menu.h"
 
 namespace Tanks::Menu {
 
@@ -66,10 +66,11 @@ void showMainMenu(sf::RenderWindow &window,
     Menu menu(initMenu(imagesPath, info.general));
 
     menu.flyAwayToRight();
-    
-//    const static std::string soundsPath = "../sounds/";
-//    Sound::BackgroundMusicHolder music(soundsPath + "background_music.ogg");
-//    music.play(static_cast<float>(info.settings.musicVolume));
+
+    //    const static std::string soundsPath = "../sounds/";
+    //    Sound::BackgroundMusicHolder music(soundsPath +
+    //    "background_music.ogg");
+    //    music.play(static_cast<float>(info.settings.musicVolume));
 
     menu.flyOutFromRight(window, backgroundSprite);
 
