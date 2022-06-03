@@ -57,10 +57,18 @@ struct PlayerSkills {
     int reloadTicks = DEFAULT_RELOAD_TICKS;
 };
 
+struct PlayerRating {
+    int singlePlayerKills = 0;
+    int singlePlayerDeath = 0;
+    int multiplayerKills = 0;
+    int multiplayerDeath = 0;
+};
+
 struct PlayerInfo {
     PlayerGeneral general;
     PlayerSkills skills{};
     PlayerSettings settings{};
+    PlayerRating rating{};
 };
 
 struct PlayersDatabase : Database {
@@ -89,6 +97,7 @@ private:
     PlayerGeneral getGeneralInfoByName(const std::string &username);
     PlayerSettings getSettingsInfoByName(const std::string &username);
     PlayerSkills getSkillsInfoByName(const std::string &username);
+    PlayerRating getRatingInfoByName(const std::string &username);
 };
 
 }  // namespace Menu

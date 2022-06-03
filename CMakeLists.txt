@@ -80,6 +80,7 @@ add_executable(
         source/menu/input_menu.cpp
         source/menu/upgrade_menu.cpp
         source/menu/progress_bar.cpp
+        source/menu/rating_menu.cpp
         source/menu/settings_menu.cpp
         source/menu/slider_bar.cpp
         source/sound/background_music.cpp

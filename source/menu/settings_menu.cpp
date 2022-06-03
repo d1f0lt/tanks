@@ -23,13 +23,13 @@ Menu initMenu(PlayerInfo &info, const std::string &imagesPath) {
     auto title =
         std::make_unique<MenuInscription>(titleInfo, sf::Vector2<float>{0, 0});
 
-    titleInfo.inscription = "Music";
+    titleInfo.inscription = "Music volume:";
     titleInfo.characterSize = 40;
-    titleInfo.textColor = sf::Color{255, 255, 255};
+    titleInfo.textColor = {63, 87, 210};
     auto musicVolume = std::make_unique<SliderBar>(
         titleInfo, sf::Vector2<float>{0, 0}, MAX_VOLUME, settings.musicVolume, SliderBarType::MUSIC);
 
-    titleInfo.inscription = "Volume";
+    titleInfo.inscription = "Sounds volume:";
     auto soundVolume = std::make_unique<SliderBar>(
         titleInfo, sf::Vector2<float>{0, 0}, MAX_VOLUME, settings.soundsVolume, SliderBarType::SOUND);
 
