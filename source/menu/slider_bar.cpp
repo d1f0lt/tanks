@@ -12,8 +12,7 @@ SliderBar::SliderBar(InscriptionInfo &titleInfo,
     : maxVolume(maxValue_),
       curVolume(curValue_),
       title(std::make_unique<MenuInscription>(titleInfo, coordinates_)),
-      type(type_),
-      coordinates(coordinates_) {
+      type(type_) {
     setPosition(coordinates_);
     slider.setSize(sf::Vector2f(sliderWidth, sliderHeight));
     slider.setFillColor(sf::Color(90,90,90));
@@ -42,10 +41,6 @@ size_t SliderBar::getCurrentVolume() const {
 
 sf::Vector2<float> SliderBar::getPosition() const {
     return axis.getPosition();
-}
-
-size_t SliderBar::getMaxVolume() const {
-    return maxVolume;
 }
 
 SliderBarType SliderBar::getType() const {

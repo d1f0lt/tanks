@@ -13,9 +13,8 @@ struct ShootSoundHolder final {
     void play(float volume_level);
 
 private:
-    sf::SoundBuffer buffer;
-    sf::Sound sound();
+    sf::Music music;
 };
-};  // namespace Tanks::Sound
+}
 
 #endif  // MOVING_TANK_SOUND_H

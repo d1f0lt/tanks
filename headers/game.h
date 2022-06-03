@@ -3,13 +3,16 @@
 
 #include <SFML/Graphics.hpp>
 #include <optional>
+#include <string>
 #include "menu/menu.h"
 
 namespace Tanks {
 
-std::optional<Menu::ButtonType> startGame(sf::RenderWindow &window,
-                                          Menu::PlayerInfo &info,
-                                          int level = 1);
+std::optional<Menu::ButtonType> startGame(
+    sf::RenderWindow &window,
+    Menu::PlayerInfo &info,
+    int level = 1,
+    std::optional<std::string> address = std::nullopt);
 
 }
 

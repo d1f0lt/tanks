@@ -22,4 +22,7 @@ MovableEntity::MovableEntity(int left,
     : ForegroundEntity(left, top, entityId, std::move(handler)),
       direction_(direction) {
 }
+std::vector<const Entity *> MovableEntity::look(Direction direction) {
+    return dynamic_cast<MovableHandler &>(getHandler()).look(direction);
+}
 }  // namespace Tanks::model

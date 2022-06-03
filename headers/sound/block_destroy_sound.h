@@ -14,8 +14,8 @@ struct BlockDestroySoundHolder final {
 
 private:
     sf::SoundBuffer buffer;
-    sf::Sound sound();
+    sf::Sound sound;
 };
-};  // namespace Tanks::Sound
+}
 
 #endif  // BLOCK_DESTROY_SOUND_H

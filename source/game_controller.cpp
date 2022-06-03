@@ -8,13 +8,12 @@ bool GameController::isEscReleased(const sf::Event &event) {
             event.key.code == sf::Keyboard::Escape);  // NOLINT
 }
 
-void GameController::makeMove(model::PlayableTank &player,
+void GameController::makeMove(model::PlayerActionsHandler &player,
                               model::Direction direction) {
-    player.setDirection(direction);
     player.move(direction);
 }
 
-void GameController::makeMove(model::PlayableTank &player) {
+void GameController::makeMove(model::PlayerActionsHandler &player) {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) ||
         sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
         auto direction = model::Direction::LEFT;
@@ -34,7 +33,7 @@ void GameController::makeMove(model::PlayableTank &player) {
     }
 }
 
-void GameController::makeShot(model::PlayableTank &player/*, Menu::PlayerSettings &settings */) {
+void GameController::makeShot(model::PlayerActionsHandler &player) {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
         player.shoot();
     }

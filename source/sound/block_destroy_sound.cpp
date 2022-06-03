@@ -1,6 +1,6 @@
+#include "sound/block_destroy_sound.h"
 #include <cassert>
 #include "constants.h"
-#include "sound/shoot_sound.h"
 
 namespace Tanks::Sound {
 

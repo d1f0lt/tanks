@@ -6,9 +6,10 @@ class Entity;
 class MovableEntity;
 class ForegroundEntity;
 class Tank;
-class BotTank;
-class PlayableTank;
+class MediumTank;
 class Projectile;
+class Bonus;
+class WalkOnWater;
 }  // namespace Tanks::model
 
 #endif  // TANKS_ENTITIES_FWD_H

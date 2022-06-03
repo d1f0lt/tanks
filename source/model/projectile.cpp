@@ -1,17 +1,14 @@
 #include "model/projectile.h"
 #include "constants.h"
+#include "model/handler.h"
 
 namespace Tanks::model {
-
-bool Projectile::canPass(const Entity &other) const {
-    return other.isBulletPassable();
-}
 
 Projectile::Projectile(int left,
                        int top,
                        Direction direction,
                        GameModel &model,
-                       int entityId)
+                       IncrId entityId)
     : MovableEntity(left,
                     top,
                     entityId,
@@ -40,6 +37,6 @@ int Projectile::getSpeed() const {
 }
 
 bool Projectile::isTankPassable() const {
-    return true;
+    return false;
 }
 }  // namespace Tanks::model

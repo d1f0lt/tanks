@@ -1,78 +1,66 @@
 #include "model/tank.h"
 #include <queue>
 #include "constants.h"
-#include "model/playable-tank.h"
+#include "model/tank_handler.h"
 
 namespace Tanks::model {
 Tank::Tank(int left,
            int top,
-           int entityId,
+           DecrId entityId,
            std::unique_ptr<TankHandler> handler,
            Direction direction,
-           int speed)
+           int speed,
+           int reloadTicks)
     : MovableEntity(left, top, entityId, std::move(handler), direction),
-      speed_(speed) {
+      speed_(speed),
+      reloadTicks_(reloadTicks) {
 }
 
-int Tank::getWidth() const {
+int MediumTank::getWidth() const {
+    return Tanks::TANK_SIZE;
+}
+
+MediumTank::MediumTank(int left,
+                       int top,
+                       DecrId entityId,
+                       const TankHandlerCreator &handlerCreator,
+                       Direction direction,
+                       int speed)
+    : Tank(left,
+           top,
+           entityId,
+           handlerCreator.createTankHandler(*this),
+           direction,
+           speed,
+           DEFAULT_RELOAD_TICKS) {
+}
+
+int MediumTank::getHeight() const {
     return TANK_SIZE;
 }
 
-int Tank::getHeight() const {
-    return TANK_SIZE;
-}
-
-int Tank::getStrength() const {
+int MediumTank::getStrength() const {
     return 1;
 }
 
-EntityType Tank::getType() const {
-    return EntityType::LEFT_DOWN_CORNER;
+EntityType MediumTank::getType() const {
+    return EntityType::MEDIUM_TANK;
 }
 
 int Tank::getSpeed() const {
     return speed_;
 }
 
-bool Tank::canPass(const Entity &other) const {
-    return other.isTankPassable();
+int Tank::getReloadTicks() const {
+    return reloadTicks_;
 }
 
-void Tank::shoot() {
-    dynamic_cast<TankHandler &>(getHandler()).shoot();
+bool Tank::isShootingThisTick() const {
+    return dynamic_cast<TankHandler &>(getHandler()).isShootingThisTick();
 }
 
-PlayableTank::PlayableTank(int left,
-                           int top,
-                           int entityId,
-                           Direction direction,
-                           GameModel &model)
-    : Tank(left,
-           top,
-           entityId,
-           std::make_unique<TankHandler>(model, *this),
-           direction,
-           DEFAULT_TANK_SPEED) {
+bool Tank::hasBonus() const {
+    return dynamic_cast<TankMovableOnWaterHandler *>(&getHandler()) != nullptr;
+    // TODO TankWithBonusHandler
 }
-
-EntityType PlayableTank::getType() const {
-    return EntityType::PLAYABLE_TANK;
-}
-
-PlayableTank::PlayableTank(int left,
-                           int top,
-                           int entityId,
-                           std::unique_ptr<TankHandler> handler,
-                           Direction direction)
-    : Tank(left,
-           top,
-           entityId,
-           std::move(handler),
-           direction,
-           DEFAULT_TANK_SPEED) {
-}
-void PlayableTank::move(Direction direction) {
-    move(direction, getSpeed());
-}
-
 }  // namespace Tanks::model

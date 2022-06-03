@@ -1,30 +1,120 @@
 #include <cassert>
 #include <chrono>
+#include <iostream>
 #include <thread>
 #include "game_controller.h"
 #include "game_environment.h"
 #include "menu/menu_controller.h"
-#include "model/game_model.h"
+#include "model/client_game_model.h"
+#include "model/network_utils.h"
+#include "model/player_action_handler.h"
+#include "model/server_game_model.h"
 #include "pause.h"
+#include "server.h"
 #include "view/bullets_view.h"
 #include "view/game_view.h"
 #include "view/tank_view.h"
 
 namespace Tanks {
+using boost::asio::ip::tcp;
 
 namespace {
-
-model::PlayableTank &getPlayerTank(
-    std::optional<std::reference_wrapper<model::Entity>> &player) {
-    return dynamic_cast<model::PlayableTank &>(player.value().get());
+void makeAction(model::PlayerActionsHandler &player) {
+    if (player.tank()) {
+        GameController::makeShot(player);
+        GameController::makeMove(player);
+    }
 }
 
-void makeAction(std::optional<std::reference_wrapper<model::Entity>> &player, Menu::PlayerSettings &settings) {
-    if (player.has_value()) {
-        auto &playerTank = getPlayerTank(player);
-        GameController::makeShot(playerTank/*, settings*/);
-        GameController::makeMove(playerTank);
+struct ServerHolder {
+public:
+    explicit ServerHolder(std::thread &&thread,
+                          std::unique_ptr<Server> server,
+                          std::condition_variable *serverStart)
+        : thread_(std::move(thread)),
+          server_(std::move(server)),
+          serverStart_(serverStart) {
+        assert(server_ != nullptr);
+        assert(serverStart_ != nullptr);
     }
+
+    ServerHolder(ServerHolder &&other) noexcept
+        : thread_(std::move(other.thread_)),
+          server_(std::move(other.server_)),
+          serverStart_(other.serverStart_) {
+    }
+
+    [[nodiscard]] Server &getServer() const {
+        return *server_;
+    }
+
+    void startServer() const {
+        server_->start();
+        serverStart_->notify_all();
+    }
+
+    ~ServerHolder() {
+        server_->stop();
+        //        client_.finishGame();
+        thread_.join();
+    }
+
+private:
+    std::thread thread_;
+    std::unique_ptr<Server> server_ = nullptr;
+    std::condition_variable *serverStart_ = nullptr;
+};
+
+static void serverImp(const std::string &filename,
+                      int players,
+                      int bots,
+                      int bonuses,
+                      std::condition_variable *&condvarOnClient,
+                      std::atomic<bool> &isServerCreated,
+                      std::unique_ptr<Server> &serverOnClient,
+                      std::condition_variable &serverOnClientInitiallized) {
+    std::condition_variable cv;
+    condvarOnClient = &cv;
+    auto serverTmp = std::make_unique<Server>(filename, bots, bonuses);
+    serverOnClient = std::move(serverTmp);
+    Server *server = serverOnClient.get();
+    isServerCreated = true;
+    serverOnClientInitiallized.notify_all();
+    for (int i = 0; i < players; i++) {
+        server->listenForNewPlayer();
+    }
+    std::mutex mutex;
+    std::unique_lock lock(mutex);
+    cv.wait(lock, [&]() { return server->getIsStarted(); });
+    while (!server->getIsStopped()) {
+        server->nextTick();
+        std::this_thread::sleep_for(std::chrono::milliseconds(15));
+    }
+    // init servermodel
+}
+
+std::unique_ptr<ServerHolder> createServer(const std::string levelFilename) {
+    std::condition_variable *startServer = nullptr;
+    std::unique_ptr<Server> serverPtr = nullptr;
+    std::condition_variable serverCreatedCv;
+
+    constexpr int PLAYERS = 1;
+    constexpr int BOTS = 10;
+    constexpr int BONUSES = 10;
+
+    std::atomic<bool> isServerCreated = false;
+
+    auto serverThread = std::thread([&]() {
+        serverImp(levelFilename, PLAYERS, BOTS, BONUSES, startServer,
+                  isServerCreated, serverPtr, serverCreatedCv);
+    });
+    std::mutex mutex;
+    std::unique_lock lock(mutex);
+    serverCreatedCv.wait(lock, [&]() -> bool { return isServerCreated; });
+
+    assert(startServer != nullptr);
+    return std::make_unique<ServerHolder>(std::move(serverThread),
+                                          std::move(serverPtr), startServer);
 }
 
 }  // namespace
@@ -32,18 +122,39 @@ void makeAction(std::optional<std::reference_wrapper<model::Entity>> &player, Me
 std::optional<Menu::ButtonType>
 startGame(  // NOLINT(readability-function-cognitive-complexity)
     sf::RenderWindow &window,
-    Menu::PlayerInfo &info,
-    int level) {
-    static const std::string imagesPath = "../images/";
-    const sf::Vector2<int> tankStartCoordinates = {
-        TILE_SIZE * 6 + (TILE_SIZE - TANK_SIZE) / 2,
-        TILE_SIZE * (MAP_HEIGHT - 2) + (TILE_SIZE - TANK_SIZE)};
+    Menu::PlayerInfo &info, // NOLINT
+    int level,
+    std::optional<std::string> address) {
+    const bool isHost = (address == std::nullopt);
 
-    model::GameModel model;
-    model.loadLevel(level);
-    const int playerId =
-        model.spawnPlayableTank(tankStartCoordinates.x, tankStartCoordinates.y)
-            .getId();
+    static const std::string imagesPath = "../images/";
+    const std::string levelFilename("../levels/level" + std::to_string(level) +
+                                    ".csv");
+
+    //    static_assert(std::is_move_constructible_v<Server>);
+    boost::asio::io_context ioContext;
+    boost::asio::ip::tcp::resolver resolver(ioContext);
+    tcp::socket clientSocket(ioContext);
+    tcp::endpoint endpoint;
+
+    std::unique_ptr<ServerHolder> serverHolder = nullptr;
+    if (isHost) {
+        serverHolder = createServer(levelFilename);
+        endpoint = serverHolder->getServer().getEndpoint();
+        clientSocket.connect(endpoint);
+    } else {
+        boost::asio::connect(clientSocket,
+                             tcp::resolver(ioContext).resolve(address.value()));
+    }
+
+    //    tcp::socket clientSocket(ioContext);
+    //    clientSocket.connect(address.value());
+
+    int playerId = model::receiveInt(clientSocket);
+    assert(playerId < 0);
+
+    model::ClientModel model(playerId, std::move(clientSocket));
+    model.loadLevel(levelFilename);
 
     View::TankSpriteHolder greenTankView(imagesPath + "tanks/green_tank.png");
 
@@ -55,6 +166,14 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
 
     Pause pause;
 
+    //    auto serverThread = server->start();
+    if (isHost) {
+        std::cout << endpoint << '\n';
+        serverHolder->startServer();
+    }
+    model.nextTick();
+
+    //    auto &model = serverPtr.model();
     while (window.isOpen()) {
         // catch event
         sf::Event event{};
@@ -65,7 +184,7 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
         }
         pause.checkPause(event);
 
-        auto player = model.getById(playerId);
+        auto player = model.getHandler();
 
         if (!pause.isPause()) {
             if (auto signal = MenuController::control(environment.getMenu(),
@@ -75,8 +194,7 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
                 pause.makePause();
             } else {
                 model.nextTick();
-                player = model.getById(playerId);
-                makeAction(player, info.settings);
+                makeAction(player);
             }
         } else {
             if (auto signal =
@@ -102,9 +220,10 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
 
         mapView.draw(window, model);
 
-        if (player.has_value()) {
-            auto &playerTank = getPlayerTank(player);
-            greenTankView.draw(window, playerTank);
+        const auto &tanks = model.getAll(model::EntityType::MEDIUM_TANK);
+        for (const auto *tank : tanks) {
+            greenTankView.draw(window,
+                               dynamic_cast<const model::Tank &>(*tank));
         }
 
         const auto &bullets = model.getAll(model::EntityType::BULLET);

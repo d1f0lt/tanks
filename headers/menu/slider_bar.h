@@ -20,14 +20,12 @@ public:
     size_t getCurrentVolume() const;
     void setSliderVolume(size_t newValue);
     void setPosition(sf::Vector2<float> newPosition) final;
-    size_t getMaxVolume() const;
     SliderBarType getType() const;
     void logic(sf::RenderWindow &window);
     void draw(sf::RenderWindow &window) const final;
 private:
     sf::RectangleShape slider;
     sf::RectangleShape axis;
-    sf::Vector2<float> coordinates;
     const size_t maxVolume;
     const size_t minVolume = 0;
     size_t curVolume = 50;

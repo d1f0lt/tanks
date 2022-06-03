@@ -1,7 +1,7 @@
 #ifndef GAME_ENVIRONMENT
 #define GAME_ENVIRONMENT
 
-#include "menu.h"
+#include "menu/menu.h"
 #include "pause.h"
 
 namespace Tanks {
