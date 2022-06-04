@@ -5,6 +5,7 @@
 #include "menu/input_menu.h"
 #include "menu/main_menu.h"
 #include "menu/menu.h"
+#include "sound/background_music.h"
 
 namespace Tanks::Menu {
 
@@ -116,11 +117,14 @@ void showUsersMenu(sf::RenderWindow &window) {
             case ButtonType::USER: {
                 db.connect();
                 auto person = db.getInfoByName(res->getInscription());
+                static const std::string musicPath = "../sounds/background_music.ogg";
+                Tanks::Sound::BackgroundMusicHolder backgroundMusic(musicPath);
+                backgroundMusic.play(static_cast<float>(person.settings.musicVolume));
                 if (!db.isOnline(person.general.name)) {
                     db.makeOnline(person.general.name);
                     db.disconnectFromDatabase();
                     menu.flyAwayToLeft(window, backgroundSprite);
-                    showMainMenu(window, backgroundSprite, person);
+                    showMainMenu(window, backgroundSprite, person, backgroundMusic);
                     db.connect();
                     db.updateInfo(person);
                     db.makeOffline(person.general.name);

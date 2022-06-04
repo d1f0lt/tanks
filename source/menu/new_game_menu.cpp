@@ -2,6 +2,7 @@
 #include <cassert>
 #include <thread>
 #include "menu/levels_menu.h"
+#include "sound/background_music.h"
 
 namespace Tanks::Menu {
 
@@ -46,7 +47,8 @@ Menu initMenu() {
 
 void showNewGameMenu(sf::RenderWindow &window,
                      const sf::Sprite &backgroundSprite,
-                     PlayerInfo &info) {
+                     PlayerInfo &info,
+                     Sound::BackgroundMusicHolder &backgroundMusicHolder) {
     const static std::string imagesPath = "../images/menu/";
     Menu menu(initMenu());
     menu.addIconToLeftUpCorner(imagesPath + "return.png", ButtonType::RETURN);
@@ -59,7 +61,7 @@ void showNewGameMenu(sf::RenderWindow &window,
         switch (res->getType()) {
             case ButtonType::SINGLE_PLAYER: {
                 menu.flyAwayToLeft(window, backgroundSprite);
-                auto ans = showLevelsMenu(window, backgroundSprite, info);
+                auto ans = showLevelsMenu(window, backgroundSprite, info, backgroundMusicHolder);
                 switch (ans) {
                     case ButtonType::RETURN:
                         menu.flyOutFromLeft(window, backgroundSprite);

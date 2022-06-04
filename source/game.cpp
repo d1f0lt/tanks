@@ -16,6 +16,7 @@
 #include "view/tank_view.h"
 #include "sound/shoot_sound.h"
 #include "sound/block_destroy_sound.h"
+#include "sound/background_music.h"
 
 
 namespace Tanks {
@@ -126,6 +127,7 @@ std::optional<Menu::ButtonType>
 startGame(  // NOLINT(readability-function-cognitive-complexity)
     sf::RenderWindow &window,
     Menu::PlayerInfo &info,
+    Sound::BackgroundMusicHolder &backgroundMusicHolder,
     int level,
     std::optional<std::string> address) {
     const bool isHost = (address == std::nullopt);
@@ -202,6 +204,7 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
                                                       window, event);
                 signal != std::nullopt) {
                 assert(signal.value()->getType() == Menu::ButtonType::PAUSE);
+                backgroundMusicHolder.play(info.settings.musicVolume);
                 pause.makePause();
             } else {
                 model.nextTick();
@@ -213,6 +216,7 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
                 signal != std::nullopt) {
                 switch (signal.value()->getType()) {
                     case Menu::ButtonType::RESUME:
+                        backgroundMusicHolder.stop();
                         pause.unpause();
                         break;
                     case Menu::ButtonType::NEW_GAME:

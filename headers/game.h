@@ -12,6 +12,7 @@ namespace Tanks {
 std::optional<Menu::ButtonType> startGame(
     sf::RenderWindow &window,
     Menu::PlayerInfo &info,
+    Sound::BackgroundMusicHolder &backgroundMusicHolder,
     int level = 1,
     std::optional<std::string> address = std::nullopt);
 
