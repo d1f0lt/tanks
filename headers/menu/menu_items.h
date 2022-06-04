@@ -22,7 +22,9 @@ enum class ButtonType {
     NEW_USER,
     USERS,
     DELETE,
-    IMPROVE
+    IMPROVE,
+    CREATE_SERVER,
+    CONNECT
 };
 
 std::string convertButtonTypeToString(ButtonType type);

@@ -83,6 +83,7 @@ add_executable(
         source/menu/rating_menu.cpp
         source/menu/settings_menu.cpp
         source/menu/slider_bar.cpp
+        source/menu/multiplayer_menu.cpp
         source/sound/background_music.cpp
         source/game.cpp
         source/game_controller.cpp

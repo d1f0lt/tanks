@@ -9,7 +9,7 @@ namespace Tanks::Menu {
 
 Menu initMenu(const std::string &titleText) {
     const static sf::Color textColor{63, 87, 210};
-    const static int limit = 15;
+    const static int limit = 18;
 
     Menu menu{};
 
@@ -21,7 +21,7 @@ Menu initMenu(const std::string &titleText) {
 
     const static size_t textSize = 50;
 
-    const auto menuWidth = title->getSize().x;
+    const float menuWidth = static_cast<float>(WINDOW_WIDTH) / 3;
     const static sf::Vector2<float> textboxSize{menuWidth, 80};
 
     sf::Vector2<float> curCoordinates{
@@ -29,14 +29,16 @@ Menu initMenu(const std::string &titleText) {
         (WINDOW_HEIGHT - title->getSize().y - marginFromTitle - textboxSize.y) /
             2};
     title->setPosition(curCoordinates);
-    title->setStandardPosition(curCoordinates);
     curCoordinates.y += title->getSize().y + marginFromTitle;
-    menu.addMenuItem(std::move(title));
 
     InscriptionInfo info{"", textSize, textColor};
 
     auto textbox = std::make_unique<TextBox>(
         limit, info, textboxSize, curCoordinates, sf::Color(0, 0, 0));
+
+    title->centralizeByWidth({curCoordinates.x, curCoordinates.x + textbox->getSize().x});
+    title->updateStandardPosition();
+    menu.addMenuItem(std::move(title));
     menu.addMenuItem(std::move(textbox));
 
     return menu;

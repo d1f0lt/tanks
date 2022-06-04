@@ -1,8 +1,8 @@
-#include "menu/new_game_menu.h"
+#include "menu/multiplayer_menu.h"
 #include <cassert>
 #include <thread>
 #include "menu/levels_menu.h"
-#include "menu/multiplayer_menu.h"
+#include "menu/input_menu.h"
 
 namespace Tanks::Menu {
 
@@ -10,10 +10,10 @@ namespace {
 
 Menu initMenu() {
     const static sf::Color textColor{63, 87, 210};
-    const static auto menuWidth = static_cast<size_t>(WINDOW_WIDTH / 3.4);
+    const static auto menuWidth = static_cast<size_t>(WINDOW_WIDTH / 2.5);
 
     // title
-    const static std::string titleText = "SELECT MODE";
+    const static std::string titleText;
     const static size_t titleCharacterSize = 76;
     InscriptionInfo title{titleText, titleCharacterSize, textColor};
 
@@ -22,7 +22,7 @@ Menu initMenu() {
 
     // buttons
     const static std::vector<ButtonType> buttonTypes = {
-        ButtonType::SINGLE_PLAYER, ButtonType::MULTIPLAYER};
+        ButtonType::CREATE_SERVER, ButtonType::CONNECT};
     const static size_t buttonsHeight = 100;
     const static sf::Color btnStandardColor(0, 0, 0, 150);
     const static sf::Color btnHoverColor(66, 66, 66, 230);
@@ -45,7 +45,7 @@ Menu initMenu() {
 }
 }  // namespace
 
-void showNewGameMenu(sf::RenderWindow &window,
+void showMultiplayerMenu(sf::RenderWindow &window,
                      const sf::Sprite &backgroundSprite,
                      PlayerInfo &info) {
     const static std::string imagesPath = "../images/menu/";
@@ -58,7 +58,7 @@ void showNewGameMenu(sf::RenderWindow &window,
     while (window.isOpen()) {
         const auto *const res = menu.showMenu(window, backgroundSprite);
         switch (res->getType()) {
-            case ButtonType::SINGLE_PLAYER: {
+            case ButtonType::CREATE_SERVER: {
                 menu.flyAwayToLeft(window, backgroundSprite);
                 auto ans = showLevelsMenu(window, backgroundSprite, info);
                 switch (ans) {
@@ -71,11 +71,11 @@ void showNewGameMenu(sf::RenderWindow &window,
                         assert(false);
                 }
             }
-            case ButtonType::MULTIPLAYER:
+            case ButtonType::CONNECT: {
                 menu.flyAwayToLeft(window, backgroundSprite);
-                showMultiplayerMenu(window, backgroundSprite, info);
+                auto ans = showInputMenu(window, backgroundSprite, "INPUT IP");
                 menu.flyOutFromLeft(window, backgroundSprite);
-                break;
+            } break;
 
             case ButtonType::RETURN:
                 menu.flyAwayToRight(window, backgroundSprite);

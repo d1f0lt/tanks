@@ -15,7 +15,9 @@ std::string convertButtonTypeToString(const ButtonType type) {
         {ButtonType::PAUSE, "PAUSE"},
         {ButtonType::UPGRADE, "UPGRADE"},
         {ButtonType::SINGLE_PLAYER, "SINGLE PLAYER"},
-        {ButtonType::MULTIPLAYER, "MULTIPLAYER"}};
+        {ButtonType::MULTIPLAYER, "MULTIPLAYER"},
+        {ButtonType::CREATE_SERVER, "CREATE A NEW GAME"},
+        {ButtonType::CONNECT, "JOIN ANOTHER"}};
     assert(dictionary.find(type) != dictionary.end());
     return dictionary[type];
 }
