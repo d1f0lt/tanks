@@ -15,6 +15,8 @@
 #include "view/game_view.h"
 #include "view/tank_view.h"
 #include "sound/shoot_sound.h"
+#include "sound/block_destroy_sound.h"
+
 
 namespace Tanks {
 using boost::asio::ip::tcp;
@@ -123,6 +125,7 @@ std::unique_ptr<ServerHolder> createServer(const std::string levelFilename) {
 std::optional<Menu::ButtonType>
 startGame(  // NOLINT(readability-function-cognitive-complexity)
     sf::RenderWindow &window,
+    Menu::PlayerInfo &info,
     int level,
     std::optional<std::string> address) {
     const bool isHost = (address == std::nullopt);
@@ -168,7 +171,11 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
 
     Tanks::Sound::ShootSoundHolder shootSound(soundsPath + "shoot.ogg");
 
+    Tanks::Sound::BlockDestroySoundHolder blockDestroySound(soundsPath + "block_destroy_sound.ogg");
+
     Pause pause;
+
+    auto volume = info.settings.soundsVolume;
 
     //    auto serverThread = server->start();
     if (isHost) {
@@ -233,7 +240,8 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
         const auto &bullets = model.getAll(model::EntityType::BULLET);
         bulletsView.draw(window, bullets);
 
-        shootSound.play(50, model.getHandler());
+        shootSound.play(static_cast<float>(volume), model.getHandler());
+        blockDestroySound.play(static_cast<float>(volume), model.getHandler());
 
         if (pause.isPause()) {
             pause.drawPause(window);
