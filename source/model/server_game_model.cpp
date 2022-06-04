@@ -6,13 +6,30 @@
 #include "model/spawners.h"
 #include "model/tank.h"
 
-#ifndef NDEBUG
+#ifdef MODEL_LOGS
 #include <fstream>
 #include <iostream>
 #endif
 
 namespace Tanks::model {
 using boost::asio::ip::tcp;
+
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
+ServerModel::ServerModel(int level, int botsCount, int bonuses) {
+    loadLevel(level);
+    for (int i = 0; i < botsCount; i++) {
+        addBot();
+    }
+    for (int i = 0; i < bonuses; i++) {
+        spawners_.emplace_back(std::make_unique<BonusSpawner>(
+            *this, getDecrId(), EntityType::WALK_ON_WATER_BONUS));
+    }
+
+#ifdef MODEL_LOGS
+    std::fstream ofs("serverEvents.txt",
+                     std::ofstream::out | std::ofstream::trunc);
+#endif
+}
 
 int ServerModel::addPlayer(tcp::socket &socket,
                            PlayerSkills skills,
@@ -184,18 +201,6 @@ PlayerSkills ServerModel::getTankSkills(int tankId) const {
 
 void ServerModel::setTankSkills(int tankId, PlayerSkills skills) {
     tanksSkills_.emplace(tankId, skills);
-}
-
-// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-ServerModel::ServerModel(int level, int botsCount, int bonuses) {
-    loadLevel(level);
-    for (int i = 0; i < botsCount; i++) {
-        addBot();
-    }
-    for (int i = 0; i < bonuses; i++) {
-        spawners_.emplace_back(std::make_unique<BonusSpawner>(
-            *this, getDecrId(), EntityType::WALK_ON_WATER_BONUS));
-    }
 }
 
 // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
