@@ -7,7 +7,8 @@ namespace Tanks::Menu {
 
 ButtonType showLevelsMenu(sf::RenderWindow &window,
                           const sf::Sprite &background,
-                          PlayerInfo &info);
+                          PlayerInfo &info,
+                          int playersAmount = 1);
 
 }
 

@@ -40,7 +40,8 @@ Menu initMenu(const std::string &imagesPath) {
 
 ButtonType showLevelsMenu(sf::RenderWindow &window,
                           const sf::Sprite &backgroundSprite,
-                          [[maybe_unused]] PlayerInfo &info) {
+                          [[maybe_unused]] PlayerInfo &info,
+                          int playersAmount) {
     const static std::string imagesPath = "../images/menu/";
     Menu menu(initMenu(imagesPath + "levels/"));
     menu.addIconToLeftUpCorner(imagesPath + "return.png", ButtonType::RETURN);
@@ -59,7 +60,7 @@ ButtonType showLevelsMenu(sf::RenderWindow &window,
                     continue;
                 }
                 auto ans =
-                    startGame(window, std::stoi(item->getDescription()), info.skills);
+                    startGame(window, std::stoi(item->getDescription()), info.skills, std::nullopt, playersAmount);
                 assert(ans != std::nullopt);
                 switch (ans.value()) {
                     case ButtonType::EXIT:

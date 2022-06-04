@@ -62,7 +62,7 @@ void showMultiplayerMenu(sf::RenderWindow &window,
         switch (res->getType()) {
             case ButtonType::CREATE_SERVER: {
                 menu.flyAwayToLeft(window, backgroundSprite);
-                auto ans = showLevelsMenu(window, backgroundSprite, info);
+                auto ans = showLevelsMenu(window, backgroundSprite, info, MAX_PLAYERS_AMOUNT);
                 switch (ans) {
                     case ButtonType::RETURN:
                         menu.flyOutFromLeft(window, backgroundSprite);
@@ -72,7 +72,7 @@ void showMultiplayerMenu(sf::RenderWindow &window,
                     default:
                         assert(false);
                 }
-            }
+            } break;
             case ButtonType::CONNECT: {
                 menu.flyAwayToLeft(window, backgroundSprite);
                 auto ip = showInputMenu(window, backgroundSprite, "INPUT IP", // NOLINT
