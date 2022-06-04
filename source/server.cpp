@@ -6,13 +6,17 @@
 namespace Tanks {
 using boost::asio::ip::tcp;
 using Menu::PlayerSkills;
-Server::Server(const std::string &levelFilename, int bots, int bonuses)
+Server::Server(const std::string &levelFilename,
+               int bots,
+               int bonuses,
+               int level)
     : /*isStarted(std::make_unique<std::atomic<bool>>(false)),
       isStopped(std::make_unique<std::atomic<bool>>(false)),
       ioContext_(std::make_shared<boost::asio::io_context>()),*/
       acceptor_(ioContext_, tcp::endpoint(tcp::v4(), 0)),
       model_(
-          std::make_unique<model::ServerModel>(levelFilename, bots, bonuses)) {
+          std::make_unique<model::ServerModel>(levelFilename, bots, bonuses)),
+      level_(level) {
 }
 
 // std::thread Server::start() {
@@ -44,6 +48,7 @@ void Server::listenForNewPlayer() {
 
         int id = model_->addPlayer(sockets_.back(), skills, lives);
         model::sendInt(sockets_.back(), id);
+        model::sendInt(sockets_.back(), getLevel());
     } catch (boost::system::system_error &) {
     }
 }
@@ -68,5 +73,9 @@ void Server::nextTick() {
 
 bool Server::getIsStarted() const {
     return isStarted;
+}
+
+int Server::getLevel() const {
+    return level_;
 }
 }  // namespace Tanks

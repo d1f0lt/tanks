@@ -16,6 +16,8 @@ public:
     void applyBonusesInBackground();
     [[nodiscard]] bool isShootingThisTick() const;
 
+    void destroyEntity() override;
+
 private:
     int lastMoveTick_ = -1;
     int lastShootTick_ = -DEFAULT_RELOAD_TICKS - 1;
