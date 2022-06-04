@@ -23,18 +23,39 @@ private:
     sf::Text time;
     sf::Image image;
     sf::Texture texture;
-    sf::Sprite sprite;  // TODO make menuItem for this
+    sf::Sprite sprite;
+};
+
+struct Lives {
+public:
+    Lives(const std::string &filename, size_t heartSize, size_t livesCount, size_t mxLivesCount); // NOLINT
+
+    void destroyLastHeart();
+
+    void draw(sf::RenderWindow &window) const;
+
+private:
+    sf::Image image;
+    sf::Texture texture;
+    std::vector<sf::Sprite> sprites;
+    size_t livesAmount;
+    size_t sizeOfOne;
+
+    void setPosition();
 };
 
 struct Environment final {
 public:
-    explicit Environment(const std::string &path);
+    explicit Environment(const std::string &path, size_t lifeAmount);
+
+    void destroyLastHeart();
 
     void draw(sf::RenderWindow &window, bool isPause) const;
 
     [[nodiscard]] const Menu::Menu &getMenu() const;
 
 private:
+    Lives lives;
     mutable Timer timer;
     Menu::Menu menu{};
     sf::Sprite backgroundSprite;

@@ -163,7 +163,7 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
 
     View::Map mapView(imagesPath + "map.png", level);
 
-    Environment environment(imagesPath + "environment/");
+    Environment environment(imagesPath + "environment/", info.skills.lifeAmount);
 
     Pause pause;
 
