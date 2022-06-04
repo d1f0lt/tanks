@@ -8,8 +8,8 @@
 
 namespace Tanks::Sound {
 
-struct ShootSoundHolder final {
-    ShootSoundHolder(const std::string &filename);
+struct TankSoundHolder final {
+    TankSoundHolder(const std::string &filename);
 
     void play(float volume_level);
 

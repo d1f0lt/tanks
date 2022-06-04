@@ -14,6 +14,7 @@
 #include "view/bullets_view.h"
 #include "view/game_view.h"
 #include "view/tank_view.h"
+#include "sound/shoot_sound.h"
 
 namespace Tanks {
 using boost::asio::ip::tcp;
@@ -127,6 +128,8 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
     const bool isHost = (address == std::nullopt);
 
     static const std::string imagesPath = "../images/";
+    static const std::string soundsPath = "../sounds/";
+
     const std::string levelFilename("../levels/level" + std::to_string(level) +
                                     ".csv");
 
@@ -162,6 +165,8 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
     View::Map mapView(imagesPath + "map.png", level);
 
     Environment environment(imagesPath + "environment/");
+
+    Tanks::Sound::ShootSoundHolder shootSound(soundsPath + "shoot.ogg");
 
     Pause pause;
 
@@ -227,6 +232,8 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
 
         const auto &bullets = model.getAll(model::EntityType::BULLET);
         bulletsView.draw(window, bullets);
+
+        shootSound.play(50, model.getHandler());
 
         if (pause.isPause()) {
             pause.drawPause(window);

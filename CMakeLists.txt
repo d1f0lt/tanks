@@ -85,6 +85,7 @@ add_executable(
         source/menu/slider_bar.cpp
         source/sound/background_music.cpp
         source/game.cpp
+        source/sound/shoot_sound.cpp
         source/game_controller.cpp
         source/game_environment.cpp
         source/pause.cpp
