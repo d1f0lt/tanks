@@ -5,9 +5,10 @@
 
 namespace Tanks::Menu {
 struct PlayerSkills {
-    int tankSpeed = DEFAULT_TANK_SPEED;
-    int bulletSpeed = DEFAULT_BULLET_SPEED;
-    int reloadTicks = DEFAULT_RELOAD_TICKS;
+    size_t tankSpeed = DEFAULT_TANK_SPEED;
+    size_t bulletSpeed = DEFAULT_BULLET_SPEED;
+    size_t reloadTicks = DEFAULT_RELOAD_TICKS;
+    size_t lifeAmount = DEFAULT_LIVES_AMOUNT;
 };
 }  // namespace Tanks::Menu
 

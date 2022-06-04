@@ -44,14 +44,14 @@ add_executable(model_tests
         source/model/handler.cpp
         source/model/event.cpp
         source/model/server_game_model.cpp
-        source/model/playable_tank_handler.cpp
+        source/model/player_action_handler.cpp
         source/model/event_executor.cpp
         source/model/client_game_model.cpp
         source/model/spawners.cpp
         source/model/network_utils.cpp
         source/model/bonus.cpp
         source/model/tank_handler.cpp
-        )
+)
 
 add_executable(
         menu_tests
@@ -59,8 +59,6 @@ add_executable(
         source/database.cpp
         source/menu/menu.cpp
         source/menu/menu_items.cpp
-        source/menu/menu_controller.cpp
-        source/menu/textbox.cpp
 )
 
 SET(COMPILER_FLAGS_FOR_MENU_TEST "-D MENU_TEST")
@@ -108,7 +106,7 @@ add_executable(
         source/model/handler.cpp
         source/model/event.cpp
         source/model/server_game_model.cpp
-        source/model/playable_tank_handler.cpp
+        source/model/player_action_handler.cpp
         source/model/event_executor.cpp
         source/model/client_game_model.cpp
         source/model/spawners.cpp

@@ -2,6 +2,7 @@
 #include <cassert>
 #include <cmath>
 #include "menu/progress_bar.h"
+#include "player_skills.h"
 
 namespace Tanks::Menu {
 

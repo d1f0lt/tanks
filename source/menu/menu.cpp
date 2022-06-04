@@ -142,11 +142,13 @@ const MenuButton *Menu::showMenu(sf::RenderWindow &window,
                 window.close();
             }
         }
+#ifndef MENU_TEST
         if (const auto res =
                 Tanks::MenuController::control(getItems(), window, event);
             res != std::nullopt) {
             return res.value();
         }
+#endif
 
         // redraw
         window.clear();
