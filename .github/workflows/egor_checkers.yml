@@ -16,7 +16,7 @@ jobs:
       - run: sudo apt-get update && sudo apt-get install clang-tidy-12 libsfml-dev libboost1.71-all-dev
       - run: clang-tidy-12 --version
       - run: ls
-      - run: bash -c "clang-tidy-12 --config-file='./.clang-tidy' $(find . -path '*/CMakeFiles/*' -prune -or \( -iname '*.cpp' -and -not -iname '*tests.cpp' -or -iname '*.h' -and -not -iname 'doctest.h' \) -print) -- -Iheaders"
+      - run: bash -c "/usr/bin/clang-tidy-12 --config-file='./.clang-tidy' $(find . -path '*/CMakeFiles/*' -prune -or \( -iname '*.cpp' -and -not -iname '*tests.cpp' -or -iname '*.h' -and -not -iname 'doctest.h' \) -print) -- -Iheaders"
   cppcheck:
     runs-on: ubuntu-20.04
     timeout-minutes: 1
