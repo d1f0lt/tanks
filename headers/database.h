@@ -48,14 +48,27 @@ struct PlayerGeneral {
 };
 
 struct PlayerSettings {
-    int musicVolume = 50;
-    int soundsVolume = 50;
+    size_t musicVolume = 50;
+    size_t soundsVolume = 50;
+};
+
+struct PlayerRating {
+    size_t kills = 0;
+    size_t deaths = 0;
+    size_t wins = 0;
+    size_t defeats = 0;
+};
+
+struct PlayerAllRating {
+    PlayerRating singlePlayer{};
+    PlayerRating multiplayer{};
 };
 
 struct PlayerInfo {
     PlayerGeneral general;
     PlayerSkills skills{};
     PlayerSettings settings{};
+    PlayerAllRating rating{};
 };
 
 struct PlayersDatabase : Database {
@@ -84,6 +97,8 @@ private:
     PlayerGeneral getGeneralInfoByName(const std::string &username);
     PlayerSettings getSettingsInfoByName(const std::string &username);
     PlayerSkills getSkillsInfoByName(const std::string &username);
+    PlayerRating getRatingInfoByName(const std::string &username, const std::string &mode);
+    PlayerAllRating getRatingInfoByName(const std::string &username);
 };
 
 }  // namespace Menu

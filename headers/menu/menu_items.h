@@ -22,7 +22,9 @@ enum class ButtonType {
     NEW_USER,
     USERS,
     DELETE,
-    IMPROVE
+    IMPROVE,
+    CREATE_SERVER,
+    CONNECT
 };
 
 std::string convertButtonTypeToString(ButtonType type);
@@ -37,11 +39,14 @@ public:
     [[nodiscard]] virtual sf::Vector2<float> getPosition() const = 0;
     [[nodiscard]] const sf::Vector2<float> &getStandardPosition() const;
 
+
     void setStandardPosition(const sf::Vector2<float> &newPosition);
     virtual void setPosition(sf::Vector2<float> newPosition) = 0;
     void move(const sf::Vector2<float> &distance);
 
-    void centralizeByWidth(
+    void updateStandardPosition();
+
+        void centralizeByWidth(
         const std::pair<float, float> &rectangleCoordinatesX);
     void centralizeByHeight(
         const std::pair<float, float> &rectangleCoordinatesY);
@@ -123,13 +128,13 @@ private:
 
 struct MenuRectangle : MenuItem {
 public:
-    MenuRectangle(Button &info, const sf::Vector2<float> &coordinates);
+    MenuRectangle(Button info, const sf::Vector2<float> &coordinates);
 
     sf::Vector2<float> getSize() const override;
     sf::Vector2<float> getPosition() const override;
 
     void setPosition(sf::Vector2<float> newPosition) override;
-    void setBorderColor(const sf::Color &color);
+    [[maybe_unused]] void setBorderColor(const sf::Color &color);
 
     void draw(sf::RenderWindow &window) const override;
 
@@ -228,6 +233,34 @@ private:
     const MenuItem *const mainButton;
 };
 
+struct OwningRectangle final : MenuRectangle {
+public:
+    OwningRectangle(std::unique_ptr<MenuInscription> &&title,
+                    std::vector<std::unique_ptr<MenuInscription>> &&leftItems,
+                    std::vector<std::unique_ptr<MenuInscription>> &&rightItems,
+                    const sf::Color &backgroundColor,
+                    const sf::Vector2<float> &coordinates);
+
+    void setPosition(sf::Vector2<float> newPosition) final;
+
+    void draw(sf::RenderWindow &window) const final;
+
+private:
+    std::unique_ptr<MenuInscription> title;
+    std::vector<std::unique_ptr<MenuInscription>> leftItems;
+    std::vector<std::unique_ptr<MenuInscription>> rightItems;
+
+    const static size_t padding = 30;
+
+    float calcMaxRightItemWidth() const;
+    float calcMaxLeftItemWidth() const;
+
+    static float calcMaxItemWidth(
+        const std::vector<std::unique_ptr<MenuInscription>> &items);
+    static void drawItems(
+        sf::RenderWindow &window,
+        const std::vector<std::unique_ptr<MenuInscription>> &items);
+};
 }  // namespace Tanks::Menu
 
 #endif

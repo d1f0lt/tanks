@@ -116,17 +116,17 @@ void showUsersMenu(sf::RenderWindow &window) {
             case ButtonType::USER: {
                 db.connect();
                 auto person = db.getInfoByName(res->getInscription());
-                if (!db.isOnline(person.general.name)) {
-                    db.makeOnline(person.general.name);
-                    db.disconnectFromDatabase();
-                    menu.flyAwayToLeft(window, backgroundSprite);
-                    showMainMenu(window, backgroundSprite, person);
-                    db.connect();
-                    db.updateInfo(person);
-                    db.makeOffline(person.general.name);
-                    db.disconnectFromDatabase();
-                    menu.flyOutFromLeft(window, backgroundSprite);
-                }
+                //                if (!db.isOnline(person.general.name)) {
+                db.makeOnline(person.general.name);
+                db.disconnectFromDatabase();
+                menu.flyAwayToLeft(window, backgroundSprite);
+                showMainMenu(window, backgroundSprite, person);
+                db.connect();
+                db.updateInfo(person);
+                db.makeOffline(person.general.name);
+                db.disconnectFromDatabase();
+                menu.flyOutFromLeft(window, backgroundSprite);
+                //                }
             } break;
             case ButtonType::NEW_USER: {
                 const static std::string title = "INPUT NAME";

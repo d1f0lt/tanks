@@ -1,9 +1,9 @@
 #include "menu/settings_menu.h"
-#include "menu/menu_controller.h"
 #include <cassert>
-#include "menu/slider_bar.h"
 #include <cmath>
 #include <iostream>
+#include "menu/menu_controller.h"
+#include "menu/slider_bar.h"
 
 namespace Tanks::Menu {
 
@@ -23,29 +23,28 @@ Menu initMenu(PlayerInfo &info, const std::string &imagesPath) {
     auto title =
         std::make_unique<MenuInscription>(titleInfo, sf::Vector2<float>{0, 0});
 
-    titleInfo.inscription = "Music";
+    titleInfo.inscription = "Music volume:";
     titleInfo.characterSize = 40;
-    titleInfo.textColor = sf::Color{255, 255, 255};
+    titleInfo.textColor = {63, 87, 210};
     auto musicVolume = std::make_unique<SliderBar>(
-        titleInfo, sf::Vector2<float>{0, 0}, MAX_VOLUME, settings.musicVolume, SliderBarType::MUSIC);
+        titleInfo, sf::Vector2<float>{0, 0}, MAX_VOLUME, settings.musicVolume,
+        SliderBarType::MUSIC);
 
-    titleInfo.inscription = "Volume";
+    titleInfo.inscription = "Sounds volume:";
     auto soundVolume = std::make_unique<SliderBar>(
-        titleInfo, sf::Vector2<float>{0, 0}, MAX_VOLUME, settings.soundsVolume, SliderBarType::SOUND);
+        titleInfo, sf::Vector2<float>{0, 0}, MAX_VOLUME, settings.soundsVolume,
+        SliderBarType::SOUND);
 
-
-
-    sf::Vector2<float> curCoordinates{
-        (WINDOW_WIDTH) / 2.8,
-        (WINDOW_HEIGHT) / 4};
+    sf::Vector2<float> curCoordinates{(WINDOW_WIDTH) / 2.8,
+                                      (WINDOW_HEIGHT) / 4};
 
     title->setPosition(curCoordinates);
-    title->centralizeByWidth(
-        {curCoordinates.x, curCoordinates.x + 600});
+    title->centralizeByWidth({curCoordinates.x, curCoordinates.x + 600});
     title->setStandardPosition(title->getPosition());
     curCoordinates.y += title->getSize().y + marginFromTitle;
     musicVolume->setPosition(curCoordinates);
-    // std::cout << musicVolume->getPosition().x << " " << musicVolume->getPosition().y << '\n';
+    // std::cout << musicVolume->getPosition().x << " " <<
+    // musicVolume->getPosition().y << '\n';
 
     curCoordinates.y += musicVolume->getSize().y + marginFromSliderBar;
     soundVolume->setPosition(curCoordinates);
@@ -60,18 +59,17 @@ Menu initMenu(PlayerInfo &info, const std::string &imagesPath) {
     return menu;
 }
 
-}
+}  // namespace
 
 void showSettingsMenu(sf::RenderWindow &window,
-                     const sf::Sprite &backgroundSprite,
-                     PlayerInfo &info) {
+                      const sf::Sprite &backgroundSprite,
+                      PlayerInfo &info) {
     const static std::string imagesPath = "../images/menu/";
 
     Menu menu(initMenu(info, imagesPath));
 
     menu.flyAwayToRight();
     menu.flyOutFromRight(window, backgroundSprite);
-
 
     while (window.isOpen()) {
         sf::Event event{};
@@ -98,4 +96,4 @@ void showSettingsMenu(sf::RenderWindow &window,
     }
 }
 
-}  // namespace Tanks::Menu 
+}  // namespace Tanks::Menu

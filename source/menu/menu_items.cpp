@@ -15,7 +15,9 @@ std::string convertButtonTypeToString(const ButtonType type) {
         {ButtonType::PAUSE, "PAUSE"},
         {ButtonType::UPGRADE, "UPGRADE"},
         {ButtonType::SINGLE_PLAYER, "SINGLE PLAYER"},
-        {ButtonType::MULTIPLAYER, "MULTIPLAYER"}};
+        {ButtonType::MULTIPLAYER, "MULTIPLAYER"},
+        {ButtonType::CREATE_SERVER, "CREATE A NEW GAME"},
+        {ButtonType::CONNECT, "JOIN ANOTHER"}};
     assert(dictionary.find(type) != dictionary.end());
     return dictionary[type];
 }
@@ -69,6 +71,10 @@ void MenuItem::setStandardPosition(const sf::Vector2<float> &newPosition) {
     standardCoordinates = newPosition;
 }
 
+void MenuItem::updateStandardPosition() {
+    setStandardPosition(getPosition());
+}
+
 void MenuItem::move(const sf::Vector2<float> &distance) {
     setPosition(sf::Vector2<float>(getPosition().x + distance.x,
                                    getPosition().y + distance.y));
@@ -77,29 +83,41 @@ void MenuItem::move(const sf::Vector2<float> &distance) {
 void MenuItem::centralizeByHeight(
     const std::pair<float, float> &rectangleCoordinatesY) {
     assert(rectangleCoordinatesY.first < rectangleCoordinatesY.second);
-    assert(rectangleCoordinatesY.second - rectangleCoordinatesY.first >=
-           getSize().y);
-    setPosition(sf::Vector2<float>(
-        getPosition().x,
-        static_cast<float>(
+    sf::Vector2<float> newPos{getPosition()};
+    if (rectangleCoordinatesY.second - rectangleCoordinatesY.first >=
+        getSize().y) {
+        newPos.y = static_cast<float>(
             static_cast<int>(rectangleCoordinatesY.first) +
             static_cast<int>((rectangleCoordinatesY.second -
                               rectangleCoordinatesY.first - getSize().y) /
-                             2))));
+                             2));
+    } else {
+        newPos.y = rectangleCoordinatesY.first -
+                   (getSize().y - rectangleCoordinatesY.second +
+                    rectangleCoordinatesY.first) /
+                       2;
+    }
+    setPosition(newPos);
 }
 
 void MenuItem::centralizeByWidth(
     const std::pair<float, float> &rectangleCoordinatesX) {
     assert(rectangleCoordinatesX.first < rectangleCoordinatesX.second);
-    assert(rectangleCoordinatesX.second - rectangleCoordinatesX.first >=
-           getSize().x);
-    setPosition(sf::Vector2<float>(
-        static_cast<float>(
+    sf::Vector2<float> newPos{getPosition()};
+    if (rectangleCoordinatesX.second - rectangleCoordinatesX.first >=
+        getSize().x) {
+        newPos.x = static_cast<float>(
             static_cast<int>(rectangleCoordinatesX.first) +
             static_cast<int>((rectangleCoordinatesX.second -
                               rectangleCoordinatesX.first - getSize().x) /
-                             2)),
-        getPosition().y));
+                             2));
+    } else {
+        newPos.x = rectangleCoordinatesX.first -
+                   (getSize().x - rectangleCoordinatesX.second +
+                    rectangleCoordinatesX.first) /
+                       2;
+    }
+    setPosition(newPos);
 }
 
 MenuInscription::MenuInscription(const InscriptionInfo &parameters,
@@ -147,8 +165,7 @@ std::string MenuInscription::getContent() const {
     return static_cast<std::string>(text.getString());
 }
 
-MenuRectangle::MenuRectangle(Button &info,
-                             const sf::Vector2<float> &coordinates)
+MenuRectangle::MenuRectangle(Button info, const sf::Vector2<float> &coordinates)
     : rectangle(info.getSize()) {
     rectangle.setPosition(coordinates);
     rectangle.setFillColor(info.getStandardColor());
@@ -166,7 +183,7 @@ void MenuRectangle::setPosition(sf::Vector2<float> newPosition) {
     rectangle.setPosition(newPosition);
 }
 
-void MenuRectangle::setBorderColor(const sf::Color &color) {
+[[maybe_unused]] void MenuRectangle::setBorderColor(const sf::Color &color) {
     rectangle.setOutlineColor(color);
 }
 
@@ -177,7 +194,7 @@ void MenuRectangle::draw(sf::RenderWindow &window) const {
 MenuButton::MenuButton(std::unique_ptr<MenuItem> &&content_,
                        const sf::Vector2<float> &coordinates,
                        ButtonWithType info_)
-    : MenuRectangle(info_, coordinates),
+    : MenuRectangle(info_, coordinates),  // NOLINT
       content(std::move(content_)),
       info(info_) {
     rectangle.setFillColor(info.getStandardColor());
@@ -247,10 +264,10 @@ MenuPicture::MenuPicture(const sf::Image &image_,
 }
 
 MenuPicture::MenuPicture(const std::string &filename,
-                         size_t sizeOfOne,
+                         size_t sizeOfOne,  // NOLINT
                          size_t count,
                          const sf::Vector2<float> &coordinates)
-    : MenuItem(coordinates) {  // NOLINT
+    : MenuItem(coordinates) {
     image.loadFromFile(filename);
     texture.loadFromImage(image);
     sprites.resize(count);
@@ -363,4 +380,96 @@ const MenuItem *MenuAdditionalButton::getMainButton() const {
     return mainButton;
 }
 
+OwningRectangle::OwningRectangle(
+    std::unique_ptr<MenuInscription> &&title_,
+    std::vector<std::unique_ptr<MenuInscription>> &&leftItems_,
+    std::vector<std::unique_ptr<MenuInscription>> &&rightItems_,
+    const sf::Color &backgroundColor,
+    const sf::Vector2<float> &coordinates)
+    : MenuRectangle(
+          Button(sf::Vector2<float>{0, 0}, backgroundColor, backgroundColor),
+          coordinates),
+      title(std::move(title_)),
+      leftItems(std::move(leftItems_)),
+      rightItems(std::move(rightItems_)) {
+    assert(leftItems.size() == rightItems.size());
+    setPosition(coordinates);
+    float rectangleHeight =
+        2 * padding +
+        (rightItems.back()->getPosition().y + rightItems.back()->getSize().y) -
+        title->getPosition().y;
+    float rectangleWidth = 2 * padding + rightItems[0]->getPosition().x +
+                           rightItems[0]->getSize().x -
+                           leftItems[0]->getPosition().x;
+    rectangle.setSize(sf::Vector2<float>{rectangleWidth, rectangleHeight});
+}
+
+void OwningRectangle::setPosition(sf::Vector2<float> newPosition) {
+    rectangle.setPosition(newPosition);
+
+    const static size_t marginFromTitle = 60;
+    const static size_t marginBetweenInscriptions = 40;
+
+    auto curCoordinates = newPosition;
+    curCoordinates.x += padding;
+    curCoordinates.y += padding;
+    title->setPosition(curCoordinates);
+    curCoordinates.y += title->getSize().y + marginFromTitle;
+
+    float mxLeftSize = calcMaxLeftItemWidth();
+    for (auto &item : leftItems) {
+        item->setPosition(curCoordinates);
+        curCoordinates.y += item->getSize().y + marginBetweenInscriptions;
+    }
+
+    float mxRightSize = calcMaxRightItemWidth();
+    const size_t marginBetweenLeftAndRightItems = std::max(
+        static_cast<size_t>(40),
+        static_cast<size_t>(title->getSize().x - mxRightSize - mxLeftSize));
+    for (size_t i = 0; i < rightItems.size(); ++i) {
+        auto &leftItem = leftItems[i];
+        auto &item = rightItems[i];
+        item->setPosition(
+            {leftItem->getPosition().x + mxLeftSize +
+                 static_cast<float>(marginBetweenLeftAndRightItems) +
+                 mxRightSize - item->getSize().x,
+             leftItem->getPosition().y});
+        item->centralizeByHeight({leftItem->getPosition().y, leftItem->getPosition().y + leftItem->getSize().y});
+    }
+    title->centralizeByWidth(
+        {leftItems[0]->getPosition().x,
+         rightItems[0]->getPosition().x + rightItems[0]->getSize().x});
+}
+
+void OwningRectangle::draw(sf::RenderWindow &window) const {
+    window.draw(rectangle);
+    title->draw(window);
+    drawItems(window, leftItems);
+    drawItems(window, rightItems);
+}
+
+float OwningRectangle::calcMaxLeftItemWidth() const {
+    return calcMaxItemWidth(leftItems);
+}
+
+float OwningRectangle::calcMaxRightItemWidth() const {
+    return calcMaxItemWidth(rightItems);
+}
+
+float OwningRectangle::calcMaxItemWidth(
+    const std::vector<std::unique_ptr<MenuInscription>> &items) {
+    float mxSize = 0;
+    for (const auto &item : items) {
+        mxSize = std::max(mxSize, item->getSize().x);
+    }
+    return mxSize;
+}
+
+void OwningRectangle::drawItems(
+    sf::RenderWindow &window,
+    const std::vector<std::unique_ptr<MenuInscription>> &items) {
+    for (const auto &item : items) {
+        item->draw(window);
+    }
+}
 }  // namespace Tanks::Menu

@@ -5,7 +5,6 @@
 #include <vector>
 #include "model/entity.h"
 
-
 namespace Tanks::Sound {
 
 struct BackgroundMusicHolder final {
@@ -16,7 +15,6 @@ struct BackgroundMusicHolder final {
 private:
     sf::Music music;
 };
-};
+}  // namespace Tanks::Sound
 
 #endif  // BACKGROUND_MUSIC_H
-

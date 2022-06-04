@@ -49,14 +49,14 @@ Menu initMenu(PlayerInfo &info, const std::string &imagesPath) {
     titleInfo.characterSize = 40;
     titleInfo.textColor = sf::Color{255, 255, 255};
     auto tankSpeed = std::make_unique<ProgressBar>(
-        titleInfo, amount, skills.tankSpeed - DEFAULT_TANK_SPEED, sizeOfOne,
-        sf::Vector2<float>{0, 0}, ProgressBarType::TANK_SPEED);
+        titleInfo, amount, skills.tankSpeed - DEFAULT_TANK_SPEED,
+        sizeOfOne, sf::Vector2<float>{0, 0}, ProgressBarType::TANK_SPEED);
     addPrice(tankSpeed, imagesPath);
 
     titleInfo.inscription = "Bullet speed";
     auto bulletSpeed = std::make_unique<ProgressBar>(
-        titleInfo, amount, skills.bulletSpeed - DEFAULT_BULLET_SPEED, sizeOfOne,
-        sf::Vector2<float>{0, 0}, ProgressBarType::BULLET_SPEED);
+        titleInfo, amount, skills.bulletSpeed - DEFAULT_BULLET_SPEED,
+        sizeOfOne, sf::Vector2<float>{0, 0}, ProgressBarType::BULLET_SPEED);
     addPrice(bulletSpeed, imagesPath);
 
     titleInfo.inscription = "Reload speed";
@@ -66,32 +66,47 @@ Menu initMenu(PlayerInfo &info, const std::string &imagesPath) {
         sizeOfOne, sf::Vector2<float>{0, 0}, ProgressBarType::RELOAD_TICKS);
     addPrice(reloadTicks, imagesPath);
 
+    titleInfo.inscription = "Lives quantity";
+    auto life = std::make_unique<ProgressBar>(
+        titleInfo, amount, static_cast<size_t>(skills.lifeAmount),
+        sizeOfOne,
+        sf::Vector2<float>{
+            0,
+            0,
+        },
+        ProgressBarType::LIFE_AMOUNT);
+    addPrice(life, imagesPath);
+
     assert(title->getSize().x <= tankSpeed->getSize().x);
     assert(tankSpeed->getSize() == bulletSpeed->getSize());
     assert(tankSpeed->getSize() == reloadTicks->getSize());
+    assert(tankSpeed->getSize() == life->getSize());
 
     sf::Vector2<float> curCoordinates{
         (WINDOW_WIDTH - tankSpeed->getSize().x) / 2,
         (WINDOW_HEIGHT - title->getSize().y - marginFromTitle -
-         tankSpeed->getSize().y * 3 - 2 * marginFromProgressBar) /
+         tankSpeed->getSize().y * 4 - 3 * marginFromProgressBar) /
             2};
 
     title->setPosition(curCoordinates);
     title->centralizeByWidth(
         {curCoordinates.x, curCoordinates.x + tankSpeed->getSize().x});
-    title->setStandardPosition(title->getPosition());
+    title->updateStandardPosition();
     curCoordinates.y += title->getSize().y + marginFromTitle;
     tankSpeed->setPosition(curCoordinates);
-    tankSpeed->setStandardPosition(curCoordinates);
+    tankSpeed->updateStandardPosition();
     curCoordinates.y += tankSpeed->getSize().y + marginFromProgressBar;
     bulletSpeed->setPosition(curCoordinates);
-    bulletSpeed->setStandardPosition(curCoordinates);
+    bulletSpeed->updateStandardPosition();
     curCoordinates.y += bulletSpeed->getSize().y + marginFromProgressBar;
     reloadTicks->setPosition(curCoordinates);
-    reloadTicks->setStandardPosition(curCoordinates);
+    reloadTicks->updateStandardPosition();
+    curCoordinates.y += reloadTicks->getSize().y + marginFromProgressBar;
+    life->setPosition(curCoordinates);
+    life->updateStandardPosition();
 
     std::vector<std::unique_ptr<MenuItem>> addingButtons;
-    for (size_t i = 0; i < 3; ++i) {
+    for (size_t i = 0; i < 4; ++i) {
         auto item = std::make_unique<MenuPicture>(imagesPath + "plus.png",
                                                   sf::Vector2<float>{0, 0});
         addingButtons.emplace_back(std::move(item));
@@ -110,6 +125,7 @@ Menu initMenu(PlayerInfo &info, const std::string &imagesPath) {
     menu.addMenuItem(std::move(tankSpeed));
     menu.addMenuItem(std::move(bulletSpeed));
     menu.addMenuItem(std::move(reloadTicks));
+    menu.addMenuItem(std::move(life));
     menu.addAddingButtons(1, std::move(addingButtons), btnInfo);
 
     menu.addPlayerInfo(info.general);
@@ -128,6 +144,9 @@ void updateSkills(PlayerSkills &skills, const ProgressBar *progressBar) {
             break;
         case ProgressBarType::RELOAD_TICKS:
             skills.reloadTicks -= 10;
+            break;
+        case ProgressBarType::LIFE_AMOUNT:
+            skills.lifeAmount++;
             break;
         default:
             assert(false);
@@ -156,7 +175,7 @@ void showUpgradeMenu(sf::RenderWindow &window,
                     dynamic_cast<const MenuAdditionalButton *>(res);
                 assert(btn != nullptr);
                 const auto *progressBar =
-                    dynamic_cast<const ProgressBar*>(btn->getMainButton());
+                    dynamic_cast<const ProgressBar *>(btn->getMainButton());
                 assert(progressBar != nullptr);
                 if (progressBar->getCurrentProgress() ==
                     progressBar->getMaxProgress()) {
@@ -174,5 +193,4 @@ void showUpgradeMenu(sf::RenderWindow &window,
         }
     }
 }
-
-}  // namespace Tanks::Menu 
+}  // namespace Tanks::Menu

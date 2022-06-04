@@ -238,8 +238,8 @@ void Menu::addPlayerInfo(PlayerGeneral &info) {
     const static size_t sizeOfOne = 32;
     const static size_t imagesCount = 16;
 
-    auto coin =
-        std::make_unique<MenuPicture>(coinFilename, sizeOfOne, imagesCount, curCoordinates);
+    auto coin = std::make_unique<MenuPicture>(coinFilename, sizeOfOne,
+                                              imagesCount, curCoordinates);
     curCoordinates.x += coin->getSize().x + marginFromCoin;
 
     InscriptionInfo moneyParameters{std::to_string(info.money), characterSize,
@@ -252,9 +252,9 @@ void Menu::addPlayerInfo(PlayerGeneral &info) {
     float maxHeight = std::max(
         std::max(username->getSize().y, coin->getSize().y), money->getSize().y);
     sf::Vector2<float> rectangleSize{
-        2*marginFromBackground + username->getSize().x + marginFromUsername +
+        2 * marginFromBackground + username->getSize().x + marginFromUsername +
             coin->getSize().x + marginFromCoin + money->getSize().x,
-        marginFromBackground*2 + maxHeight};
+        marginFromBackground * 2 + maxHeight};
     Button btnInfo(rectangleSize, rectangleColor, rectangleColor);
     auto background = std::make_unique<MenuRectangle>(btnInfo, curCoordinates);
 

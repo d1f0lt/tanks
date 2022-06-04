@@ -1,11 +1,14 @@
 #include "menu/main_menu.h"
+#include <cassert>
 #include <memory>
 #include <string>
 #include "constants.h"
 #include "menu.h"
 #include "menu/new_game_menu.h"
-#include "menu/upgrade_menu.h"
+#include "menu/rating_menu.h"
 #include "menu/settings_menu.h"
+#include "menu/upgrade_menu.h"
+#include "sound/background_music.h"
 
 namespace Tanks::Menu {
 
@@ -63,6 +66,12 @@ void showMainMenu(sf::RenderWindow &window,
     Menu menu(initMenu(imagesPath, info.general));
 
     menu.flyAwayToRight();
+
+    //    const static std::string soundsPath = "../sounds/";
+    //    Sound::BackgroundMusicHolder music(soundsPath +
+    //    "background_music.ogg");
+    //    music.play(static_cast<float>(info.settings.musicVolume));
+
     menu.flyOutFromRight(window, backgroundSprite);
 
     while (window.isOpen()) {
@@ -93,8 +102,13 @@ void showMainMenu(sf::RenderWindow &window,
                 menu.flyAwayToLeft();
                 menu.flyOutFromLeft(window, backgroundSprite);
                 break;
-            default:
+            case ButtonType::RATING:
+                menu.flyAwayToLeft(window, backgroundSprite);
+                showRatingMenu(window, backgroundSprite, info);
+                menu.flyOutFromLeft(window, backgroundSprite);
                 break;
+            default:
+                assert(false);
         }
     }
 }

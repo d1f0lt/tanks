@@ -15,4 +15,4 @@ void BlockDestroySoundHolder::play(float volume_level) {
         sound.play();
     }
 }
-};
+};  // namespace Tanks::Sound

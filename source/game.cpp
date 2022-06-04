@@ -128,13 +128,14 @@ std::unique_ptr<ServerHolder> createServer(const std::string levelFilename) {
     assert(startServer != nullptr);
     return std::make_unique<ServerHolder>(std::move(serverThread),
                                           std::move(serverPtr), startServer);
-};
+}
 
 }  // namespace
 
 std::optional<Menu::ButtonType>
 startGame(  // NOLINT(readability-function-cognitive-complexity)
     sf::RenderWindow &window,
+    [[maybe_unused]] Menu::PlayerInfo &info,
     int level,
     PlayerSkills skills,
     std::optional<std::pair<std::string, std::string>> addressPort,
@@ -180,12 +181,13 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
     model.loadLevel(levelFilename);
 
     View::TankSpriteHolder greenTankView(imagesPath + "tanks/green_tank.png");
+//    View::TankSpriteHolder redTankView(imagesPath + "tanks/green_tank.png");
 
     View::BulletsSpriteHolder bulletsView(imagesPath + "bullet.png");
 
     View::Map mapView(imagesPath + "map.png", level);
 
-    Environment environment(imagesPath + "environment/");
+    Environment environment(imagesPath + "environment/", info.skills.lifeAmount);
 
     Pause pause;
 

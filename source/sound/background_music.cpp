@@ -13,4 +13,4 @@ void BackgroundMusicHolder::play(float volume_level) {
     music.setVolume(volume_level);
     music.play();
 }
-};
+}  // namespace Tanks::Sound

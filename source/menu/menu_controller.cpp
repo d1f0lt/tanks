@@ -1,23 +1,26 @@
 #include "menu/menu_controller.h"
-#include "menu/textbox.h"
-#include "menu/slider_bar.h"
 #include <cassert>
+#include "menu/slider_bar.h"
+#include "menu/textbox.h"
 
 namespace Tanks {
 namespace {
-void updateVolume(Menu::PlayerSettings &settings, const Menu::SliderBar *sliderBar) {
+void updateVolume(Menu::PlayerSettings &settings,
+                  const Menu::SliderBar *sliderBar) {
     switch (sliderBar->getType()) {
         case Menu::SliderBarType::MUSIC:
-            settings.musicVolume = static_cast<int>(sliderBar->getCurrentVolume());
+            settings.musicVolume =
+                static_cast<int>(sliderBar->getCurrentVolume());
             break;
         case Menu::SliderBarType::SOUND:
-            settings.soundsVolume = static_cast<int>(sliderBar->getCurrentVolume());
+            settings.soundsVolume =
+                static_cast<int>(sliderBar->getCurrentVolume());
             break;
         default:
             assert(false);
     }
 }
-}
+}  // namespace
 
 std::optional<Menu::MenuButton *> MenuController::control(
     const std::vector<std::unique_ptr<Menu::MenuItem>> &items,
@@ -71,7 +74,9 @@ std::optional<std::string> MenuController::textEntered(const Menu::Menu &menu,
     return std::nullopt;
 }
 
-void MenuController::sliderMove(const Menu::Menu &menu, sf::RenderWindow &window, Menu::PlayerSettings &settings) {
+void MenuController::sliderMove(const Menu::Menu &menu,
+                                sf::RenderWindow &window,
+                                Menu::PlayerSettings &settings) {
     for (const auto &menuItem : menu.getItems()) {
         auto *item = dynamic_cast<Menu::SliderBar *>(menuItem.get());
         if (item == nullptr) {
@@ -81,5 +86,4 @@ void MenuController::sliderMove(const Menu::Menu &menu, sf::RenderWindow &window
         updateVolume(settings, item);
     }
 }
-
 }  // namespace Tanks

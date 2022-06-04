@@ -1,4 +1,5 @@
 #include "game_controller.h"
+#include "sound/shoot_sound.h"
 
 namespace Tanks {
 
