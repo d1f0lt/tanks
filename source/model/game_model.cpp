@@ -159,9 +159,9 @@ bool GameModel::executeEvent(Event &event) {
         } else {
             filename = "client.log";
         }
-        std::ofstream ofs(filename, std::ios_base::app);
-        ofs << getTick() << ' ' << static_cast<int>(event.getType())
-            << std::endl;
+        std::ofstream of(filename, std::ios_base::app);
+        of << getTick() << ' ' << static_cast<int>(event.getType())
+           << std::endl;
     }
 #endif
 
@@ -227,13 +227,6 @@ void GameModel::setWasShootThisTurn(bool wasShootThisTurn) {
 
 void GameModel::setWasDestroyedBlockThisTurn(bool wasDestroyedBlockThisTurn) {
     wasDestroyedBlockThisTurn_ = wasDestroyedBlockThisTurn;
-}
-
-int GameModel::getKills(int tankId) const {
-    if (kills_.count(tankId) == 0) {
-        return 0;
-    }
-    return kills_.at(tankId);
 }
 
 // TODO

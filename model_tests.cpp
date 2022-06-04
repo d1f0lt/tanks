@@ -309,8 +309,8 @@ TEST_CASE("Can't shoot then move on 1 tick") {
     CHECK(top == tank.getTop());
     serverModel.nextTick();
     CHECK(serverModel.getTick() == 2);
-    clientModel.nextTick();
     serverModel.finishGame();
+    clientModel.nextTick();
 }
 
 TEST_CASE("Block check") {
@@ -425,7 +425,6 @@ TEST_CASE("3 Bullets destroy 3 bricks") {
             serverModel.nextTick();
         }
     }
-    CHECK(serverModel.getKills(id) == 0);
     serverModel.finishGame();
 }
 
@@ -532,7 +531,6 @@ TEST_CASE("Shoot static tank") {
     serverModel.nextTick();
     auto &floor = serverModel.getByCoords(TILE_SIZE * 3, TILE_SIZE);
     CHECK(floor.getType() == EntityType::FLOOR);
-    CHECK(serverModel.getKills(id) == 1);
     serverModel.finishGame();
 }
 

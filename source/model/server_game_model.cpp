@@ -6,7 +6,7 @@
 #include "model/spawners.h"
 #include "model/tank.h"
 
-#ifdef MODEL_LOGS
+#ifndef NDEBUG
 #include <fstream>
 #include <iostream>
 #endif
@@ -14,35 +14,17 @@
 namespace Tanks::model {
 using boost::asio::ip::tcp;
 
-// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-ServerModel::ServerModel(int level, int botsCount, int bonuses) {
-    loadLevel(level);
-    for (int i = 0; i < botsCount; i++) {
-        addBot();
-    }
-    for (int i = 0; i < bonuses; i++) {
-        spawners_.emplace_back(std::make_unique<BonusSpawner>(
-            *this, getDecrId(), EntityType::WALK_ON_WATER_BONUS));
-    }
-
-#ifdef MODEL_LOGS
-    std::fstream ofs("serverEvents.txt",
-                     std::ofstream::out | std::ofstream::trunc);
-#endif
-}
-
 int ServerModel::addPlayer(tcp::socket &socket,
                            PlayerSkills skills,
                            int lives) {
-    int playerId = getDecrId();
-    //    playersSockets_.emplace(playerId, *socket);
-    setTankSkills(playerId, skills);
-    spawners_.emplace_back(
-        std::make_unique<MediumTankSpawner>(*this, playerId));
+    int id = getDecrId();
+    //    playersSockets_.emplace(id, *socket);
+    setPlayerSkills(id, skills);
+    spawners_.emplace_back(std::make_unique<MediumTankSpawner>(*this, id));
     players_.emplace(
-        playerId, Player{socket, std::thread([&]() { receiveTurns(socket); })});
-    tankLives_.emplace(playerId, lives);
-    return playerId;
+        id, Player{socket, std::thread([&]() { receiveTurns(socket); })});
+    tankLives_.emplace(id, lives);
+    return id;
 }
 
 void ServerModel::nextTick() {
@@ -151,9 +133,9 @@ void ServerModel::executeAllEvents() {
         }
     }
 
-    for (auto botId : bots_) {
-        if (getById(botId)) {
-            auto event = getEventByBot(botId);
+    for (auto id : bots_) {
+        if (getById(id)) {
+            auto event = getEventByBot(id);
             if (executeEvent(*event)) {
                 eventsToSend.emplace_back(std::move(event));
             }
@@ -195,15 +177,25 @@ std::unique_ptr<Event> ServerModel::getEventByBot(int botId) {
 
 #endif
 
-PlayerSkills ServerModel::getTankSkills(int tankId) const {
-    return tanksSkills_.at(tankId);
+PlayerSkills ServerModel::getPlayerSkills(int id) const {
+    return tanksSkills_.at(id);
 }
 
-void ServerModel::setTankSkills(int tankId, PlayerSkills skills) {
-    tanksSkills_.emplace(tankId, skills);
+void ServerModel::setPlayerSkills(int id, PlayerSkills skills) {
+    tanksSkills_.emplace(id, skills);
 }
 
-// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
+ServerModel::ServerModel(int level, int botsCount, int bonuses) {
+    loadLevel(level);
+    for (int i = 0; i < botsCount; i++) {
+        addBot();
+    }
+    for (int i = 0; i < bonuses; i++) {
+        spawners_.emplace_back(std::make_unique<BonusSpawner>(
+            *this, getDecrId(), EntityType::WALK_ON_WATER_BONUS));
+    }
+}
+
 ServerModel::ServerModel(const std::string &level, int botsCount, int bonuses) {
     loadLevel(level);
     for (int i = 0; i < botsCount; i++) {
@@ -216,12 +208,12 @@ ServerModel::ServerModel(const std::string &level, int botsCount, int bonuses) {
 }
 
 void ServerModel::addBot() {
-    auto botId = getDecrId();
-    bots_.emplace(botId);
+    auto id = getDecrId();
+    bots_.emplace(id);
     PlayerSkills skills;
-    tanksSkills_.emplace(botId, skills);
-    spawners_.emplace_back(std::make_unique<MediumTankSpawner>(*this, botId));
-    tankLives_.emplace(botId, INFINITE_LIVES);
+    tanksSkills_.emplace(id, skills);
+    spawners_.emplace_back(std::make_unique<MediumTankSpawner>(*this, id));
+    tankLives_.emplace(id, INFINITE_LIVES);
 }
 
 DecrId ServerModel::getDecrId() {

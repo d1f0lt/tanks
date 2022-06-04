@@ -85,7 +85,7 @@ bool EventExecutor::visit(SetPosition &event) const {
     return true;
 }
 
-bool EventExecutor::visit(GameEnd &) const {
+bool EventExecutor::visit(GameEnd &event) const {
     getModel().finishGame();
     return true;
 }

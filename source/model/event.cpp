@@ -88,12 +88,11 @@ int TankSpawn::getTop() const {
     return top_;
 }
 
-TankSpawn::TankSpawn(
-    int tankId,  // NOLINT(bugprone-easily-swappable-parameters)
-    int left,
-    int top,
-    EntityType entityType,
-    Menu::PlayerSkills skills)
+TankSpawn::TankSpawn(int tankId,
+                     int left,
+                     int top,
+                     EntityType entityType,
+                     Menu::PlayerSkills skills)
     : tankId_(tankId),
       left_(left),
       top_(top),
@@ -123,9 +122,8 @@ EventType TankSpawn::getType() const {
     return EventType::SPAWN_TANK;
 }
 
-// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-BonusSpawn::BonusSpawn(int bonusId, int left, int top, EntityType type)
-    : id_(bonusId), left_(left), top_(top), type_(type) {
+BonusSpawn::BonusSpawn(int id, int left, int top, EntityType type)
+    : id_(id), left_(left), top_(top), type_(type) {
 }
 
 void BonusSpawn::sendTo(tcp::socket &socket) const {
@@ -189,13 +187,12 @@ EventType TankShoot::getType() const {
     return EventType::TANK_SHOOT;
 }
 
-// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-SetPosition::SetPosition(int entityId, int left, int top)
-    : entityId_(entityId), left_(left), top_(top) {
+SetPosition::SetPosition(int id, int left, int top)
+    : id_(id), left_(left), top_(top) {
 }
 
 int SetPosition::getId() const {
-    return entityId_;
+    return id_;
 }
 int SetPosition::getLeft() const {
     return left_;
@@ -209,7 +206,7 @@ bool SetPosition::acceptExecutor(const EventVisitor &executor) {
 }
 
 void SetPosition::sendTo(tcp::socket &socket) const {
-    sendMultipleInts(socket, EventType::SET_POSITION, entityId_, left_, top_);
+    sendMultipleInts(socket, EventType::SET_POSITION, id_, left_, top_);
 }
 
 std::unique_ptr<Event> SetPosition::readFrom(tcp::socket &socket) {
@@ -222,7 +219,7 @@ EventType SetPosition::getType() const {
 }
 
 bool GameEnd::acceptExecutor(const EventVisitor &executor) {
-    return executor.visit(*this);
+    return true;
 }
 
 void GameEnd::sendTo(tcp::socket &socket) const {

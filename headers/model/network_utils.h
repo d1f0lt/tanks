@@ -1,5 +1,3 @@
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "cppcoreguidelines-pro-type-reinterpret-cast"
 #ifndef TANKS_NETWORK_UTILS_H
 #define TANKS_NETWORK_UTILS_H
 
@@ -43,5 +41,3 @@ void safeShutdown(tcp::socket &socket);
 }  // namespace Tanks::model
 
 #endif  // TANKS_NETWORK_UTILS_H
-
-#pragma clang diagnostic pop

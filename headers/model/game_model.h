@@ -56,8 +56,6 @@ public:
 
     [[nodiscard]] int getTick() const;
 
-    [[nodiscard]] int getKills(int tankId) const;
-
     [[nodiscard]] bool wasShootThisTurn() const;
     [[nodiscard]] bool wasDestroyedBlockThisTurn() const;
 
@@ -91,15 +89,13 @@ protected:
 private:
     GameMap map_;
     GroupedEntities groupedEntities_;
-    std::unordered_map<Entity *, BasicHandler *> handlers_;
+    EntityHolder entityHolder_;
     std::unordered_map<int, Entity *> byId_;
-    EntityHolder entityHolder_;  // must be after handlers_
+    std::unordered_map<Entity *, BasicHandler *> handlers_;
 
     std::atomic<int> currentTick_ = 0;
     IncrId currentId_{0};
     std::mt19937 rnd{42};
-
-    std::unordered_map<int, int> kills_;
 
     bool wasShootThisTurn_ = false;
     bool wasDestroyedBlockThisTurn_ = false;

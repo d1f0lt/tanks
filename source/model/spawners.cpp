@@ -26,23 +26,23 @@ std::pair<int, int> Spawner::getFreeCoords() {
     int top = -1;
     int right = -1;
     int down = -1;
-    bool canSpawn = false;
+    bool ok = false;
 
     auto entity = createEntity(0, 0);
 
-    while (!canSpawn) {
+    while (!ok) {
         left = getModel().getRnd() % getModel().getWidth();
         top = getModel().getRnd() % getModel().getHeight();
         right = std::min(left + entity->getWidth(), getModel().getWidth());
         down = std::min(top + entity->getHeight(), getModel().getHeight());
-        canSpawn = true;
+        ok = true;
 
-        for (int row = top; row < down && canSpawn; row++) {
-            for (int col = left; col < right && canSpawn; col++) {
+        for (int row = top; row < down && ok; row++) {
+            for (int col = left; col < right && ok; col++) {
                 auto &other = model_.getByCoords(col, row);
                 assert(model_.getById(other.getId()));
                 if (!entity->canStandOn(other)) {
-                    canSpawn = false;
+                    ok = false;
                 } else {
                     assert(dynamic_cast<MovableEntity *>(&other) == nullptr);
                 }
@@ -82,7 +82,7 @@ int MediumTankSpawner::getTimeout() {
 std::unique_ptr<Event> MediumTankSpawner::createEvent() {
     assert(getModel().getLives(getEntityId()) != 0);
     auto [left, top] = getFreeCoords();
-    auto skills = getModel().getTankSkills(getEntityId());
+    auto skills = getModel().getPlayerSkills(getEntityId());
     return std::make_unique<TankSpawn>(getEntityId(), left, top,
                                        EntityType::MEDIUM_TANK, skills);
 }

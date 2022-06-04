@@ -30,12 +30,6 @@ enum class EventType {
 
 class Event {
 public:
-    Event() = default;
-    Event(Event &&) = default;
-    Event(const Event &) = default;
-    Event &operator=(Event &&) = delete;
-    Event &operator=(const Event &) = delete;
-
     virtual ~Event() = default;
 
     virtual bool acceptExecutor(const EventVisitor &executor) = 0;
@@ -118,7 +112,7 @@ private:
 
 class BonusSpawn : public Event {
 public:
-    explicit BonusSpawn(int bonusId, int left, int top, EntityType type);
+    explicit BonusSpawn(int id, int left, int top, EntityType type);
 
     [[nodiscard]] EventType getType() const override;
 
@@ -141,7 +135,7 @@ private:
 
 class SetPosition : public Event {
 public:
-    explicit SetPosition(int entityId, int left, int top);
+    explicit SetPosition(int id, int left, int top);
 
     [[nodiscard]] EventType getType() const override;
 
@@ -154,7 +148,7 @@ public:
     [[nodiscard]] int getTop() const;
 
 private:
-    const int entityId_;
+    const int id_;
     const int left_;
     const int top_;
 };

@@ -12,16 +12,11 @@
 #include "pause.h"
 #include "player_skills.h"
 #include "server.h"
-#include "sound/shoot_sound.h"
 #include "view/bullets_view.h"
 #include "view/game_view.h"
 #include "view/tank_view.h"
 
 namespace Tanks {
-constexpr int PLAYERS = 1;
-constexpr int BOTS = 10;
-constexpr int BONUSES = 10;
-
 using boost::asio::ip::tcp;
 using Menu::PlayerSkills;
 
@@ -56,10 +51,6 @@ public:
           serverStart_(other.serverStart_) {
     }
 
-    ServerHolder(const ServerHolder &) = delete;
-    ServerHolder &operator=(ServerHolder &&) = delete;
-    ServerHolder &operator=(const ServerHolder &) = delete;
-
     [[nodiscard]] Server &getServer() const {
         return *server_;
     }
@@ -89,8 +80,8 @@ void serverImp(const std::string &filename,
                std::atomic<bool> &isServerCreated,
                std::unique_ptr<Server> &serverOnClient,
                std::condition_variable &serverOnClientInitiallized) {
-    std::condition_variable internalCondvar;
-    condvarOnClient = &internalCondvar;
+    std::condition_variable cv;
+    condvarOnClient = &cv;
     auto serverTmp = std::make_unique<Server>(filename, bots, bonuses);
     serverOnClient = std::move(serverTmp);
     Server *server = serverOnClient.get();
@@ -99,10 +90,9 @@ void serverImp(const std::string &filename,
     for (int i = 0; i < players; i++) {
         server->listenForNewPlayer();
     }
-
     std::mutex mutex;
     std::unique_lock lock(mutex);
-    internalCondvar.wait(lock, [&]() { return server->getIsStarted(); });
+    cv.wait(lock, [&]() { return server->getIsStarted(); });
     while (!server->getIsStopped()) {
         server->nextTick();
         std::this_thread::sleep_for(std::chrono::milliseconds(15));
@@ -114,6 +104,10 @@ std::unique_ptr<ServerHolder> createServer(const std::string levelFilename) {
     std::condition_variable *startServer = nullptr;
     std::unique_ptr<Server> serverPtr = nullptr;
     std::condition_variable serverCreatedCv;
+
+    constexpr int PLAYERS = 1;
+    constexpr int BOTS = 10;
+    constexpr int BONUSES = 10;
 
     std::atomic<bool> isServerCreated = false;
 
@@ -165,13 +159,8 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
     sendSkillsTo(clientSocket, skills);
     model::sendInt(clientSocket, lives);
 
-    const std::vector<int> players = [&]() {
-        std::vector<int> res(PLAYERS);
-        for (int i = 0; i < PLAYERS; i++) {
-            res[i] = -BONUSES - BOTS - 1 - i;
-        }
-        return res;
-    }();
+    //    tcp::socket clientSocket(ioContext);
+    //    clientSocket.connect(addressPort.value());
 
     int playerId = model::receiveInt(clientSocket);
     assert(playerId < 0);
@@ -189,11 +178,11 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
 
     Pause pause;
 
+    //    auto serverThread = server->start();
     if (isHost) {
         std::cout << endpoint << '\n';
         serverHolder->startServer();
     }
-
     model.nextTick();
 
     //    auto &model = serverPtr.model();

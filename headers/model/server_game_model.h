@@ -18,25 +18,20 @@ class ServerModel : public GameModel {
     friend ServerEventExecutor;
 
 public:
-    ServerModel(ServerModel &&) = delete;
-    ServerModel(const ServerModel &) = delete;
-    ServerModel &operator=(ServerModel &&) = delete;
-    ServerModel &operator=(const ServerModel &) = delete;
+    ~ServerModel() override;
+
+    void finishGame() noexcept final;
 
     explicit ServerModel(int level = 1, int botsCount = 0, int bonuses = 0);
     explicit ServerModel(const std::string &level,
                          int botsCount = 0,
                          int bonuses = 0);
 
-    ~ServerModel() override;
-
-    void finishGame() noexcept final;
-
     [[nodiscard]] int addPlayer(tcp::socket &socket,
                                 PlayerSkills skills,
                                 int lives);
 
-    [[nodiscard]] PlayerSkills getTankSkills(int tankId) const;
+    [[nodiscard]] PlayerSkills getPlayerSkills(int id) const;
 
     void nextTick() override;
 
@@ -71,7 +66,7 @@ private:
 
     [[nodiscard]] DecrId getDecrId();
 
-    void setTankSkills(int tankId, PlayerSkills skills);
+    void setPlayerSkills(int id, PlayerSkills skills);
     void addBot();
 };
 }  // namespace Tanks::model

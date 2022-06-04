@@ -4,14 +4,13 @@
 
 namespace Tanks::model {
 
-Projectile::Projectile(
-    int left,
-    int top,
-    Direction direction,
-    GameModel &model,
-    IncrId entityId,
-    int speed,  // NOLINT(bugprone-easily-swappable-parameters)
-    int tank)
+Projectile::Projectile(int left,
+                       int top,
+                       Direction direction,
+                       GameModel &model,
+                       IncrId entityId,
+                       int speed,
+                       int tank)
     : MovableEntity(left,
                     top,
                     entityId,
@@ -43,8 +42,5 @@ int Projectile::getSpeed() const {
 
 bool Projectile::isTankPassable() const {
     return false;
-}
-int Projectile::getShooter() const {
-    return tank_;
 }
 }  // namespace Tanks::model
