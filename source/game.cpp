@@ -20,6 +20,10 @@ namespace Tanks {
 using boost::asio::ip::tcp;
 using Menu::PlayerSkills;
 
+constexpr int PLAYERS = 1;
+constexpr int BOTS = 10;
+constexpr int BONUSES = 10;
+
 namespace {
 void makeAction(model::PlayerActionsHandler &player) {
     if (player.tank()) {
@@ -105,10 +109,6 @@ std::unique_ptr<ServerHolder> createServer(const std::string levelFilename) {
     std::unique_ptr<Server> serverPtr = nullptr;
     std::condition_variable serverCreatedCv;
 
-    constexpr int PLAYERS = 1;
-    constexpr int BOTS = 10;
-    constexpr int BONUSES = 10;
-
     std::atomic<bool> isServerCreated = false;
 
     auto serverThread = std::thread([&]() {
@@ -177,6 +177,14 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
     Environment environment(imagesPath + "environment/");
 
     Pause pause;
+
+    const std::vector<int> playerIds = [&]() {
+        std::vector<int> res(PLAYERS);
+        for (int i = 0; i < PLAYERS; i++) {
+            res[i] = -BONUSES - BOTS - 1 - i;
+        }
+        return res;
+    }();
 
     //    auto serverThread = server->start();
     if (isHost) {
