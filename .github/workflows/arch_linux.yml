@@ -8,7 +8,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: pacman -Syyu --noconfirm --noprogressbar
-      - run: pacman -S cmake ninja gcc sfml boost boost-libs --noconfirm --noprogressbar
+      - run: pacman -S cmake ninja gcc sfml boost boost-libs --noconfirm --noprogressbar -t tanks -t model_tests
       - run: cmake . -GNinja
       - run: cmake --build .
       

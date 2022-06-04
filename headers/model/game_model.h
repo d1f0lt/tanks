@@ -89,15 +89,18 @@ protected:
 private:
     GameMap map_;
     GroupedEntities groupedEntities_;
+    EntityHolder entityHolder_;
     std::unordered_map<int, Entity *> byId_;
     std::unordered_map<Entity *, BasicHandler *> handlers_;
+
     std::atomic<int> currentTick_ = 0;
     IncrId currentId_{0};
     std::mt19937 rnd{42};
-    EntityHolder entityHolder_;
+
     bool wasShootThisTurn_ = false;
     bool wasDestroyedBlockThisTurn_ = false;
     std::atomic<bool> isFinished_ = false;
+
     mutable std::mutex modelMutex_;
     std::condition_variable condvar_;
 };

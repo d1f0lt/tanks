@@ -14,9 +14,7 @@ ClientModel::ClientModel(int playerId, int lives, tcp::socket socket)
     : playerId_(playerId),
       playerLives_(lives),
       socket_(std::move(socket)),
-      receiver_([&]() { receiveEvents(); }){
-          //    std::thread([&]() { receiveEvents(); }).detach();
-      };
+      eventReceiver_([&]() { receiveEvents(); }){};
 
 PlayerActionsHandler ClientModel::getHandler() {
     return PlayerActionsHandler(playerId_, *this, socket_);
@@ -37,12 +35,6 @@ void ClientModel::receiveEvents() {
             for (int i = 0; i < count; i++) {
                 addEvent(readEvent(socket));
             }
-#ifndef NDEBUG
-//            static std::fstream log;
-//            log.open("log_client.txt", std::ios_base::app);
-//            log << count << std::endl;
-//            log.close();
-#endif
         }
     } catch (boost::system::system_error &) {
         return;
@@ -100,7 +92,7 @@ void ClientModel::finishGame() noexcept {
     setFinished();
     std::unique_lock lock(getMutex());
     safeShutdown(socket_);
-    receiver_.join();
+    eventReceiver_.join();
 }
 
 void ClientModel::nextTick() {

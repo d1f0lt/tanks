@@ -40,7 +40,7 @@ private:
 
     SafeQueue<std::unique_ptr<Event>> events_;
     SafeQueue<int> tickSize_;
-    std::thread receiver_;
+    std::thread eventReceiver_;
 };
 }  // namespace Tanks::model
 

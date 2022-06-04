@@ -28,6 +28,10 @@ public:
 
     using GameModel::getHandler;
     using ServerModel::addEvent;
+    int addPlayer(tcp::socket &socket) {
+        return ServerModel::addPlayer(socket, Menu::PlayerSkills(),
+                                      INFINITE_LIVES);
+    }
 };
 
 void setPosition(DebugServer &server,
@@ -62,7 +66,7 @@ TEST_CASE("Game creation") {
     client##i.connect(acceptor.local_endpoint());              \
     connection##i.join();                                      \
     auto id##i = serverModel.addPlayer(server##i);             \
-    ClientModel clientModel##i(id##i, std::move(client##i));
+    ClientModel clientModel##i(id##i, INFINITE_LIVES, std::move(client##i));
 
 #define GET_PLAYER_CONTORS(i)                                                \
     auto &tank##i = dynamic_cast<Tank &>(serverModel.getById(id##i)->get()); \
@@ -786,7 +790,8 @@ void userReceiver(tcp::acceptor &acceptor, ServerModel &serverModel) {
             tcp::socket server = acceptor.accept();
             serverSockets.emplace_back(
                 std::make_unique<tcp::socket>(std::move(server)));
-            int id = serverModel.addPlayer(*serverSockets.back(), {});
+            int id = serverModel.addPlayer(*serverSockets.back(), {},
+                                           INFINITE_LIVES);
             sendInt(*serverSockets.back(), id);
         } catch (boost::system::system_error &) {
             return;
@@ -802,7 +807,7 @@ void userMover(tcp::acceptor &acceptor,
     tcp::socket client(context);
     client.connect(acceptor.local_endpoint());
     int id = receiveInt(client);
-    ClientModel clientModel(id, std::move(client));
+    ClientModel clientModel(id, INFINITE_LIVES, std::move(client));
     clientModel.loadLevel(1);
     clientModel.nextTick();
     std::unique_lock lock(vec_mutex);
