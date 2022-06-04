@@ -42,3 +42,4 @@ Makefile
 
 #sqlite
 *.dblite
+*.conf
