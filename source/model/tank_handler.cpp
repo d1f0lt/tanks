@@ -75,8 +75,8 @@ void TankHandler::applyBonusesInBackground() {
     auto &model = getModel();
     auto &tank = dynamic_cast<Tank &>(getEntity());
     std::vector<Bonus *> bonuses;
-    for (unsigned i = 0; i < background.size(); i++) {
-        auto entity = model.getById(background[i]);
+    for (int entityInBackground : background) {
+        auto entity = model.getById(entityInBackground);
         if (!entity) {
             continue;
         }

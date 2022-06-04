@@ -47,4 +47,8 @@ void PlayerActionsHandler::shoot() {
 std::optional<std::reference_wrapper<Tank>> PlayerActionsHandler::tank() {
     return model_.tank();
 }
+
+const GameModel &PlayerActionsHandler::getModel() const {
+    return model_;
+}
 }  // namespace Tanks::model

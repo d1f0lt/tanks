@@ -17,14 +17,15 @@ using boost::asio::ip::tcp;
 int ServerModel::addPlayer(tcp::socket &socket,
                            PlayerSkills skills,
                            int lives) {
-    int id = getDecrId();
-    //    playersSockets_.emplace(id, *socket);
-    setTankSkills(id, skills);
-    spawners_.emplace_back(std::make_unique<MediumTankSpawner>(*this, id));
+    int playerId = getDecrId();
+    //    playersSockets_.emplace(playerId, *socket);
+    setTankSkills(playerId, skills);
+    spawners_.emplace_back(
+        std::make_unique<MediumTankSpawner>(*this, playerId));
     players_.emplace(
-        id, Player{socket, std::thread([&]() { receiveTurns(socket); })});
-    tankLives_.emplace(id, lives);
-    return id;
+        playerId, Player{socket, std::thread([&]() { receiveTurns(socket); })});
+    tankLives_.emplace(playerId, lives);
+    return playerId;
 }
 
 void ServerModel::nextTick() {
@@ -133,9 +134,9 @@ void ServerModel::executeAllEvents() {
         }
     }
 
-    for (auto id : bots_) {
-        if (getById(id)) {
-            auto event = getEventByBot(id);
+    for (auto botId : bots_) {
+        if (getById(botId)) {
+            auto event = getEventByBot(botId);
             if (executeEvent(*event)) {
                 eventsToSend.emplace_back(std::move(event));
             }
@@ -185,6 +186,7 @@ void ServerModel::setTankSkills(int tankId, PlayerSkills skills) {
     tanksSkills_.emplace(tankId, skills);
 }
 
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 ServerModel::ServerModel(int level, int botsCount, int bonuses) {
     loadLevel(level);
     for (int i = 0; i < botsCount; i++) {
@@ -196,6 +198,7 @@ ServerModel::ServerModel(int level, int botsCount, int bonuses) {
     }
 }
 
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 ServerModel::ServerModel(const std::string &level, int botsCount, int bonuses) {
     loadLevel(level);
     for (int i = 0; i < botsCount; i++) {
@@ -208,12 +211,12 @@ ServerModel::ServerModel(const std::string &level, int botsCount, int bonuses) {
 }
 
 void ServerModel::addBot() {
-    auto id = getDecrId();
-    bots_.emplace(id);
+    auto botId = getDecrId();
+    bots_.emplace(botId);
     PlayerSkills skills;
-    tanksSkills_.emplace(id, skills);
-    spawners_.emplace_back(std::make_unique<MediumTankSpawner>(*this, id));
-    tankLives_.emplace(id, INFINITE_LIVES);
+    tanksSkills_.emplace(botId, skills);
+    spawners_.emplace_back(std::make_unique<MediumTankSpawner>(*this, botId));
+    tankLives_.emplace(botId, INFINITE_LIVES);
 }
 
 DecrId ServerModel::getDecrId() {

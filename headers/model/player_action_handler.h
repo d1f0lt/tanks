@@ -22,6 +22,8 @@ public:
     void shoot(Direction direction);
     void shoot();
 
+    [[nodiscard]] const GameModel &getModel() const;
+
     [[nodiscard]] std::optional<std::reference_wrapper<Tank>> tank();
 
 private:

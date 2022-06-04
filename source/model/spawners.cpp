@@ -26,23 +26,23 @@ std::pair<int, int> Spawner::getFreeCoords() {
     int top = -1;
     int right = -1;
     int down = -1;
-    bool ok = false;
+    bool canSpawn = false;
 
     auto entity = createEntity(0, 0);
 
-    while (!ok) {
+    while (!canSpawn) {
         left = getModel().getRnd() % getModel().getWidth();
         top = getModel().getRnd() % getModel().getHeight();
         right = std::min(left + entity->getWidth(), getModel().getWidth());
         down = std::min(top + entity->getHeight(), getModel().getHeight());
-        ok = true;
+        canSpawn = true;
 
-        for (int row = top; row < down && ok; row++) {
-            for (int col = left; col < right && ok; col++) {
+        for (int row = top; row < down && canSpawn; row++) {
+            for (int col = left; col < right && canSpawn; col++) {
                 auto &other = model_.getByCoords(col, row);
                 assert(model_.getById(other.getId()));
                 if (!entity->canStandOn(other)) {
-                    ok = false;
+                    canSpawn = false;
                 } else {
                     assert(dynamic_cast<MovableEntity *>(&other) == nullptr);
                 }

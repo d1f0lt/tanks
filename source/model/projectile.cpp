@@ -4,13 +4,14 @@
 
 namespace Tanks::model {
 
-Projectile::Projectile(int left,
-                       int top,
-                       Direction direction,
-                       GameModel &model,
-                       IncrId entityId,
-                       int speed,
-                       int tank)
+Projectile::Projectile(
+    int left,
+    int top,
+    Direction direction,
+    GameModel &model,
+    IncrId entityId,
+    int speed,  // NOLINT(bugprone-easily-swappable-parameters)
+    int tank)
     : MovableEntity(left,
                     top,
                     entityId,

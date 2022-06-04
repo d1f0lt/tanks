@@ -9,7 +9,7 @@ Tank::Tank(int left,
            DecrId entityId,
            std::unique_ptr<TankHandler> handler,
            Direction direction,
-           int speed,
+           int speed,  // NOLINT(bugprone-easily-swappable-parameters)
            int reloadTicks,
            int bulletSpeed)
     : MovableEntity(left, top, entityId, std::move(handler), direction),
