@@ -3,9 +3,8 @@
 #include "model/network_utils.h"
 #include "model/tank.h"
 
-#ifndef NDEBUG
+#ifdef MODEL_LOGS
 #include <fstream>
-#include <iostream>
 #endif
 
 namespace Tanks::model {
@@ -14,7 +13,12 @@ ClientModel::ClientModel(int playerId, int lives, tcp::socket socket)
     : playerId_(playerId),
       playerLives_(lives),
       socket_(std::move(socket)),
-      eventReceiver_([&]() { receiveEvents(); }){};
+      eventReceiver_([&]() { receiveEvents(); }) {
+#ifdef MODEL_LOGS
+    std::ofstream ofs("clientEvents.txt",
+                      std::ofstream::out | std::ofstream::trunc);
+#endif
+};
 
 PlayerActionsHandler ClientModel::getHandler() {
     return PlayerActionsHandler(playerId_, *this, socket_);
