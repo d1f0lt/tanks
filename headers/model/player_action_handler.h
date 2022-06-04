@@ -20,12 +20,12 @@ public:
     void move(Direction direction);
     void setDirection(Direction direction);
 
+    [[nodiscard]] const GameModel &getModel() const;
+
     void shoot(Direction direction);
     void shoot();
 
     [[nodiscard]] std::optional<std::reference_wrapper<Tank>> tank();
-
-    [[nodiscard]] const GameModel &getModel() const;
 
     [[nodiscard]] int getLives() const;
 

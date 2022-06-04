@@ -15,6 +15,11 @@
 #include "view/bullets_view.h"
 #include "view/game_view.h"
 #include "view/tank_view.h"
+#include "sound/shoot_sound.h"
+#include "sound/block_destroy_sound.h"
+#include "sound/background_music.h"
+#include "menu/settings_menu.h"
+
 
 namespace Tanks {
 using boost::asio::ip::tcp;
@@ -137,6 +142,9 @@ std::unique_ptr<ServerHolder> createServer(const std::string levelFilename,
 std::optional<Menu::ButtonType>
 startGame(  // NOLINT(readability-function-cognitive-complexity)
     sf::RenderWindow &window,
+    Menu::PlayerInfo &info,
+    Sound::BackgroundMusicHolder &backgroundMusicHolder,
+    const sf::Sprite &backgroundSprite,
     int level,
     PlayerSkills skills,
     std::optional<std::pair<std::string, std::string>> addressPort,
@@ -145,6 +153,8 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
     //    addressPort = {"127.0.0.1", "12345"};
 
     static const std::string imagesPath = "../images/";
+
+    static const std::string soundsPath = "../sounds/";
 
     //    static_assert(std::is_move_constructible_v<Server>);
     boost::asio::io_context ioContext;
@@ -189,6 +199,10 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
 
     Environment environment(imagesPath + "environment/", skills.lifeAmount);
 
+    Tanks::Sound::ShootSoundHolder shootSound(soundsPath + "shoot.ogg");
+
+    Tanks::Sound::BlockDestroySoundHolder blockDestroySound(soundsPath + "block_destroy_sound.ogg");
+
     Pause pause;
 
     const std::vector<int> playerIds = [&]() -> std::vector<int> {
@@ -198,6 +212,8 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
         }
         return res;
     }();
+
+    auto volume = info.settings.soundsVolume;
 
     //    auto serverThread = server->start();
     if (isHost) {
@@ -225,6 +241,7 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
                                                       window, event);
                 signal != std::nullopt) {
                 assert(signal.value()->getType() == Menu::ButtonType::PAUSE);
+                backgroundMusicHolder.play(info.settings.musicVolume);
                 pause.makePause();
             } else {
                 model.nextTick();
@@ -236,7 +253,12 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
                 signal != std::nullopt) {
                 switch (signal.value()->getType()) {
                     case Menu::ButtonType::RESUME:
+                        backgroundMusicHolder.stop();
                         pause.unpause();
+                        break;
+                    case Menu::ButtonType::SETTINGS:
+                        showSettingsMenu(window, backgroundSprite, info, backgroundMusicHolder);
+                        backgroundMusicHolder.setVolume(static_cast<float>(info.settings.musicVolume));
                         break;
                     case Menu::ButtonType::NEW_GAME:
                         return Menu::ButtonType::NEW_GAME;
@@ -262,6 +284,9 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
 
         const auto &bullets = model.getAll(model::EntityType::BULLET);
         bulletsView.draw(window, bullets);
+
+        shootSound.play(static_cast<float>(volume), model.getHandler());
+        blockDestroySound.play(static_cast<float>(volume), model.getHandler());
 
         if (pause.isPause()) {
             pause.drawPause(window);

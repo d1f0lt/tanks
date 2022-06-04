@@ -19,7 +19,7 @@ SET(GCC_WARNINGS "-Wall -Wextra -pthread")
 #SET(GCC_OPTIMIZE "-ggdb -g3 -ftrapv -D_GLIBCXX_DEBUG") # Latest is integer overflow protection
 #SET(GCC_OPTIMIZE "-ggdb -g3 -Og -DMODEL_LOGS")# Latest is integer overflow protection
 #SET(GCC_OPTIMIZE "-O2 -mtune=native") # RELEASE
-SET(GCC_OPTIMIZE "-O2 -DNDEBUG ") # RELEASE
+#SET(GCC_OPTIMIZE "-O2 -DNDEBUG ") # RELEASE
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_WARNINGS} ${SANITIZERS} ${GCC_OPTIMIZE}")
 
 find_package(SFML 2.5 COMPONENTS graphics audio REQUIRED)
@@ -84,6 +84,8 @@ add_executable(
         source/menu/multiplayer_menu.cpp
         source/sound/background_music.cpp
         source/game.cpp
+        source/sound/shoot_sound.cpp
+        source/sound/block_destroy_sound.cpp
         source/game_controller.cpp
         source/game_environment.cpp
         source/pause.cpp

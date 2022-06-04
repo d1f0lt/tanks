@@ -2,12 +2,14 @@
 #define NEW_GAME_MENU_H
 
 #include "menu.h"
+#include "sound/background_music.h"
 
 namespace Tanks::Menu {
 
 void showNewGameMenu(sf::RenderWindow &window,
                      const sf::Sprite &background,
-                     PlayerInfo &info);
+                     PlayerInfo &info,
+                     Sound::BackgroundMusicHolder &backgroundMusicHolder);
 
 }
 

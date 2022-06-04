@@ -13,4 +13,4 @@ void TankDestroySoundHolder::play(float volume_level) {
     sound.setVolume(volume_level);
     sound.play();
 }
-};  // namespace Tanks::Sound
+}  // namespace Tanks::Sound
