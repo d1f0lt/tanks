@@ -70,9 +70,9 @@ void Spawner::nextTick() {
 std::unique_ptr<Entity> MediumTankSpawner::createEntity(int left, int top) {
     TankHandlerCreator handlerCreator(getModel());
     // TODO get PlayerInfo
-    return std::make_unique<MediumTank>(left, top, DecrId(getEntityId()),
-                                        handlerCreator, Direction::LEFT,
-                                        DEFAULT_TANK_SPEED);
+    return std::make_unique<MediumTank>(
+        left, top, DecrId(getEntityId()), handlerCreator, Direction::LEFT,
+        DEFAULT_TANK_SPEED, DEFAULT_RELOAD_TICKS, DEFAULT_BULLET_SPEED);
 }
 
 int MediumTankSpawner::getTimeout() {
@@ -81,9 +81,11 @@ int MediumTankSpawner::getTimeout() {
 
 std::unique_ptr<Event> MediumTankSpawner::createEvent() {
     auto [left, top] = getFreeCoords();
-    return std::make_unique<SpawnTank>(
-        getEntityId(), left, top, EntityType::MEDIUM_TANK, DEFAULT_TANK_SPEED,
-        DEFAULT_BULLET_SPEED, DEFAULT_RELOAD_TICKS);
+    const auto &[tankSpeed, bulletSpeed, reloadTicks] =
+        getModel().getPlayerSkills(getEntityId());
+    return std::make_unique<SpawnTank>(getEntityId(), left, top,
+                                       EntityType::MEDIUM_TANK, tankSpeed,
+                                       bulletSpeed, reloadTicks);
 }
 
 MediumTankSpawner::MediumTankSpawner(ServerModel &model, int entityId)

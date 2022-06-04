@@ -5,7 +5,7 @@
 #include <cinttypes>
 #include <iosfwd>
 #include <memory>
-#include "model/entity.h"
+#include "entity.h"
 #include "model/event_executor.h"
 
 #ifdef MODEL_LOGS

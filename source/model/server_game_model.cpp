@@ -142,6 +142,7 @@ std::unique_ptr<Event> ServerModel::getEventByBot(int botId) {
     }
 }
 #else
+
 std::unique_ptr<Event> ServerModel::getEventByBot(int botId) {
     int rnd = getRnd() % 80;
     if (rnd >= 70) {

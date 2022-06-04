@@ -1,7 +1,7 @@
 #ifndef TANKS_TANK_H
 #define TANKS_TANK_H
 
-#include "game_model_fwd.h"
+#include "model/game_model_fwd.h"
 #include "movable_entity.h"
 
 namespace Tanks::model {
@@ -13,10 +13,12 @@ public:
                   std::unique_ptr<TankHandler> handler,
                   Direction direction,
                   int speed,
-                  int reloadTicks);
+                  int reloadTicks,
+                  int bulletSpeed);
 
     [[nodiscard]] int getSpeed() const final;
     [[nodiscard]] int getReloadTicks() const;
+    [[nodiscard]] int getBulletSpeed() const;
 
     [[nodiscard]] bool isShootingThisTick() const;
     [[nodiscard]] bool hasBonus() const;
@@ -24,6 +26,7 @@ public:
 private:
     int speed_ = -1;
     const int reloadTicks_;
+    const int bulletSpeed_;
 };
 
 class MediumTank : public Tank {
@@ -33,7 +36,9 @@ public:
                         DecrId entityId,
                         const TankHandlerCreator &handlerCreator,
                         Direction direction,
-                        int speed);
+                        int speed,
+                        int reloadTicks,
+                        int bulletSpeed);
 
     [[nodiscard]] int getWidth() const override;
     [[nodiscard]] int getHeight() const override;

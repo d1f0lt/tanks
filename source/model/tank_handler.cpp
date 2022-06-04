@@ -33,7 +33,8 @@ void TankHandler::shoot() {
     auto projectile = std::make_unique<Projectile>(
         getEntity().getLeft() + DIFF_LEFT.at(tank.getDirection()),
         getEntity().getTop() + DIFF_TOP.at(tank.getDirection()),
-        tank.getDirection(), getModel(), getModel().getIncrId());
+        tank.getDirection(), getModel(), getModel().getIncrId(),
+        tank.getBulletSpeed());
 
     auto &handler =
         dynamic_cast<ProjectileHandler &>(getModel().getHandler(*projectile));

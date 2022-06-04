@@ -6,8 +6,8 @@
 #include <unordered_set>
 #include <vector>
 #include "constants.h"
-#include "model/entities_fwd.h"
-#include "model/entity.h"
+#include "entities_fwd.h"
+#include "entity.h"
 #include "model/game_model_fwd.h"
 
 namespace Tanks::model {

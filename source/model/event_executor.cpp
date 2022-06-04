@@ -35,7 +35,8 @@ bool EventExecutor::visit(SpawnTank &event) const {
             getModel().addEntity(std::make_unique<MediumTank>(
                 event.getLeft(), event.getTop(), event.getTankId(),
                 TankHandlerCreator(getModel()), Direction::LEFT,
-                event.getTankSpeed()));
+                event.getTankSpeed(), event.getReloadTicks(),
+                event.getBulletSpeed()));
             break;
         default:
             assert(false);

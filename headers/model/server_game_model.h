@@ -7,17 +7,11 @@
 #include "model/game_model.h"
 #include "model/spawners.h"
 #include "model/thread_safe_queue.h"
+#include "player_skills.h"
 
 namespace Tanks::model {
 using boost::asio::ip::tcp;
-
-struct PlayerSkillsTmp {
-    const int tankSpeed = DEFAULT_TANK_SPEED;
-    const int bulletSpeed = DEFAULT_BULLET_SPEED;
-    const int reloadTicks = DEFAULT_RELOAD_TICKS;
-};
-
-using PlayerSkills = PlayerSkillsTmp;
+using Menu::PlayerSkills;
 
 class ServerModel : public GameModel {
     friend Spawner;
@@ -33,6 +27,8 @@ public:
                          int bonuses = 0);
 
     [[nodiscard]] int addPlayer(tcp::socket &socket, PlayerSkills skills = {});
+
+    [[nodiscard]] PlayerSkills getPlayerSkills(int id) const;
 
 protected:
     void addEvent(std::unique_ptr<Event> event);
@@ -57,8 +53,6 @@ private:
     void sendEventsToClients(const std::vector<std::unique_ptr<Event>> &events);
 
     [[nodiscard]] DecrId getDecrId();
-
-    [[nodiscard]] PlayerSkills getPlayerSkills(int id) const;
 
     void setPlayerSkills(int id, PlayerSkills skills);
     void addBot();

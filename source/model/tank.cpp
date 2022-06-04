@@ -10,10 +10,12 @@ Tank::Tank(int left,
            std::unique_ptr<TankHandler> handler,
            Direction direction,
            int speed,
-           int reloadTicks)
+           int reloadTicks,
+           int bulletSpeed)
     : MovableEntity(left, top, entityId, std::move(handler), direction),
       speed_(speed),
-      reloadTicks_(reloadTicks) {
+      reloadTicks_(reloadTicks),
+      bulletSpeed_(bulletSpeed) {
 }
 
 int MediumTank::getWidth() const {
@@ -25,14 +27,17 @@ MediumTank::MediumTank(int left,
                        DecrId entityId,
                        const TankHandlerCreator &handlerCreator,
                        Direction direction,
-                       int speed)
+                       int speed,
+                       int reloadTicks,
+                       int bulletSpeed)
     : Tank(left,
            top,
            entityId,
            handlerCreator.createTankHandler(*this),
            direction,
            speed,
-           DEFAULT_RELOAD_TICKS) {
+           reloadTicks,
+           bulletSpeed) {
 }
 
 int MediumTank::getHeight() const {
@@ -62,5 +67,9 @@ bool Tank::isShootingThisTick() const {
 bool Tank::hasBonus() const {
     return dynamic_cast<TankMovableOnWaterHandler *>(&getHandler()) != nullptr;
     // TODO TankWithBonusHandler
+}
+
+int Tank::getBulletSpeed() const {
+    return bulletSpeed_;
 }
 }  // namespace Tanks::model

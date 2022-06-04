@@ -8,12 +8,14 @@ Projectile::Projectile(int left,
                        int top,
                        Direction direction,
                        GameModel &model,
-                       IncrId entityId)
+                       IncrId entityId,
+                       int speed)
     : MovableEntity(left,
                     top,
                     entityId,
                     std::make_unique<ProjectileHandler>(model, *this),
-                    direction) {
+                    direction),
+      speed_(speed) {
 }
 
 EntityType Projectile::getType() const {
@@ -33,7 +35,7 @@ int Projectile::getHeight() const {
 }
 
 int Projectile::getSpeed() const {
-    return DEFAULT_BULLET_SPEED;
+    return speed_;
 }
 
 bool Projectile::isTankPassable() const {

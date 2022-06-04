@@ -2,7 +2,7 @@
 #define TANKS_SPAWNERS_H
 
 #include <memory>
-#include "model/entity.h"
+#include "entity.h"
 #include "model/event_fwd.h"
 #include "model/game_model_fwd.h"
 

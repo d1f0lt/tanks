@@ -58,7 +58,8 @@ void ClientModel::executeAllEvents() {
 #endif
     std::unique_ptr<Event> event;
     int cnt = -1;
-    int ticks = std::max(1, static_cast<int>(tickSize_.Size()));
+    //    int ticks = std::max(1, static_cast<int>(tickSize_.Size()));
+    int ticks = static_cast<int>(tickSize_.Size()) + 1;
     for (int i = 0; i < ticks && !getIsFinished(); i++) {
         if (!tickSize_.ConsumeSync(cnt)) {
             return;

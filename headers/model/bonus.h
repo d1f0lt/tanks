@@ -1,7 +1,7 @@
 #ifndef TANKS_BONUS_H
 #define TANKS_BONUS_H
 
-#include "model/foreground_entity.h"
+#include "foreground_entity.h"
 #include "model/handler.h"
 
 namespace Tanks::model {

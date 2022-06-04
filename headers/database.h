@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include "constants.h"
+#include "player_skills.h"
 #include "sqlite3.h"
 
 namespace Tanks {
@@ -49,12 +50,6 @@ struct PlayerGeneral {
 struct PlayerSettings {
     int musicVolume = 50;
     int soundsVolume = 50;
-};
-
-struct PlayerSkills {
-    int tankSpeed = DEFAULT_TANK_SPEED;
-    int bulletSpeed = DEFAULT_BULLET_SPEED;
-    int reloadTicks = DEFAULT_RELOAD_TICKS;
 };
 
 struct PlayerInfo {
