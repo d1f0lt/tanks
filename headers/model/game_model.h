@@ -89,9 +89,9 @@ protected:
 private:
     GameMap map_;
     GroupedEntities groupedEntities_;
-    EntityHolder entityHolder_;
-    std::unordered_map<int, Entity *> byId_;
     std::unordered_map<Entity *, BasicHandler *> handlers_;
+    std::unordered_map<int, Entity *> byId_;
+    EntityHolder entityHolder_;  // must be after handlers_
 
     std::atomic<int> currentTick_ = 0;
     IncrId currentId_{0};
