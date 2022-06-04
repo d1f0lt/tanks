@@ -64,7 +64,7 @@ protected:
     void eraseEntity(Entity &entity);
 
     virtual void executeAllEvents() = 0;
-    bool executeEvent(Event &event);
+    virtual bool executeEvent(Event &event);
     void moveBullets();
 
     [[nodiscard]] BasicHandler &getHandler(Entity &entity);

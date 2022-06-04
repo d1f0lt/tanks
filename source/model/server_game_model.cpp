@@ -14,13 +14,16 @@
 namespace Tanks::model {
 using boost::asio::ip::tcp;
 
-int ServerModel::addPlayer(tcp::socket &socket, PlayerSkills skills) {
+int ServerModel::addPlayer(tcp::socket &socket,
+                           PlayerSkills skills,
+                           int lives) {
     int id = getDecrId();
     //    playersSockets_.emplace(id, *socket);
     setPlayerSkills(id, skills);
     spawners_.emplace_back(std::make_unique<MediumTankSpawner>(*this, id));
     players_.emplace(
         id, Player{socket, std::thread([&]() { receiveTurns(socket); })});
+    tankLives_.emplace(id, lives);
     return id;
 }
 
@@ -210,6 +213,7 @@ void ServerModel::addBot() {
     PlayerSkills skills;
     tanksSkills_.emplace(id, std::move(skills));
     spawners_.emplace_back(std::make_unique<MediumTankSpawner>(*this, id));
+    tankLives_.emplace(id, INFINITE_LIVES);
 }
 
 DecrId ServerModel::getDecrId() {
@@ -241,6 +245,23 @@ void ServerModel::finishGame() noexcept {
 
 ServerModel::~ServerModel() {
     finishGame();
+}
+
+int ServerModel::getLives(int tankId) const {
+    assert(tankLives_.count(tankId) == 1);
+    return tankLives_.at(tankId);
+}
+
+void ServerModel::decrLives(int tankId) {
+    int &lives = tankLives_[tankId];
+    if (lives == INFINITE_LIVES || lives == 0) {
+        return;
+    }
+    lives--;
+}
+
+bool ServerModel::executeEvent(Event &event) {
+    return event.acceptExecutor(ServerEventExecutor(*this));
 }
 
 }  // namespace Tanks::model

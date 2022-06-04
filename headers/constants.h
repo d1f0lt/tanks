@@ -23,6 +23,7 @@ inline constexpr int BULLET_SIZE = 10;
 inline constexpr int DEFAULT_RELOAD_TICKS = 100;
 inline constexpr int BONUS_SIZE = 40;
 inline constexpr int DEFAULT_RESPAWN_TIME = 10;
+inline constexpr int INFINITE_LIVES = -1;
 
 // menu
 inline constexpr int LEVELS_COUNT = 1;

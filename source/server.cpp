@@ -36,13 +36,13 @@ PlayerSkills receiveFrom(tcp::socket &socket) {
 
 void Server::listenForNewPlayer() {
     try {
-        // TODO get skills
         auto socket = acceptor_.accept();
         sockets_.emplace_back(std::move(socket));
         assert(sockets_.size() <= 20);
         PlayerSkills skills = receiveFrom(sockets_.back());
+        int lives = model::receiveInt(sockets_.back());
 
-        int id = model_->addPlayer(sockets_.back(), skills);
+        int id = model_->addPlayer(sockets_.back(), skills, lives);
         model::sendInt(sockets_.back(), id);
     } catch (boost::system::system_error &) {
     }

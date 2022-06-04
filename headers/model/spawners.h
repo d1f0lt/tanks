@@ -12,7 +12,7 @@ public:
     explicit Spawner(ServerModel &model, int entityId);
     virtual ~Spawner() = default;
 
-    [[nodiscard]] bool isSpawnNow();
+    [[nodiscard]] virtual bool isSpawnNow();
     void nextTick();
 
     [[nodiscard]] virtual int getTimeout() = 0;
@@ -38,6 +38,7 @@ public:
     explicit MediumTankSpawner(ServerModel &model, int entityId);
 
     [[nodiscard]] int getTimeout() override;
+    bool isSpawnNow() override;
 
 protected:
     [[nodiscard]] std::unique_ptr<Entity> createEntity(int left,

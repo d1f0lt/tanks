@@ -15,6 +15,7 @@ using Menu::PlayerSkills;
 
 class ServerModel : public GameModel {
     friend Spawner;
+    friend ServerEventExecutor;
 
 public:
     ~ServerModel() override;
@@ -26,11 +27,15 @@ public:
                          int botsCount = 0,
                          int bonuses = 0);
 
-    [[nodiscard]] int addPlayer(tcp::socket &socket, PlayerSkills skills = {});
+    [[nodiscard]] int addPlayer(tcp::socket &socket,
+                                PlayerSkills skills,
+                                int lives);
 
     [[nodiscard]] PlayerSkills getPlayerSkills(int id) const;
 
     void nextTick() override;
+
+    [[nodiscard]] int getLives(int tankId) const;
 
 protected:
     void addEvent(std::unique_ptr<Event> event);
@@ -39,12 +44,17 @@ protected:
         std::thread receiver_;
     };
 
+    bool executeEvent(Event &event) override;
+
+    void decrLives(int tankId);
+
 private:
     SafeQueue<std::unique_ptr<Event>> events_;
     std::unordered_map<int, Player> players_;
     std::unordered_set<int> bots_;
     std::vector<std::unique_ptr<Spawner>> spawners_;
     std::unordered_map<int, PlayerSkills> tanksSkills_;
+    std::unordered_map<int, int> tankLives_;
     DecrId decrId{-1};
 
     void receiveTurns(tcp::socket &client);

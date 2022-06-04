@@ -1,6 +1,7 @@
 #include "model/event_executor.h"
 #include "model/bonus.h"
 #include "model/game_model.h"
+#include "model/server_game_model.h"
 #include "model/tank.h"
 
 namespace Tanks::model {
@@ -90,5 +91,14 @@ bool EventExecutor::visit(GameEnd &event) const {
 }
 
 EventExecutor::EventExecutor(GameModel &model) : EventVisitor(model) {
+}
+
+ServerEventExecutor::ServerEventExecutor(ServerModel &model)
+    : EventExecutor(model) {
+}
+
+bool ServerEventExecutor::visit(TankSpawn &event) const {
+    dynamic_cast<ServerModel &>(getModel()).decrLives(event.getTankId());
+    return EventExecutor::visit(event);
 }
 }  // namespace Tanks::model

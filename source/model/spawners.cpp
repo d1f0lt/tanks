@@ -80,6 +80,7 @@ int MediumTankSpawner::getTimeout() {
 }
 
 std::unique_ptr<Event> MediumTankSpawner::createEvent() {
+    assert(getModel().getLives(getEntityId()) != 0);
     auto [left, top] = getFreeCoords();
     auto skills = getModel().getPlayerSkills(getEntityId());
     return std::make_unique<TankSpawn>(getEntityId(), left, top,
@@ -90,12 +91,19 @@ MediumTankSpawner::MediumTankSpawner(ServerModel &model, int entityId)
     : Spawner(model, entityId) {
 }
 
+bool MediumTankSpawner::isSpawnNow() {
+    if (getModel().getLives(getEntityId()) == 0) {
+        return false;
+    }
+    return Spawner::isSpawnNow();
+}
+
 BonusSpawner::BonusSpawner(ServerModel &model, DecrId entityId, EntityType type)
     : Spawner(model, entityId), type_(type) {
 }
 
 int BonusSpawner::getTimeout() {
-    return 10;
+    return 100;
 }
 
 std::unique_ptr<Event> BonusSpawner::createEvent() {

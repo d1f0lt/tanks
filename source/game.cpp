@@ -131,7 +131,8 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
     sf::RenderWindow &window,
     int level,
     PlayerSkills skills,
-    std::optional<std::pair<std::string, std::string>> addressPort) {
+    std::optional<std::pair<std::string, std::string>> addressPort,
+    int lives) {
     const bool isHost = (addressPort == std::nullopt);
     //    addressPort = {"127.0.0.1", "12345"};
 
@@ -156,6 +157,7 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
                                                addressPort.value().second));
     }
     sendSkillsTo(clientSocket, skills);
+    model::sendInt(clientSocket, lives);
 
     //    tcp::socket clientSocket(ioContext);
     //    clientSocket.connect(addressPort.value());

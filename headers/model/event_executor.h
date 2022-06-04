@@ -23,10 +23,10 @@ private:
     GameModel &model_;
 };
 
-class EventExecutor : EventVisitor {
+class EventExecutor : public EventVisitor {
     friend GameModel;
 
-private:
+protected:
     explicit EventExecutor(GameModel &model);
 
 public:
@@ -36,6 +36,14 @@ public:
     [[nodiscard]] bool visit(TankShoot &event) const override;
     [[nodiscard]] bool visit(SetPosition &event) const override;
     [[nodiscard]] bool visit(GameEnd &event) const override;
+};
+
+class ServerEventExecutor : public EventExecutor {
+    friend ServerModel;
+
+public:
+    explicit ServerEventExecutor(ServerModel &model);
+    bool visit(TankSpawn &event) const override;
 };
 }  // namespace Tanks::model
 
