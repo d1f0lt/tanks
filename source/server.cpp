@@ -1,5 +1,6 @@
 #include "server.h"
 #include <chrono>
+#include <iostream>
 #include <thread>
 #include "model/network_utils.h"
 
@@ -77,5 +78,23 @@ bool Server::getIsStarted() const {
 
 int Server::getLevel() const {
     return level_;
+}
+
+[[noreturn]] void createAndRunServer(int level,
+                                     int players,
+                                     int bots,
+                                     int bonuses) {
+    const std::string levelFilename("../levels/level" + std::to_string(level) +
+                                    ".csv");
+    Server server(levelFilename, bots, bonuses, level);
+    std::cout << server.getEndpoint() << std::endl;
+    for (int i = 0; i < players; i++) {
+        server.listenForNewPlayer();
+    }
+
+    while (true) {
+        server.nextTick();
+        std::this_thread::sleep_for(std::chrono::milliseconds(15));
+    }
 }
 }  // namespace Tanks

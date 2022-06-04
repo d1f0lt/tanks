@@ -176,7 +176,8 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
     const std::string levelFilename("../levels/level" + std::to_string(level) +
                                     ".csv");
 
-    model::ClientModel model(playerId, skills.lifeAmount, std::move(clientSocket));
+    model::ClientModel model(playerId, skills.lifeAmount,
+                             std::move(clientSocket));
     model.loadLevel(levelFilename);
 
     View::TankSpriteHolder greenTankView(imagesPath + "tanks/green_tank.png");
