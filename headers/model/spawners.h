@@ -10,6 +10,11 @@ namespace Tanks::model {
 class Spawner {
 public:
     explicit Spawner(ServerModel &model, int entityId);
+    Spawner(Spawner &&) = default;
+    Spawner(const Spawner &) = delete;
+    Spawner &operator=(Spawner &&) = delete;
+    Spawner &operator=(const Spawner &) = delete;
+
     virtual ~Spawner() = default;
 
     [[nodiscard]] virtual bool isSpawnNow();

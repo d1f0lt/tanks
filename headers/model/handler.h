@@ -23,7 +23,6 @@ public:
     virtual ~BasicHandler();
 
     [[nodiscard]] virtual bool canStandOn(const Entity &other) const;
-    //    [[nodiscard]] bool initIfSurvive();
 
     virtual void destroyEntity();
 
@@ -32,8 +31,6 @@ protected:
     [[nodiscard]] GameModel &getModel() const;
 
     [[nodiscard]] static BasicHandler *getActualHandler(Entity &entity);
-    //    [[nodiscard]] virtual void initEntity();
-    //    [[nodiscard]] virtual bool isDieOnCreation();
 
 private:
     GameModel &model_;
@@ -44,9 +41,10 @@ class ForegroundHandler : public BasicHandler {
 public:
     explicit ForegroundHandler(GameModel &model, ForegroundEntity &entity);
 
-    void setBackground();
-    std::vector<int> restoreBackground();
     void destroyEntity() override;
+
+    void setBackground();
+    void restoreBackground();
     [[nodiscard]] std::vector<int> snapshotBackground() const;
 
     void setPosition(int left, int top);
@@ -78,8 +76,8 @@ protected:
     std::vector<Entity *> nearest(Direction direction, T cond) {
         int minDist = INT_MAX;
         std::vector<Entity *> res;
-        auto lk = lookMutable(direction);
-        for (auto *entity : lk) {
+        auto forward = lookMutable(direction);
+        for (auto *entity : forward) {
             if (cond(entity)) {
                 if (getEntity().dist(*entity) <= minDist) {
                     if (int dist = getEntity().dist(*entity); dist < minDist) {
@@ -88,7 +86,7 @@ protected:
                     } else {
                         res.emplace_back(entity);
                     }
-                }  // elements in look are unsorted, can't else break
+                }  // elements in forward are unsorted, can't else {break;}
             }
         }
         return res;
@@ -115,7 +113,7 @@ public:
     explicit BonusHandler(GameModel &model, Bonus &entity);
 
     virtual void apply(Tank &tank) = 0;
-    bool canStandOn(const Entity &other) const override;
+    [[nodiscard]] bool canStandOn(const Entity &other) const override;
 };
 
 class WalkOnWaterHandler : public BonusHandler {

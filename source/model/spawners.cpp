@@ -82,7 +82,7 @@ int MediumTankSpawner::getTimeout() {
 std::unique_ptr<Event> MediumTankSpawner::createEvent() {
     assert(getModel().getLives(getEntityId()) != 0);
     auto [left, top] = getFreeCoords();
-    auto skills = getModel().getPlayerSkills(getEntityId());
+    auto skills = getModel().getTankSkills(getEntityId());
     return std::make_unique<TankSpawn>(getEntityId(), left, top,
                                        EntityType::MEDIUM_TANK, skills);
 }

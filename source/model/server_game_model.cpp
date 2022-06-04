@@ -19,7 +19,7 @@ int ServerModel::addPlayer(tcp::socket &socket,
                            int lives) {
     int id = getDecrId();
     //    playersSockets_.emplace(id, *socket);
-    setPlayerSkills(id, skills);
+    setTankSkills(id, skills);
     spawners_.emplace_back(std::make_unique<MediumTankSpawner>(*this, id));
     players_.emplace(
         id, Player{socket, std::thread([&]() { receiveTurns(socket); })});
@@ -177,12 +177,12 @@ std::unique_ptr<Event> ServerModel::getEventByBot(int botId) {
 
 #endif
 
-PlayerSkills ServerModel::getPlayerSkills(int id) const {
-    return tanksSkills_.at(id);
+PlayerSkills ServerModel::getTankSkills(int tankId) const {
+    return tanksSkills_.at(tankId);
 }
 
-void ServerModel::setPlayerSkills(int id, PlayerSkills skills) {
-    tanksSkills_.emplace(id, skills);
+void ServerModel::setTankSkills(int tankId, PlayerSkills skills) {
+    tanksSkills_.emplace(tankId, skills);
 }
 
 ServerModel::ServerModel(int level, int botsCount, int bonuses) {

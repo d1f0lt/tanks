@@ -43,4 +43,7 @@ int Projectile::getSpeed() const {
 bool Projectile::isTankPassable() const {
     return false;
 }
+int Projectile::getShooter() const {
+    return tank_;
+}
 }  // namespace Tanks::model

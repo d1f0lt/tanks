@@ -56,6 +56,8 @@ public:
 
     [[nodiscard]] int getTick() const;
 
+    [[nodiscard]] int getKills(int tankId) const;
+
     [[nodiscard]] bool wasShootThisTurn() const;
     [[nodiscard]] bool wasDestroyedBlockThisTurn() const;
 
@@ -96,6 +98,8 @@ private:
     std::atomic<int> currentTick_ = 0;
     IncrId currentId_{0};
     std::mt19937 rnd{42};
+
+    std::unordered_map<int, int> kills_;
 
     bool wasShootThisTurn_ = false;
     bool wasDestroyedBlockThisTurn_ = false;

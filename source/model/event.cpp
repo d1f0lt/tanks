@@ -219,7 +219,7 @@ EventType SetPosition::getType() const {
 }
 
 bool GameEnd::acceptExecutor(const EventVisitor &executor) {
-    return true;
+    return executor.visit(*this);
 }
 
 void GameEnd::sendTo(tcp::socket &socket) const {

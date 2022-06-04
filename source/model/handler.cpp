@@ -47,27 +47,12 @@ BasicHandler *BasicHandler::getActualHandler(Entity &entity) {
     return &entity.getHandler();
 }
 
-// bool BasicHandler::initIfSurvive() {
-//     if (isDieOnCreation()) {
-//         return false;
-//     }
-//     initEntity();
-//     return true;
-// }
-//
-// void BasicHandler::initEntity() {
-// }
-//
-// bool BasicHandler::isDieOnCreation() {
-//     return false;
-// }
-
 std::vector<const Entity *> MovableHandler::look(Direction direction) {
     auto res = lookMutable(direction);
     return {res.begin(), res.end()};
 }
 
-std::vector<int> ForegroundHandler::restoreBackground() {
+void ForegroundHandler::restoreBackground() {
     for (int id : getBackground()) {
         auto entity = getModel().getById(id);
         if (!entity) {
@@ -76,9 +61,7 @@ std::vector<int> ForegroundHandler::restoreBackground() {
         getModel().getMap().exchange(&(entity->get()), &getEntity());
     }
     assert(getModel().getMap().checkRemoved(getEntity()));
-    auto bg = std::move(getBackground());
     getBackground().clear();
-    return bg;
 }
 
 void ForegroundHandler::setBackground() {
@@ -313,6 +296,10 @@ void ProjectileHandler::destroy(Entity &other) {
         return;
     }
 
+    if (dynamic_cast<Tank *>(&other)) {
+        auto &bullet = dynamic_cast<Projectile &>(getEntity());
+        getModel().kills_[bullet.getShooter()]++;
+    }
     getModel().getHandler(other).destroyEntity();
 }
 

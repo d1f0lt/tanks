@@ -4,10 +4,10 @@
 #include "model/tank.h"
 
 namespace Tanks::model {
-PlayerActionsHandler::PlayerActionsHandler(int id,
+PlayerActionsHandler::PlayerActionsHandler(int playerId,
                                            ClientModel &model,
                                            tcp::socket &socket)
-    : id_(id), model_(model), socket_(socket) {
+    : id_(playerId), model_(model), socket_(socket) {
 }
 
 void PlayerActionsHandler::move(Direction direction, int speed) {

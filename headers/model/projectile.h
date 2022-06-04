@@ -20,6 +20,7 @@ public:
     [[nodiscard]] int getHeight() const override;
     [[nodiscard]] int getStrength() const override;
     [[nodiscard]] int getSpeed() const override;
+    [[nodiscard]] int getShooter() const;
 
     [[nodiscard]] bool isTankPassable() const override;
 

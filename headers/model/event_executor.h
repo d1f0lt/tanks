@@ -8,6 +8,7 @@ namespace Tanks::model {
 class EventVisitor {
 public:
     explicit EventVisitor(GameModel &model);
+    virtual ~EventVisitor() = default;
 
     [[nodiscard]] virtual bool visit(TankMove &event) const = 0;
     [[nodiscard]] virtual bool visit(TankSpawn &event) const = 0;

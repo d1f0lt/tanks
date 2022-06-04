@@ -80,29 +80,29 @@ bool Entity::canStandOn(const Entity &other) const {
     return getHandler().canStandOn(other);
 }
 
-IncrId::IncrId(const int data) : data(data) {
+IncrId::IncrId(const int data) : data_(data) {
     assert(data >= 0);
 }
 
 IncrId::operator int() const {
-    return data;
+    return data_;
 }
 
 IncrId IncrId::operator++(int) {  // postfix
-    IncrId res(data++);
+    IncrId res(data_++);
     return res;
 }
 
-DecrId::DecrId(int data) : data(data) {
+DecrId::DecrId(int data) : data_(data) {
     assert(data < 0);
 }
 
 DecrId::operator int() const {
-    return data;
+    return data_;
 }
 
 DecrId DecrId::operator--(int) {  // postfix
-    DecrId res(data--);
+    DecrId res(data_--);
     return res;
 }
 }  // namespace Tanks::model

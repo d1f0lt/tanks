@@ -11,7 +11,7 @@ using boost::asio::ip::tcp;
 
 class PlayerActionsHandler {
 public:
-    explicit PlayerActionsHandler(int id,
+    explicit PlayerActionsHandler(int playerId,
                                   ClientModel &model,
                                   tcp::socket &socket);
 
