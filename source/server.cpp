@@ -42,8 +42,8 @@ void Server::listenForNewPlayer() {
         PlayerSkills skills = receiveFrom(sockets_.back());
         int lives = model::receiveInt(sockets_.back());
 
-        int playerId = model_->addPlayer(sockets_.back(), skills, lives);
-        model::sendInt(sockets_.back(), playerId);
+        int id = model_->addPlayer(sockets_.back(), skills, lives);
+        model::sendInt(sockets_.back(), id);
     } catch (boost::system::system_error &) {
     }
 }

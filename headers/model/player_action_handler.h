@@ -11,7 +11,7 @@ using boost::asio::ip::tcp;
 
 class PlayerActionsHandler {
 public:
-    explicit PlayerActionsHandler(int playerId,
+    explicit PlayerActionsHandler(int id,
                                   ClientModel &model,
                                   tcp::socket &socket);
 
@@ -22,9 +22,9 @@ public:
     void shoot(Direction direction);
     void shoot();
 
-    [[nodiscard]] const GameModel &getModel() const;
-
     [[nodiscard]] std::optional<std::reference_wrapper<Tank>> tank();
+
+    [[nodiscard]] const GameModel &getModel() const;
 
 private:
     const int id_;

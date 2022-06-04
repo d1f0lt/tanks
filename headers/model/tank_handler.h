@@ -41,12 +41,6 @@ private:
 class TankHandlerCreator {
 public:
     explicit TankHandlerCreator(GameModel &model);
-
-    TankHandlerCreator(TankHandlerCreator &&) = delete;
-    TankHandlerCreator(const TankHandlerCreator &) = delete;
-    TankHandlerCreator &operator=(TankHandlerCreator &&) = delete;
-    TankHandlerCreator &operator=(const TankHandlerCreator &) = delete;
-
     virtual ~TankHandlerCreator() = default;
 
     [[nodiscard]] virtual std::unique_ptr<TankHandler> createTankHandler(

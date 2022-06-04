@@ -35,33 +35,50 @@ void BasicHandler::destroyEntity() {
     assert(getEntity().getStrength() != 0);
     int left = getEntity().getLeft();
     int top = getEntity().getTop();
-    int entityId = getEntity().getId();
+    int id = getEntity().getId();
     auto &model = getModel();
     model.wasDestroyedBlockThisTurn_ = true;
     getModel().map_.erase(getEntity());
     getModel().eraseEntity(getEntity());
-    model.addEntity(std::make_unique<Floor>(left, top, entityId, model));
+    model.addEntity(std::make_unique<Floor>(left, top, id, model));
 }
 
 BasicHandler *BasicHandler::getActualHandler(Entity &entity) {
     return &entity.getHandler();
 }
 
+// bool BasicHandler::initIfSurvive() {
+//     if (isDieOnCreation()) {
+//         return false;
+//     }
+//     initEntity();
+//     return true;
+// }
+//
+// void BasicHandler::initEntity() {
+// }
+//
+// bool BasicHandler::isDieOnCreation() {
+//     return false;
+// }
+
 std::vector<const Entity *> MovableHandler::look(Direction direction) {
     auto res = lookMutable(direction);
     return {res.begin(), res.end()};
 }
 
-void ForegroundHandler::restoreBackground() {
-    for (int backgroundEntityId : getBackground()) {
-        auto entity = getModel().getById(backgroundEntityId);
+std::vector<int> ForegroundHandler::restoreBackground() {
+    for (int id : getBackground()) {
+        auto entity = getModel().getById(id);
         if (!entity) {
             continue;
         }
         getModel().getMap().exchange(&(entity->get()), &getEntity());
     }
     assert(getModel().getMap().checkRemoved(getEntity()));
+    auto bg = std::move(getBackground());
     getBackground().clear();
+    return bg;
 }
 
 void ForegroundHandler::setBackground() {
@@ -79,17 +96,17 @@ void ForegroundHandler::setBackground() {
     int width = entity.getWidth();
     for (int row = entity.getTop(); row < top + height; row++) {
         for (int col = entity.getLeft(); col < left + width; col++) {
-            auto entityId = getModel().getByCoords(col, row).getId();
-            assert(canStandOn(getModel().getById(entityId)->get()));
-            assert(entityId >= 0);
-            assert(getModel().getById(entityId));
-            assert(!dynamic_cast<MovableEntity *>(
-                &getModel().getById(entityId)->get()));
-            if (setted.find(entityId) != setted.end()) {
+            auto id = getModel().getByCoords(col, row).getId();
+            assert(canStandOn(getModel().getById(id)->get()));
+            assert(id >= 0);
+            assert(getModel().getById(id));
+            assert(
+                !dynamic_cast<MovableEntity *>(&getModel().getById(id)->get()));
+            if (setted.find(id) != setted.end()) {
                 continue;
             }
-            setted.insert(entityId);
-            background.emplace_back(entityId);
+            setted.insert(id);
+            background.emplace_back(id);
         }
     }
     getModel().map_.insert(entity);
@@ -193,28 +210,28 @@ std::vector<int> ForegroundHandler::underTank() {
     int width = entity.getWidth();
     for (int row = entity.getTop(); row < top + height; row++) {
         for (int col = entity.getLeft(); col < left + width; col++) {
-            auto mapEntityId = getModel().getByCoords(col, row).getId();
-            assert(getModel().getById(mapEntityId));
-            auto &entity = getModel().getById(mapEntityId)->get();
+            auto id = getModel().getByCoords(col, row).getId();
+            assert(getModel().getById(id));
+            auto &entity = getModel().getById(id)->get();
             if (!canStandOn(entity)) {
-                assert(canStandOn(getModel().getById(mapEntityId)->get()));
+                assert(canStandOn(getModel().getById(id)->get()));
             }
-            if (setted.find(mapEntityId) != setted.end()) {
+            if (setted.find(id) != setted.end()) {
                 continue;
             }
-            setted.insert(mapEntityId);
+            setted.insert(id);
         }
     }
     return {setted.begin(), setted.end()};
 }
 
 bool ForegroundHandler::isDieOnCreation() {
-    auto underTankIds = underTank();
+    auto bg = underTank();
     std::vector<Projectile *> bullets;
-    for (auto entityId : underTankIds) {
-        assert(getModel().getById(entityId));
-        if (auto *bullet = dynamic_cast<Projectile *>(
-                &getModel().getById(entityId)->get())) {
+    for (auto id : bg) {
+        assert(getModel().getById(id));
+        if (auto *bullet =
+                dynamic_cast<Projectile *>(&getModel().getById(id)->get())) {
             bullets.emplace_back(bullet);
         }
     }
@@ -296,10 +313,6 @@ void ProjectileHandler::destroy(Entity &other) {
         return;
     }
 
-    if (dynamic_cast<Tank *>(&other) != nullptr) {
-        auto &bullet = dynamic_cast<Projectile &>(getEntity());
-        getModel().kills_[bullet.getShooter()]++;
-    }
     getModel().getHandler(other).destroyEntity();
 }
 
@@ -340,8 +353,7 @@ BonusHandler::BonusHandler(GameModel &model, Bonus &entity)
     : ForegroundHandler(model, entity) {
 }
 bool BonusHandler::canStandOn(const Entity &other) const {
-    return other.isTankPassable() &&
-           (dynamic_cast<const Bonus *>(&other) != nullptr);
+    return other.isTankPassable() && (!dynamic_cast<const Bonus *>(&other));
 }
 
 WalkOnWaterHandler::WalkOnWaterHandler(GameModel &model, WalkOnWater &entity)

@@ -32,7 +32,7 @@ public:
     [[nodiscard]] IncrId operator++(int);  // postfix
 
 private:
-    int data_;
+    int data;
 };
 
 struct DecrId {
@@ -43,13 +43,7 @@ public:
     [[nodiscard]] DecrId operator--(int);  // postfix
 
 private:
-    int data_;
-};
-
-struct EntityBlank {
-    int id_;
-    int left_;
-    int top_;
+    int data;
 };
 
 class Entity {

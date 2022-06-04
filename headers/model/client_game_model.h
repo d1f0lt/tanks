@@ -15,12 +15,6 @@ using Menu::PlayerSkills;
 class ClientModel : public GameModel {
 public:
     explicit ClientModel(int playerId, int lives, tcp::socket socket);
-
-    ClientModel(ClientModel &&) = delete;
-    ClientModel(const ClientModel &) = delete;
-    ClientModel &operator=(ClientModel &&) = delete;
-    ClientModel &operator=(const ClientModel &) = delete;
-
     ~ClientModel() noexcept override;
 
     [[nodiscard]] PlayerActionsHandler getHandler();
