@@ -81,11 +81,9 @@ int MediumTankSpawner::getTimeout() {
 
 std::unique_ptr<Event> MediumTankSpawner::createEvent() {
     auto [left, top] = getFreeCoords();
-    const auto &[tankSpeed, reloadTicks, bulletSpeed] =
-        getModel().getPlayerSkills(getEntityId());
+    auto skills = getModel().getPlayerSkills(getEntityId());
     return std::make_unique<TankSpawn>(getEntityId(), left, top,
-                                       EntityType::MEDIUM_TANK, tankSpeed,
-                                       reloadTicks, bulletSpeed);
+                                       EntityType::MEDIUM_TANK, skills);
 }
 
 MediumTankSpawner::MediumTankSpawner(ServerModel &model, int entityId)

@@ -8,6 +8,7 @@
 #endif
 
 namespace Tanks::model {
+
 ClientModel::ClientModel(int playerId, tcp::socket socket)
     : playerId_(playerId),
       socket_(std::move(socket)),

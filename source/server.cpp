@@ -5,6 +5,7 @@
 
 namespace Tanks {
 using boost::asio::ip::tcp;
+using Menu::PlayerSkills;
 Server::Server(const std::string &levelFilename, int bots, int bonuses)
     : /*isStarted(std::make_unique<std::atomic<bool>>(false)),
       isStopped(std::make_unique<std::atomic<bool>>(false)),
@@ -27,14 +28,21 @@ tcp::endpoint Server::getEndpoint() {
     return acceptor_.local_endpoint();
 }
 
+PlayerSkills receiveFrom(tcp::socket &socket) {
+    auto [tankSpeed, reloadTick, bulletSpeed] =
+        model::receiveMultipleInts<int, int, int>(socket);
+    return {tankSpeed, reloadTick, bulletSpeed};
+}
+
 void Server::listenForNewPlayer() {
     try {
         // TODO get skills
         auto socket = acceptor_.accept();
         sockets_.emplace_back(std::move(socket));
         assert(sockets_.size() <= 20);
+        PlayerSkills skills = receiveFrom(sockets_.back());
 
-        int id = model_->addPlayer(sockets_.back(), {});
+        int id = model_->addPlayer(sockets_.back(), skills);
         model::sendInt(sockets_.back(), id);
     } catch (boost::system::system_error &) {
     }

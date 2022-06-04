@@ -207,7 +207,8 @@ ServerModel::ServerModel(const std::string &level, int botsCount, int bonuses) {
 void ServerModel::addBot() {
     auto id = getDecrId();
     bots_.emplace(id);
-    tanksSkills_.emplace(id, PlayerSkills());
+    PlayerSkills skills;
+    tanksSkills_.emplace(id, std::move(skills));
     spawners_.emplace_back(std::make_unique<MediumTankSpawner>(*this, id));
 }
 

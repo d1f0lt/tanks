@@ -10,6 +10,7 @@
 #include "model/player_action_handler.h"
 #include "model/server_game_model.h"
 #include "pause.h"
+#include "player_skills.h"
 #include "server.h"
 #include "view/bullets_view.h"
 #include "view/game_view.h"
@@ -17,6 +18,7 @@
 
 namespace Tanks {
 using boost::asio::ip::tcp;
+using Menu::PlayerSkills;
 
 namespace {
 void makeAction(model::PlayerActionsHandler &player) {
@@ -24,6 +26,11 @@ void makeAction(model::PlayerActionsHandler &player) {
         GameController::makeShot(player);
         GameController::makeMove(player);
     }
+}
+
+void sendSkillsTo(tcp::socket &socket, const PlayerSkills &skills) {
+    model::sendMultipleInts(socket, skills.tankSpeed, skills.bulletSpeed,
+                            skills.reloadTicks);
 }
 
 struct ServerHolder {
@@ -123,6 +130,7 @@ std::optional<Menu::ButtonType>
 startGame(  // NOLINT(readability-function-cognitive-complexity)
     sf::RenderWindow &window,
     int level,
+    PlayerSkills skills,
     std::optional<std::pair<std::string, std::string>> addressPort) {
     const bool isHost = (addressPort == std::nullopt);
     //    addressPort = {"127.0.0.1", "12345"};
@@ -147,6 +155,7 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
                                                addressPort.value().first,
                                                addressPort.value().second));
     }
+    sendSkillsTo(clientSocket, skills);
 
     //    tcp::socket clientSocket(ioContext);
     //    clientSocket.connect(addressPort.value());

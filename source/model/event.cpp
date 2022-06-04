@@ -1,6 +1,7 @@
 #include "model/event.h"
 #include <unordered_map>
 #include "model/network_utils.h"
+#include "player_skills.h"
 
 namespace Tanks::model {
 std::unique_ptr<Event> TankMove::readFrom(
@@ -71,8 +72,9 @@ bool TankSpawn::acceptExecutor(const EventVisitor &executor) {
 std::unique_ptr<Event> TankSpawn::readFrom(tcp::socket &socket) {
     auto [tankId, left, top, type, tankSpeed, bulletSpeed, reloadTicks] =
         receiveMultipleInts<int, int, int, EntityType, int, int, int>(socket);
-    return std::make_unique<TankSpawn>(tankId, left, top, type, tankSpeed,
-                                       bulletSpeed, reloadTicks);
+    return std::make_unique<TankSpawn>(
+        tankId, left, top, type,
+        Menu::PlayerSkills{tankSpeed, bulletSpeed, reloadTicks});
 }
 
 DecrId TankSpawn::getTankId() const {
@@ -90,16 +92,14 @@ TankSpawn::TankSpawn(int tankId,
                      int left,
                      int top,
                      EntityType entityType,
-                     int tankSpeed,
-                     int bulletSpeed,
-                     int reloadTicks)
+                     Menu::PlayerSkills skills)
     : tankId_(tankId),
       left_(left),
       top_(top),
       entityType_(entityType),
-      tankSpeed_(tankSpeed),
-      bulletSpeed_(bulletSpeed),
-      reloadTicks_(reloadTicks) {
+      tankSpeed_(skills.tankSpeed),
+      bulletSpeed_(skills.bulletSpeed),
+      reloadTicks_(skills.reloadTicks) {
 }
 
 EntityType TankSpawn::getEntityType() const {

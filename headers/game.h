@@ -5,12 +5,14 @@
 #include <optional>
 #include <string>
 #include "menu/menu.h"
+#include "player_skills.h"
 
 namespace Tanks {
 
 std::optional<Menu::ButtonType> startGame(
     sf::RenderWindow &window,
     int level = 1,
+    Menu::PlayerSkills skills = Menu::PlayerSkills(),
     std::optional<std::pair<std::string, std::string>> address = std::nullopt);
 
 }

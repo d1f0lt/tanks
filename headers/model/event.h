@@ -7,6 +7,7 @@
 #include <memory>
 #include "entity.h"
 #include "model/event_executor.h"
+#include "player_skills.h"
 
 #ifdef MODEL_LOGS
 #include <fstream>
@@ -63,9 +64,7 @@ public:
                        int left,
                        int top,
                        EntityType entityType,
-                       int tankSpeed,
-                       int bulletSpeed,
-                       int reloadTicks);
+                       Menu::PlayerSkills skills);
 
     [[nodiscard]] EventType getType() const override;
 
