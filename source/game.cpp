@@ -65,6 +65,11 @@ public:
     }
 
     ~ServerHolder() {
+        if (!server_->getIsStarted()) {
+            server_->stop();
+            server_->start();
+            serverStart_->notify_all();
+        }
         server_->stop();
         //        client_.finishGame();
         thread_.join();
