@@ -142,19 +142,6 @@ std::vector<std::vector<const Entity *>> GameModel::getAll() const {
     return res;
 }
 
-void GameModel::nextTick() {
-    if (getIsFinished()) {
-        return;
-    }
-    std::unique_lock lock(getMutex());
-    wasShootThisTurn_ = false;
-    wasDestroyedBlockThisTurn_ = false;
-    executeAllEvents();
-    moveBullets();
-    currentTick_++;
-    condvar_.notify_all();
-}
-
 BasicHandler &GameModel::getHandler(Entity &entity) {
     return *handlers_.at(&entity);
 }
@@ -232,6 +219,14 @@ std::condition_variable &GameModel::getCondvar() {
 
 void GameModel::incrTick(int add) {
     currentTick_ += add;
+}
+
+void GameModel::setWasShootThisTurn(bool wasShootThisTurn) {
+    wasShootThisTurn_ = wasShootThisTurn;
+}
+
+void GameModel::setWasDestroyedBlockThisTurn(bool wasDestroyedBlockThisTurn) {
+    wasDestroyedBlockThisTurn_ = wasDestroyedBlockThisTurn;
 }
 
 // TODO

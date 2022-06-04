@@ -58,8 +58,7 @@ void ClientModel::executeAllEvents() {
 #endif
     std::unique_ptr<Event> event;
     int cnt = -1;
-    //    int ticks = std::max(1, static_cast<int>(tickSize_.Size()));
-    int ticks = static_cast<int>(tickSize_.Size()) + 1;
+    int ticks = std::max(1, static_cast<int>(tickSize_.Size()));
     for (int i = 0; i < ticks && !getIsFinished(); i++) {
         if (!tickSize_.ConsumeSync(cnt)) {
             return;
@@ -74,9 +73,9 @@ void ClientModel::executeAllEvents() {
 #endif
             executeEvent(*event);
         }
+        moveBullets();
         incrTick();
     }
-    incrTick(-1);
 }
 
 ClientModel::~ClientModel() noexcept {
@@ -99,6 +98,18 @@ void ClientModel::finishGame() noexcept {
     std::unique_lock lock(getMutex());
     safeShutdown(socket_);
     receiver_.join();
+}
 
-}  // namespace Tanks::model
+void ClientModel::nextTick() {
+    if (getIsFinished()) {
+        return;
+    }
+    std::unique_lock lock(getMutex());
+    setWasDestroyedBlockThisTurn(false);
+    setWasShootThisTurn(false);
+    executeAllEvents();
+    lock.unlock();
+    getCondvar().notify_all();
+}
+// namespace Tanks::model
 }  // namespace Tanks::model

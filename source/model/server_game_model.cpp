@@ -24,6 +24,20 @@ int ServerModel::addPlayer(tcp::socket &socket, PlayerSkills skills) {
     return id;
 }
 
+void ServerModel::nextTick() {
+    if (getIsFinished()) {
+        return;
+    }
+    std::unique_lock lock(getMutex());
+    setWasShootThisTurn(false);
+    setWasDestroyedBlockThisTurn(false);
+    executeAllEvents();
+    moveBullets();
+    incrTick();
+    lock.unlock();
+    getCondvar().notify_all();
+}
+
 void ServerModel::receiveTurns(tcp::socket &socket) {
     try {
         while (!getIsFinished()) {

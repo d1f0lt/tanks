@@ -4,7 +4,7 @@
 namespace Tanks::model {
 class Event;
 class TankMove;
-class SpawnTank;
+class TankSpawn;
 class BonusSpawn;
 class TankShoot;
 class SetPosition;

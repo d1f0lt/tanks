@@ -30,6 +30,8 @@ public:
 
     [[nodiscard]] PlayerSkills getPlayerSkills(int id) const;
 
+    void nextTick() override;
+
 protected:
     void addEvent(std::unique_ptr<Event> event);
     struct Player {

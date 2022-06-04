@@ -47,7 +47,7 @@ std::unique_ptr<Event> readEvent(boost::asio::ip::tcp::socket &socket) {
                                std::unique_ptr<Event> (*)(tcp::socket &)>
                 tmp;
             tmp[EventType::TANK_MOVE] = TankMove::readFrom;
-            tmp[EventType::SPAWN_TANK] = SpawnTank::readFrom;
+            tmp[EventType::SPAWN_TANK] = TankSpawn::readFrom;
             tmp[EventType::BONUS_SPAWN] = BonusSpawn::readFrom;
             tmp[EventType::SET_POSITION] = SetPosition::readFrom;
             tmp[EventType::TANK_SHOOT] = TankShoot::readFrom;
@@ -59,34 +59,34 @@ std::unique_ptr<Event> readEvent(boost::asio::ip::tcp::socket &socket) {
     return readers.at(type)(socket);
 }
 
-void SpawnTank::sendTo(boost::asio::ip::tcp::socket &socket) const {
+void TankSpawn::sendTo(boost::asio::ip::tcp::socket &socket) const {
     sendMultipleInts(socket, EventType::SPAWN_TANK, tankId_, left_, top_,
                      entityType_, tankSpeed_, bulletSpeed_, reloadTicks_);
 }
 
-bool SpawnTank::acceptExecutor(const EventVisitor &executor) {
+bool TankSpawn::acceptExecutor(const EventVisitor &executor) {
     return executor.visit(*this);
 }
 
-std::unique_ptr<Event> SpawnTank::readFrom(tcp::socket &socket) {
+std::unique_ptr<Event> TankSpawn::readFrom(tcp::socket &socket) {
     auto [tankId, left, top, type, tankSpeed, bulletSpeed, reloadTicks] =
         receiveMultipleInts<int, int, int, EntityType, int, int, int>(socket);
-    return std::make_unique<SpawnTank>(tankId, left, top, type, tankSpeed,
+    return std::make_unique<TankSpawn>(tankId, left, top, type, tankSpeed,
                                        bulletSpeed, reloadTicks);
 }
 
-DecrId SpawnTank::getTankId() const {
+DecrId TankSpawn::getTankId() const {
     return tankId_;
 }
-int SpawnTank::getLeft() const {
+int TankSpawn::getLeft() const {
     return left_;
 }
 
-int SpawnTank::getTop() const {
+int TankSpawn::getTop() const {
     return top_;
 }
 
-SpawnTank::SpawnTank(int tankId,
+TankSpawn::TankSpawn(int tankId,
                      int left,
                      int top,
                      EntityType entityType,
@@ -102,23 +102,23 @@ SpawnTank::SpawnTank(int tankId,
       reloadTicks_(reloadTicks) {
 }
 
-EntityType SpawnTank::getEntityType() const {
+EntityType TankSpawn::getEntityType() const {
     return entityType_;
 }
 
-int SpawnTank::getTankSpeed() const {
+int TankSpawn::getTankSpeed() const {
     return tankSpeed_;
 }
 
-int SpawnTank::getBulletSpeed() const {
+int TankSpawn::getBulletSpeed() const {
     return bulletSpeed_;
 }
 
-int SpawnTank::getReloadTicks() const {
+int TankSpawn::getReloadTicks() const {
     return reloadTicks_;
 }
 
-EventType SpawnTank::getType() const {
+EventType TankSpawn::getType() const {
     return EventType::SPAWN_TANK;
 }
 

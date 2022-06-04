@@ -10,6 +10,7 @@
 
 #ifdef MODEL_LOGS
 #include <fstream>
+#include "event.h"
 #endif
 
 namespace Tanks::model {
@@ -56,9 +57,9 @@ private:
     const int speed_;
 };
 
-class SpawnTank : public Event {
+class TankSpawn : public Event {
 public:
-    explicit SpawnTank(int tankId,
+    explicit TankSpawn(int tankId,
                        int left,
                        int top,
                        EntityType entityType,
@@ -231,7 +232,7 @@ inline void printEvent(const Event &event, std::ofstream &file) {
                           move.getDirection(), move.getSpeed());
         } break;
         case EventType::SPAWN_TANK: {
-            auto &spawn = dynamic_cast<const SpawnTank &>(event);
+            auto &spawn = dynamic_cast<const TankSpawn &>(event);
             printManyInts(file, spawn.getType(), spawn.getTankId(),
                           spawn.getEntityType(), spawn.getLeft(),
                           spawn.getTop(), spawn.getReloadTicks(),

@@ -4,6 +4,7 @@
 #include <boost/asio/connect.hpp>
 #include <thread>
 #include "doctest.h"
+#include "model/bonus.h"
 #include "model/client_game_model.h"
 #include "model/network_utils.h"
 #include "model/projectile.h"
@@ -108,6 +109,22 @@ bool operator==(const Entity &a, const Entity &b) {
         a.isBulletPassable() != b.isBulletPassable()) {
         CHECK(false);
         return false;
+    }
+    if (const auto *bullet1 = dynamic_cast<const Projectile *>(&a)) {
+        const auto *bullet2 = dynamic_cast<const Projectile *>(&b);
+        CHECK(bullet2 != nullptr);
+        CHECK(bullet1->getSpeed() == bullet2->getSpeed());
+    }
+    if (const auto *tank1 = dynamic_cast<const Tank *>(&a)) {
+        const auto *tank2 = dynamic_cast<const Tank *>(&b);
+        CHECK(tank2 != nullptr);
+        CHECK(tank1->getReloadTicks() == tank2->getReloadTicks());
+        CHECK(tank1->getBulletSpeed() == tank2->getBulletSpeed());
+        CHECK(tank1->getSpeed() == tank2->getSpeed());
+    }
+    if (const auto *bonus1 = dynamic_cast<const Bonus *>(&a)) {
+        const auto *bonus2 = dynamic_cast<const Bonus *>(&b);
+        CHECK(bonus2 != nullptr);
     }
     return true;
 }
@@ -810,6 +827,48 @@ void userMover(tcp::acceptor &acceptor,
         }
     } catch (boost::system::system_error &) {
     }
+}
+
+TEST_CASE("1 user 30 bots 10 bonuses, check correction") {
+    INIT_GAME_FULL(1, 30, 10);
+    constexpr int CLIENTS = 1;
+#ifdef MODEL_BIG_TESTS
+    constexpr int TICKS = 1e3;
+#else
+    constexpr int TICKS = 1e2;
+#endif
+
+    //    std::mt19937 rnd(
+    //        std::chrono::steady_clock::now().time_since_epoch().count());
+    std::mt19937 rnd{0};
+    std::thread([&]() { userReceiver(acceptor, serverModel); }).detach();
+    std::mutex vec_mutex;
+    std::vector<std::reference_wrapper<ClientModel> > vec;
+    vec.reserve(CLIENTS);
+    for (int i = 0; i < CLIENTS; i++) {
+        std::thread([&]() {
+            userMover(acceptor, vec_mutex, vec, rnd);
+        }).detach();
+    }
+    std::this_thread::sleep_for(std::chrono::seconds(5));
+    int sleeps = 0;
+    for (int i = 0; i < TICKS; i++) {
+        try {
+            serverModel.nextTick();
+        } catch (boost::system::system_error &e) {
+            std::cerr << e.what() << std::endl;
+        }
+        for (auto &mod : vec) {
+            while (mod.get().getTick() != serverModel.getTick()) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(15));
+                sleeps++;
+                //                CHECK(cnt < 10);
+            }
+            CHECK(differences(serverModel, mod) == 0);
+        }
+    }
+    serverModel.finishGame();
+    std::cout << "sleeps: " << sleeps;
 }
 
 TEST_CASE("10 users 30 bots 10 bonuses, check correction") {

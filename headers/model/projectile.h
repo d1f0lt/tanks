@@ -12,7 +12,8 @@ public:
                         Direction direction,
                         GameModel &model,
                         IncrId entityId,
-                        int speed);
+                        int speed,
+                        int tank);
 
     [[nodiscard]] EntityType getType() const override;
     [[nodiscard]] int getWidth() const override;
@@ -24,6 +25,7 @@ public:
 
 private:
     const int speed_;
+    const int tank_;
 };
 }  // namespace Tanks::model
 

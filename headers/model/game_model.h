@@ -43,7 +43,7 @@ public:
     [[nodiscard]] std::optional<std::reference_wrapper<Entity>> getById(
         int entityId);
 
-    void nextTick();
+    virtual void nextTick() = 0;
 
     void loadLevel(int level);
     void loadLevel(const std::string &filename);
@@ -81,15 +81,17 @@ protected:
     [[nodiscard]] bool getIsFinished() const;
 
     void setFinished();
-
     void incrTick(int add = 1);
+
+    void setWasShootThisTurn(bool wasShootThisTurn);
+    void setWasDestroyedBlockThisTurn(bool wasDestroyedBlockThisTurn);
 
 private:
     GameMap map_;
     GroupedEntities groupedEntities_;
     std::unordered_map<int, Entity *> byId_;
     std::unordered_map<Entity *, BasicHandler *> handlers_;
-    int currentTick_ = 0;
+    std::atomic<int> currentTick_ = 0;
     IncrId currentId_{0};
     std::mt19937 rnd{42};
     EntityHolder entityHolder_;

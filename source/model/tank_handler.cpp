@@ -34,7 +34,7 @@ void TankHandler::shoot() {
         getEntity().getLeft() + DIFF_LEFT.at(tank.getDirection()),
         getEntity().getTop() + DIFF_TOP.at(tank.getDirection()),
         tank.getDirection(), getModel(), getModel().getIncrId(),
-        tank.getBulletSpeed());
+        tank.getBulletSpeed(), tank.getId());
 
     auto &handler =
         dynamic_cast<ProjectileHandler &>(getModel().getHandler(*projectile));

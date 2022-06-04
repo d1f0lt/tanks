@@ -9,13 +9,15 @@ Projectile::Projectile(int left,
                        Direction direction,
                        GameModel &model,
                        IncrId entityId,
-                       int speed)
+                       int speed,
+                       int tank)
     : MovableEntity(left,
                     top,
                     entityId,
                     std::make_unique<ProjectileHandler>(model, *this),
                     direction),
-      speed_(speed) {
+      speed_(speed),
+      tank_(tank) {
 }
 
 EntityType Projectile::getType() const {

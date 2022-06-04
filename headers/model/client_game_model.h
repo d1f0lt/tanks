@@ -20,6 +20,8 @@ public:
     [[nodiscard]] std::optional<std::reference_wrapper<Tank>> tank();
     void finishGame() noexcept override;
 
+    void nextTick() override;
+
 protected:
     void receiveEvents();
     void executeAllEvents() override;

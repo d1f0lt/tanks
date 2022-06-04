@@ -25,7 +25,7 @@ bool EventExecutor::visit(TankMove &event) const {
     return true;
 }
 
-bool EventExecutor::visit(SpawnTank &event) const {
+bool EventExecutor::visit(TankSpawn &event) const {
     if (getModel().getById(event.getTankId())) {
         return false;
     }
