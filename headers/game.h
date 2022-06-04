@@ -13,6 +13,7 @@ std::optional<Menu::ButtonType> startGame(
     sf::RenderWindow &window,
     Menu::PlayerInfo &info,
     Sound::BackgroundMusicHolder &backgroundMusicHolder,
+    const sf::Sprite &backgroundSprite,
     int level = 1,
     std::optional<std::string> address = std::nullopt);
 

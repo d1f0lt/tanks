@@ -3,6 +3,8 @@
 #include "constants.h"
 #include "game.h"
 #include "sound/background_music.h"
+#include "menu/settings_menu.h"
+#include "pause.h"
 
 namespace Tanks::Menu {
 
@@ -61,7 +63,7 @@ ButtonType showLevelsMenu(sf::RenderWindow &window,
                     continue;
                 }
                 backgroundMusicHolder.stop();
-                auto ans = startGame(window, info, backgroundMusicHolder, std::stoi(item->getDescription()));
+                auto ans = startGame(window, info, backgroundMusicHolder, backgroundSprite, std::stoi(item->getDescription()));
                 assert(ans != std::nullopt);
                 switch (ans.value()) {
                     case ButtonType::EXIT:
