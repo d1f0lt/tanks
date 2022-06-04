@@ -228,6 +228,13 @@ void GameModel::setWasShootThisTurn(bool wasShootThisTurn) {
 void GameModel::setWasDestroyedBlockThisTurn(bool wasDestroyedBlockThisTurn) {
     wasDestroyedBlockThisTurn_ = wasDestroyedBlockThisTurn;
 }
+void GameModel::setWasTankDestroyed(bool wasTankDestroyed) {
+    GameModel::wasTankDestroyed_ = wasTankDestroyed;
+}
+
+bool GameModel::wasTankDestroyedThisTurn() const {
+    return wasTankDestroyed_;
+}
 
 // TODO
 // PlayerSkillsTmp GameModel::getPlayerSkills(int id) {

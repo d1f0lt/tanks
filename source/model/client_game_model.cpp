@@ -102,6 +102,7 @@ void ClientModel::nextTick() {
     std::unique_lock lock(getMutex());
     setWasDestroyedBlockThisTurn(false);
     setWasShootThisTurn(false);
+    setWasTankDestroyed(false);
     executeAllEvents();
     lock.unlock();
     getCondvar().notify_all();

@@ -8,7 +8,10 @@ namespace Tanks {
 using boost::asio::ip::tcp;
 class Server {
 public:
-    explicit Server(const std::string &levelFilename, int bots, int bonuses);
+    explicit Server(const std::string &levelFilename,
+                    int bots,
+                    int bonuses,
+                    int level);
 
     void stop();
     void start();
@@ -16,6 +19,7 @@ public:
     [[nodiscard]] tcp::endpoint getEndpoint();
     [[nodiscard]] bool getIsStopped() const;
     [[nodiscard]] bool getIsStarted() const;
+    [[nodiscard]] int getLevel() const;
 
     void listenForNewPlayer();
 
@@ -28,6 +32,7 @@ private:
     tcp::acceptor acceptor_;
     std::vector<tcp::socket> sockets_;
     std::unique_ptr<model::ServerModel> model_;
+    const int level_;
 
     void work();
 };

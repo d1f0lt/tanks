@@ -101,6 +101,11 @@ bool TankHandler::isShootingThisTick() const {
     return getModel().getTick() == lastShootTick_;
 }
 
+void TankHandler::destroyEntity() {
+    getModel().setWasTankDestroyed(true);
+    ForegroundHandler::destroyEntity();
+}
+
 void TankMovableOnWaterHandler::stopBonus() {
 }
 

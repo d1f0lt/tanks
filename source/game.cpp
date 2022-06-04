@@ -85,13 +85,14 @@ void serverImp(const std::string &filename,
                int players,
                int bots,
                int bonuses,
+               int level,
                std::condition_variable *&condvarOnClient,
                std::atomic<bool> &isServerCreated,
                std::unique_ptr<Server> &serverOnClient,
                std::condition_variable &serverOnClientInitiallized) {
     std::condition_variable cv;
     condvarOnClient = &cv;
-    auto serverTmp = std::make_unique<Server>(filename, bots, bonuses);
+    auto serverTmp = std::make_unique<Server>(filename, bots, bonuses, level);
     serverOnClient = std::move(serverTmp);
     Server *server = serverOnClient.get();
     isServerCreated = true;
@@ -110,7 +111,8 @@ void serverImp(const std::string &filename,
 }
 
 std::unique_ptr<ServerHolder> createServer(const std::string levelFilename,
-                                           int players) {
+                                           int players,
+                                           int level) {
     std::condition_variable *startServer = nullptr;
     std::unique_ptr<Server> serverPtr = nullptr;
     std::condition_variable serverCreatedCv;
@@ -118,7 +120,7 @@ std::unique_ptr<ServerHolder> createServer(const std::string levelFilename,
     std::atomic<bool> isServerCreated = false;
 
     auto serverThread = std::thread([&]() {
-        serverImp(levelFilename, players, BOTS, BONUSES, startServer,
+        serverImp(levelFilename, players, BOTS, BONUSES, level, startServer,
                   isServerCreated, serverPtr, serverCreatedCv);
     });
     std::mutex mutex;
@@ -143,8 +145,6 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
     //    addressPort = {"127.0.0.1", "12345"};
 
     static const std::string imagesPath = "../images/";
-    const std::string levelFilename("../levels/level" + std::to_string(level) +
-                                    ".csv");
 
     //    static_assert(std::is_move_constructible_v<Server>);
     boost::asio::io_context ioContext;
@@ -154,7 +154,10 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
 
     std::unique_ptr<ServerHolder> serverHolder = nullptr;
     if (isHost) {
-        serverHolder = createServer(levelFilename, players);
+        const std::string levelFilename("../levels/level" +
+                                        std::to_string(level) + ".csv");
+        assert(level >= 1);
+        serverHolder = createServer(levelFilename, players, level);
         endpoint = serverHolder->getServer().getEndpoint();
         clientSocket.connect(endpoint);
     } else {
@@ -165,13 +168,15 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
     sendSkillsTo(clientSocket, skills);
     model::sendInt(clientSocket, skills.lifeAmount);
 
-    //    tcp::socket clientSocket(ioContext);
-    //    clientSocket.connect(addressPort.value());
-
     int playerId = model::receiveInt(clientSocket);
     assert(playerId < 0);
 
-    model::ClientModel model(playerId, static_cast<int>(skills.lifeAmount), std::move(clientSocket));
+    level = model::receiveInt(clientSocket);
+
+    const std::string levelFilename("../levels/level" + std::to_string(level) +
+                                    ".csv");
+
+    model::ClientModel model(playerId, skills.lifeAmount, std::move(clientSocket));
     model.loadLevel(levelFilename);
 
     View::TankSpriteHolder greenTankView(imagesPath + "tanks/green_tank.png");

@@ -58,6 +58,7 @@ public:
 
     [[nodiscard]] bool wasShootThisTurn() const;
     [[nodiscard]] bool wasDestroyedBlockThisTurn() const;
+    [[nodiscard]] bool wasTankDestroyedThisTurn() const;
 
 protected:
     void addEntity(std::unique_ptr<Entity> entity);
@@ -86,6 +87,9 @@ protected:
     void setWasShootThisTurn(bool wasShootThisTurn);
     void setWasDestroyedBlockThisTurn(bool wasDestroyedBlockThisTurn);
 
+public:
+    void setWasTankDestroyed(bool wasTankDestroyed);
+
 private:
     GameMap map_;
     GroupedEntities groupedEntities_;
@@ -99,6 +103,7 @@ private:
 
     bool wasShootThisTurn_ = false;
     bool wasDestroyedBlockThisTurn_ = false;
+    bool wasTankDestroyed_ = false;
     std::atomic<bool> isFinished_ = false;
 
     mutable std::mutex modelMutex_;

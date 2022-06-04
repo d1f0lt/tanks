@@ -34,6 +34,7 @@ void ServerModel::nextTick() {
     std::unique_lock lock(getMutex());
     setWasShootThisTurn(false);
     setWasDestroyedBlockThisTurn(false);
+    setWasTankDestroyed(false);
     executeAllEvents();
     moveBullets();
     incrTick();
