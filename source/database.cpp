@@ -128,7 +128,7 @@ PlayerGeneral PlayersDatabase::getGeneralInfoByName(
 
 PlayerSkills PlayersDatabase::getSkillsInfoByName(const std::string &username) {
     const std::string request =
-        "SELECT tank_speed, bullet_speed, reload_ticks FROM skills" +
+        "SELECT tank_speed, bullet_speed, reload_ticks, number_of_life FROM skills" +
         requestEnd(username);
     bool flag = isConnected();
     connect();
@@ -138,6 +138,7 @@ PlayerSkills PlayersDatabase::getSkillsInfoByName(const std::string &username) {
     res.tankSpeed = sqlite3_column_int(stmt, 0);
     res.bulletSpeed = sqlite3_column_int(stmt, 1);
     res.reloadTicks = sqlite3_column_int(stmt, 2);
+    res.lifeAmount = sqlite3_column_int(stmt, 3);
     sqlite3_finalize(stmt);
     if (!flag) {
         disconnectFromDatabase();
@@ -233,7 +234,8 @@ std::vector<std::string> PlayersDatabase::getAllUsernames() {
 
 namespace {
 
-std::string convert(int64_t val) {
+template <typename T>
+std::string convert(T val) {
     return std::to_string(val) + ',';
 }
 
@@ -246,11 +248,11 @@ std::string playersAddRequest(PlayerGeneral &info) {
 std::string skillsAddRequest(PlayerInfo &info) {
     auto &skills = info.skills;
     std::string req =
-        "INSERT INTO skills (name,tank_speed,bullet_speed,reload_ticks) "
+        "INSERT INTO skills (name,tank_speed,bullet_speed,reload_ticks,number_of_life) "
         "VALUES(";
     req += "'" + info.general.name + "',";
     req += convert(skills.tankSpeed) + convert(skills.bulletSpeed) +
-           std::to_string(skills.reloadTicks) + ");";
+           convert(skills.reloadTicks) + std::to_string(skills.lifeAmount) + ");";
     return req;
 }
 
@@ -307,9 +309,10 @@ std::string playersUpdateRequest(PlayerGeneral &info) {
 std::string skillsUpdateRequest(PlayerInfo &playerInfo) {
     auto &info = playerInfo.skills;
     std::string request =
-        "UPDATE skills SET tank_speed = " + std::to_string(info.tankSpeed) +
-        ", bullet_speed = " + std::to_string(info.bulletSpeed) +
-        ", reload_ticks = " + std::to_string(info.reloadTicks) +
+        "UPDATE skills SET tank_speed = " + convert(info.tankSpeed) +
+        "bullet_speed = " + convert(info.bulletSpeed) +
+        "reload_ticks = " + convert(info.reloadTicks) +
+        "number_of_life = " + std::to_string(info.lifeAmount) +
         requestEnd(playerInfo.general.name);
     return request;
 }

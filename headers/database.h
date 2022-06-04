@@ -47,21 +47,22 @@ struct PlayerGeneral {
 };
 
 struct PlayerSettings {
-    int musicVolume = 50;
-    int soundsVolume = 50;
+    size_t musicVolume = 50;
+    size_t soundsVolume = 50;
 };
 
 struct PlayerSkills {
-    int tankSpeed = DEFAULT_TANK_SPEED;
-    int bulletSpeed = DEFAULT_BULLET_SPEED;
-    int reloadTicks = DEFAULT_RELOAD_TICKS;
+    size_t tankSpeed = DEFAULT_TANK_SPEED;
+    size_t bulletSpeed = DEFAULT_BULLET_SPEED;
+    size_t reloadTicks = DEFAULT_RELOAD_TICKS;
+    size_t lifeAmount = DEFAULT_LIVES_AMOUNT;
 };
 
 struct PlayerRating {
-    int kills = 0;
-    int deaths = 0;
-    int wins = 0;
-    int defeats = 0;
+    size_t kills = 0;
+    size_t deaths = 0;
+    size_t wins = 0;
+    size_t defeats = 0;
 };
 
 struct PlayerAllRating {

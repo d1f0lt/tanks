@@ -157,6 +157,7 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
     model.loadLevel(levelFilename);
 
     View::TankSpriteHolder greenTankView(imagesPath + "tanks/green_tank.png");
+//    View::TankSpriteHolder redTankView(imagesPath + "tanks/green_tank.png");
 
     View::BulletsSpriteHolder bulletsView(imagesPath + "bullet.png");
 

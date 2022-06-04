@@ -37,11 +37,14 @@ public:
     [[nodiscard]] virtual sf::Vector2<float> getPosition() const = 0;
     [[nodiscard]] const sf::Vector2<float> &getStandardPosition() const;
 
+
     void setStandardPosition(const sf::Vector2<float> &newPosition);
     virtual void setPosition(sf::Vector2<float> newPosition) = 0;
     void move(const sf::Vector2<float> &distance);
 
-    void centralizeByWidth(
+    void updateStandardPosition();
+
+        void centralizeByWidth(
         const std::pair<float, float> &rectangleCoordinatesX);
     void centralizeByHeight(
         const std::pair<float, float> &rectangleCoordinatesY);

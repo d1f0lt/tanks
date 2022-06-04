@@ -69,6 +69,10 @@ void MenuItem::setStandardPosition(const sf::Vector2<float> &newPosition) {
     standardCoordinates = newPosition;
 }
 
+void MenuItem::updateStandardPosition() {
+    setStandardPosition(getPosition());
+}
+
 void MenuItem::move(const sf::Vector2<float> &distance) {
     setPosition(sf::Vector2<float>(getPosition().x + distance.x,
                                    getPosition().y + distance.y));
