@@ -22,10 +22,26 @@ std::string toString(double num) {
     return res;
 }
 
+template <typename T>
+void initInscription(
+    const std::string &newInscription,
+    InscriptionInfo &info,
+    T value,
+    std::vector<std::unique_ptr<MenuInscription>> &leftItems,
+    std::vector<std::unique_ptr<MenuInscription>> &rightItems) {
+    info.inscription = newInscription;
+    addItemToVector(leftItems, info);
+    if constexpr (!(std::is_same<T, std::string>::value)) {
+        info.inscription = std::to_string(value);
+    } else {
+        info.inscription = value;
+    }
+    addItemToVector(rightItems, info);
+}
+
 std::unique_ptr<OwningRectangle> initRectangle(const std::string &titleText,
                                                const sf::Color &textColor,
-                                               int killsCount,
-                                               int deathCount) {
+                                               PlayerRating &rating) {
     const static size_t titleCharacterSize = 60;
     InscriptionInfo titleInfo{titleText, titleCharacterSize, textColor};
     auto title =
@@ -35,23 +51,20 @@ std::unique_ptr<OwningRectangle> initRectangle(const std::string &titleText,
     std::vector<std::unique_ptr<MenuInscription>> leftItems;
     std::vector<std::unique_ptr<MenuInscription>> rightItems;
 
-    InscriptionInfo info{"Number of kills:", textCharacterSize, textColor};
-    addItemToVector(leftItems, info);
-    info.inscription = std::to_string(killsCount);
-    addItemToVector(rightItems, info);
+    InscriptionInfo info{"", textCharacterSize, textColor};
+    initInscription("Kills:", info, rating.kills, leftItems, rightItems);
 
-    info.inscription = "Number of deaths:";
-    addItemToVector(leftItems, info);
-    info.inscription = std::to_string(deathCount);
-    addItemToVector(rightItems, info);
+    initInscription("Deaths:", info, rating.deaths, leftItems, rightItems);
 
-    info.inscription = "Rating:";
-    addItemToVector(leftItems, info);
-    info.inscription =
-        (deathCount == 0
-             ? std::to_string(killsCount)
-             : toString(static_cast<double>(killsCount) / deathCount));
-    addItemToVector(rightItems, info);
+    std::string value =
+        (rating.deaths == 0
+             ? std::to_string(rating.kills)
+             : toString(static_cast<double>(rating.kills) / rating.deaths));
+    initInscription("Rating:", info, value, leftItems, rightItems);
+
+    initInscription("Wins:", info, rating.wins, leftItems, rightItems);
+
+    initInscription("Defeats:", info, rating.defeats, leftItems, rightItems);
 
     static sf::Color backgroundColor{0, 0, 0, 192};
 
@@ -72,11 +85,9 @@ Menu initMenu(const std::string &imagesPath, PlayerInfo &playerInfo) {
         titleInfo, sf::Vector2<float>{100, 100});
 
     auto singlePlayer =
-        initRectangle("Single player", textColor, rating.singlePlayerKills,
-                      rating.singlePlayerDeath);
+        initRectangle("Single player", textColor, rating.singlePlayer);
     auto multiplayer =
-        initRectangle("Multiplayer", textColor, rating.multiplayerKills,
-                      rating.multiplayerDeath);
+        initRectangle("Multiplayer", textColor, rating.multiplayer);
 
     const static size_t marginBetweenStats = 200;
     sf::Vector2<float> curCoordinates{

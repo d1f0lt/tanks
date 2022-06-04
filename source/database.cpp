@@ -102,12 +102,18 @@ PlayerInfo PlayersDatabase::getInfoByName(const std::string &username) {
     return res;
 }
 
+namespace {
+std::string requestEnd(const std::string &username) {
+    return " WHERE name = '" + username + "';";
+}
+}  // namespace
+
 PlayerGeneral PlayersDatabase::getGeneralInfoByName(
     const std::string &username) {
     bool flag = isConnected();
     connect();
     const std::string request =
-        "SELECT name, money FROM players WHERE name = '" + username + "';";
+        "SELECT name, money FROM players" + requestEnd(username);
     PlayerGeneral res;
     res.name = username;
     sqlite3_prepare_v2(db, request.c_str(), -1, &stmt, nullptr);
@@ -122,9 +128,8 @@ PlayerGeneral PlayersDatabase::getGeneralInfoByName(
 
 PlayerSkills PlayersDatabase::getSkillsInfoByName(const std::string &username) {
     const std::string request =
-        "SELECT tank_speed, bullet_speed, reload_ticks FROM skills WHERE name "
-        "= '" +
-        username + "';";
+        "SELECT tank_speed, bullet_speed, reload_ticks FROM skills" +
+        requestEnd(username);
     bool flag = isConnected();
     connect();
     PlayerSkills res;
@@ -143,8 +148,8 @@ PlayerSkills PlayersDatabase::getSkillsInfoByName(const std::string &username) {
 PlayerSettings PlayersDatabase::getSettingsInfoByName(
     const std::string &username) {
     const std::string request =
-        "SELECT music_volume, sounds_volume FROM settings WHERE name = '" +
-        username + "';";
+        "SELECT music_volume, sounds_volume FROM settings" +
+        requestEnd(username);
     bool flag = isConnected();
     connect();
     PlayerSettings res;
@@ -159,19 +164,46 @@ PlayerSettings PlayersDatabase::getSettingsInfoByName(
     return res;
 }
 
-PlayerRating PlayersDatabase::getRatingInfoByName(const std::string &username) {
-    const std::string request =
-        "SELECT * FROM rating WHERE name = '" + username + "';";
+namespace {
+
+std::string getSelectRequestForRatingByName(
+    const std::string &username,  // NOLINT
+    const std::string &mode) {
+    std::string res = "SELECT " + mode + "_kills, " + mode + "_deaths, " +
+                      mode + "_wins, " + mode + "_defeats ";
+    res += "FROM rating" + requestEnd(username);
+    return res;
+}
+
+}  // namespace
+
+PlayerRating PlayersDatabase::getRatingInfoByName(const std::string &username,
+                                                  const std::string &mode) {
+    const std::string request = getSelectRequestForRatingByName(username, mode);
     bool flag = isConnected();
     connect();
     PlayerRating res;
     sqlite3_prepare_v2(db, request.c_str(), -1, &stmt, nullptr);
     sqlite3_step(stmt);
-    res.singlePlayerKills = sqlite3_column_int(stmt, 1);
-    res.singlePlayerDeath = sqlite3_column_int(stmt, 2);
-    res.multiplayerKills = sqlite3_column_int(stmt, 3);
-    res.multiplayerDeath = sqlite3_column_int(stmt, 4);
+    res.kills = sqlite3_column_int(stmt, 0);
+    res.deaths = sqlite3_column_int(stmt, 1);
+    res.wins = sqlite3_column_int(stmt, 2);
+    res.defeats = sqlite3_column_int(stmt, 3);
     sqlite3_finalize(stmt);
+    if (!flag) {
+        disconnectFromDatabase();
+    }
+    return res;
+}
+
+PlayerAllRating PlayersDatabase::getRatingInfoByName(
+    const std::string &username) {
+    const std::string request = "SELECT * FROM rating" + requestEnd(username);
+    bool flag = isConnected();
+    connect();
+    PlayerAllRating res;
+    res.singlePlayer = getRatingInfoByName(username, "single_player");
+    res.multiplayer = getRatingInfoByName(username, "multiplayer");
     if (!flag) {
         disconnectFromDatabase();
     }
@@ -234,14 +266,13 @@ std::string settingsAddRequest(PlayerInfo &info) {
 
 std::string ratingAddRequest(PlayerInfo &info) {
     auto &rat = info.rating;
-    std::string req =
-        "INSERT INTO rating "
-        "(name,single_player_kills,single_player_deaths,"
-        "multiplayer_kills,multiplayer_deaths) VALUES(";
+    std::string req = "INSERT INTO rating VALUES(";
     req += "'" + info.general.name + "',";
-    req += convert(rat.singlePlayerKills) + convert(rat.singlePlayerDeath) +
-           convert(rat.multiplayerKills) +
-           std::to_string(rat.multiplayerDeath) + ");";
+    req += convert(rat.singlePlayer.kills) + convert(rat.singlePlayer.deaths) +
+           convert(rat.singlePlayer.wins) + convert(rat.singlePlayer.defeats) +
+           convert(rat.multiplayer.kills) + convert(rat.multiplayer.deaths) +
+           convert(rat.multiplayer.wins) +
+           std::to_string(rat.multiplayer.defeats) + ");";
     return req;
 }
 
@@ -265,10 +296,6 @@ void PlayersDatabase::insert(const std::string &name) {
 }
 
 namespace {
-
-std::string requestEnd(const std::string &username) {
-    return " where name = '" + username + "';";
-}
 
 std::string playersUpdateRequest(PlayerGeneral &info) {
     std::string request =
@@ -297,13 +324,17 @@ std::string settingsUpdateRequest(PlayerInfo &playerInfo) {
 }
 
 std::string ratingUpdateRequest(PlayerInfo &playerInfo) {
-    auto &info = playerInfo.rating;
+    auto &rat = playerInfo.rating;
     std::string request =
         "UPDATE rating SET single_player_kills = " +
-        convert(info.singlePlayerKills) +
-        "single_player_deaths = " + convert(info.singlePlayerDeath) +
-        "multiplayer_kills = " + convert(info.multiplayerKills) +
-        "multiplayer_deaths = " + std::to_string(info.multiplayerDeath) +
+        convert(rat.singlePlayer.kills) +
+        "single_player_deaths = " + convert(rat.singlePlayer.deaths) +
+        "single_player_wins = " + convert(rat.singlePlayer.wins) +
+        "single_player_defeats = " + convert(rat.singlePlayer.defeats) +
+        "multiplayer_kills = " + convert(rat.multiplayer.wins) +
+        "multiplayer_deaths = " + convert(rat.multiplayer.deaths) +
+        "multiplayer_wins = " + convert(rat.multiplayer.wins) +
+        "multiplayer_defeats = " + std::to_string(rat.multiplayer.defeats) +
         requestEnd(playerInfo.general.name);
     return request;
 }
@@ -324,13 +355,12 @@ void PlayersDatabase::updateInfo(PlayerInfo &info) {
 
 void PlayersDatabase::deleteByName(const std::string &username) {
     const static std::string requestStart = "DELETE FROM ";
-    const std::string requestEnd = " where name = '" + username + "';";
     bool flag = isConnected();
     connect();
-    exec(requestStart + "skills" + requestEnd);
-    exec(requestStart + "settings" + requestEnd);
-    exec(requestStart + "rating" + requestEnd);
-    exec(requestStart + "players" + requestEnd);
+    exec(requestStart + "skills" + requestEnd(username));
+    exec(requestStart + "settings" + requestEnd(username));
+    exec(requestStart + "rating" + requestEnd(username));
+    exec(requestStart + "players" + requestEnd(username));
     if (!flag) {
         disconnectFromDatabase();
     }
@@ -338,7 +368,7 @@ void PlayersDatabase::deleteByName(const std::string &username) {
 
 bool PlayersDatabase::isOnline(const std::string &username) {
     const std::string request =
-        "SELECT online FROM players WHERE name = '" + username + "';";
+        "SELECT online FROM players" + requestEnd(username);
     bool flag = isConnected();
     connect();
     sqlite3_prepare_v2(db, request.c_str(), -1, &stmt, nullptr);
@@ -353,7 +383,7 @@ bool PlayersDatabase::isOnline(const std::string &username) {
 
 void PlayersDatabase::makeOnline(const std::string &username) {
     const std::string request =
-        "UPDATE players SET online = 1 WHERE name = '" + username + "';";
+        "UPDATE players SET online = 1" + requestEnd(username);
     bool flag = isConnected();
     connect();
     exec(request);
@@ -364,7 +394,7 @@ void PlayersDatabase::makeOnline(const std::string &username) {
 
 void PlayersDatabase::makeOffline(const std::string &username) {
     const std::string request =
-        "UPDATE players SET online = 0 WHERE name = '" + username + "';";
+        "UPDATE players SET online = 0" + requestEnd(username);
     bool flag = isConnected();
     connect();
     exec(request);

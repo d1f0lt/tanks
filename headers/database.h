@@ -58,17 +58,22 @@ struct PlayerSkills {
 };
 
 struct PlayerRating {
-    int singlePlayerKills = 0;
-    int singlePlayerDeath = 0;
-    int multiplayerKills = 0;
-    int multiplayerDeath = 0;
+    int kills = 0;
+    int deaths = 0;
+    int wins = 0;
+    int defeats = 0;
+};
+
+struct PlayerAllRating {
+    PlayerRating singlePlayer{};
+    PlayerRating multiplayer{};
 };
 
 struct PlayerInfo {
     PlayerGeneral general;
     PlayerSkills skills{};
     PlayerSettings settings{};
-    PlayerRating rating{};
+    PlayerAllRating rating{};
 };
 
 struct PlayersDatabase : Database {
@@ -97,7 +102,8 @@ private:
     PlayerGeneral getGeneralInfoByName(const std::string &username);
     PlayerSettings getSettingsInfoByName(const std::string &username);
     PlayerSkills getSkillsInfoByName(const std::string &username);
-    PlayerRating getRatingInfoByName(const std::string &username);
+    PlayerRating getRatingInfoByName(const std::string &username, const std::string &mode);
+    PlayerAllRating getRatingInfoByName(const std::string &username);
 };
 
 }  // namespace Menu

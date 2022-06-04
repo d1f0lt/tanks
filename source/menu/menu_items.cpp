@@ -77,29 +77,41 @@ void MenuItem::move(const sf::Vector2<float> &distance) {
 void MenuItem::centralizeByHeight(
     const std::pair<float, float> &rectangleCoordinatesY) {
     assert(rectangleCoordinatesY.first < rectangleCoordinatesY.second);
-    assert(rectangleCoordinatesY.second - rectangleCoordinatesY.first >=
-           getSize().y);
-    setPosition(sf::Vector2<float>(
-        getPosition().x,
-        static_cast<float>(
+    sf::Vector2<float> newPos{getPosition()};
+    if (rectangleCoordinatesY.second - rectangleCoordinatesY.first >=
+        getSize().y) {
+        newPos.y = static_cast<float>(
             static_cast<int>(rectangleCoordinatesY.first) +
             static_cast<int>((rectangleCoordinatesY.second -
                               rectangleCoordinatesY.first - getSize().y) /
-                             2))));
+                             2));
+    } else {
+        newPos.y = rectangleCoordinatesY.first -
+                   (getSize().y - rectangleCoordinatesY.second +
+                    rectangleCoordinatesY.first) /
+                       2;
+    }
+    setPosition(newPos);
 }
 
 void MenuItem::centralizeByWidth(
     const std::pair<float, float> &rectangleCoordinatesX) {
     assert(rectangleCoordinatesX.first < rectangleCoordinatesX.second);
-    assert(rectangleCoordinatesX.second - rectangleCoordinatesX.first >=
-           getSize().x);
-    setPosition(sf::Vector2<float>(
-        static_cast<float>(
+    sf::Vector2<float> newPos{getPosition()};
+    if (rectangleCoordinatesX.second - rectangleCoordinatesX.first >=
+        getSize().x) {
+        newPos.x = static_cast<float>(
             static_cast<int>(rectangleCoordinatesX.first) +
             static_cast<int>((rectangleCoordinatesX.second -
                               rectangleCoordinatesX.first - getSize().x) /
-                             2)),
-        getPosition().y));
+                             2));
+    } else {
+        newPos.x = rectangleCoordinatesX.first -
+                   (getSize().x - rectangleCoordinatesX.second +
+                    rectangleCoordinatesX.first) /
+                       2;
+    }
+    setPosition(newPos);
 }
 
 MenuInscription::MenuInscription(const InscriptionInfo &parameters,
@@ -391,7 +403,6 @@ void OwningRectangle::setPosition(sf::Vector2<float> newPosition) {
 
     const static size_t marginFromTitle = 60;
     const static size_t marginBetweenInscriptions = 40;
-    const static size_t marginBetweenLeftAndRightItems = 50;
 
     auto curCoordinates = newPosition;
     curCoordinates.x += padding;
@@ -404,13 +415,20 @@ void OwningRectangle::setPosition(sf::Vector2<float> newPosition) {
         item->setPosition(curCoordinates);
         curCoordinates.y += item->getSize().y + marginBetweenInscriptions;
     }
+
     float mxRightSize = calcMaxRightItemWidth();
+    const size_t marginBetweenLeftAndRightItems = std::max(
+        static_cast<size_t>(40),
+        static_cast<size_t>(title->getSize().x - mxRightSize - mxLeftSize));
     for (size_t i = 0; i < rightItems.size(); ++i) {
+        auto &leftItem = leftItems[i];
         auto &item = rightItems[i];
-        item->setPosition({leftItems[i]->getPosition().x + mxLeftSize +
-                               marginBetweenLeftAndRightItems + mxRightSize -
-                               item->getSize().x,
-                           leftItems[i]->getPosition().y});
+        item->setPosition(
+            {leftItem->getPosition().x + mxLeftSize +
+                 static_cast<float>(marginBetweenLeftAndRightItems) +
+                 mxRightSize - item->getSize().x,
+             leftItem->getPosition().y});
+        item->centralizeByHeight({leftItem->getPosition().y, leftItem->getPosition().y + leftItem->getSize().y});
     }
     title->centralizeByWidth(
         {leftItems[0]->getPosition().x,
