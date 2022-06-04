@@ -7,9 +7,13 @@
 
 namespace Tanks::Menu {
 
+enum class FlyDirection {LEFT, RIGHT};
+
 std::optional<std::string> showInputMenu(sf::RenderWindow &window,
                                          const sf::Sprite &background,
-                                         const std::string &title);
+                                         const std::string &title,
+                                         const std::string &defaultValue,
+                                         FlyDirection flyDirectionAfterInput = FlyDirection::RIGHT);
 
 }
 

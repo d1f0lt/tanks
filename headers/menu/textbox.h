@@ -12,7 +12,8 @@ public:
             const InscriptionInfo &info,
             const sf::Vector2<float> &rectangleSize,
             const sf::Vector2<float> &pos,
-            const sf::Color &rectangleColor);
+            const sf::Color &rectangleColor,
+            const std::string &defaultValue);
 
     sf::Vector2<float> getPosition() const final;
     sf::Vector2<float> getSize() const final;
@@ -25,6 +26,7 @@ public:
 private:
     sf::RectangleShape rectangle;
     std::string text;
+    std::string defaultValue;
     mutable std::unique_ptr<MenuInscription> content;
     const size_t limit;
     const sf::Color defaultColor;

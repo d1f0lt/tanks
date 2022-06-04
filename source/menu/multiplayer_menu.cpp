@@ -1,8 +1,10 @@
 #include "menu/multiplayer_menu.h"
 #include <cassert>
 #include <thread>
-#include "menu/levels_menu.h"
+#include "game.h"
 #include "menu/input_menu.h"
+#include "menu/levels_menu.h"
+#include <boost/system/system_error.hpp>
 
 namespace Tanks::Menu {
 
@@ -46,8 +48,8 @@ Menu initMenu() {
 }  // namespace
 
 void showMultiplayerMenu(sf::RenderWindow &window,
-                     const sf::Sprite &backgroundSprite,
-                     PlayerInfo &info) {
+                         const sf::Sprite &backgroundSprite,
+                         PlayerInfo &info) {
     const static std::string imagesPath = "../images/menu/";
     Menu menu(initMenu());
     menu.addIconToLeftUpCorner(imagesPath + "return.png", ButtonType::RETURN);
@@ -73,7 +75,24 @@ void showMultiplayerMenu(sf::RenderWindow &window,
             }
             case ButtonType::CONNECT: {
                 menu.flyAwayToLeft(window, backgroundSprite);
-                auto ans = showInputMenu(window, backgroundSprite, "INPUT IP");
+                auto ip = showInputMenu(window, backgroundSprite, "INPUT IP", // NOLINT
+                                        "192.168.0.1", FlyDirection::LEFT);
+                if (ip != std::nullopt) {
+                    auto port = showInputMenu(window, backgroundSprite,
+                                              "INPUT PORT", "80");
+                    if (port != std::nullopt) {
+                        try {
+                            auto address =
+                                std::make_pair(ip.value(), port.value());
+                            std::optional<std::pair<std::string, std::string>>
+                                opt(address);
+                            startGame(window, -1, info.skills, opt,
+                                      MAX_PLAYERS_AMOUNT);
+                        } catch (const boost::system::system_error &err) {
+                            menu.flyOutFromLeft(window, backgroundSprite);
+                        }
+                    }
+                }
                 menu.flyOutFromLeft(window, backgroundSprite);
             } break;
 

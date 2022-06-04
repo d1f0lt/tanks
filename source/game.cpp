@@ -135,11 +135,9 @@ std::unique_ptr<ServerHolder> createServer(const std::string levelFilename,
 std::optional<Menu::ButtonType>
 startGame(  // NOLINT(readability-function-cognitive-complexity)
     sf::RenderWindow &window,
-    [[maybe_unused]] Menu::PlayerInfo &info,
     int level,
     PlayerSkills skills,
     std::optional<std::pair<std::string, std::string>> addressPort,
-    int lives,
     int players) {
     const bool isHost = (addressPort == std::nullopt);
     //    addressPort = {"127.0.0.1", "12345"};
@@ -165,7 +163,7 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
                                                addressPort.value().second));
     }
     sendSkillsTo(clientSocket, skills);
-    model::sendInt(clientSocket, lives);
+    model::sendInt(clientSocket, skills.lifeAmount);
 
     //    tcp::socket clientSocket(ioContext);
     //    clientSocket.connect(addressPort.value());
@@ -173,7 +171,7 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
     int playerId = model::receiveInt(clientSocket);
     assert(playerId < 0);
 
-    model::ClientModel model(playerId, lives, std::move(clientSocket));
+    model::ClientModel model(playerId, static_cast<int>(skills.lifeAmount), std::move(clientSocket));
     model.loadLevel(levelFilename);
 
     View::TankSpriteHolder greenTankView(imagesPath + "tanks/green_tank.png");
@@ -184,8 +182,7 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
 
     View::Map mapView(imagesPath + "map.png", level);
 
-    Environment environment(imagesPath + "environment/",
-                            info.skills.lifeAmount);
+    Environment environment(imagesPath + "environment/", skills.lifeAmount);
 
     Pause pause;
 

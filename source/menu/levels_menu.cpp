@@ -59,7 +59,7 @@ ButtonType showLevelsMenu(sf::RenderWindow &window,
                     continue;
                 }
                 auto ans =
-                    startGame(window, info, std::stoi(item->getDescription()));
+                    startGame(window, std::stoi(item->getDescription()), info.skills);
                 assert(ans != std::nullopt);
                 switch (ans.value()) {
                     case ButtonType::EXIT:

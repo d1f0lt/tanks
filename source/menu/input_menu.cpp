@@ -7,7 +7,8 @@
 
 namespace Tanks::Menu {
 
-Menu initMenu(const std::string &titleText) {
+Menu initMenu(const std::string &titleText,  // NOLINT
+              const std::string &defaultValue) {
     const static sf::Color textColor{63, 87, 210};
     const static int limit = 18;
 
@@ -33,10 +34,12 @@ Menu initMenu(const std::string &titleText) {
 
     InscriptionInfo info{"", textSize, textColor};
 
-    auto textbox = std::make_unique<TextBox>(
-        limit, info, textboxSize, curCoordinates, sf::Color(0, 0, 0));
+    auto textbox =
+        std::make_unique<TextBox>(limit, info, textboxSize, curCoordinates,
+                                  sf::Color(0, 0, 0), defaultValue);
 
-    title->centralizeByWidth({curCoordinates.x, curCoordinates.x + textbox->getSize().x});
+    title->centralizeByWidth(
+        {curCoordinates.x, curCoordinates.x + textbox->getSize().x});
     title->updateStandardPosition();
     menu.addMenuItem(std::move(title));
     menu.addMenuItem(std::move(textbox));
@@ -46,10 +49,12 @@ Menu initMenu(const std::string &titleText) {
 
 std::optional<std::string> showInputMenu(sf::RenderWindow &window,
                                          const sf::Sprite &background,
-                                         const std::string &title) {
+                                         const std::string &title,  // NOLINT
+                                         const std::string &defaultValue,
+                                         FlyDirection flyDirectionAfterInput) {
     const static std::string imagesPath = "../images/menu/";
 
-    auto menu(initMenu(title));
+    auto menu(initMenu(title, defaultValue));
     menu.addIconToLeftUpCorner(imagesPath + "return.png", ButtonType::RETURN);
 
     menu.flyAwayToRight();
@@ -63,6 +68,11 @@ std::optional<std::string> showInputMenu(sf::RenderWindow &window,
             } else if (event.type == sf::Event::TextEntered) {
                 auto ans = MenuController::textEntered(menu, event);
                 if (ans != std::nullopt) {
+                    if (flyDirectionAfterInput == FlyDirection::RIGHT) {
+                        menu.flyAwayToRight(window, background);
+                    } else {
+                        menu.flyAwayToLeft(window, background);
+                    }
                     return ans.value();
                 }
             }

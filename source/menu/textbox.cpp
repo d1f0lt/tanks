@@ -9,14 +9,16 @@ TextBox::TextBox(size_t limit_,
                  const InscriptionInfo &info,
                  const sf::Vector2<float> &rectangleSize,  // NOLINT
                  const sf::Vector2<float> &pos,
-                 const sf::Color &rectangleColor)
+                 const sf::Color &rectangleColor,
+                 const std::string &defaultValue)
     : rectangle(rectangleSize),
       text(info.inscription),
+      defaultValue(defaultValue),
       content(std::make_unique<MenuInscription>(
-          InscriptionInfo{"user1", info.characterSize, info.textColor},
+          InscriptionInfo{defaultValue, info.characterSize, info.textColor},
           pos)),
       limit(limit_),
-      defaultColor(info.textColor) {
+      defaultColor(info.textColor){
     setPosition(pos);
     content->setStandardPosition(content->getPosition());
     rectangle.setFillColor(rectangleColor);
@@ -45,7 +47,7 @@ void TextBox::draw(sf::RenderWindow &window) const {
     window.draw(rectangle);
     if (text.empty()) {
         const static sf::Color greyColor{128, 128, 128, 128};
-        content->setContent("user1");
+        content->setContent(defaultValue);
         content->setTextColor(greyColor);
         content->draw(window);
         content->setTextColor(defaultColor);

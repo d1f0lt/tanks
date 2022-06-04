@@ -132,7 +132,7 @@ void showUsersMenu(sf::RenderWindow &window) {
                 const static std::string title = "INPUT NAME";
 
                 menu.flyAwayToLeft(window, backgroundSprite);
-                auto ans = showInputMenu(window, backgroundSprite, title);
+                auto ans = showInputMenu(window, backgroundSprite, title, "user1");
                 if (ans != std::nullopt) {
                     insertNewUser(ans.value(), db);
                     menu = initMenu(db, imagesPath);
