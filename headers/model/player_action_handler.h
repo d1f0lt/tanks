@@ -2,6 +2,7 @@
 #define TANKS_PLAYER_ACTION_HANDLER_H
 
 #include <boost/asio/ip/tcp.hpp>
+#include <optional>
 #include "model/handler.h"
 #include "model/player_action_handler_fwd.h"
 
@@ -25,6 +26,8 @@ public:
     [[nodiscard]] std::optional<std::reference_wrapper<Tank>> tank();
 
     [[nodiscard]] const GameModel &getModel() const;
+
+    [[nodiscard]] int getLives() const;
 
 private:
     const int id_;

@@ -20,7 +20,7 @@ namespace Tanks {
 using boost::asio::ip::tcp;
 using Menu::PlayerSkills;
 
-constexpr int PLAYERS = 1;
+// constexpr int PLAYERS = 1;
 constexpr int BOTS = 10;
 constexpr int BONUSES = 10;
 
@@ -104,7 +104,8 @@ void serverImp(const std::string &filename,
     // init servermodel
 }
 
-std::unique_ptr<ServerHolder> createServer(const std::string levelFilename) {
+std::unique_ptr<ServerHolder> createServer(const std::string levelFilename,
+                                           int players) {
     std::condition_variable *startServer = nullptr;
     std::unique_ptr<Server> serverPtr = nullptr;
     std::condition_variable serverCreatedCv;
@@ -112,7 +113,7 @@ std::unique_ptr<ServerHolder> createServer(const std::string levelFilename) {
     std::atomic<bool> isServerCreated = false;
 
     auto serverThread = std::thread([&]() {
-        serverImp(levelFilename, PLAYERS, BOTS, BONUSES, startServer,
+        serverImp(levelFilename, players, BOTS, BONUSES, startServer,
                   isServerCreated, serverPtr, serverCreatedCv);
     });
     std::mutex mutex;
@@ -133,7 +134,8 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
     int level,
     PlayerSkills skills,
     std::optional<std::pair<std::string, std::string>> addressPort,
-    int lives) {
+    int lives,
+    int players) {
     const bool isHost = (addressPort == std::nullopt);
     //    addressPort = {"127.0.0.1", "12345"};
 
@@ -149,7 +151,7 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
 
     std::unique_ptr<ServerHolder> serverHolder = nullptr;
     if (isHost) {
-        serverHolder = createServer(levelFilename);
+        serverHolder = createServer(levelFilename, players);
         endpoint = serverHolder->getServer().getEndpoint();
         clientSocket.connect(endpoint);
     } else {
@@ -170,19 +172,21 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
     model.loadLevel(levelFilename);
 
     View::TankSpriteHolder greenTankView(imagesPath + "tanks/green_tank.png");
-//    View::TankSpriteHolder redTankView(imagesPath + "tanks/green_tank.png");
+    //    View::TankSpriteHolder redTankView(imagesPath +
+    //    "tanks/green_tank.png");
 
     View::BulletsSpriteHolder bulletsView(imagesPath + "bullet.png");
 
     View::Map mapView(imagesPath + "map.png", level);
 
-    Environment environment(imagesPath + "environment/", info.skills.lifeAmount);
+    Environment environment(imagesPath + "environment/",
+                            info.skills.lifeAmount);
 
     Pause pause;
 
-    const std::vector<int> playerIds = [&]() {
-        std::vector<int> res(PLAYERS);
-        for (int i = 0; i < PLAYERS; i++) {
+    const std::vector<int> playerIds = [&]() -> std::vector<int> {
+        std::vector<int> res(players);
+        for (int i = 0; i < players; i++) {
             res[i] = -BONUSES - BOTS - 1 - i;
         }
         return res;
@@ -193,6 +197,7 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
         std::cout << endpoint << '\n';
         serverHolder->startServer();
     }
+
     model.nextTick();
 
     //    auto &model = serverPtr.model();

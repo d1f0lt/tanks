@@ -15,7 +15,8 @@ std::optional<Menu::ButtonType> startGame(
     int level = 1,
     Menu::PlayerSkills skills = Menu::PlayerSkills(),
     std::optional<std::pair<std::string, std::string>> address = std::nullopt,
-    int lives = INFINITE_LIVES);
+    int lives = INFINITE_LIVES,
+    int players = 1);
 
 }
 

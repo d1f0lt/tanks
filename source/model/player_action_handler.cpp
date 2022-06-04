@@ -1,6 +1,6 @@
+#include "model/player_action_handler.h"
 #include "model/client_game_model.h"
 #include "model/event.h"
-#include "model/player_action_handler.h"
 #include "model/tank.h"
 
 namespace Tanks::model {
@@ -50,5 +50,9 @@ std::optional<std::reference_wrapper<Tank>> PlayerActionsHandler::tank() {
 
 const GameModel &PlayerActionsHandler::getModel() const {
     return model_;
+}
+
+int PlayerActionsHandler::getLives() const {
+    return model_.getLives();
 }
 }  // namespace Tanks::model
