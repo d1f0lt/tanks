@@ -14,17 +14,20 @@ using Menu::PlayerSkills;
 
 class ClientModel : public GameModel {
 public:
-    explicit ClientModel(int playerId, tcp::socket socket);
+    explicit ClientModel(int playerId, int lives, tcp::socket socket);
     ~ClientModel() noexcept override;
 
     [[nodiscard]] PlayerActionsHandler getHandler();
 
     [[nodiscard]] std::optional<std::reference_wrapper<Tank>> tank();
-    void finishGame() noexcept override;
 
+    [[nodiscard]] int getLives() const;
+
+    void finishGame() noexcept override;
     void nextTick() override;
 
 protected:
+    void eraseEntity(Entity &entity) override;
     void receiveEvents();
     void executeAllEvents() override;
 
@@ -32,6 +35,7 @@ protected:
 
 private:
     const int playerId_;
+    int playerLives_;
     tcp::socket socket_;
 
     SafeQueue<std::unique_ptr<Event>> events_;

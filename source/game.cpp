@@ -165,7 +165,7 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
     int playerId = model::receiveInt(clientSocket);
     assert(playerId < 0);
 
-    model::ClientModel model(playerId, std::move(clientSocket));
+    model::ClientModel model(playerId, lives, std::move(clientSocket));
     model.loadLevel(levelFilename);
 
     View::TankSpriteHolder greenTankView(imagesPath + "tanks/green_tank.png");

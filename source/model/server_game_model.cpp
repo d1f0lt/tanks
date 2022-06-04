@@ -211,7 +211,7 @@ void ServerModel::addBot() {
     auto id = getDecrId();
     bots_.emplace(id);
     PlayerSkills skills;
-    tanksSkills_.emplace(id, std::move(skills));
+    tanksSkills_.emplace(id, skills);
     spawners_.emplace_back(std::make_unique<MediumTankSpawner>(*this, id));
     tankLives_.emplace(id, INFINITE_LIVES);
 }
@@ -229,8 +229,6 @@ void ServerModel::finishGame() noexcept {
         return;
     }
     setFinished();
-    //    std::mutex mutexLocal;
-    //    std::unique_lock lockLocal(mutexLocal);
     std::unique_lock<std::mutex> modelLock(getMutex(), std::defer_lock);
     getCondvar().wait(modelLock, [&]() { return modelLock.try_lock(); });
     assert(modelLock);

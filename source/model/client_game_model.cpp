@@ -2,6 +2,7 @@
 #include <thread>
 #include "model/network_utils.h"
 #include "model/tank.h"
+
 #ifndef NDEBUG
 #include <fstream>
 #include <iostream>
@@ -9,8 +10,9 @@
 
 namespace Tanks::model {
 
-ClientModel::ClientModel(int playerId, tcp::socket socket)
+ClientModel::ClientModel(int playerId, int lives, tcp::socket socket)
     : playerId_(playerId),
+      playerLives_(lives),
       socket_(std::move(socket)),
       receiver_([&]() { receiveEvents(); }){
           //    std::thread([&]() { receiveEvents(); }).detach();
@@ -111,6 +113,17 @@ void ClientModel::nextTick() {
     executeAllEvents();
     lock.unlock();
     getCondvar().notify_all();
+}
+
+void ClientModel::eraseEntity(Entity &entity) {
+    if (entity.getId() == playerId_ && playerLives_ != INFINITE_LIVES) {
+        playerLives_--;
+    }
+    GameModel::eraseEntity(entity);
+}
+
+int ClientModel::getLives() const {
+    return playerLives_;
 }
 // namespace Tanks::model
 }  // namespace Tanks::model
