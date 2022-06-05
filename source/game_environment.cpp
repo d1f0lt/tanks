@@ -127,7 +127,7 @@ void Lives::setPosition() {
 }
 
 size_t Lives::getLivesAmount() const {
-    return livesAmount
+    return livesAmount;
 }
 
 void Lives::draw(sf::RenderWindow &window) const {

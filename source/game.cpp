@@ -182,8 +182,7 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
     model.loadLevel(levelFilename);
 
     View::TankSpriteHolder greenTankView(imagesPath + "tanks/green_tank.png");
-    //    View::TankSpriteHolder redTankView(imagesPath +
-    //    "tanks/green_tank.png");
+    View::TankSpriteHolder redTankView(imagesPath + "tanks/red_tank.png");
 
     View::BulletsSpriteHolder bulletsView(imagesPath + "bullet.png");
 
@@ -262,9 +261,13 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
         mapView.draw(window, model);
 
         const auto &tanks = model.getAll(model::EntityType::MEDIUM_TANK);
-        for (const auto *tank : tanks) {
-            greenTankView.draw(window,
-                               dynamic_cast<const model::Tank &>(*tank));
+        for (const auto *entity : tanks) {
+            const auto &tank = dynamic_cast<const model::Tank &>(*entity);
+            if (playerIds.find(tank.getId()) != playerIds.end()) {
+                greenTankView.draw(window, tank);
+            } else {
+                redTankView.draw(window, tank);
+            }
         }
 
         const auto &bullets = model.getAll(model::EntityType::BULLET);
