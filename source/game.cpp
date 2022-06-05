@@ -292,8 +292,17 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
                         break;
                     case Menu::ButtonType::NEW_GAME:
                         return Menu::ButtonType::NEW_GAME;
-                    case Menu::ButtonType::EXIT:
+                    case Menu::ButtonType::EXIT: {
+                        Menu::PlayerRating &rat = info.rating.singlePlayer;
+                        if (players != 1) {
+                            rat = info.rating.multiplayer;
+                        }
+                        rat.kills += model.getKills();
+                        info.general.money +=
+                            static_cast<int64_t>(10 * model.getKills());
+                        rat.deaths += info.skills.lifeAmount - model.getLives();
                         return signal.value()->getType();
+                    }
                     default:
                         break;
                 }
