@@ -5,24 +5,27 @@
 
 int main(int argc, const char *argv[]) {
     if (argc >= 3 && std::string(argv[1]) == "server") {
-        int level = std::stoi(argv[1]);
+        int level = std::stoi(argv[2]);
         if (level <= 0 || level >= 4) {
             return 123;
         }
-        int players = std::stoi(argv[2]);
-        int bots = 10;
-        int bonuses = 2;
-        if (players <= 0) {
-            return 123;
-        }
+        int players = 2;
         if (argc >= 4) {
-            bots = std::stoi(argv[3]);
+            players = std::stoi(argv[3]);
+            if (players <= 0) {
+                return 123;
+            }
+        }
+        int bots = 10;
+        if (argc >= 5) {
+            bots = std::stoi(argv[4]);
             if (bots < 0) {
                 return 123;
             }
         }
-        if (argc >= 5) {
-            bonuses = std::stoi(argv[4]);
+        int bonuses = 2;
+        if (argc >= 6) {
+            bonuses = std::stoi(argv[5]);
             if (bonuses < 0) {
                 return 123;
             }
