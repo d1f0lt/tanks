@@ -84,6 +84,8 @@ add_executable(
         source/menu/multiplayer_menu.cpp
         source/sound/background_music.cpp
         source/game.cpp
+        source/sound/shoot_sound.cpp
+        source/sound/block_destroy_sound.cpp
         source/game_controller.cpp
         source/game_environment.cpp
         source/pause.cpp
@@ -94,6 +96,7 @@ add_executable(
         source/view/bonus_view.cpp
         source/sound/shoot_sound.cpp
         source/sound/background_music.cpp
+        source/sound/tank_destroy_sound.cpp
         source/model/blocks.cpp
         source/model/entity.cpp
         source/model/game_model.cpp

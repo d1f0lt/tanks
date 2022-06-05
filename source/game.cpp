@@ -5,6 +5,7 @@
 #include "game_controller.h"
 #include "game_environment.h"
 #include "menu/menu_controller.h"
+#include "menu/settings_menu.h"
 #include "model/client_game_model.h"
 #include "model/network_utils.h"
 #include "model/player_action_handler.h"
@@ -12,10 +13,14 @@
 #include "pause.h"
 #include "player_skills.h"
 #include "server.h"
+#include "sound/background_music.h"
+#include "sound/block_destroy_sound.h"
+#include "sound/shoot_sound.h"
+#include "sound/tank_destroy_sound.h"
+#include "view/bonus_view.h"
 #include "view/bullets_view.h"
 #include "view/game_view.h"
 #include "view/tank_view.h"
-#include "view/bonus_view.h"
 
 namespace Tanks {
 using boost::asio::ip::tcp;
@@ -146,6 +151,9 @@ void drawTank(sf::RenderWindow &window,
 std::optional<Menu::ButtonType>
 startGame(  // NOLINT(readability-function-cognitive-complexity)
     sf::RenderWindow &window,
+    Menu::PlayerInfo &info,
+    Sound::BackgroundMusicHolder &backgroundMusicHolder,
+    const sf::Sprite &backgroundSprite,
     int level,
     PlayerSkills skills,
     std::optional<std::pair<std::string, std::string>> addressPort,
@@ -154,6 +162,8 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
     //    addressPort = {"127.0.0.1", "12345"};
 
     static const std::string imagesPath = "../images/";
+
+    static const std::string soundsPath = "../sounds/";
 
     //    static_assert(std::is_move_constructible_v<Server>);
     boost::asio::io_context ioContext;
@@ -183,8 +193,9 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
     assert(playerId < 0);
 
     level = model::receiveInt(clientSocket);
-    const auto [splayers, sbots, sbonuses] =
-        model::receiveMultipleInts<int, int, int>(clientSocket);
+    const int splayers = model::receiveInt(clientSocket);
+    const int sbots = model::receiveInt(clientSocket);
+    const int sbonuses = model::receiveInt(clientSocket);
 
     const std::string levelFilename("../levels/level" + std::to_string(level) +
                                     ".csv");
@@ -205,6 +216,14 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
 
     Environment environment(imagesPath + "environment/", skills.lifeAmount);
 
+    Tanks::Sound::ShootSoundHolder shootSound(soundsPath + "shoot.ogg");
+
+    Tanks::Sound::BlockDestroySoundHolder blockDestroySound(
+        soundsPath + "block_destroy_sound.ogg");
+
+    Tanks::Sound::TankDestroySoundHolder tankDestroySound(
+        soundsPath + "tank_destroy_sound.ogg");
+
     Pause pause;
 
     const std::unordered_set<int> playerIds = [&]() -> std::unordered_set<int> {
@@ -214,6 +233,8 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
         }
         return res;
     }();
+
+    auto volume = info.settings.soundsVolume;
 
     //    auto serverThread = server->start();
     if (isHost) {
@@ -243,6 +264,8 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
                                                       window, event);
                 signal != std::nullopt) {
                 assert(signal.value()->getType() == Menu::ButtonType::PAUSE);
+                backgroundMusicHolder.play(
+                    static_cast<float>(info.settings.musicVolume));
                 pause.makePause();
             } else {
                 model.nextTick();
@@ -258,7 +281,14 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
                 signal != std::nullopt) {
                 switch (signal.value()->getType()) {
                     case Menu::ButtonType::RESUME:
+                        backgroundMusicHolder.stop();
                         pause.unpause();
+                        break;
+                    case Menu::ButtonType::SETTINGS:
+                        showSettingsMenu(window, backgroundSprite, info,
+                                         backgroundMusicHolder);
+                        backgroundMusicHolder.setVolume(
+                            static_cast<float>(info.settings.musicVolume));
                         break;
                     case Menu::ButtonType::NEW_GAME:
                         return Menu::ButtonType::NEW_GAME;
@@ -289,13 +319,19 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
             }
         }
 
-        const auto bonuses = model.getAll(model::EntityType::WALK_ON_WATER_BONUS);
+        const auto bonuses =
+            model.getAll(model::EntityType::WALK_ON_WATER_BONUS);
         for (const auto *entity : bonuses) {
-            bonusView.draw(window, dynamic_cast<const model::WalkOnWater *>(entity));
+            bonusView.draw(window,
+                           dynamic_cast<const model::WalkOnWater *>(entity));
         }
 
         const auto &bullets = model.getAll(model::EntityType::BULLET);
         bulletsView.draw(window, bullets);
+
+        shootSound.play(static_cast<float>(volume), model.getHandler());
+        blockDestroySound.play(static_cast<float>(volume), model.getHandler());
+        tankDestroySound.play(static_cast<float>(volume), model.getHandler());
 
         if (pause.isPause()) {
             pause.drawPause(window);

@@ -17,6 +17,10 @@ void PlayerActionsHandler::move(Direction direction, int speed) {
     TankMove(id_, direction, speed).sendTo(socket_);
 }
 
+const GameModel &PlayerActionsHandler::getModel() const {
+    return model_;
+}
+
 void PlayerActionsHandler::setDirection(Direction direction) {
     if (!model_.tank()) {
     }
@@ -46,10 +50,6 @@ void PlayerActionsHandler::shoot() {
 
 std::optional<std::reference_wrapper<Tank>> PlayerActionsHandler::tank() {
     return model_.tank();
-}
-
-const GameModel &PlayerActionsHandler::getModel() const {
-    return model_;
 }
 
 int PlayerActionsHandler::getLives() const {

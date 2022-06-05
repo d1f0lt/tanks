@@ -2,6 +2,9 @@
 #include <cassert>
 #include "constants.h"
 #include "game.h"
+#include "sound/background_music.h"
+#include "menu/settings_menu.h"
+#include "pause.h"
 
 namespace Tanks::Menu {
 
@@ -41,6 +44,7 @@ Menu initMenu(const std::string &imagesPath) {
 ButtonType showLevelsMenu(sf::RenderWindow &window,
                           const sf::Sprite &backgroundSprite,
                           [[maybe_unused]] PlayerInfo &info,
+                          Sound::BackgroundMusicHolder &backgroundMusicHolder,
                           int playersAmount) {
     const static std::string imagesPath = "../images/menu/";
     Menu menu(initMenu(imagesPath + "levels/"));
@@ -59,13 +63,15 @@ ButtonType showLevelsMenu(sf::RenderWindow &window,
                 if (level > LEVELS_COUNT) {
                     continue;
                 }
-                auto ans = startGame(window, std::stoi(item->getDescription()),
-                                     info.skills, std::nullopt, playersAmount);
+                backgroundMusicHolder.stop();
+                auto ans = startGame(window, info, backgroundMusicHolder, backgroundSprite, std::stoi(item->getDescription()), info.skills, std::nullopt, playersAmount);
                 assert(ans != std::nullopt);
                 switch (ans.value()) {
                     case ButtonType::EXIT:
+                        backgroundMusicHolder.play(info.settings.musicVolume);
                         return ans.value();
                     case ButtonType::NEW_GAME:
+                        backgroundMusicHolder.play(info.settings.musicVolume);
                         continue;
                     default:
                         assert(false);

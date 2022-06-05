@@ -12,6 +12,10 @@ struct BackgroundMusicHolder final {
 
     void play(float volume_level);
 
+    void stop();
+
+    void setVolume(float volume_level);
+
 private:
     sf::Music music;
 };

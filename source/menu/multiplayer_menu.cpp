@@ -5,6 +5,7 @@
 #include "menu/input_menu.h"
 #include "menu/levels_menu.h"
 #include <boost/system/system_error.hpp>
+#include "sound/background_music.h"
 
 namespace Tanks::Menu {
 
@@ -49,7 +50,8 @@ Menu initMenu() {
 
 void showMultiplayerMenu(sf::RenderWindow &window,
                          const sf::Sprite &backgroundSprite,
-                         PlayerInfo &info) {
+                         PlayerInfo &info,
+                         Sound::BackgroundMusicHolder &backgroundMusicHolder) {
     const static std::string imagesPath = "../images/menu/";
     Menu menu(initMenu());
     menu.addIconToLeftUpCorner(imagesPath + "return.png", ButtonType::RETURN);
@@ -62,7 +64,7 @@ void showMultiplayerMenu(sf::RenderWindow &window,
         switch (res->getType()) {
             case ButtonType::CREATE_SERVER: {
                 menu.flyAwayToLeft(window, backgroundSprite);
-                auto ans = showLevelsMenu(window, backgroundSprite, info, MAX_PLAYERS_AMOUNT);
+                auto ans = showLevelsMenu(window, backgroundSprite, info, backgroundMusicHolder, MAX_PLAYERS_AMOUNT);
                 switch (ans) {
                     case ButtonType::RETURN:
                         menu.flyOutFromLeft(window, backgroundSprite);
@@ -86,7 +88,7 @@ void showMultiplayerMenu(sf::RenderWindow &window,
                                 std::make_pair(ip.value(), port.value());
                             std::optional<std::pair<std::string, std::string>>
                                 opt(address);
-                            startGame(window, -1, info.skills, opt,
+                            startGame(window, info, backgroundMusicHolder, backgroundSprite, -1, info.skills, opt,
                                       MAX_PLAYERS_AMOUNT);
                         } catch (const boost::system::system_error &err) {
                             menu.flyOutFromLeft(window, backgroundSprite);
