@@ -2,8 +2,8 @@
 
 Just tanks is a free and opensource multiplayer arcade game inspired by "Battle City". Your goal is to destroy the opponent's tanks and not be destroyed
 by them. You can choose either a multiplayer to play with up to 10 friends or single-player to improve your
-skills with relaxing game against bots. Get money for your wins and use them to transform your little tank into
-the war machine.
+skills with relaxing game against bots. Earn coins for your wins and use them to transform your tiny tank into
+an invincible war machine.
 
 ## Controls
 
@@ -39,7 +39,7 @@ Note: this project supports only Linux and gcc compiler. But feel free to try bu
 
      cd bin
     ./tanks # to play game
-    ./tanks server <level number> <players> <bots> <bonues> # to run a server
+    ./tanks server <level number> <players> <bots> <bonuses> # to run a server
 
 ## LICENSE
 
