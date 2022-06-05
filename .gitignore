@@ -39,3 +39,7 @@ Makefile
 *.sln
 *.vcxproj
 *.vcxproj.filters
+
+#sqlite
+*.dblite
+*.conf

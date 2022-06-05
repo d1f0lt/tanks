@@ -2,10 +2,11 @@
 #define TANKS_ENTITY_H
 
 #include <SFML/Graphics/Rect.hpp>
+#include <memory>
+#include "constants.h"
+#include "model/handler_fwd.h"
 
 namespace Tanks::model {
-enum class Direction { UP, RIGHT, DOWN, LEFT };
-
 enum class EntityType {
     LEFT_UP_CORNER,
     RIGHT_UP_CORNER,
@@ -17,19 +18,44 @@ enum class EntityType {
     BRICK,
     STEEL,
     WATER,
-    PLAYABLE_TANK,
-    BOT_TANK,
+    MEDIUM_TANK,
     BULLET,
     GRASS,
+    WALK_ON_WATER_BONUS
+};
+
+struct IncrId {
+public:
+    explicit IncrId(int data);
+
+    [[nodiscard]] operator int() const;
+    [[nodiscard]] IncrId operator++(int);  // postfix
+
+private:
+    int data;
+};
+
+struct DecrId {
+public:
+    explicit DecrId(int data);
+
+    [[nodiscard]] operator int() const;
+    [[nodiscard]] DecrId operator--(int);  // postfix
+
+private:
+    int data;
 };
 
 class Entity {
+    friend WalkOnWaterHandler;
+    friend BasicHandler;
+    //    friend ForegroundHandler;
+
 public:
-    explicit Entity(int left_,
-                    int top_,
-                    int height_,
-                    int width_,
-                    EntityType type_);
+    explicit Entity(int left,
+                    int top,
+                    int entityId,
+                    std::unique_ptr<BasicHandler> handler);
 
     Entity(const Entity &) = delete;
     Entity(Entity &&) = delete;
@@ -38,30 +64,35 @@ public:
 
     virtual ~Entity() = default;
 
-    [[nodiscard]] EntityType getType() const;
+    [[nodiscard]] virtual EntityType getType() const = 0;
+    [[nodiscard]] int getId() const;
 
     [[nodiscard]] int getLeft() const;
     [[nodiscard]] int getTop() const;
-
-    [[nodiscard]] int getWidth() const;
-    [[nodiscard]] int getHeight() const;
+    [[nodiscard]] virtual int getWidth() const = 0;
+    [[nodiscard]] virtual int getHeight() const = 0;
+    [[nodiscard]] virtual int getStrength() const = 0;
 
     [[nodiscard]] bool intersect(const Entity &other) const;
+    [[nodiscard]] int dist(const Entity &other) const;
 
-    // TODO: make it pure virtual and override in derives
-    [[nodiscard]] bool isTankPassable() const;
-    [[nodiscard]] bool isBulletPassable() const;
-    [[nodiscard]] bool isDestroyable() const;
+    [[nodiscard]] virtual bool isTankPassable() const;
+    [[nodiscard]] virtual bool isBulletPassable() const;
+    [[nodiscard]] bool canStandOn(const Entity &other) const;
 
 protected:
     void setTop(int top);
     void setLeft(int left);
 
-private:
-    [[nodiscard]] sf::Rect<int> getRect() const;
+    [[nodiscard]] BasicHandler &getHandler() const;
 
-    EntityType type;
-    sf::Rect<int> rect = {-1, -1, -1, -1};
+private:
+    [[nodiscard]] sf::IntRect getRect() const;
+    [[nodiscard]] std::unique_ptr<BasicHandler> &getAccessToHandler();
+
+    int left_ = -1, top_ = -1;
+    const int id_;
+    std::unique_ptr<BasicHandler> handler_;
 };
 }  // namespace Tanks::model
 

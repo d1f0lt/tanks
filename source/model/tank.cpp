@@ -1,63 +1,75 @@
 #include "model/tank.h"
-#include <cassert>
 #include <queue>
 #include "constants.h"
-#include "model/playable-tank.h"
+#include "model/tank_handler.h"
 
 namespace Tanks::model {
-Tank::Tank(int left_,
-           int top_,
-           EntityType type_,
-           Direction direction_,
-           std::unique_ptr<BasicHandler> handler_)
-    : MovableEntity(left_,
-                    top_,
-                    TANK_SIZE,
-                    TANK_SIZE,
-                    type_,
-                    direction_,
-                    TANK_SPEED,
-                    std::move(handler_)) {
+Tank::Tank(int left,
+           int top,
+           DecrId entityId,
+           std::unique_ptr<TankHandler> handler,
+           Direction direction,
+           int speed,
+           int reloadTicks,
+           int bulletSpeed)
+    : MovableEntity(left, top, entityId, std::move(handler), direction),
+      speed_(speed),
+      reloadTicks_(reloadTicks),
+      bulletSpeed_(bulletSpeed) {
 }
 
-Tank::Tank(int left_,
-           int top_,
-           EntityType type_,
-           Direction direction_,
-           GameModel &model_)
-    : MovableEntity(left_,
-                    top_,
-                    TANK_SIZE,
-                    TANK_SIZE,
-                    type_,
-                    direction_,
-                    TANK_SPEED,
-                    std::make_unique<TankHandler>(model_, *this)) {
+int MediumTank::getWidth() const {
+    return Tanks::TANK_SIZE;
 }
 
-void Tank::shoot() {
-    handler->shoot();
+MediumTank::MediumTank(int left,
+                       int top,
+                       DecrId entityId,
+                       const TankHandlerCreator &handlerCreator,
+                       Direction direction,
+                       int speed,
+                       int reloadTicks,
+                       int bulletSpeed)
+    : Tank(left,
+           top,
+           entityId,
+           handlerCreator.createTankHandler(*this),
+           direction,
+           speed,
+           reloadTicks,
+           bulletSpeed) {
 }
 
-PlayableTank::PlayableTank(int left_,
-                           int top_,
-                           Direction direction_,
-                           std::unique_ptr<BasicHandler> handler_)
-    : Tank(left_,
-           top_,
-           EntityType::PLAYABLE_TANK,
-           direction_,
-           std::move(handler_)) {
+int MediumTank::getHeight() const {
+    return TANK_SIZE;
 }
 
-PlayableTank::PlayableTank(int left, int top, Direction dir, GameModel &model)
-    : Tank(left, top, EntityType::PLAYABLE_TANK, dir, model) {
+int MediumTank::getStrength() const {
+    return 1;
 }
 
-BotTank::BotTank(int left_,
-                 int top_,
-                 Direction direction_,
-                 std::unique_ptr<BasicHandler> handler_)
-    : Tank(left_, top_, EntityType::BOT_TANK, direction_, std::move(handler_)) {
+EntityType MediumTank::getType() const {
+    return EntityType::MEDIUM_TANK;
+}
+
+int Tank::getSpeed() const {
+    return speed_;
+}
+
+int Tank::getReloadTicks() const {
+    return reloadTicks_;
+}
+
+bool Tank::isShootingThisTick() const {
+    return dynamic_cast<TankHandler &>(getHandler()).isShootingThisTick();
+}
+
+bool Tank::hasBonus() const {
+    return dynamic_cast<TankMovableOnWaterHandler *>(&getHandler()) != nullptr;
+    // TODO TankWithBonusHandler
+}
+
+int Tank::getBulletSpeed() const {
+    return bulletSpeed_;
 }
 }  // namespace Tanks::model

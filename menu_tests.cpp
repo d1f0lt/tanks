@@ -2,8 +2,9 @@
 
 #include <memory>
 #include "constants.h"
+#include "database.h"
 #include "doctest.h"
-#include "menu.h"
+#include "menu/menu.h"
 
 using namespace Tanks::Menu;
 
@@ -150,25 +151,28 @@ TEST_CASE("Menu animation") {
             const static size_t titleCharacterSize = 80;
             InscriptionInfo title{titleText, titleCharacterSize, textColor};
 
-            // inscriptions
-            const static std::string inscriptionsText;
             const static size_t inscriptionsCharacterSize = 50;
-            InscriptionInfo inscriptions{inscriptionsText,
-                                         inscriptionsCharacterSize, textColor};
 
             // buttons
             const static std::vector<ButtonType> buttonTypes = {
-                ButtonType::NEW_GAME, ButtonType::UPGRADE,
-                ButtonType::CREATE_MAP, ButtonType::RATING};
+                ButtonType::NEW_GAME, ButtonType::UPGRADE, ButtonType::SETTINGS,
+                ButtonType::RATING};
             const static size_t buttonsHeight = 100;
-            const static sf::Color btnStandardColor;
-            const static sf::Color btnHoverColor;
+            const static sf::Color btnStandardColor(0, 0, 0, 150);
+            const static sf::Color btnHoverColor(66, 66, 66, 230);
             std::vector<ButtonWithType> buttons;
+            std::vector<std::unique_ptr<MenuItem>> inscriptions;
             buttons.reserve(buttonTypes.size());
+            inscriptions.reserve(buttonTypes.size());
             for (auto type : buttonTypes) {
                 buttons.emplace_back(ButtonWithType(
                     type, sf::Vector2<float>(menuWidth, buttonsHeight),
                     btnStandardColor, btnHoverColor));
+                InscriptionInfo info{convertButtonTypeToString(type),
+                                     inscriptionsCharacterSize, textColor};
+                auto item = std::make_unique<MenuInscription>(
+                    info, sf::Vector2<float>{0, 0});
+                inscriptions.emplace_back(std::move(item));
             }
 
             return Menu(menuWidth, title, inscriptions, buttons);
@@ -209,4 +213,63 @@ TEST_CASE("Menu animation") {
         }();
         checks(menu, window, backgroundSprite, 8);
     }
+}
+
+#include "database.h"
+
+TEST_CASE("Players database") {
+    const std::string tableName = "players";
+    const std::string path = "../.data/";
+    PlayersDatabase db(path + "menu_test_");
+    db.connect();
+    db.dropTable("players");
+    db.dropTable("settings");
+    db.dropTable("skills");
+    db.createTable(path + "pattern_for_players.sql");
+    db.createTable(path + "pattern_for_settings.sql");
+    db.createTable(path + "pattern_for_skills.sql");
+
+    db.insert("first");
+    REQUIRE(db.getNumberOfRows(tableName) == 1);
+    db.insert("second");
+    REQUIRE(db.getNumberOfRows(tableName) == 2);
+    PlayerInfo thirdData{PlayerGeneral{"third", 10}, PlayerSkills{7, 13, 50},
+                         PlayerSettings{40, 50}};
+    db.insert(thirdData);
+    REQUIRE(db.getNumberOfRows(tableName) == 3);
+
+    auto usernames = db.getAllUsernames();
+    REQUIRE(usernames.size() == 3);
+
+    CHECK(usernames[0] == "first");
+    CHECK(usernames[1] == "second");
+    CHECK(usernames[2] == "third");
+
+    auto second = db.getInfoByName("second");
+    auto third = db.getInfoByName("third");
+    auto first = db.getInfoByName("first");
+    CHECK(!db.isOnline("first"));
+    CHECK(!db.isOnline("second"));
+    CHECK(!db.isOnline("third"));
+
+    auto check = [](PlayerInfo &current, PlayerInfo &correct) {
+        CHECK(current.general.name == correct.general.name);
+        CHECK(current.general.money == correct.general.money);
+        CHECK(current.skills.tankSpeed == correct.skills.tankSpeed);
+        CHECK(current.skills.bulletSpeed == correct.skills.bulletSpeed);
+        CHECK(current.skills.reloadTicks == correct.skills.reloadTicks);
+        CHECK(current.settings.musicVolume == correct.settings.musicVolume);
+        CHECK(current.settings.soundsVolume == correct.settings.soundsVolume);
+    };
+
+    PlayerInfo correct{PlayerGeneral{"first"}};
+
+    check(first, correct);
+
+    correct.general.name = "second";
+    check(second, correct);
+
+    correct = thirdData;
+    check(third, correct);
+    db.disconnectFromDatabase();
 }

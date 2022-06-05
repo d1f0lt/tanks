@@ -1,27 +1,30 @@
 #include "model/grouped_entities.h"
+#include <cassert>
 
 namespace Tanks::model {
 void GroupedEntities::insert(Entity &entity) {
-    // 0 - usual blocks
-    // 1 - bot-Tanks
-    // 2 - playable Tanks
-    // 3 - bullets
-    // 4 - grass
-    // TODO make it independent from order in EntityType
-    entities[static_cast<unsigned>(entity.getType())].emplace_back(&entity);
+    auto type = static_cast<unsigned>(entity.getType());
+    entities_[type].emplace_back(&entity);
 }
 
 void GroupedEntities::erase(Entity &entity) {
-    entities[0].erase(
-        std::find(entities[0].begin(), entities[0].end(), &entity));
+    auto type = static_cast<unsigned>(entity.getType());
+    for (auto iter = entities_[type].begin(); iter != entities_[type].end();
+         iter++) {
+        if (*iter == &entity) {
+            entities_[type].erase(iter);
+            break;
+        }
+    }
 }
 
-const std::vector<std::vector<Entity *>> &GroupedEntities::snapshotAll() const {
-    return entities;
+std::vector<std::vector<Entity *>> GroupedEntities::snapshotAll() const {
+    return entities_;
 }
 
-GroupedEntities::GroupedEntities()
-    : entities(25) {  // TODO create as many as need
+const std::vector<std::vector<Entity *>> &GroupedEntities::getAllByLink()
+    const {
+    return entities_;
 }
 
 }  // namespace Tanks::model

@@ -1,63 +1,108 @@
 #include "model/entity.h"
+#include <cassert>
 #include <unordered_set>
+#include "model/handler.h"
 
 namespace Tanks::model {
-Entity::Entity(int left_, int top_, int height_, int width_, EntityType type_)
-    : type(type_), rect(left_, top_, height_, width_) {
-}
-
-EntityType Entity::getType() const {
-    return type;
-}
-
-sf::Rect<int> Entity::getRect() const {
-    return rect;
-}
-
-int Entity::getWidth() const {
-    return getRect().width;
-}
-
-int Entity::getHeight() const {
-    return getRect().height;
-}
-
 int Entity::getLeft() const {
-    return getRect().left;
+    return left_;
 }
 
 int Entity::getTop() const {
-    return getRect().top;
+    return top_;
+}
+
+sf::IntRect Entity::getRect() const {
+    return {left_, top_, getHeight(), getWidth()};
 }
 
 bool Entity::intersect(const Entity &other) const {
-    return other.getRect().intersects(getRect());
+    return getRect().intersects(other.getRect());
 }
 
 void Entity::setTop(int top) {
-    rect.top = top;
+    top_ = top;
 }
 
 void Entity::setLeft(int left) {
-    rect.left = left;
+    left_ = left;
 }
 
 bool Entity::isTankPassable() const {
-    static const std::unordered_set<EntityType> PASSABLE = {
-        EntityType::FLOOR, EntityType::GRASS, EntityType::BULLET};
-    return PASSABLE.count(getType()) == 1;
+    return false;
 }
 
 bool Entity::isBulletPassable() const {
-    static const std::unordered_set<EntityType> PASSABLE = {
-        EntityType::GRASS, EntityType::FLOOR, EntityType::WATER};
-    return PASSABLE.count(getType()) == 1;
+    return false;
 }
 
-bool Entity::isDestroyable() const {
-    static const std::unordered_set<EntityType> DESTROYABLE = {
-        EntityType::BRICK, EntityType::BULLET, EntityType::PLAYABLE_TANK,
-        EntityType::BOT_TANK};
-    return DESTROYABLE.count(getType()) == 1;
+namespace {
+[[nodiscard]] int segdist(int left1, int right1, int left2, int right2) {
+    if (left1 > left2) {
+        std::swap(left1, left2);
+        std::swap(right1, right2);
+    }
+
+    return std::max(0, left2 - right1);
+}
+}  // namespace
+
+int Entity::dist(const Entity &other) const {
+    int delta_x =
+        segdist(getLeft(), getLeft() + getWidth() - 1, other.getLeft(),
+                other.getLeft() + other.getWidth() - 1);
+    int delta_y = segdist(getTop(), getTop() + getHeight() - 1, other.getTop(),
+                          other.getTop() + other.getHeight() - 1);
+    return delta_x + delta_y;
+}
+
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
+Entity::Entity(int left,
+               int top,
+               int entityId,
+               std::unique_ptr<BasicHandler> handler)
+    : left_(left), top_(top), id_(entityId), handler_(std::move(handler)) {
+}
+
+int Entity::getId() const {
+    return id_;
+}
+
+BasicHandler &Entity::getHandler() const {
+    return *handler_;
+}
+
+std::unique_ptr<BasicHandler> &Entity::getAccessToHandler() {
+    return handler_;
+}
+
+bool Entity::canStandOn(const Entity &other) const {
+    return getHandler().canStandOn(other);
+}
+
+IncrId::IncrId(const int data) : data(data) {
+    assert(data >= 0);
+}
+
+IncrId::operator int() const {
+    return data;
+}
+
+IncrId IncrId::operator++(int) {  // postfix
+    IncrId res(data++);
+    return res;
+}
+
+DecrId::DecrId(int data) : data(data) {
+    assert(data < 0);
+}
+
+DecrId::operator int() const {
+    return data;
+}
+
+DecrId DecrId::operator--(int) {  // postfix
+    DecrId res(data--);
+    return res;
 }
 }  // namespace Tanks::model

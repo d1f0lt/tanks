@@ -1,34 +1,50 @@
 #ifndef TANKS_TANK_H
 #define TANKS_TANK_H
 
-#include "game_map.h"
+#include "model/game_model_fwd.h"
 #include "movable_entity.h"
 
 namespace Tanks::model {
 class Tank : public MovableEntity {
 public:
-    explicit Tank(int left_,
-                  int top_,
-                  EntityType type_,
-                  Direction direction_,
-                  std::unique_ptr<BasicHandler> handler_);
+    explicit Tank(int left,
+                  int top,
+                  DecrId entityId,
+                  std::unique_ptr<TankHandler> handler,
+                  Direction direction,
+                  int speed,
+                  int reloadTicks,
+                  int bulletSpeed);
 
-    explicit Tank(int left_,
-                  int top_,
-                  EntityType type_,
-                  Direction direction_,
-                  GameModel &model_);
+    [[nodiscard]] int getSpeed() const final;
+    [[nodiscard]] int getReloadTicks() const;
+    [[nodiscard]] int getBulletSpeed() const;
 
-protected:
-    void shoot();
+    [[nodiscard]] bool isShootingThisTick() const;
+    [[nodiscard]] bool hasBonus() const;
+
+private:
+    int speed_ = -1;
+    const int reloadTicks_;
+    const int bulletSpeed_;
 };
 
-class BotTank : public Tank {
+class MediumTank : public Tank {
 public:
-    explicit BotTank(int left_,
-                     int top_,
-                     Direction direction_,
-                     std::unique_ptr<BasicHandler> handler_);
+    explicit MediumTank(int left,
+                        int top,
+                        DecrId entityId,
+                        const TankHandlerCreator &handlerCreator,
+                        Direction direction,
+                        int speed,
+                        int reloadTicks,
+                        int bulletSpeed);
+
+    [[nodiscard]] int getWidth() const override;
+    [[nodiscard]] int getHeight() const override;
+
+    [[nodiscard]] int getStrength() const override;
+    [[nodiscard]] EntityType getType() const override;
 };
 
 }  // namespace Tanks::model

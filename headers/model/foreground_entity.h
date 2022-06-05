@@ -2,34 +2,27 @@
 #define TANKS_FOREGROUND_ENTITY_H
 
 #include <memory>
+#include <unordered_set>
 #include <vector>
 #include "entity.h"
-#include "model/handler.h"
+#include "model/handler_fwd.h"
 
 namespace Tanks::model {
 class ForegroundEntity : public Entity {
     friend ForegroundHandler;
 
 public:
-    ForegroundEntity(int left,
-                     int top,
-                     int width,
-                     int height,
-                     EntityType type,
-                     std::unique_ptr<BasicHandler> handler_);
+    explicit ForegroundEntity(int left,
+                              int top,
+                              int entityId,
+                              std::unique_ptr<ForegroundHandler> handler);
 
     [[nodiscard]] std::vector<const Entity *> look(Direction direction) const;
 
-    [[nodiscard]] std::vector<std::vector<const Entity *>> snapshotBackground()
-        const;
+    [[nodiscard]] std::vector<int> snapshotBackground() const;
 
-protected:
-    void restoreBackground();
-    void setBackground();
-
-protected:
-    std::unique_ptr<BasicHandler> handler;
-    std::vector<std::vector<const Entity *>> background;
+private:
+    std::vector<int> background_;
 };
 
 }  // namespace Tanks::model

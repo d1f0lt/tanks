@@ -10,10 +10,10 @@ namespace Tanks::model {
 class EntityHolder {
 public:
     Entity &insert(std::unique_ptr<Entity> entity);
-    void remove(Entity &entity);
+    void erase(Entity &entity);
 
 private:
-    std::vector<std::unique_ptr<Entity>> buffer;
+    std::vector<std::unique_ptr<Entity>> buffer_;
 };
 }  // namespace Tanks::model
 

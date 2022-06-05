@@ -2,32 +2,27 @@
 #include "model/handler.h"
 
 namespace Tanks::model {
-void MovableEntity::move(Direction dir) {
-    handler->move(dir);
-}
-
-MovableEntity::MovableEntity(int left,
-                             int right,
-                             int width,
-                             int height,
-                             EntityType type,
-                             Direction direction,
-                             int speed,
-                             std::unique_ptr<BasicHandler> handler_)
-    : ForegroundEntity(left, right, width, height, type, std::move(handler_)),
-      direction(direction),
-      speed(speed) {
+void MovableEntity::move(Direction direction, int speed) {
+    dynamic_cast<MovableHandler &>(getHandler()).move(direction, speed);
 }
 
 Direction MovableEntity::getDirection() const {
-    return direction;
+    return direction_;
 }
 
-void MovableEntity::setDirection(Direction dir) {
-    direction = dir;
+void MovableEntity::setDirection(Direction direction) {
+    direction_ = direction;
 }
 
-int MovableEntity::getSpeed() const {
-    return speed;
+MovableEntity::MovableEntity(int left,
+                             int top,
+                             int entityId,
+                             std::unique_ptr<MovableHandler> handler,
+                             Direction direction)
+    : ForegroundEntity(left, top, entityId, std::move(handler)),
+      direction_(direction) {
+}
+std::vector<const Entity *> MovableEntity::look(Direction direction) {
+    return dynamic_cast<MovableHandler &>(getHandler()).look(direction);
 }
 }  // namespace Tanks::model

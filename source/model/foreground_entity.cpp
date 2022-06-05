@@ -1,33 +1,25 @@
 #include "model/foreground_entity.h"
+#include "model/handler.h"
 
 namespace Tanks::model {
+
 ForegroundEntity::ForegroundEntity(int left,
                                    int top,
-                                   int width,
-                                   int height,
-                                   EntityType type_,
-                                   std::unique_ptr<BasicHandler> handler_)
-    : Entity(left, top, width, height, type_),
-      handler(std::move(handler_)),
-      background(height, std::vector<const Entity *>(width, nullptr)) {
-    setBackground();
+                                   int entityId,
+                                   std::unique_ptr<ForegroundHandler> handler)
+    : Entity(left, top, entityId, std::move(handler)) {
+    background_.reserve(16);
 }
 
 std::vector<const Entity *> ForegroundEntity::look(Direction direction) const {
-    return handler->look(direction);
+    return dynamic_cast<MovableHandler &>(getHandler()).look(direction);
 }
 
-void ForegroundEntity::restoreBackground() {
-    handler->restoreBackground();
+std::vector<int> ForegroundEntity::snapshotBackground() const {
+    return dynamic_cast<ForegroundHandler &>(getHandler()).snapshotBackground();
 }
-
-void ForegroundEntity::setBackground() {
-    handler->setBackground();
-}
-
-std::vector<std::vector<const Entity *>> ForegroundEntity::snapshotBackground()
-    const {
-    return background;
-}
+// bool ForegroundEntity::isDieOnCreation() {
+//     return false
+// }
 
 }  // namespace Tanks::model

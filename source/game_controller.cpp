@@ -1,26 +1,41 @@
 #include "game_controller.h"
-#include "player.h"
+#include "sound/shoot_sound.h"
 
 namespace Tanks {
 
 bool GameController::isEscReleased(const sf::Event &event) {
     return (event.type == sf::Event::KeyReleased &&
-            event.key.code == sf::Keyboard::Escape);
+            event.key.code == sf::Keyboard::Escape);  // NOLINT
 }
 
-void GameController::makeMove(Player &player, const double time) {
+void GameController::makeMove(model::PlayerActionsHandler &player,
+                              model::Direction direction) {
+    player.move(direction);
+}
+
+void GameController::makeMove(model::PlayerActionsHandler &player) {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) ||
         sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-        player.updatePosition(Direction::LEFT, time);
+        auto direction = model::Direction::LEFT;
+        makeMove(player, direction);
     } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) ||
                sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-        player.updatePosition(Direction::RIGHT, time);
+        auto direction = model::Direction::RIGHT;
+        makeMove(player, direction);
     } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) ||
                sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
-        player.updatePosition(Direction::DOWN, time);
-    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) ||
-               sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
-        player.updatePosition(Direction::UP, time);
+        auto direction = model::Direction::DOWN;
+        makeMove(player, direction);
+    } else if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Up) ||
+                sf::Keyboard::isKeyPressed(sf::Keyboard::W))) {
+        auto direction = model::Direction::UP;
+        makeMove(player, direction);
+    }
+}
+
+void GameController::makeShot(model::PlayerActionsHandler &player) {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
+        player.shoot();
     }
 }
 

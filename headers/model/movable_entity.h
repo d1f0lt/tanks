@@ -1,7 +1,7 @@
 #ifndef TANKS_MOVABLE_ENTITY_H
 #define TANKS_MOVABLE_ENTITY_H
 
-#include "model/foreground_entity.h"
+#include "foreground_entity.h"
 
 namespace Tanks::model {
 
@@ -10,25 +10,21 @@ public:
     friend MovableHandler;
 
     explicit MovableEntity(int left,
-                           int right,
-                           int width,
-                           int height,
-                           EntityType type,
-                           Direction direction,
-                           int speed,
-                           std::unique_ptr<BasicHandler> handler_);
+                           int top,
+                           int entityId,
+                           std::unique_ptr<MovableHandler> handler,
+                           Direction direction);
 
     [[nodiscard]] Direction getDirection() const;
-    [[nodiscard]] int getSpeed() const;
+    [[nodiscard]] virtual int getSpeed() const = 0;
+    [[nodiscard]] std::vector<const Entity *> look(Direction direction);
 
 protected:
-    void setDirection(Direction dir);
-
-    void move(Direction dir);
+    virtual void setDirection(Direction direction);
+    virtual void move(Direction direction, int speed);
 
 private:
-    Direction direction;
-    int speed = 0;
+    Direction direction_;
 };
 }  // namespace Tanks::model
 
