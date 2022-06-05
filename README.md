@@ -33,7 +33,7 @@ Note: this project supports only Linux and gcc compiler. But feel free to try bu
 
     git clone https://github.com/d1f0lt/tanks
     cd tanks
-    cmake --build .
+    cmake --build . -t tanks
 
 ## How to play
 
