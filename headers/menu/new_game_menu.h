@@ -1,7 +1,7 @@
 #ifndef NEW_GAME_MENU_H
 #define NEW_GAME_MENU_H
 
-#include "menu.h"
+#include "menu/menu.h"
 
 namespace Tanks::Menu {
 

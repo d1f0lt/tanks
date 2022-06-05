@@ -1,7 +1,7 @@
 #ifndef UPGRADE_MENU_H
 #define UPGRADE_MENU_H
 
-#include "menu.h"
+#include "menu/menu.h"
 
 namespace Tanks::Menu {
 

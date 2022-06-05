@@ -1,7 +1,7 @@
 #ifndef SLIDER_BAR_H
 #define SLIDER_BAR_H
 
-#include "menu.h"
+#include "menu/menu.h"
 
 namespace Tanks::Menu {
 

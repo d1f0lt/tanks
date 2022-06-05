@@ -1,7 +1,7 @@
 #ifndef MULTIPLAYER_MENU_H
 #define MULTIPLAYER_MENU_H
 
-#include "menu.h"
+#include "menu/menu.h"
 
 namespace Tanks::Menu {
 

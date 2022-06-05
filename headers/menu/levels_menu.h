@@ -1,7 +1,7 @@
 #ifndef LEVELS_MENU_H
 #define LEVELS_MENU_H
 
-#include "menu.h"
+#include "menu/menu.h"
 
 namespace Tanks::Menu {
 

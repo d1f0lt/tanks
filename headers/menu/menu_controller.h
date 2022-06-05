@@ -2,7 +2,7 @@
 #define CONTROLLER_H
 
 #include <optional>
-#include "menu.h"
+#include "menu/menu.h"
 
 namespace Tanks {
 
