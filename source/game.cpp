@@ -165,6 +165,7 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
                                                addressPort.value().first,
                                                addressPort.value().second));
     }
+    clientSocket.set_option(tcp::no_delay(true));
     sendSkillsTo(clientSocket, skills);
     model::sendInt(clientSocket, skills.lifeAmount);
 

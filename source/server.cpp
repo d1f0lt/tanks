@@ -43,6 +43,8 @@ PlayerSkills receiveFrom(tcp::socket &socket) {
 void Server::listenForNewPlayer() {
     try {
         auto socket = acceptor_.accept();
+        socket.set_option(tcp::no_delay(true));
+
         sockets_.emplace_back(std::move(socket));
         assert(sockets_.size() <= 20);
         PlayerSkills skills = receiveFrom(sockets_.back());
@@ -91,7 +93,10 @@ int Server::getLevel() const {
     std::cout << server.getEndpoint() << std::endl;
     for (int i = 0; i < players; i++) {
         server.listenForNewPlayer();
+        std::cout << i + 1 << ' ' << "connected" << std::endl;
     }
+
+    std::cout << "All connected!" << std::endl;
 
     while (true) {
         server.nextTick();
