@@ -5,6 +5,10 @@
 
 int main(int argc, const char *argv[]) {
     if (argc >= 3 && std::string(argv[1]) == "server") {
+        int level = std::stoi(argv[1]);
+        if (level <= 0 || level >= 4) {
+            return 123;
+        }
         int players = std::stoi(argv[2]);
         int bots = 10;
         int bonuses = 2;
@@ -23,7 +27,7 @@ int main(int argc, const char *argv[]) {
                 return 123;
             }
         }
-        Tanks::createAndRunServer(1, 2, bots, bonuses);
+        Tanks::createAndRunServer(level, players, bots, bonuses);
     }
     static const std::string musicPath = "../sounds/background_music.ogg";
     sf::RenderWindow window(

@@ -133,7 +133,9 @@ std::unique_ptr<ServerHolder> createServer(const std::string levelFilename,
                                           std::move(serverPtr), startServer);
 }
 
-void drawTank(sf::RenderWindow &window, View::TankSpriteHolder &tankView, const model::Entity* entity) {
+void drawTank(sf::RenderWindow &window,
+              View::TankSpriteHolder &tankView,
+              const model::Entity *entity) {
     const auto &tank = dynamic_cast<const model::Tank &>(*entity);
     tankView.draw(window, tank);
 }
