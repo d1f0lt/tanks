@@ -132,6 +132,11 @@ std::unique_ptr<ServerHolder> createServer(const std::string levelFilename,
                                           std::move(serverPtr), startServer);
 }
 
+void drawTank(sf::RenderWindow &window, View::TankSpriteHolder &tankView, const model::Entity* entity) {
+    const auto &tank = dynamic_cast<const model::Tank &>(*entity);
+    tankView.draw(window, tank);
+}
+
 }  // namespace
 
 std::optional<Menu::ButtonType>
@@ -178,12 +183,13 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
     const std::string levelFilename("../levels/level" + std::to_string(level) +
                                     ".csv");
 
-    model::ClientModel model(playerId, skills.lifeAmount,
+    model::ClientModel model(playerId, static_cast<int>(skills.lifeAmount),
                              std::move(clientSocket));
     model.loadLevel(levelFilename);
 
     View::TankSpriteHolder greenTankView(imagesPath + "tanks/green_tank.png");
     View::TankSpriteHolder redTankView(imagesPath + "tanks/red_tank.png");
+    View::TankSpriteHolder blueTankView(imagesPath + "tanks/blue_tank.png");
 
     View::BulletsSpriteHolder bulletsView(imagesPath + "bullet.png");
 
@@ -261,13 +267,14 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
 
         mapView.draw(window, model);
 
+        drawTank(window, greenTankView, &model.getById(playerId).value().get());
+
         const auto &tanks = model.getAll(model::EntityType::MEDIUM_TANK);
         for (const auto *entity : tanks) {
-            const auto &tank = dynamic_cast<const model::Tank &>(*entity);
-            if (playerIds.find(tank.getId()) != playerIds.end()) {
-                greenTankView.draw(window, tank);
-            } else {
-                redTankView.draw(window, tank);
+            if (playerIds.find(entity->getId()) == playerIds.end()) {
+                drawTank(window, redTankView, entity);
+            } else if (entity->getId() != playerId) {
+                drawTank(window, blueTankView, entity);
             }
         }
 
