@@ -1,7 +1,7 @@
 #ifndef PROGRESS_BAR_H
 #define PROGRESS_BAR_H
 
-#include "menu.h"
+#include "menu/menu.h"
 
 namespace Tanks::Menu {
 

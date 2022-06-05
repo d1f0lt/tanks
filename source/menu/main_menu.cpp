@@ -3,7 +3,7 @@
 #include <memory>
 #include <string>
 #include "constants.h"
-#include "menu.h"
+#include "menu/menu.h"
 #include "menu/new_game_menu.h"
 #include "menu/rating_menu.h"
 #include "menu/settings_menu.h"

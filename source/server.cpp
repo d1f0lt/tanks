@@ -1,5 +1,6 @@
 #include "server.h"
 #include <chrono>
+#include <iostream>
 #include <thread>
 #include "model/network_utils.h"
 
@@ -17,6 +18,7 @@ Server::Server(const std::string &levelFilename,
       model_(
           std::make_unique<model::ServerModel>(levelFilename, bots, bonuses)),
       level_(level) {
+    sockets_.reserve(100);
 }
 
 // std::thread Server::start() {
@@ -41,6 +43,8 @@ PlayerSkills receiveFrom(tcp::socket &socket) {
 void Server::listenForNewPlayer() {
     try {
         auto socket = acceptor_.accept();
+        socket.set_option(tcp::no_delay(true));
+
         sockets_.emplace_back(std::move(socket));
         assert(sockets_.size() <= 20);
         PlayerSkills skills = receiveFrom(sockets_.back());
@@ -77,5 +81,26 @@ bool Server::getIsStarted() const {
 
 int Server::getLevel() const {
     return level_;
+}
+
+[[noreturn]] void createAndRunServer(int level,
+                                     int players,
+                                     int bots,
+                                     int bonuses) {
+    const std::string levelFilename("../levels/level" + std::to_string(level) +
+                                    ".csv");
+    Server server(levelFilename, bots, bonuses, level);
+    std::cout << server.getEndpoint() << std::endl;
+    for (int i = 0; i < players; i++) {
+        server.listenForNewPlayer();
+        std::cout << i + 1 << ' ' << "connected" << std::endl;
+    }
+
+    std::cout << "All connected!" << std::endl;
+
+    while (true) {
+        server.nextTick();
+        std::this_thread::sleep_for(std::chrono::milliseconds(15));
+    }
 }
 }  // namespace Tanks

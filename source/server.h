@@ -36,6 +36,11 @@ private:
 
     void work();
 };
+
+[[noreturn]] void createAndRunServer(int level,
+                                     int players,
+                                     int bots = 10,
+                                     int bonuses = 2);
 }  // namespace Tanks
 
 #endif  // TANKS_SERVER_H

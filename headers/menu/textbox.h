@@ -2,7 +2,7 @@
 #define TEXTBOX_H
 
 #include <sstream>
-#include "menu.h"
+#include "menu/menu.h"
 
 namespace Tanks::Menu {
 
