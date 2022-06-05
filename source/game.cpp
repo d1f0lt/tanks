@@ -193,8 +193,9 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
     assert(playerId < 0);
 
     level = model::receiveInt(clientSocket);
-    const auto [splayers, sbots, sbonuses] =
-        model::receiveMultipleInts<int, int, int>(clientSocket);
+    const int splayers = model::receiveInt(clientSocket);
+    const int sbots = model::receiveInt(clientSocket);
+    const int sbonuses = model::receiveInt(clientSocket);
 
     const std::string levelFilename("../levels/level" + std::to_string(level) +
                                     ".csv");
