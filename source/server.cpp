@@ -8,6 +8,7 @@ namespace Tanks {
 using boost::asio::ip::tcp;
 using Menu::PlayerSkills;
 Server::Server(const std::string &levelFilename,
+               int players,
                int bots,
                int bonuses,
                int level)
@@ -17,7 +18,10 @@ Server::Server(const std::string &levelFilename,
       acceptor_(ioContext_, tcp::endpoint(tcp::v4(), 0)),
       model_(
           std::make_unique<model::ServerModel>(levelFilename, bots, bonuses)),
-      level_(level) {
+      level_(level),
+      players_(players),
+      bots_(bots),
+      bonuses_(bonuses) {
     sockets_.reserve(100);
 }
 
@@ -53,6 +57,7 @@ void Server::listenForNewPlayer() {
         int id = model_->addPlayer(sockets_.back(), skills, lives);
         model::sendInt(sockets_.back(), id);
         model::sendInt(sockets_.back(), getLevel());
+        model::sendMultipleInts(sockets_.back(), players_, bots_, bonuses_);
     } catch (boost::system::system_error &) {
     }
 }
@@ -89,7 +94,7 @@ int Server::getLevel() const {
                                      int bonuses) {
     const std::string levelFilename("../levels/level" + std::to_string(level) +
                                     ".csv");
-    Server server(levelFilename, bots, bonuses, level);
+    Server server(levelFilename, players, bots, bonuses, level);
     std::cout << server.getEndpoint() << std::endl;
     for (int i = 0; i < players; i++) {
         server.listenForNewPlayer();

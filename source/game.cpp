@@ -92,7 +92,8 @@ void serverImp(const std::string &filename,
                std::condition_variable &serverOnClientInitiallized) {
     std::condition_variable cv;
     condvarOnClient = &cv;
-    auto serverTmp = std::make_unique<Server>(filename, bots, bonuses, level);
+    auto serverTmp =
+        std::make_unique<Server>(filename, players, bots, bonuses, level);
     serverOnClient = std::move(serverTmp);
     Server *server = serverOnClient.get();
     isServerCreated = true;
@@ -179,6 +180,8 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
     assert(playerId < 0);
 
     level = model::receiveInt(clientSocket);
+    const auto [splayers, sbots, sbonuses] =
+        model::receiveMultipleInts<int, int, int>(clientSocket);
 
     const std::string levelFilename("../levels/level" + std::to_string(level) +
                                     ".csv");
@@ -201,8 +204,8 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
 
     const std::unordered_set<int> playerIds = [&]() -> std::unordered_set<int> {
         std::unordered_set<int> res;
-        for (int i = 0; i < players; i++) {
-            res.insert(-BONUSES - BOTS - 1 - i);
+        for (int i = 0; i < splayers; i++) {
+            res.insert(-sbonuses - sbots - 1 - i);
         }
         return res;
     }();
@@ -239,7 +242,8 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
             } else {
                 model.nextTick();
                 makeAction(player);
-                while (model.getLives() < static_cast<int>(environment.getLivesAmount())) {
+                while (model.getLives() <
+                       static_cast<int>(environment.getLivesAmount())) {
                     environment.destroyLastHeart();
                 }
             }
