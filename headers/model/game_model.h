@@ -30,7 +30,7 @@ class GameModel {
     friend BonusHandler;
 
 public:
-    explicit GameModel() = default;
+    explicit GameModel();
     virtual ~GameModel() = default;
     GameModel(GameModel &&) = delete;
     GameModel(const GameModel &) = delete;
@@ -99,7 +99,7 @@ private:
 
     std::atomic<int> currentTick_ = 0;
     IncrId currentId_{0};
-    std::mt19937 rnd{42};
+    std::mt19937 rnd;
 
     bool wasShootThisTurn_ = false;
     bool wasDestroyedBlockThisTurn_ = false;

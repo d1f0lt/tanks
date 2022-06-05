@@ -14,6 +14,10 @@
 #endif
 
 namespace Tanks::model {
+GameModel::GameModel()
+    : rnd(std::chrono::steady_clock::now().time_since_epoch().count()) {
+}
+
 Entity &GameModel::getByCoords(int col, int row) {
     return map_.getEntityByCoords(col, row);
 }
@@ -228,6 +232,7 @@ void GameModel::setWasShootThisTurn(bool wasShootThisTurn) {
 void GameModel::setWasDestroyedBlockThisTurn(bool wasDestroyedBlockThisTurn) {
     wasDestroyedBlockThisTurn_ = wasDestroyedBlockThisTurn;
 }
+
 void GameModel::setWasTankDestroyed(bool wasTankDestroyed) {
     GameModel::wasTankDestroyed_ = wasTankDestroyed;
 }
