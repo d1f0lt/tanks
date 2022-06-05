@@ -1,0 +1,51 @@
+name: github_ubuntu_compile_run
+on: [ push ]
+jobs:
+  compile-run:
+    runs-on: ${{ matrix.compiler.runs-on }}
+    timeout-minutes: 60
+    strategy:
+      matrix:
+        compiler:
+          - command: g++-10
+            version-flags: --version
+            flags:
+            runs-on: ubuntu-20.04
+            packages: g++-10 gcc-10
+            target:
+          - command: clang++-12
+            version-flags: --version
+            flags: -stdlib=libstdc++
+            packages: clang-12
+            runs-on: ubuntu-20.04
+        #            target:
+        #          - command: clang++-12
+        #            version-flags: --version
+        #            flags: -stdlib=libc++
+        #            runs-on: ubuntu-20.04
+        #            packages: clang-12 libc++-12-dev libc++abi-12-dev
+        #            target: --target model_tests
+        sanitize:
+          # - flags: -fsanitize=undefined  -O2
+          #   run-prefix: valgrind --quiet --error-exitcode=123
+          #   cmake-flags: -DCMAKE_BUILD_TYPE=Debug
+          #   packages: valgrind
+          - flags: -fsanitize=undefined -fno-sanitize-recover=all -fsanitize=address -Og
+            run-prefix:
+            cmake-flags: -DCMAKE_BUILD_TYPE=Debug
+            packages:
+          - flags:
+            run-prefix:
+            cmake-flags: -DCMAKE_BUILD_TYPE=Release
+            packages:
+    steps:
+      - uses: actions/checkout@v3
+      - run: sudo apt-get update && sudo apt-get install cmake make libsfml-dev ninja-build ${{matrix.compiler.packages}} ${{matrix.sanitize.packages}} libboost1.71-all-dev libsqlite3-dev
+      - run: cmake --version
+      - run: ${{matrix.compiler.command}} ${{matrix.compiler.version-flags}}
+      - run: cmake . -DCMAKE_CXX_COMPILER="${{matrix.compiler.command}}" -DEXTRA_CXX_FLAGS="${{matrix.compiler.flags}} ${{matrix.sanitize.flags}}" ${{matrix.compiler.cmake-flags}} ${{matrix.sanitize.cmake-flags}} -GNinja
+      - run: cmake --build . ${{matrix.compiler.cmake-build-flags}} ${{matrix.sanitize.cmake-build-flags}} -t tanks
+      - run: cmake --build . ${{matrix.compiler.cmake-build-flags}} ${{matrix.sanitize.cmake-build-flags}} -t model_tests
+      - working-directory: ./bin
+        run: ${{matrix.sanitize.run-prefix}} ./model_tests
+ 
