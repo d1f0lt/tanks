@@ -7,7 +7,7 @@ int main(int argc, const char *argv[]) {
     if (argc >= 3 && std::string(argv[1]) == "server") {
         int players = std::stoi(argv[2]);
         if (players <= 0) {
-            return 1;
+            return 123;
         }
         Tanks::createAndRunServer(1, 2);
     }
