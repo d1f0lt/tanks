@@ -208,6 +208,8 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
 
     model.nextTick();
 
+    std::cout << "Connected" << std::endl;
+
     //    auto &model = serverPtr.model();
     while (window.isOpen()) {
         // catch event

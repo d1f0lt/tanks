@@ -18,6 +18,7 @@ Server::Server(const std::string &levelFilename,
       model_(
           std::make_unique<model::ServerModel>(levelFilename, bots, bonuses)),
       level_(level) {
+    sockets_.reserve(100);
 }
 
 // std::thread Server::start() {
