@@ -26,7 +26,7 @@ inline constexpr int DEFAULT_RESPAWN_TIME = 10;
 inline constexpr int INFINITE_LIVES = -1;
 inline constexpr int DEFAULT_LIVES_AMOUNT = 3;
 inline constexpr int MAX_LIVES_AMOUNT = 5;
-inline constexpr int MAX_PLAYERS_AMOUNT = 2;
+inline constexpr int MAX_PLAYERS_AMOUNT = 3;
 
 // menu
 inline constexpr int LEVELS_COUNT = 3;

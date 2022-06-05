@@ -271,7 +271,9 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
 
         mapView.draw(window, model);
 
-        drawTank(window, greenTankView, &model.getById(playerId).value().get());
+        if (auto tank = model.getById(playerId); tank != std::nullopt) {
+            drawTank(window, greenTankView, &tank.value().get());
+        }
 
         const auto &tanks = model.getAll(model::EntityType::MEDIUM_TANK);
         for (const auto *entity : tanks) {
