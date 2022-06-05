@@ -19,6 +19,7 @@
 #include "sound/block_destroy_sound.h"
 #include "sound/background_music.h"
 #include "menu/settings_menu.h"
+#include "sound/tank_destroy_sound.h"
 
 
 namespace Tanks {
@@ -216,6 +217,8 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
 
     Tanks::Sound::BlockDestroySoundHolder blockDestroySound(soundsPath + "block_destroy_sound.ogg");
 
+    Tanks::Sound::TankDestroySoundHolder tankDestroySound(soundsPath + "tank_destroy_sound.ogg");
+
     Pause pause;
 
     const std::unordered_set<int> playerIds = [&]() -> std::unordered_set<int> {
@@ -313,6 +316,7 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
 
         shootSound.play(static_cast<float>(volume), model.getHandler());
         blockDestroySound.play(static_cast<float>(volume), model.getHandler());
+        tankDestroySound.play(static_cast<float>(volume), model.getHandler());
 
         if (pause.isPause()) {
             pause.drawPause(window);
