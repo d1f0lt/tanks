@@ -9,6 +9,7 @@ using boost::asio::ip::tcp;
 class Server {
 public:
     explicit Server(const std::string &levelFilename,
+                    int players,
                     int bots,
                     int bonuses,
                     int level);
@@ -33,6 +34,9 @@ private:
     std::vector<tcp::socket> sockets_;
     std::unique_ptr<model::ServerModel> model_;
     const int level_;
+    const int players_;
+    const int bots_;
+    const int bonuses_;
 
     void work();
 };
