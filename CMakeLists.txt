@@ -91,6 +91,7 @@ add_executable(
         source/view/game_view.cpp
         source/view/tank_view.cpp
         source/view/bullets_view.cpp
+        source/view/bonus_view.cpp
         source/sound/shoot_sound.cpp
         source/sound/background_music.cpp
         source/model/blocks.cpp

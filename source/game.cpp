@@ -15,6 +15,7 @@
 #include "view/bullets_view.h"
 #include "view/game_view.h"
 #include "view/tank_view.h"
+#include "view/bonus_view.h"
 
 namespace Tanks {
 using boost::asio::ip::tcp;
@@ -196,6 +197,8 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
     View::TankSpriteHolder redTankView(imagesPath + "tanks/red_tank.png");
     View::TankSpriteHolder blueTankView(imagesPath + "tanks/blue_tank.png");
 
+    View::BonusView bonusView(imagesPath + "droplet.png");
+
     View::BulletsSpriteHolder bulletsView(imagesPath + "bullet.png");
 
     View::Map mapView(imagesPath + "map.png", level);
@@ -284,6 +287,11 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
             } else if (entity->getId() != playerId) {
                 drawTank(window, blueTankView, entity);
             }
+        }
+
+        const auto bonuses = model.getAll(model::EntityType::WALK_ON_WATER_BONUS);
+        for (const auto *entity : bonuses) {
+            bonusView.draw(window, dynamic_cast<const model::WalkOnWater *>(entity));
         }
 
         const auto &bullets = model.getAll(model::EntityType::BULLET);
