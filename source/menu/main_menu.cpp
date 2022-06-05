@@ -53,8 +53,6 @@ Menu initMenu(const std::string &imagesPath, PlayerGeneral &playersInfo) {
     menu.addIconToLeftUpCorner(imagesPath + "users.png", ButtonType::USERS);
     menu.addPlayerInfo(playersInfo);
 
-    menu.flyAwayToRight();
-
     return menu;
 }
 
@@ -67,6 +65,8 @@ void showMainMenu(sf::RenderWindow &window,
     const static std::string imagesPath = "../images/menu/";
 
     Menu menu(initMenu(imagesPath, info.general));
+
+    menu.flyAwayToRight();
 
     //    const static std::string soundsPath = "../sounds/";
     //    Sound::BackgroundMusicHolder music(soundsPath +
@@ -82,6 +82,7 @@ void showMainMenu(sf::RenderWindow &window,
                 menu.flyAwayToLeft(window, backgroundSprite);
                 showNewGameMenu(window, backgroundSprite, info, backgroundMusicHolder);
                 menu = initMenu(imagesPath, info.general);
+                menu.flyAwayToLeft();
                 menu.flyOutFromLeft(window, backgroundSprite);
             } break;
             case ButtonType::EXIT:
