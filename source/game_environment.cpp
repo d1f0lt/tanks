@@ -126,6 +126,10 @@ void Lives::setPosition() {
     }
 }
 
+size_t Lives::getLivesAmount() const {
+    return livesAmount
+}
+
 void Lives::draw(sf::RenderWindow &window) const {
     for (const auto &sprite : sprites) {
         window.draw(sprite);
@@ -143,6 +147,10 @@ Environment::Environment(const std::string &path, size_t lifeAmount)
 
 void Environment::destroyLastHeart() {
     lives.destroyLastHeart();
+}
+
+size_t Environment::getLivesAmount() const {
+    return lives.getLivesAmount();
 }
 
 void Environment::draw(sf::RenderWindow &window, bool isPause) const {

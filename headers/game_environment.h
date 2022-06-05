@@ -32,6 +32,8 @@ public:
 
     void destroyLastHeart();
 
+    size_t getLivesAmount() const;
+
     void draw(sf::RenderWindow &window) const;
 
 private:
@@ -49,6 +51,8 @@ public:
     explicit Environment(const std::string &path, size_t lifeAmount);
 
     void destroyLastHeart();
+
+    size_t getLivesAmount() const;
 
     void draw(sf::RenderWindow &window, bool isPause) const;
 

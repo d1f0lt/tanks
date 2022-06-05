@@ -233,6 +233,9 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
             } else {
                 model.nextTick();
                 makeAction(player);
+                while (model.getLives() < static_cast<int>(environment.getLivesAmount())) {
+                    environment.destroyLastHeart();
+                }
             }
         } else {
             if (auto signal =
