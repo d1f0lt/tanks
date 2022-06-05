@@ -1,18 +1,18 @@
 # Just Tanks
 
-Just tanks is a free and opensource multiplayer game. Your goal is to destroy the opponent's tanks and not be destroyed
+Just tanks is a free and opensource multiplayer arcade game inspired by "Battle City". Your goal is to destroy the opponent's tanks and not be destroyed
 by them. You can choose either a multiplayer to play with up to 10 friends or single-player to improve your
 skills with relaxing game against bots. Get money for your wins and use them to transform your little tank into
 the war machine.
 
 ## Controls
 
-* W --- move up
-* A --- move left
-* S --- move down
-* D --- move right
-* SPACE --- make a shot
-* ESC --- to pause game
+* W &ndash; move up
+* A &ndash; move left
+* S &ndash; move down
+* D &ndash; move right
+* SPACE &ndash; make a shot
+* ESC &ndash; to pause game
 
 You can also use the arrow keys on your keyboard to move.
 
