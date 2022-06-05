@@ -4,8 +4,12 @@
 #include "sound/background_music.h"
 
 int main(int argc, const char *argv[]) {
-    if (argc >= 2 && std::string(argv[1]) == "server") {
-        Tanks::createAndRunServer(1, 1);
+    if (argc >= 3 && std::string(argv[1]) == "server") {
+        int players = std::stoi(argv[2]);
+        if (players <= 0) {
+            return;
+        }
+        Tanks::createAndRunServer(1, 2);
     }
     static const std::string musicPath = "../sounds/background_music.ogg";
     sf::RenderWindow window(

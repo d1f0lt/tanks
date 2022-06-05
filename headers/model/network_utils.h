@@ -8,7 +8,7 @@
 namespace Tanks::model {
 using boost::asio::buffer;
 using boost::asio::ip::tcp;
-using transferIntType = std::int32_t;
+using transferIntType = std::int16_t;
 
 template <typename T>
 void sendInt(tcp::socket &socket, T value) {

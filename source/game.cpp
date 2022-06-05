@@ -193,10 +193,10 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
 
     Pause pause;
 
-    const std::vector<int> playerIds = [&]() -> std::vector<int> {
-        std::vector<int> res(players);
+    const std::unordered_set<int> playerIds = [&]() -> std::unordered_set<int> {
+        std::unordered_set<int> res;
         for (int i = 0; i < players; i++) {
-            res[i] = -BONUSES - BOTS - 1 - i;
+            res.insert(-BONUSES - BOTS - 1 - i);
         }
         return res;
     }();
