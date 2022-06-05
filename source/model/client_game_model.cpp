@@ -118,5 +118,9 @@ void ClientModel::eraseEntity(Entity &entity) {
 int ClientModel::getLives() const {
     return playerLives_;
 }
+
+int ClientModel::getKills() const {
+    return kills_;
+}
 // namespace Tanks::model
 }  // namespace Tanks::model

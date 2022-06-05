@@ -5,6 +5,7 @@
 #include <thread>
 #include "model/game_model.h"
 #include "model/player_action_handler.h"
+#include "model/projectile.h"
 #include "model/thread_safe_queue.h"
 #include "player_skills.h"
 
@@ -13,6 +14,8 @@ using boost::asio::ip::tcp;
 using Menu::PlayerSkills;
 
 class ClientModel : public GameModel {
+    friend ProjectileHandler;
+
 public:
     explicit ClientModel(int playerId, int lives, tcp::socket socket);
     ~ClientModel() noexcept override;
@@ -26,6 +29,8 @@ public:
     void finishGame() noexcept override;
     void nextTick() override;
 
+    [[nodiscard]] int getKills() const;
+
 protected:
     void eraseEntity(Entity &entity) override;
     void receiveEvents();
@@ -37,6 +42,7 @@ private:
     const int playerId_;
     int playerLives_;
     tcp::socket socket_;
+    int kills_ = 0;
 
     SafeQueue<std::unique_ptr<Event>> events_;
     SafeQueue<int> tickSize_;
