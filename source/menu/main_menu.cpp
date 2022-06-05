@@ -60,7 +60,8 @@ Menu initMenu(const std::string &imagesPath, PlayerGeneral &playersInfo) {
 
 void showMainMenu(sf::RenderWindow &window,
                   const sf::Sprite &backgroundSprite,
-                  PlayerInfo &info) {
+                  PlayerInfo &info,
+                  Sound::BackgroundMusicHolder &backgroundMusicHolder) {
     const static std::string imagesPath = "../images/menu/";
 
     Menu menu(initMenu(imagesPath, info.general));
@@ -79,7 +80,7 @@ void showMainMenu(sf::RenderWindow &window,
         switch (res->getType()) {
             case ButtonType::NEW_GAME: {
                 menu.flyAwayToLeft(window, backgroundSprite);
-                showNewGameMenu(window, backgroundSprite, info);
+                showNewGameMenu(window, backgroundSprite, info, backgroundMusicHolder);
                 menu.flyOutFromLeft(window, backgroundSprite);
             } break;
             case ButtonType::EXIT:
@@ -97,10 +98,11 @@ void showMainMenu(sf::RenderWindow &window,
                 break;
             case ButtonType::SETTINGS:
                 menu.flyAwayToLeft(window, backgroundSprite);
-                showSettingsMenu(window, backgroundSprite, info);
+                showSettingsMenu(window, backgroundSprite, info, backgroundMusicHolder);
                 menu = initMenu(imagesPath, info.general);
                 menu.flyAwayToLeft();
                 menu.flyOutFromLeft(window, backgroundSprite);
+                backgroundMusicHolder.setVolume(static_cast<float>(info.settings.musicVolume));
                 break;
             case ButtonType::RATING:
                 menu.flyAwayToLeft(window, backgroundSprite);

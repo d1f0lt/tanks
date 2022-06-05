@@ -1,9 +1,10 @@
 #include "menu/settings_menu.h"
 #include <cassert>
+#include "menu/slider_bar.h"
+#include "sound/background_music.h"
 #include <cmath>
 #include <iostream>
 #include "menu/menu_controller.h"
-#include "menu/slider_bar.h"
 
 namespace Tanks::Menu {
 
@@ -62,8 +63,9 @@ Menu initMenu(PlayerInfo &info, const std::string &imagesPath) {
 }  // namespace
 
 void showSettingsMenu(sf::RenderWindow &window,
-                      const sf::Sprite &backgroundSprite,
-                      PlayerInfo &info) {
+                     const sf::Sprite &backgroundSprite,
+                     PlayerInfo &info,
+                     Sound::BackgroundMusicHolder &backgroundMusicHolder) {
     const static std::string imagesPath = "../images/menu/";
 
     Menu menu(initMenu(info, imagesPath));
@@ -80,6 +82,7 @@ void showSettingsMenu(sf::RenderWindow &window,
         }
 
         Tanks::MenuController::sliderMove(menu, window, info.settings);
+        backgroundMusicHolder.setVolume(static_cast<float>(info.settings.musicVolume));
 
         if (const auto res =
                 Tanks::MenuController::control(menu, window, event);

@@ -3,15 +3,18 @@
 
 #include <SFML/Audio.hpp>
 #include <vector>
+#include <string>
 #include "model/entity.h"
+#include "model/player_action_handler.h"
 
 namespace Tanks::Sound {
+
+using model::PlayerActionsHandler;
 
 struct ShootSoundHolder final {
     ShootSoundHolder(const std::string &filename);
 
-    void play(float volume_level,
-              const std::vector<const model::Entity *> &bullets);
+    void play(float volume_level, const PlayerActionsHandler &playerActionsHandler);
 
 private:
     sf::SoundBuffer buffer;
