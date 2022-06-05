@@ -10,17 +10,9 @@ message("CMake runtime output directory: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-SET(GCC_WARNINGS "-Wall -Wextra -pthread")
-#SET(SANITIZERS "-fsanitize=address,undefined,leak,vptr,enum,null,shift,vla-bound")
-#SET(SANITIZERS "-fsanitize=undefined")
-#SET(SANITIZERS "-fsanitize=address,undefined,leak,vptr,enum,null,shift,vla-bound")
-#SET(SANITIZERS "-fsanitize=address,undefined,leak,vptr")
-#SET(SANITIZERS "-fsanitize=address,undefined")
-#SET(GCC_OPTIMIZE "-ggdb -g3 -ftrapv -D_GLIBCXX_DEBUG") # Latest is integer overflow protection
-#SET(GCC_OPTIMIZE "-ggdb -g3 -Og -DMODEL_LOGS")# Latest is integer overflow protection
-#SET(GCC_OPTIMIZE "-O2 -mtune=native") # RELEASE
-SET(GCC_OPTIMIZE "-O2 -DNDEBUG ") # RELEASE
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_WARNINGS} ${SANITIZERS} ${GCC_OPTIMIZE}")
+SET(PTHREAD "-pthread")
+SET(GCC_OPTIMIZE "-O2") 
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${PTHREAD} ${GCC_OPTIMIZE}")
 
 find_package(SFML 2.5 COMPONENTS graphics audio REQUIRED)
 find_package(SQLite3 REQUIRED)
