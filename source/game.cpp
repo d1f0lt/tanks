@@ -150,6 +150,8 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
     boost::asio::io_context ioContext;
     boost::asio::ip::tcp::resolver resolver(ioContext);
     tcp::socket clientSocket(ioContext);
+    clientSocket.open(tcp::v4());
+    clientSocket.set_option(tcp::no_delay(true));
     tcp::endpoint endpoint;
 
     std::unique_ptr<ServerHolder> serverHolder = nullptr;
@@ -165,7 +167,6 @@ startGame(  // NOLINT(readability-function-cognitive-complexity)
                                                addressPort.value().first,
                                                addressPort.value().second));
     }
-    clientSocket.set_option(tcp::no_delay(true));
     sendSkillsTo(clientSocket, skills);
     model::sendInt(clientSocket, skills.lifeAmount);
 
