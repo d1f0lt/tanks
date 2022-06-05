@@ -5,6 +5,7 @@
 #include <unordered_set>
 #include "model/blocks.h"
 #include "model/bonus.h"
+#include "model/client_game_model.h"
 #include "model/projectile.h"
 #include "model/tank.h"
 
@@ -311,6 +312,10 @@ void ProjectileHandler::destroy(Entity &other) {
     if (other.getStrength() > getEntity().getStrength() ||
         other.getStrength() == 0) {
         return;
+    }
+
+    if (auto *model = dynamic_cast<ClientModel *>(&getModel())) {
+        model->kills_++;
     }
 
     getModel().getHandler(other).destroyEntity();

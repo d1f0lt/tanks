@@ -81,6 +81,8 @@ void showMainMenu(sf::RenderWindow &window,
             case ButtonType::NEW_GAME: {
                 menu.flyAwayToLeft(window, backgroundSprite);
                 showNewGameMenu(window, backgroundSprite, info, backgroundMusicHolder);
+                menu = initMenu(imagesPath, info.general);
+                menu.flyAwayToLeft();
                 menu.flyOutFromLeft(window, backgroundSprite);
             } break;
             case ButtonType::EXIT:
